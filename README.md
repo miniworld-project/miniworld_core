@@ -32,4 +32,5 @@ Do not hesitate to contact us!
 
 ## Demo
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/j6D-43Tso04?list=PLU2J7CyV0Bom-gBxH_NdKPX8jfrQDtS5v" frameborder="0" allowfullscreen></iframe>
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/j6D-43Tso04/0.jpg)](https://www.youtube.com/embed/j6D-43Tso04?list=PLU2J7CyV0Bom-gBxH_NdKPX8jfrQDtS5v)
+
