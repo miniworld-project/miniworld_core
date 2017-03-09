@@ -1,0 +1,154 @@
+{
+  // scenario name has to be unique!
+  "scenario" : "scenario name",
+  "cnt_nodes" : 5,
+
+  // can be used in node_details config too!
+  // arma, RandomWalk, MoveOnBigStreets
+  "walk_model" : {
+   "name" : "arma",
+    // arma specific
+    "filepath" : "somepath"
+  },
+
+  "provisioning" : {
+    "image": "images/openwrt-x86-kvm_guest-combined-ext4-batman-adv.img",
+    "parallel" : true,
+
+    // TODO: implement auto-login service?
+//    "login" : {
+//      "user" : "",
+//      "pw" : ""
+//    },
+    // "selectors" vs "pexpect"
+    "boot_mode" : "selectors",
+    // use re.escape for pure strings!
+    "regex_shell_prompt" : "(.*)root@OpenWrt.*[#]?",
+    "regex_boot_completed" : "procd: - init complete -.*",
+    "shell" : {
+      "pre_network_start" : {
+        // file is prefered over direct commands
+        "shell_cmd_file_path" : null,
+        // shell commands are appended to commands of the file (if given)
+        "shell_cmds" : [""]
+      },
+      "post_network_start" : {
+        // file is prefered over direct commands
+        "shell_cmd_file_path" : null,
+        // shell commands are appended to commands of the file (if given)
+        "shell_cmds" : [""]
+      }
+    }
+  },
+  "qemu" : {
+    "ram" : "32M",
+    "qemu_user_addition": "-hdb stick.img",
+    "nic" : {
+      "model" : "e1000"
+    }
+  },
+
+
+  // network topology
+  "network" : {
+    // vde, bridged
+    "backend" : {
+      "name" : "bridged",
+
+      // bridged backend
+      // "single" or "multi"
+      "connection_mode": "single",
+      "execution_mode" : {
+       // "iproute" or "pyroute2" or "brctl"
+        "name" : "iproute2",
+        "parallel" : false,
+        // use batch mode of ip and tc, otherwise execute
+        "batch" : false,
+      // execute commands in one shell call: "sh -c cmd_1; ...; cmd_n"
+        "one_shell_call" : false
+      },
+      "event_hook_script" : "path to event script",
+      // vlan vs vxlan vs gretap
+      "distributed_mode" : "gretap",
+      // dict of ip adresses for tunnel endpoints
+      "tunnel_endpoints" : {},
+
+      // vde backend
+      "num_ports" : null
+
+    },
+    "links" : {
+      // "miniworld.model.network.linkqualitymodels.LinkQualityModelRange.LinkQualityModelRange"
+      "model" : "miniworld.model.network.linkqualitymodels.LinkQualityModelRange.LinkQualityModelWiFi",
+
+      "configuration" : {
+        "auto_ipv4" : true,
+
+        "connectivity_check" : {
+          "enabled" : true,
+          "timeout" : 60
+        },
+        "ip_provisioner" : {
+          // same_subnet, p2p
+          //"name" : "same_subnet",
+          "base_network_cidr" : "10.0.0.0/8",
+          "prefixlen" : 16
+        },
+        "nic_prefix" : "eth"
+      },
+      "interfaces" : ["mesh", "hubwifi"],
+      // bandwidth in kbit/s
+     "bandwidth": 55296000
+    },
+    // CORE Mobility Pattern
+    // path to a Core XML file (used to create the initial network topology => which nodes are connected to each other)
+    // Use core scenario config files to create the network topology
+    // The keys are the seconds a scenario lasts
+    // The values the paths to the scenario configs
+    "core" : {
+      "topologies" : [
+        [10, "MiniWorld_Images/examples/core_scenarios/no_network.xml"],
+        // pairwise
+        [10, "MiniWorld_Images/examples/core_scenarios/chain_4.xml"],
+        // no nodes are connected
+        [10, "MiniWorld_Images/examples/core_scenarios/no_network.xml"],
+        // circlewise
+        [10, "MiniWorld_Images/examples/core_scenarios/circle.xml"]
+        ],
+      "loop" : false,
+      // "lan" vs "wifi"
+      "mode" : "wifi"
+      }
+    // custom topology definition?
+//    "cloud1" : {
+//      "router" : "1@ap1",
+//      "participants" : ["1", "2"]
+//    },
+//    "bridges" : [["cloud1", "cloud2"]]
+//
+  },
+
+  // filled by the server
+  "distributed" : {
+    "node_id_mapping" : {},
+    // list of the node ids that are maintained by this server
+    "server_id" : 0
+  },
+
+  // customize nodes ...
+  "node_details": {
+    "1": {
+      "walk_model": "arma",
+      "interfaces" : ["mesh", "ap", "mesh"], // => 1@mesh1, 1@ap1, 1@mesh2
+      "provisioning" : {
+        "shell_cmds" : [""],
+        // must hold otherwise the scenario refuses to start
+        "shell_post_condition" : ""
+      },
+      "qemu" : {
+       "qemu_user_addition": "-hdb /tmp/arma/1medic.img"
+      }
+    }
+  }
+
+}
