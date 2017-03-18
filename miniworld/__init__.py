@@ -21,6 +21,12 @@ __author__ = 'Nils Schmidt'
 
 def init(do_init_singletons=True):
     ''' Init the module by installing signal handlers and creating the temp files '''
+    
+    if not os.path.exists(PATH_GLOBAL_CONFIG):
+        # TODO: render config.json from config sleeve
+        log.info('creating config ...')
+        shutil.copy2('sample_configs/config.json', '.')
+
     # TODO: Ticket #2
     install_signal_handlers()
     set_global_config(PATH_GLOBAL_CONFIG)
