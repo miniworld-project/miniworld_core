@@ -1,16 +1,35 @@
+import gzip
 import json
-import os
-import tempfile
-
 import subprocess
-
-import pytest
 import sys
+import tempfile
+import urllib2
+from StringIO import StringIO
+
+import os
+import pytest
 
 devnull = open(os.devnull, "w")
+image_path = None
+
+
+def get_openwrt_image():
+    image_url = 'https://downloads.openwrt.org/chaos_calmer/15.05.1/x86/kvm_guest/openwrt-15.05.1-x86-kvm_guest-combined-ext4.img.gz'
+    image_name = os.path.basename(image_url)
+    global image_path
+    image_path = os.path.join(tempfile.gettempdir(), image_name)
+    if not os.path.exists(image_path):
+        print('downloading {} to {}'.format(image_url, image_path))
+        data = StringIO(urllib2.urlopen(image_url).read())
+        gzip_data = gzip.GzipFile(fileobj=data)
+        with open(image_path, 'w') as f:
+            f.write(gzip_data.read())
 
 
 class Runner(object):
+    def __init__(self):
+        get_openwrt_image()
+
     def start_scenario(self, scenario):
         '''
 
@@ -32,6 +51,10 @@ class Runner(object):
     def check_for_errors(self):
         subprocess.check_call(['./mw.py', 'ping'])
 
+    @property
+    def image_path(self):
+        return image_path
+
 
 @pytest.fixture
 def runner():
@@ -51,8 +74,12 @@ def server(runner):
     # check for rpc errors
     runner.check_for_errors()
 
+    # shut down gracefully
     server_proc.kill()
-    subprocess.Popen(['./cleanup.sh'], stdout=devnull, stderr=devnull)
+    try:
+        subprocess.Popen(['./cleanup.sh'], stdout=devnull, stderr=devnull)
+    except subprocess.CalledProcessError:
+        pass
     sys.stderr.write('server stopped\n')
 
 

@@ -8,7 +8,7 @@ def test_boot(server, runner):
         "scenario": "acceptance_boot",
         "cnt_nodes": 1,
         "provisioning": {
-            "image": os.path.abspath("tests/acceptance/openwrt-15.05.1-x86-kvm_guest-combined-ext4.img"),
+            "image": runner.image_path,
             "regex_shell_prompt": "root@OpenWrt:/#"
         }
     }
@@ -20,7 +20,7 @@ def test_snapshot_boot(server, runner):
         "scenario": "acceptance_boot",
         "cnt_nodes": 1,
         "provisioning": {
-            "image": os.path.abspath("tests/acceptance/openwrt-15.05.1-x86-kvm_guest-combined-ext4.img"),
+            "image": runner.image_path,
             "regex_shell_prompt": "root@OpenWrt:/#"
         }
     }
@@ -35,7 +35,7 @@ def test_shell_provisioning(server, runner):
         "scenario": "acceptance_boot",
         "cnt_nodes": 1,
         "provisioning": {
-            "image": os.path.abspath("tests/acceptance/openwrt-15.05.1-x86-kvm_guest-combined-ext4.img"),
+            "image": runner.image_path,
             "regex_shell_prompt": "root@OpenWrt:/#"
         },
         "shell": {
