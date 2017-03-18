@@ -73,12 +73,23 @@ def server(runner):
 
     # check for rpc errors
     runner.check_for_errors()
-
     # shut down gracefully
     server_proc.kill()
+
+    # def hard_shutdown():
+    #     if not server_proc.poll() is not None:
+    #         print('graceful shutdown did not succeed')
+    #         server_proc.send_signal(signal.SIGKILL)
+    #         signal.alarm(0)
+    #
+    #         assert False
+    #
+    # signal.signal(signal.SIGALRM, hard_shutdown)
+    # signal.alarm(5)
+    # server_proc.wait()
+
     try:
         subprocess.Popen(['./cleanup.sh'], stdout=devnull, stderr=devnull)
-    except subprocess.CalledProcessError:
     except:
         pass
     sys.stderr.write('server stopped\n')
