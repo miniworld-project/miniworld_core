@@ -79,6 +79,7 @@ def server(runner):
     try:
         subprocess.Popen(['./cleanup.sh'], stdout=devnull, stderr=devnull)
     except subprocess.CalledProcessError:
+    except:
         pass
     sys.stderr.write('server stopped\n')
 
