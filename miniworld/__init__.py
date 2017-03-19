@@ -29,7 +29,7 @@ def init(do_init_singletons=True):
 
     # TODO: Ticket #2
     install_signal_handlers()
-    set_global_config(PATH_GLOBAL_CONFIG)
+    set_global_config(os.getenv('CONFIG') or PATH_GLOBAL_CONFIG)
     set_log_level(config.get_log_level())
 
     clean_miniworld_dir()
