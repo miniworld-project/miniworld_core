@@ -1,41 +1,51 @@
-import os
-
 import subprocess
 
 
-def test_boot(server, runner):
+def test_boot(image_path, runner):
     scenario = {
         "scenario": "acceptance_boot",
+        "walk_model": {
+            "name": "core"
+        },
         "cnt_nodes": 1,
         "provisioning": {
-            "image": runner.image_path,
+            "image": image_path,
             "regex_shell_prompt": "root@OpenWrt:/#"
         }
     }
-    runner.start_scenario(scenario)
+
+    with runner() as r:
+        r.start_scenario(scenario)
 
 
-def test_snapshot_boot(server, runner):
+def test_snapshot_boot(image_path, runner):
     scenario = {
         "scenario": "acceptance_boot",
         "cnt_nodes": 1,
+        "walk_model": {
+            "name": "core"
+        },
         "provisioning": {
-            "image": runner.image_path,
+            "image": image_path,
             "regex_shell_prompt": "root@OpenWrt:/#"
         }
     }
-    runner.start_scenario(scenario)
-    runner.check_for_errors()
-    subprocess.check_call(['./mw.py', 'stop'])
-    runner.start_scenario(scenario)
+    with runner() as r:
+        r.start_scenario(scenario)
+        r.check_for_errors()
+        subprocess.check_call(['./mw.py', 'stop'])
+        r.start_scenario(scenario)
 
 
-def test_shell_provisioning(server, runner):
+def test_shell_provisioning(image_path, runner):
     scenario = {
         "scenario": "acceptance_boot",
         "cnt_nodes": 1,
+        "walk_model": {
+            "name": "core"
+        },
         "provisioning": {
-            "image": runner.image_path,
+            "image": image_path,
             "regex_shell_prompt": "root@OpenWrt:/#"
         },
         "shell": {
@@ -46,24 +56,20 @@ def test_shell_provisioning(server, runner):
             }
         }
     }
-    runner.start_scenario(scenario)
+    with runner() as r:
+        r.start_scenario(scenario)
 
-
-# def test_network_switching(server):
+# def test_address_configurator(runner):
 #     pass
 #
 #
-# def test_address_configurator(server):
+# def test_network_checking(runner):
 #     pass
 #
 #
-# def test_network_checking(server):
+# def test_wifi_network_backend(runner):
 #     pass
 #
 #
-# def test_wifi_network_backend(server):
-#     pass
-#
-#
-# def test_link_quality_models(server):
+# def test_link_quality_models(runner):
 #     pass
