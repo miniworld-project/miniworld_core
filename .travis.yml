@@ -15,9 +15,6 @@ install:
     - make
     - sudo make install
     - popd
-    - git clone https://github.com/miniworld-project/miniworld_core.git 
-    - pushd miniworld_core
-    - git checkout testing
     - sudo bash -c "source /home/travis/virtualenv/python2.7/bin/activate && pip install -r requirements.txt"
 language: python
 script: 
