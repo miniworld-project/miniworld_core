@@ -34,3 +34,7 @@ Do not hesitate to contact us!
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/j6D-43Tso04/0.jpg)](https://youtu.be/j6D-43Tso04?list=PLU2J7CyV0Bom-gBxH_NdKPX8jfrQDtS5v)
 
+## Documentation
+
+The documentation is hosted on [readthedocs](http://miniworld-core.readthedocs.io/en/nightly/).
+Until the documentation is fully ready, please use the nightly branch.
