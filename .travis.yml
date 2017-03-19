@@ -21,4 +21,4 @@ script:
     - pushd ~/build/miniworld-project/miniworld_core
     - uname -a
     - pwd
-    - sudo bash -c "source /home/travis/virtualenv/python2.7/bin/activate && pytest -s tests/acceptance"
+    - sudo bash -c "source /home/travis/virtualenv/python2.7/bin/activate && PYTHONPATH=$PWD pytest -s tests/acceptance"
