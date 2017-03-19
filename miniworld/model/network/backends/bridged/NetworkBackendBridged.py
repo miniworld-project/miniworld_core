@@ -402,24 +402,6 @@ def NetworkBackendBridged():
 
     return NetworkBackendBridged
 
-    # def __new__(cls, *args, **kwargs):
-    #
-    #     # from miniworld.model.network.backends.bridged.multidevice.NetworkBackendBridgedMultiDevice import \
-    #     #     NetworkBackendBridgedMultiDevice
-    #     # from miniworld.model.network.backends.bridged.singledevice.NetworkBackendBridgedSingleDevice import \
-    #     #     NetworkBackendBridgedSingleDevice
-    #     #
-    #     # if scenario_config.is_connection_mode_single():
-    #     #     return NetworkBackendBridgedSingleDevice
-    #     # elif scenario_config.is_connection_mode_multi():
-    #     #     return NetworkBackendBridgedMultiDevice
-    #     # else:
-    #     #     raise ValueError("NetworkBackend connection mode not set!")
-    #
-    #     class custom(cls, get_mixin_class()):
-    #         pass
-    #
-    #     return custom(*args, **kwargs)
 
 if __name__ == '__main__':
     from collections import defaultdict
