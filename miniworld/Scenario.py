@@ -168,7 +168,7 @@ class ScenarioConfig(JSONConfig.JSONConfig):
         return int(self.get_qemu_memory().split("M")[0])
 
 
-    @customizable_attrs("qemu", "nic", "model", default = "e1000",
+    @customizable_attrs("qemu", "nic", "model", default = "virtio-net-pci",
                         expected=miniworld.ScenarioConstants.get_nic_models())
     def get_qemu_nic(self):
         pass
@@ -255,7 +255,9 @@ class ScenarioConfig(JSONConfig.JSONConfig):
     def get_network_backend_bridged_connection_mode(self):
         pass
 
-    @customizable_attrs("network", "backend", "execution_mode", "name", default="iproute2", expected=["iproute2", "pyroute2", "brctl"])
+    EXECUTION_MODES = ["iproute2", "pyroute2", "brctl"]
+
+    @customizable_attrs("network", "backend", "execution_mode", "name", default="iproute2", expected=EXECUTION_MODES)
     def get_network_backend_bridged_execution_mode(self):
         pass
 
