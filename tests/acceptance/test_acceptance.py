@@ -4,9 +4,6 @@ import subprocess
 def test_boot(image_path, runner):
     scenario = {
         "scenario": "acceptance_boot",
-        "walk_model": {
-            "name": "core"
-        },
         "cnt_nodes": 1,
         "provisioning": {
             "image": image_path,
@@ -22,9 +19,6 @@ def test_snapshot_boot(image_path, runner):
     scenario = {
         "scenario": "acceptance_boot",
         "cnt_nodes": 1,
-        "walk_model": {
-            "name": "core"
-        },
         "provisioning": {
             "image": image_path,
             "regex_shell_prompt": "root@OpenWrt:/#"
@@ -41,9 +35,6 @@ def test_shell_provisioning(image_path, runner):
     scenario = {
         "scenario": "acceptance_boot",
         "cnt_nodes": 1,
-        "walk_model": {
-            "name": "core"
-        },
         "provisioning": {
             "image": image_path,
             "regex_shell_prompt": "root@OpenWrt:/#"
