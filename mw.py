@@ -2,77 +2,16 @@
 
 import argparse
 import json
-import xmlrpclib
 import sys
+import xmlrpclib
 
 from miniworld import Constants, Config
-from miniworld.Scenario import scenario_config
-from miniworld.management.events import CLIEventDisplay
+from miniworld.Config import config
+from miniworld.log import log
 from miniworld.rpc import RPCUtil
 from miniworld.util import CliUtil
 from miniworld.util.CliUtil import rpc_parser
-from miniworld.log import log
-from miniworld.Config import config
 
-'''
-mw start -cs <json> -cc <json> <scenario_config>
-
-
-./mw ping
-"pong"
-
-./mw.py info addr
-{
-    "1": "172.17.0.1",
-    "2": "172.17.0.3"
-}
-
- ./mw.py info addr --node-id 1
-"172.17.0.1"
-
-./mw.py info server
-{
-    "1": [
-        1,
-        2,
-        5
-    ],
-    "2": [
-        3,
-        4
-    ]
-}
-
-./mw.py info server --node-id 3
-2
-
-
-mw info connections --include-interfaces
-
-mw info links
-mw info scenario
-mw info config
-mw info node <id> boot
-
-
-mw info network commands
-mw info network commands [step] [--node <id>]
-
-mw info node <id> all
-
-
-mw logs boot --node-id 1
-
-
-mw exec 1
-mw exec 1 cmd
-mw exec_all
-mw exec_all cmd
-
-mw pause # let rpc call block new step()
-
-mw error
-'''
 
 class Action(object):
 
