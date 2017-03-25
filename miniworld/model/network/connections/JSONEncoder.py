@@ -31,7 +31,7 @@ class ConnectionEncoder(json.JSONEncoder):
             return res
 
         elif isinstance(obj, EmulationNode):
-            res = obj.id
+            res = str(obj.id)
             # print p(res)
             return res
 
@@ -46,6 +46,11 @@ class ConnectionEncoder(json.JSONEncoder):
             return res
 
         elif isinstance(obj, str):
+            res = str(obj)
+            # print p(res)
+            return res
+
+        elif isinstance(obj, int):
             res = str(obj)
             # print p(res)
             return res
