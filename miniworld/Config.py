@@ -58,6 +58,10 @@ class GlobalConfig(JSONConfig.JSONConfig):
     def is_debug(self):
         pass
 
+    @customizable_attrs("logging", "log_provisioning", default=False)
+    def is_log_provisioning(self):
+        pass
+
     @customizable_attrs("logging", "level", default = "INFO")
     def get_log_level(self):
         pass

@@ -544,7 +544,7 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
 
         kwargs.update({
             'brief_logger': self.nlog,
-            'verbose_logger': self.verbose_logger,
+            'verbose_logger': self.nlog if config.is_log_provisioning() else None,
             'shell_prompt' : scenario_config.get_shell_prompt(node_id = self.id)
         })
         return REPLable.run_commands(self, *args, **kwargs)
