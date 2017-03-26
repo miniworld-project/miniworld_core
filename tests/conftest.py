@@ -1,24 +1,23 @@
 import gzip
 import json
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
 import urllib2
 from StringIO import StringIO
+from copy import deepcopy
 
 import os
 import pytest
-from copy import deepcopy
-
-import signal
 
 from miniworld.util import JSONConfig
 
 devnull = open(os.devnull, "w")
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def config_path(tmpdir_factory):
     return str(tmpdir_factory.mktemp('config').join('config.json'))
 
@@ -27,6 +26,9 @@ def pytest_addoption(parser):
     parser.addoption("--no-server", action="store_true",
                      help="Start the miniworld server from outside")
 
+
+def strip_output(output):
+    return '\n'.join(output.split('\n')[:-1])
 
 @pytest.fixture(scope='session')
 def image_path():
@@ -44,8 +46,7 @@ def image_path():
     return image_path
 
 
-@pytest.fixture
-def runner(tmpdir_factory, config_path, request):
+def create_runner(tmpdir_factory, request, config_path):
     class Runner(object):
         def __init__(self, debug=True):
             self.scenario = str(tmpdir_factory.mktemp('scenarios').join('scenario.json'))
@@ -68,10 +69,20 @@ def runner(tmpdir_factory, config_path, request):
             config['logging']['level'] = 'DEBUG'
             #config['logging']['debug'] = True
             config['logging']['log_provisioning'] = True
+            self.set_config(config)
+
+        def set_config(self, config):
             with open(config_path, "w") as f:
                 f.write(json.dumps(config, indent=4))
 
         def __enter__(self):
+            self.start()
+            return self
+
+        def __exit__(self, type, value, traceback):
+            self.stop(hard=True)
+
+        def start(self):
             env = deepcopy(os.environ)
             env.update({'CONFIG': self.config})
             if self.is_start_server:
@@ -81,27 +92,30 @@ def runner(tmpdir_factory, config_path, request):
                 sys.stderr.write('please start the server yourself')
             self.connect_to_server()
 
-            return self
-
-        def __exit__(self, type, value, traceback):
+        def stop(self, hard=True):
             # check for rpc errors
             self.check_for_errors()
             # shut down gracefully
             subprocess.check_call(['./mw.py', 'stop'])
-            if self.server_proc:
-                self.server_proc.kill()
+            if hard:
+                if self.server_proc:
+                    self.server_proc.kill()
 
-                def hard_shutdown(*args, **kwargs):
-                    if not self.server_proc.poll() is not None:
-                        print('graceful shutdown did not succeed')
-                        self.server_proc.send_signal(signal.SIGKILL)
-                        signal.alarm(0)
+                    def hard_shutdown(*args, **kwargs):
+                        if not self.server_proc.poll() is not None:
+                            print('graceful shutdown did not succeed')
+                            self.server_proc.send_signal(signal.SIGKILL)
+                            signal.alarm(0)
 
-                        assert False
+                            assert False
 
-                signal.signal(signal.SIGALRM, hard_shutdown)
-                signal.alarm(5)
-                self.server_proc.wait()
+                    signal.signal(signal.SIGALRM, hard_shutdown)
+                    signal.alarm(5)
+                    self.server_proc.wait()
+
+        def reset(self):
+            self.stop(hard=False)
+            self.start_scenario(self.scenario)
 
         def start_scenario(self, scenario):
             '''
@@ -122,6 +136,38 @@ def runner(tmpdir_factory, config_path, request):
         def step(self):
             subprocess.check_call(['./mw.py', 'step'])
 
+        def get_connections(self):
+            '''
+            Returns
+            -------
+            dict
+            '''
+            return json.loads(strip_output(subprocess.check_output(['./mw.py', 'info', 'connections'])))
+
+        def get_links(self):
+            '''
+            Returns
+            -------
+            dict
+            '''
+            return json.loads(strip_output(subprocess.check_output(['./mw.py', 'info', 'links'])))
+
+        def get_distances(self):
+            '''
+            Returns
+            -------
+            dict
+            '''
+            return json.loads(strip_output(subprocess.check_output(['./mw.py', 'info', 'distances'])))
+
+        def get_addr(self):
+            '''
+            Returns
+            -------
+            dict
+            '''
+            return json.loads(strip_output(subprocess.check_output(['./mw.py', 'info', 'addr'])))
+
         @staticmethod
         def connect_to_server():
             print('connecting to server')
@@ -132,6 +178,14 @@ def runner(tmpdir_factory, config_path, request):
                     return
                 except subprocess.CalledProcessError:
                     pass
-
     return Runner
 
+
+@pytest.fixture
+def runner(tmpdir_factory, config_path, request):
+    return create_runner(tmpdir_factory, request, config_path)
+
+
+@pytest.fixture(scope='session')
+def core_topologies_dir():
+    return 'tests/core_topologies/'
