@@ -16,7 +16,7 @@ from miniworld import Scenario
 from miniworld.Config import config
 from miniworld.Scenario import scenario_config, LINK_QUALITY_VAL_LOSS_NONE
 from miniworld.concurrency.ExceptionStopThread import ExceptionStopThread
-from miniworld.errors import SimulationStateAlreadyStarted, SimulationStateStartFailed
+from miniworld.errors import SimulationStateAlreadyStarted, SimulationStateStartFailed, Base
 from miniworld.log import get_logger, get_stdout_handler
 from miniworld.log import log
 from miniworld.management.RunLoop import RunLoop
@@ -95,6 +95,14 @@ class SimulationManager(Resetable, object):
     resets : int
         The number of times an experiment has been started/stopped
     '''
+
+    class Error(Base):
+        pass
+
+    class NoMovementDirector(Error):
+        pass
+
+
     def __init__(self):
         self.lock = Lock()
 
@@ -698,7 +706,7 @@ class SimulationManager(Resetable, object):
                 return distance_matrix_diff
 
             else:
-                self.logger.critical("No movement director existing! Function is not usable without it!")
+                raise self.NoMovementDirector()
 
         with mylock(self.lock):
 
