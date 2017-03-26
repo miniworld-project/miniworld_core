@@ -174,7 +174,7 @@ def NetworkBackendBridgedPyroute2IPRoute():
             self.step_cnt = 0
             self.ipb = pyroute2.IPBatch()
             self.cache = None
-
+            self.created_bridges = set()
             self.reset_step_state()
 
         def reset_step_state(self):
@@ -209,7 +209,9 @@ def NetworkBackendBridgedPyroute2IPRoute():
             # TOOD: REMOVE?
 
             for bridge in set(self.p_links_add_bridge.keys()):
-                self.ipr.link("add", kind="bridge", ifname=bridge)
+                if bridge not in self.created_bridges:
+                    self.ipr.link("add", kind="bridge", ifname=bridge)
+                    self.created_bridges.add(bridge)
             self.build_cache()
             # set hub mode
             for bridge in self.p_bridges:
