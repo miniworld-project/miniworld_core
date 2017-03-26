@@ -14,11 +14,11 @@ install:
     - git checkout v4.2.0
     - make
     - sudo make install
-    - popd
+    - p opd
     - sudo bash -c "source /home/travis/virtualenv/python2.7/bin/activate && pip install -r requirements.txt"
 language: python
 script:
     - pushd ~/build/miniworld-project/miniworld_core
     - uname -a
     - pwd
-    - sudo bash -c "source /home/travis/virtualenv/python2.7/bin/activate && PYTHONPATH=$PWD pytest -s tests"
+    - sudo bash -c "source /home/travis/virtualenv/python2.7/bin/activate && PYTHONPATH=$PWD pytest tests"
