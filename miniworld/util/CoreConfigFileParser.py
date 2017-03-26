@@ -6,7 +6,7 @@ from miniworld.log import log
 
 __author__ = "Nils Schmidt"
 
-def parse_core_config_file(file_path):
+def parse_core_config_file(file_path, include_interfaces=False):
     '''
     Parse the core xml config file and return which nodes are connected with each other.
 
@@ -19,6 +19,8 @@ def parse_core_config_file(file_path):
     -------
     dict<int, set<int>
         Which nodes are connected to each other (upper triangular matrix)
+    dict<(int, int), (int, int)>
+        If include_interfaces
 
     The file looks like this:
     <?xml version="1.0" encoding="UTF-8"?>
@@ -38,7 +40,6 @@ def parse_core_config_file(file_path):
       ...
       '''
     # Open XML document using minidom parser
-    # TODO: #32: error handling!
     DOMTree = xml.dom.minidom.parse(file_path)
     scenario = DOMTree.documentElement
     version = scenario.getAttribute("version")
@@ -47,7 +48,7 @@ def parse_core_config_file(file_path):
 
     # type:dict<int, list<int>>
     # store for each node the nodes which are connected to it
-    connections = defaultdict(set)
+    connections = defaultdict(set) if not include_interfaces else {}
 
     networks = scenario.getElementsByTagName("network")
     for network in networks:
@@ -55,19 +56,29 @@ def parse_core_config_file(file_path):
 
         for channel in network.getElementsByTagName("channel"):
             cur_node_id = None
+            cur_interface = None
             for member in channel.getElementsByTagName("member"):
                 if(member.getAttribute("type") == "interface"):
                     log.debug(member.childNodes[0].data)
-                    # split "n1/eth1" to 1
-                    node_id = int(member.childNodes[0].data.split("/")[0][1:])
+                    # split "n1/eth1" to 1, 1
+                    node_id, interface = member.childNodes[0].data.split("/")
+                    node_id = int(node_id[1:])
+                    interface = int(interface.split('eth')[1])
+                    interface += 1
 
                     if cur_node_id is None:
                         cur_node_id = node_id
+                        cur_interface = interface
                     else:
-                        connections[cur_node_id].add(node_id)
+                        if include_interfaces:
+                            connections[(cur_node_id, cur_interface)] = (node_id, interface)
+                        else:
+                            connections[cur_node_id].add(node_id)
                         if cur_node_id >= node_id:
-                            connections[node_id].add(cur_node_id)
-
+                            if include_interfaces:
+                                connections[(node_id, interface)] = (cur_node_id, cur_interface)
+                            else:
+                                connections[node_id].add(cur_node_id)
     return connections
 
 def parse_core_config_file_positions(file_path):
