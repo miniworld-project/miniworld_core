@@ -108,9 +108,9 @@ def new_action_decorator(fun):
 def action_info_addr(self, args):
     res = self.connection.get_distributed_address_mapping()
     if args.node_id:
-        res = res[args.node_id]
+        res = json.loads(res)[args.node_id]
 
-    return res
+    print res
 
 @new_action_decorator
 def action_info_server(self, args):
@@ -136,9 +136,9 @@ def action_info_distances(self, args):
 def action_info_scenario(self, args):
     return self.connection.get_scenario()
 
-@new_action_decorator
-def action_info_shell_vars(self, args):
-    print self.connection.get_shell_variables(args.node_id)
+# @new_action_decorator
+# def action_info_shell_vars(self, args):
+#     print self.connection.get_shell_variables(args.node_id)
 
 #################################################
 ### ping
@@ -235,7 +235,7 @@ if __name__ == '__main__':
     ACTION_PING = "ping"
 
     ACTION_INFO = "info"
-    ACTION_INFO_SHELL_VARS = "shell_vars"
+    # ACTION_INFO_SHELL_VARS = "shell_vars"
     ACTION_INFO_ADDR = "addr"
     ACTION_INFO_SERVER = "server"
     ACTION_INFO_CONNECTIONS = "connections"
@@ -295,9 +295,9 @@ if __name__ == '__main__':
             distances_parser.set_defaults(func=action_info_distances)
 
             # shell variables
-            shell_vars_parser = info_subparser.add_parser(ACTION_INFO_SHELL_VARS)
-            add_node_id_arg_optional(shell_vars_parser)
-            shell_vars_parser.set_defaults(func=action_info_shell_vars)
+            # shell_vars_parser = info_subparser.add_parser(ACTION_INFO_SHELL_VARS)
+            # add_node_id_arg_optional(shell_vars_parser)
+            # shell_vars_parser.set_defaults(func=action_info_shell_vars)
 
             # scenario parser
             scenario_parser = info_subparser.add_parser(ACTION_INFO_SCENARIO)
