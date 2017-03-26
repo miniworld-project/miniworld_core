@@ -202,6 +202,7 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
 
                 self.net_configurator.apply_nic_check_commands(check_commands_per_node)
 
+        self.net_configurator.reset()
         return network_backend.after_simulation_step(simulation_manager, step_cnt, network_backend, emulation_nodes)
 
     def before_distance_matrix_changed(self, simulation_manager, network_backend, changed_distance_matrix,

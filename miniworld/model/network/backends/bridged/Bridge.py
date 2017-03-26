@@ -1,7 +1,7 @@
 from pprint import pformat
 import netifaces
 
-
+from miniworld import log
 from miniworld.errors import NetworkBackendErrorReset
 from miniworld.model.singletons.Singletons import singletons
 from miniworld.model.network.backends import AbstractSwitch
@@ -93,7 +93,7 @@ class Bridge(AbstractSwitch.AbstractSwitch, Resetable.Resetable):
 
         '''
         try:
-            if self.bridge_dev_name:
+            if self.started and self.bridge_dev_name:
                 self.run(IPRoute2Commands.get_link_del_cmd(self.bridge_dev_name))
 
         except Exception as e:

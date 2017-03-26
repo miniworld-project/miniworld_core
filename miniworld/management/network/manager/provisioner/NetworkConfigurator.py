@@ -87,6 +87,8 @@ class NetworkConfigurator(object):
         # /x subnet generator
         self.subnet_generator = NetUtil.get_slash_x(ipaddress.ip_network(base_network_cidr).subnets(), prefixlen)
 
+    def reset(self):
+        self.nic_check_commands = {}
 
     def needs_reconfiguration(self, step_cnt):
         return step_cnt < 1
