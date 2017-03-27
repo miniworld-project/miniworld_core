@@ -94,6 +94,9 @@ class CommandRunner(object):
         self.sock = None
         self.re_shell_prompt = re.compile(shell_prompt, flags=re.DOTALL | re.MULTILINE)
 
+    def is_reuse_socket(self):
+        return hasattr(self.replable, 'uds_socket')
+
     def __call__(self, *args, **kwargs):
         '''
         Execute the code lazily in the REPL.
@@ -115,9 +118,17 @@ class CommandRunner(object):
         '''
 
         try:
+            self.sock = None
             # wait until uds is reachable
-            self.sock = self.replable.wait_until_uds_reachable(return_sock=True)
+            if self.is_reuse_socket():
+                if self.replable.uds_socket is None:
+                    self.replable.uds_socket = self.replable.wait_until_uds_reachable(return_sock=True)
+                self.sock = self.replable.uds_socket
+            else:
+                self.sock = self.replable.wait_until_uds_reachable(return_sock=True)
 
+
+            # TODO: old stuff
             # return socket object first
             yield self.sock
 
@@ -132,21 +143,22 @@ class CommandRunner(object):
         except socket.error, e:
             self.brief_logger.exception(e)
         except Timeout as e:
-            raise REPLTimeout("The REPL '%s' encountered a timeout (%s)!" % (self.replable, self.timeout))
+            raise REPLTimeout("The REPL '%s' encountered a timeout (%s) while looking for shell prompt (%s)" % (self.replable, self.timeout, self.shell_prompt))
 
         # finally close socket
         finally:
 
             try:
-                try:
-                    self.sock.shutdown(socket.SHUT_RDWR)
-                except socket.error:
-                    log.exception(e)
+                if not self.is_reuse_socket():
+                    try:
+                        self.sock.shutdown(socket.SHUT_RDWR)
+                    except socket.error as e:
+                        log.exception(e)
 
-                try:
-                    self.sock.close()
-                except socket.error:
-                    log.exception(e)
+                    try:
+                        self.sock.close()
+                    except socket.error as e:
+                        log.exception(e)
 
             except AttributeError as e:
                 log.exception(e)
@@ -266,6 +278,7 @@ class CommandRunner(object):
         '''
         if check_fun is None:
             def check_fun2(buf, whole_data):
+                # TODO: expose via logging config entry
                 if self.verbose_logger is not None:
                     self.verbose_logger.debug("expecting '%s', got: '%s'", self.shell_prompt, buf)
 

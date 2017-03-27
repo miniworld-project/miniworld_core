@@ -72,4 +72,4 @@ class QemuTap(Qemu.Qemu):
         pass
 
     def reset(self):
-        pass
+        super(QemuTap, self).reset()
