@@ -15,10 +15,10 @@ install:
     - make
     - sudo make install
     - popd
-    - sudo bash -c "source /home/travis/virtualenv/python2.7/bin/activate && pip install -r requirements.txt"
+    - sudo bash -c "source /home/travis/virtualenv/python3.5/bin/activate && pip install -r requirements.txt"
 language: python
 script:
     - pushd ~/build/miniworld-project/miniworld_core
     - uname -a
     - pwd
-    - sudo bash -c "source /home/travis/virtualenv/python2.7/bin/activate && PYTHONPATH=$PWD pytest tests"
+    - sudo bash -c "source /home/travis/virtualenv/python3.5/bin/activate && PYTHONPATH=$PWD pytest tests"
