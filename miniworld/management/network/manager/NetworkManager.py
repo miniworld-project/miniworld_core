@@ -16,7 +16,7 @@ from miniworld.model.network.connections.ConnectionStore import ConnectionStore
 from miniworld.model.network.interface.Interface import Management
 from miniworld.model.network.linkqualitymodels.LinkQualityConstants import *
 from miniworld.model.singletons.Resetable import Resetable
-from miniworld.util import PlotUtil, PathUtil
+from miniworld.util import PathUtil
 
 PATH_LOG_FILE_NETWORK_CHECK_COMMANDS = PathUtil.get_log_file_path("network_check_commands.txt")
 
@@ -230,7 +230,7 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
                 conns_per_node[x].add(y)
                 conns_per_node[y].add(x)
 
-        all_node_ids = conns_per_node.keys() + self.new_conns_per_node.keys()
+        all_node_ids = list(conns_per_node.keys()) + list(self.new_conns_per_node.keys())
         self.new_conns_per_node = {
                     node_id: (conns_per_node.get(node_id, set()) - self.new_conns_per_node.get(node_id, set())) for node_id in
             all_node_ids}
@@ -485,7 +485,7 @@ if __name__ == '__main__':
     (n1, i1, conn), (n2, i2, _), conn_store = list(testing.get_pairwise_connected_nodes(2))
 
     x = conn_store.get_link_quality_matrix(include_interfaces=False, key='loss')
-    print x
+    print(x)
 
     # print conn_store.get_link_quality_matrix(False)
     #

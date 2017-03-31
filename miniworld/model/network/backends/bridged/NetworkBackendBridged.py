@@ -4,6 +4,7 @@ from os.path import dirname
 from subprocess import check_output
 
 from ordered_set import OrderedSet
+from collections import defaultdict
 
 from miniworld.Scenario import scenario_config
 from miniworld.log import log

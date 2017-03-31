@@ -1,6 +1,7 @@
 import errno
 import time
-
+import socket
+import selectors
 from miniworld.errors import Base
 
 __author__ = 'Nils Schmidt'
