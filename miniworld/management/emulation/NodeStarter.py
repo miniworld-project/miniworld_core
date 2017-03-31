@@ -1,6 +1,3 @@
-
-
-import sys
 from copy import deepcopy
 from threading import Lock, Event
 
@@ -22,7 +19,7 @@ TIME_NODE_STATUS_REFRESH = 5
 
 # TODO: RENAME TO NODES?
 # TODO: REFACTOR!
-class NodeStarter(object):
+class NodeStarter:
     '''
     Starts the emulation nodes together with all its subcomponents: qemu, vde_switch
 
@@ -153,9 +150,6 @@ class NodeStarter(object):
 
             return self.nodes, management_node
 
-        except Exception as e:
-            raise e, None, sys.exc_info()[2]
-
         finally:
             # stop thread
             self.event_nodes_started.set()
@@ -164,7 +158,7 @@ class NodeStarter(object):
 
     @staticmethod
     def assert_only_one_wifibridge_interface(interfaces):
-        if len(filter(lambda x: is_central_node_interface(x), interfaces)) > 1:
+        if len(list(filter(lambda x: is_central_node_interface(x), interfaces))) > 1:
             raise Unsupported("Multiple '%s' are not supported at the moment!" % HubWiFi)
 
     # TODO: #82: DOC, maybe singleton ref?

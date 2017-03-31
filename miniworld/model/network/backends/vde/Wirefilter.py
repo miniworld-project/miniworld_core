@@ -1,13 +1,8 @@
 import logging
-import os
-from StringIO import StringIO
-
 import re
+from io import StringIO
 
-import subprocess32
-
-from miniworld.log import get_logger, get_file_handler
-from miniworld.management.ShellHelper import fmt_cmd_template
+from miniworld.log import get_logger
 from miniworld.model.ShellCmdWrapper import ShellCmdWrapper
 from miniworld.model.emulation.InterfaceDependentID import InterfaceDependentID
 from miniworld.model.emulation.nodes.EmulationNode import EmulationNode

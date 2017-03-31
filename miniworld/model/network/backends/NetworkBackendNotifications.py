@@ -3,7 +3,7 @@
 # TODO: provide context managers!
 
 
-class NetworkBackendNotifications(object):
+class NetworkBackendNotifications:
     ''' This interface describes the interaction between the :py:class:`.SimulationManager`,
         the :py:class:`.NetworkManager` and the :py:class:`.NetworkBackend`.
     '''
@@ -221,7 +221,7 @@ class NetworkBackendNotifications(object):
         '''
         pass
 
-class ConnectionInfo(object):
+class ConnectionInfo:
 
     '''
     Attributes

@@ -1,33 +1,30 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import argparse
-import contextlib
 import json
 import logging
 import os
 import pprint
 import sys
 import threading
-from SimpleXMLRPCServer import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
-from StringIO import StringIO
 from collections import OrderedDict
 from functools import wraps
 from threading import Lock
+from xmlrpc.server import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
+
+import netifaces
 
 # set PYTHONPATH
-import netifaces
+sys.path.append(os.getcwd())
+
 
 from miniworld.management.spatial import MovementDirectorFactory
 from miniworld.model.emulation.Qemu import Qemu
 from miniworld.model.network.connections.JSONEncoder import ConnectionEncoder
 from miniworld.rpc import RPCUtil
 from miniworld.rpc.zeromq import ZeroMQProtoServer, ZeroMQProtoClient
-from miniworld.util import ConcurrencyUtil
-
-sys.path.append(os.getcwd())
 
 import miniworld
-from miniworld import Scenario
 from miniworld.Scenario import scenario_config
 from miniworld.Config import config
 from miniworld.log import get_logger, log
@@ -139,7 +136,7 @@ def assert_simulation_manager_started(fun):
 
 # TODO: set response type to json in all method responses!
 # TODO: refactor!!
-class MiniWorldRPC(object):
+class MiniWorldRPC:
     '''
     Attributes
     ----------

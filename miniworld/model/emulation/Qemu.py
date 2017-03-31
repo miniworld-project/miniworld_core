@@ -1,10 +1,9 @@
 import hashlib
+import re
 import socket
 import time
-from StringIO import StringIO
-
-import re
-from UserDict import UserDict
+from collections import UserDict
+from io import StringIO
 
 import miniworld.model.network.interface.Interface
 from miniworld.Config import config
@@ -18,7 +17,6 @@ __author__ = 'Nils Schmidt'
 
 from os.path import basename, abspath
 from os.path import splitext
-import pexpect
 from miniworld.errors import QemuBootWaitTimeout
 from miniworld.util import PathUtil, NetUtil
 from miniworld.model.singletons.Singletons import singletons
@@ -141,18 +139,18 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
 
         # unix domain socket paths
         self.path_uds_socket = self.get_qemu_sock_path(self.id)
-        self.uds_socket = None
+        #self.uds_socket = None
 
     def reset(self):
-        try:
-            self.uds_socket.shutdown(socket.SHUT_RDWR)
-        except socket.error as e:
-            self.nlog.exception(e)
-
-        try:
-            self.uds_socket.close()
-        except socket.error as e:
-            self.nlog.exception(e)
+        # try:
+        #     self.uds_socket.shutdown(socket.SHUT_RDWR)
+        # except socket.error as e:
+        #     self.nlog.exception(e)
+        #
+        # try:
+        #     self.uds_socket.close()
+        # except socket.error as e:
+        #     self.nlog.exception(e)
             
         super(Qemu, self).reset()
 
@@ -413,7 +411,7 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
             # TODO: REMOVE SELF REF
             # TODO: USE PARTIAL BUFFER ONLY!
             def check_fun(buf, whole_data):
-                f.write(buf)
+                f.write(buf.decode())
                 # TODO: #35: more efficient!!!
                 if compiled_regex.search(whole_data) is not None:
                     return True
@@ -447,7 +445,8 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
 
 
         commands = []
-        for cmd in flo.buf.split("\n"):
+        flo.seek(0)
+        for cmd in flo.read().split("\n"):
             # append return value checker
             commands.append( "%s%s" % (cmd, self.exit_code_shell_cmd_checker) )
 

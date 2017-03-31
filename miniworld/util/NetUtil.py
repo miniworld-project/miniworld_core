@@ -1,11 +1,6 @@
 import errno
-import socket
-
-import select
-import selectors34 as selectors
 import time
 
-from miniworld import log
 from miniworld.errors import Base
 
 __author__ = 'Nils Schmidt'
@@ -78,9 +73,8 @@ def uds_reachable(uds_path, return_sock=False):
     sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     try:
         sock.connect(uds_path)
-    except socket.error as e:
-        if e[0] in (errno.ECONNREFUSED, errno.ENOENT):
-            return False, None
+    except (ConnectionRefusedError, FileNotFoundError):
+        return False, None
     finally:
         if not return_sock:
             sock.shutdown(socket.SHUT_RDWR)
@@ -172,7 +166,7 @@ class SocketExpect(object):
 
         try:
             data = self.sock.recv(self.read_buf_size)
-            self.output += data
+            self.output += data.decode('utf-8')
             res = self.check_fun(data, self.output)
             if res:
                 return res
@@ -201,7 +195,7 @@ def wait_for_boot(*args, **kwargs):
         try:
             kwargs["timeout"] = 0.1
             buffered_socket_reader = SocketExpect(*args, **kwargs)
-            sock.send("\n")
+            sock.send(b"\n")
             res = buffered_socket_reader.read()
             if res:
                 return res
@@ -214,7 +208,7 @@ def wait_for_boot(*args, **kwargs):
                 raise Timeout("waited %d seconds for the VM boot ... giving up ...")
 
 if __name__ == '__main__':
-    import selectors34 as selectors
+    import selectors
     import socket
 
     def foo():
@@ -232,9 +226,9 @@ if __name__ == '__main__':
                 if mask == selectors.EVENT_READ:
                     sock = key.fileobj
                     data = sock.recv(1)
-                    print data
+                    print(data)
                 else:
-                    print mask
+                    print(mask)
 
 
         sel.unregister(sock)

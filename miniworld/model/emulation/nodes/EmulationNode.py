@@ -7,10 +7,9 @@ from miniworld.model import StartableObject
 
 
 __author__ = 'Nils Schmidt'
-from StringIO import StringIO
+from io import StringIO
 
 from miniworld.log import get_node_logger
-from miniworld.model.emulation.Qemu import Qemu
 from miniworld.model.ShellCmdWrapper import ShellCmdWrapper
 
 # TODO: REMOVE
@@ -86,6 +85,8 @@ class EmulationNode(StartableObject.StartableSimulationStateObject, ShellCmdWrap
 
         # node id
         self.id = node_id
+        if not isinstance(self.id, int):
+            raise ValueError('int required')
 
         # create extra node logger
         self.nlog = get_node_logger(node_id)
@@ -93,18 +94,31 @@ class EmulationNode(StartableObject.StartableSimulationStateObject, ShellCmdWrap
         # qemu instance, prevent cyclic import
         self.virtualization_layer = network_backend_bootstrapper.virtualization_layer_type(node_id, self)
 
+        self.name = None
+
+    @property
+    def name(self):
+        return self._name or str(self.id)
+
+    @name.setter
+    def name(self, name):
+        self._name = name
+
     def __eq__(self, other):
-        return self.id == other.id
+        return self.name == other.name
 
     def __lt__(self, other):
         return self.id < other.id
 
     def __str__(self):
-        return str(self.id)
+        return str(self.name)
 
     def __repr__(self):
         return str(self)
         #return '%s(%s, %s)' % (self.__class__.__name__, self.id, self.network_mixin)
+
+    def __hash__(self):
+        return hash(self.name)
 
     # TODO: adjust DOC
     def _start(self, *args, **kwargs):

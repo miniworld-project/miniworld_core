@@ -2,7 +2,7 @@ __author__ = 'Nils Schmidt'
 
 
 # TODO: #54,#55: adjust doc
-class Singletons(object):
+class Singletons:
     '''
     Stores all singletons.
     The module `SingletonInit` shall be used to initialize them. Therefore, we prevent cyclic imports.
@@ -40,9 +40,9 @@ class Singletons(object):
 singletons = Singletons()
 
 if __name__ == '__main__':
-    class Foo(object):
+    class Foo():
         def reset_simulation_state(self):
-            print "reset"
+            print("reset")
 
     singletons.simulation_state_gc.add_singleton_with_simulation_scenario_state_(Foo())
     singletons.simulation_state_gc.reset_simulation_scenario_state()

@@ -7,7 +7,7 @@ KEYWORD_NODE_ID = "node_id"
 
 log = get_logger(__name__)
 
-class TemplateEngine(object):
+class TemplateEngine:
     '''
     A template engine for writing template shell scripts.
     Keywords are optionally! If unusued, an empty string is used instead and a warning is logged.
@@ -42,8 +42,8 @@ if __name__ == '__main__':
     #nc = NodeClass()
     #nc.
 
-    print render_script_from_flo("../../templates/std_network.sh")
-    print render_script_from_flo("../../templates/std_network.sh", ipv4_addr = "192.168.0.1")
+    print(render_script_from_flo("../../templates/std_network.sh"))
+    print(render_script_from_flo("../../templates/std_network.sh", ipv4_addr = "192.168.0.1"))
     #print render_script_from_flo("../../templates/std_network.sh", **{KEYWORD_IPV4_ADDR_AP : "192.168.0.1"})
 
 

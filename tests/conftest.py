@@ -1,16 +1,16 @@
 import gzip
 import json
+import os
 import shutil
 import signal
 import subprocess
 import sys
 import tempfile
-import urllib2
-from StringIO import StringIO
 from copy import deepcopy
+from io import BytesIO
 
-import os
 import pytest
+import requests
 
 from miniworld.util import JSONConfig
 
@@ -30,18 +30,21 @@ def pytest_addoption(parser):
 def strip_output(output):
     return '\n'.join(output.split('\n')[:-1])
 
+
 @pytest.fixture(scope='session')
 def image_path():
     image_url = 'https://downloads.openwrt.org/chaos_calmer/15.05.1/x86/kvm_guest/openwrt-15.05.1-x86-kvm_guest-combined-ext4.img.gz'
+
     image_name = os.path.basename(image_url)
     # always use the same file path to prevent multiple downloads
     image_path = str(os.path.join(tempfile.gettempdir(), image_name))
 
     if not os.path.exists(image_path):
-        print('downloading {} to {}'.format(image_url, image_path))
-        data = StringIO(urllib2.urlopen(image_url).read())
-        gzip_data = gzip.GzipFile(fileobj=data)
-        with open(image_path, 'w') as f:
+        print(('downloading {} to {}'.format(image_url, image_path)))
+        response = requests.get(image_url)
+        buf = BytesIO(response.content)
+        gzip_data = gzip.GzipFile(fileobj=buf)
+        with open(image_path, 'wb') as f:
             f.write(gzip_data.read())
     return image_path
 
@@ -59,15 +62,15 @@ def create_runner(tmpdir_factory, request, config_path):
                 shutil.copy2('sample_configs/config.json', config_path)
                 if self.debug:
                     self.enable_debug()
-                print('config: {}:'.format(config_path))
+                print(('config: {}:'.format(config_path)))
                 with open(config_path, "r") as f:
-                    print(f.read())
+                    print((f.read()))
             os.environ['CONFIG'] = config_path
 
         def enable_debug(self):
             config = JSONConfig.read_json_config(self.config)
             config['logging']['level'] = 'DEBUG'
-            #config['logging']['debug'] = True
+            # config['logging']['debug'] = True
             config['logging']['log_provisioning'] = True
             self.set_config(config)
 
@@ -127,7 +130,7 @@ def create_runner(tmpdir_factory, request, config_path):
                 scenario_json = json.dumps(scenario, indent=4)
                 f.write(scenario_json)
                 f.flush()
-                print('scenario:\n{}'.format(scenario_json))
+                print(('scenario:\n{}'.format(scenario_json)))
                 subprocess.check_call(['./mw.py', 'start', f.name])
 
         def check_for_errors(self):
@@ -142,7 +145,7 @@ def create_runner(tmpdir_factory, request, config_path):
             -------
             dict
             '''
-            return json.loads(strip_output(subprocess.check_output(['./mw.py', 'info', 'connections'])))
+            return json.loads(strip_output(subprocess.check_output(['./mw.py', 'info', 'connections']).decode()))
 
         def get_links(self):
             '''
@@ -150,7 +153,7 @@ def create_runner(tmpdir_factory, request, config_path):
             -------
             dict
             '''
-            return json.loads(strip_output(subprocess.check_output(['./mw.py', 'info', 'links'])))
+            return json.loads(strip_output(subprocess.check_output(['./mw.py', 'info', 'links']).decode()))
 
         def get_distances(self):
             '''
@@ -158,7 +161,7 @@ def create_runner(tmpdir_factory, request, config_path):
             -------
             dict
             '''
-            return json.loads(strip_output(subprocess.check_output(['./mw.py', 'info', 'distances'])))
+            return json.loads(strip_output(subprocess.check_output(['./mw.py', 'info', 'distances']).decode()))
 
         def get_addr(self):
             '''
@@ -166,7 +169,7 @@ def create_runner(tmpdir_factory, request, config_path):
             -------
             dict
             '''
-            return json.loads(strip_output(subprocess.check_output(['./mw.py', 'info', 'addr'])))
+            return json.loads(strip_output(subprocess.check_output(['./mw.py', 'info', 'addr']).decode()))
 
         @staticmethod
         def connect_to_server():
@@ -178,6 +181,7 @@ def create_runner(tmpdir_factory, request, config_path):
                     return
                 except subprocess.CalledProcessError:
                     pass
+
     return Runner
 
 

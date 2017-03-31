@@ -1,8 +1,7 @@
+import subprocess
 from collections import defaultdict
 
-import subprocess
-
-import subprocess32
+from ordered_set import OrderedSet
 
 from miniworld import log
 from miniworld.Scenario import scenario_config
@@ -10,8 +9,6 @@ from miniworld.model.network.backends.AbstractConnection import AbstractConnecti
 from miniworld.model.network.linkqualitymodels.LinkQualityConstants import *
 from miniworld.model.network.linkqualitymodels.LinkQualityModelRange import LinkQualityModelNetEm
 from miniworld.model.singletons.Singletons import singletons
-
-from ordered_set import OrderedSet
 __author__ = 'Nils Schmidt'
 
 def get_superclass_dynamic():
@@ -243,7 +240,7 @@ def ConnectionDummy():
             for cleanup_cmd in ConnectionDummy.cleanup_commands:
                 try:
                     self.run(cleanup_cmd)
-                except subprocess32.CalledProcessError as e:
+                except subprocess.CalledProcessError as e:
                     log.exception(e)
 
             ConnectionDummy.cleanup_commands = set()

@@ -1,5 +1,5 @@
 
-class InterfaceFilter(object):
+class InterfaceFilter:
 
     def __init__(self, *args, **kwargs):
         pass

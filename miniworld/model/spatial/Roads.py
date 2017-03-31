@@ -9,11 +9,11 @@ __email__ = "uni at lampep.de"
 
 from collections import OrderedDict
 import geojson
-from Road import Road
+from .Road import Road
 
 
 
-class Roads(object): 
+class Roads:
     '''
     Attributes
     ----------

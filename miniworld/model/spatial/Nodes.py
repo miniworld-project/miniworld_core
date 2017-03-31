@@ -5,7 +5,6 @@ from miniworld.model.collections.DistanceMatrix import DistanceMatrix
 __author__ = "Patrick Lampe"
 __email__ = "uni at lampep.de"
 
-from UserList import UserList
 from collections import OrderedDict
 
 import geojson
@@ -16,7 +15,7 @@ from miniworld.model.spatial.Node.ReplayNode import ReplayNode
 from miniworld.model.singletons.Singletons import singletons
 from miniworld.Scenario import scenario_config
 
-class Nodes(object):
+class Nodes:
     ''' abstraction of current state of all nodes
     Parameter
     ---------

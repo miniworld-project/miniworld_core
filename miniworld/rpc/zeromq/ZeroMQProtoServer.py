@@ -1,13 +1,11 @@
 #!/usr/bin/env python
 import argparse
-import json
-import threading
-from pprint import pformat
-
 import random
 import sys
-
+import threading
 import time
+from pprint import pformat
+
 import zmq
 
 import miniworld
@@ -285,8 +283,8 @@ class ZeroMQServerRouter(ZeroMQServer):
         log.info("syncing nodes ...")
 
         distance_matrix_per_server = dict(zip(distance_matrix_per_server.keys(),
-                                              map(DistanceMatrix.transform_distance_matrix,
-                                                  distance_matrix_per_server.values())))
+                                              list(map(DistanceMatrix.transform_distance_matrix,
+                                                  distance_matrix_per_server.values()))))
 
         expect_distance_matrix = self.get_expecter_state(States.STATE_DISTANCE_MATRIX, 1)
         # sync clients and send each his distance matrix

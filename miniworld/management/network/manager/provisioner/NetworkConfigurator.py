@@ -1,7 +1,5 @@
-from StringIO import StringIO
-
 import ipaddress
-from concurrent import futures
+from io import StringIO
 
 import miniworld.Scenario
 from miniworld import singletons
@@ -15,7 +13,7 @@ from miniworld.util import DictUtil, NetUtil, ConcurrencyUtil
 class NetworkConfiguratorError(Base):
     pass
 
-class NetworkConfigurator(object):
+class NetworkConfigurator:
 
     '''
     Base class for network configuraters.
@@ -82,7 +80,7 @@ class NetworkConfigurator(object):
         self.prefixlen = prefixlen
 
         # needed for `ipaddress` module
-        base_network_cidr = unicode(base_network_cidr)
+        base_network_cidr = base_network_cidr
 
         # /x subnet generator
         self.subnet_generator = NetUtil.get_slash_x(ipaddress.ip_network(base_network_cidr).subnets(), prefixlen)

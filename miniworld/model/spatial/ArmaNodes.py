@@ -13,7 +13,7 @@ import geojson
 from miniworld.model.spatial.Node.ArmaNode import ArmaNode
 
 
-class ArmaNodes(object):
+class ArmaNodes:
     def __init__(self, node_cnt):
         self.file = open(singletons.spatial_singleton.file_path, "r")
         self.node_cnt = node_cnt

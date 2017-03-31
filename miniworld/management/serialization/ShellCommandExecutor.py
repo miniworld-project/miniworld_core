@@ -1,14 +1,12 @@
-import UserDict
-
+import collections
 from collections import defaultdict
+from concurrent import futures
 from multiprocessing import cpu_count
 
-from concurrent import futures
-
-from miniworld.model.singletons.Singletons import singletons
-from miniworld.model.singletons.Resetable import Resetable
-
 from ordered_set import OrderedSet
+
+from miniworld.model.singletons.Resetable import Resetable
+from miniworld.model.singletons.Singletons import singletons
 
 class ShellCommandSerializer(object, Resetable):
 
@@ -164,7 +162,7 @@ class ShellCommandExecutor(object, Resetable):
     def set_event_super_order(self, event_order_id_order):
         self.event_order_id_order = event_order_id_order
 
-class EventOrder(UserDict.UserDict):
+class EventOrder(collections.UserDict):
     '''
     Attributes
     -----------
@@ -193,5 +191,5 @@ if __name__ == '__main__':
     #sce.set_event_order_id_order(["bridge", "connection"])
     sce.set_event_super_order(["connection", "bridge"])
     #sce.run_commands()
-    print list(sce.get_serialized_commands_per_event_order())
+    print(list(sce.get_serialized_commands_per_event_order()))
     #sce.run_commands()

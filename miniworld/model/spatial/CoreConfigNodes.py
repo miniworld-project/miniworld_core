@@ -1,10 +1,8 @@
 
 # encoding: utf-8
-import random
 from pprint import pformat
 
 from miniworld.Scenario import scenario_config
-from miniworld.management import RunLoop
 from miniworld.model.collections.DistanceMatrix import DistanceMatrix
 from miniworld.model.singletons.Resetable import Resetable
 from miniworld.model.singletons.Singletons import singletons
@@ -25,7 +23,7 @@ def factory():
 
     raise ValueError("Core mode '%s' not supported!" % scenario_config.get_core_mode())
 
-class CoreConfigNodes(object, Resetable):
+class CoreConfigNodes(Resetable):
     '''
     Parameter
     ---------
@@ -104,7 +102,7 @@ class CoreConfigNodes(object, Resetable):
     def walk(self):
         logger().info("step")
 
-        if self.remaining_seconds <= 0 or self.remaining_seconds is None:
+        if self.remaining_seconds is None or self.remaining_seconds <= 0:
             next_scenario = self.__get_next_scenario()
             if next_scenario:
                 self.remaining_seconds, self.crnt_core_config_file = next_scenario

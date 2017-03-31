@@ -1,12 +1,11 @@
 
 # encoding: utf-8
-from miniworld.model.singletons.Singletons import singletons
 from miniworld.Scenario import scenario_config
 
 __author__ = "Patrick Lampe"
 __email__ = "uni at lampep.de"
 
-class SimulationStep(object):
+class SimulationStep:
     ''' 
     Parameter
     ---------

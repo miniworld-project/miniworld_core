@@ -15,7 +15,7 @@ PORT_DEFAULT_SERVICE = 5561
 PORT_PUB_RESET_SERVICE = 5562
 PORT_PUB_SERVICE = 5563
 
-class Protocol(object):
+class Protocol:
     '''
     Abstract protocol which defines how data is represented on the wire.
     '''

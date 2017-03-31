@@ -1,13 +1,12 @@
-from StringIO import StringIO
-
+from io import StringIO
 
 from miniworld import config
 from miniworld.Scenario import scenario_config
 from miniworld.log import get_node_logger
+from miniworld.model.network.backends.NetworkMixin import NetworkMixin
 from miniworld.model.network.interface import Interfaces
 from miniworld.model.network.interface.Interface import *
 from miniworld.util import NetUtil
-from miniworld.model.network.backends.NetworkMixin import NetworkMixin
 __author__ = 'Nils Schmidt'
 
 def get_cmd_rename_mgmt_interface():

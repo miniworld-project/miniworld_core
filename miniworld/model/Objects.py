@@ -1,4 +1,4 @@
-from UserList import UserList
+from collections import UserList
 
 
 class Objects(UserList):
@@ -15,7 +15,7 @@ class Objects(UserList):
         if fun is None and _type is not None:
             fun = lambda _if: type(_if) == _type
 
-        return self.__class__(filter(fun, self))
+        return self.__class__(list(filter(fun, self)))
 
     def sorted(self):
         return self.__class__(sorted(self))

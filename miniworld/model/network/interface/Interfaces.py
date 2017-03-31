@@ -1,9 +1,8 @@
 from collections import defaultdict
 
-import miniworld.model.network.interface.Interface
 from miniworld.errors import InterfaceUnknown
 from miniworld.model.Objects import Objects
-from miniworld.model.network.interface.Interface import INTERFACE_NORMAL_CLASSES_TYPES, INTERFACE_NAME_TYPE_MAPPING, AP, Mesh, ADHoc, Bluetooth, WifiDirect, HubWiFi, Management
+from miniworld.model.network.interface.Interface import INTERFACE_NORMAL_CLASSES_TYPES, INTERFACE_NAME_TYPE_MAPPING, AP, Mesh
 
 __author__ = 'Nils Schmidt'
 
@@ -119,9 +118,9 @@ if __name__ == '__main__':
     interfaces = Interfaces.factory([Mesh, Mesh, AP, Mesh, AP])
     d = {}
     d[interfaces] = 1
-    print type(d.items()[0][0])
-    print type(d.items()[0][1])
-    print d
-    print DictUtil.to_fully_staffed_matrix_2(d)
+    print(type(d.items()[0][0]))
+    print(type(d.items()[0][1]))
+    print(d)
+    print(DictUtil.to_fully_staffed_matrix_2(d))
     #for i in Interfaces.factory([Mesh, Mesh, AP, Mesh, AP]):
     #    print i

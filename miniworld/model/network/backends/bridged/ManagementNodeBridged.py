@@ -1,8 +1,6 @@
 from miniworld import config
-from miniworld.Scenario import scenario_config
-from miniworld.model.singletons import Resetable
-from miniworld.model.singletons.Singletons import singletons
 from miniworld.model.emulation.nodes.virtual import ManagementNode
+from miniworld.model.singletons import Resetable
 
 
 class ManagementNodeBridged(ManagementNode.ManagementNode, Resetable.Resetable):
@@ -19,7 +17,8 @@ class ManagementNodeBridged(ManagementNode.ManagementNode, Resetable.Resetable):
     def _start(self, switch = True, bridge_dev_name=None):
         # TODO: DOC, NetlinkError: (34, 'Numerical result out of range')
 
-        self.id = config.get_bridge_tap_name()
+        self.name = config.get_bridge_tap_name()
+        self.id
         ManagementNode.ManagementNode._start(self, switch=switch, bridge_dev_name=bridge_dev_name)
         self.switch.id = config.get_bridge_tap_name()
 

@@ -1,12 +1,9 @@
 import atexit
 import logging
 import os
-import shlex
 import shutil
 import signal
 import sys
-
-from subprocess32 import check_output
 
 from miniworld.Config import set_global_config, PATH_GLOBAL_CONFIG, config
 from miniworld.Constants import PATH_TMP, PATH_LOGS, PROJECT_NAME, PATH_CLEANUP_SCRIPT

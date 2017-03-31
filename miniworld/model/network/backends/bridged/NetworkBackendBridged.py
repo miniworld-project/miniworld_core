@@ -1,11 +1,10 @@
 import os
 import re
 from os.path import dirname
-from collections import defaultdict
-from ordered_set import OrderedSet
-from subprocess32 import check_output
+from subprocess import check_output
 
-from miniworld import run_shell
+from ordered_set import OrderedSet
+
 from miniworld.Scenario import scenario_config
 from miniworld.log import log
 from miniworld.management import ShellHelper
@@ -21,7 +20,7 @@ from miniworld.util import PathUtil
 __author__ = 'Nils Schmidt'
 
 
-class EventMonitor(object, Resetable):
+class EventMonitor(Resetable):
     '''
     Monitors new bridge events.
 
@@ -408,4 +407,4 @@ if __name__ == '__main__':
     from pprint import pformat
 
     connections = {1: [2], 2: [3, 1], 3: [2]}
-    print pformat(configure_network(connections))
+    print(pformat(configure_network(connections)))

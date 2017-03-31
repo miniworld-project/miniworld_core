@@ -1,21 +1,17 @@
-import os
 import re
 import socket
 
-import time
-
 from miniworld import log
+from miniworld.Config import config
 from miniworld.Scenario import scenario_config
-from miniworld.management.ShellHelper import run_shell
 from miniworld.repl.errors import REPLUnexpectedResult, REPLTimeout
 from miniworld.util import NetUtil
 from miniworld.util.NetUtil import read_remaining_data, Timeout
-from miniworld.Config import config
 
 # buffer size for for non-bytewise operations
 SOCKET_READ_BUF_SIZE = 65536
 
-class CommandRunner(object):
+class CommandRunner:
     '''
     This class is responsible for the command execution of the :py:class:`.REPL`.
 
@@ -140,7 +136,7 @@ class CommandRunner(object):
             for x in self.execute_script():
                 yield x
 
-        except socket.error, e:
+        except socket.error as e:
             self.brief_logger.exception(e)
         except Timeout as e:
             raise REPLTimeout("The REPL '%s' encountered a timeout (%s) while looking for shell prompt (%s)" % (self.replable, self.timeout, self.shell_prompt))
@@ -183,7 +179,7 @@ class CommandRunner(object):
                 self.verbose_logger.debug("sending '%s', timeout: %s [done]", ENTER_SHELL_CMD, self.timeout)
 
             if self.enter_shell_send_newline:
-                self.sock.send("\n")
+                self.sock.send(b"\n")
             if self.wait_for_command_execution(timeout=self.timeout):
                 break
         if self.verbose_logger:
@@ -221,7 +217,7 @@ class CommandRunner(object):
 
                 # execute command
                 cmd = cmd + "\n"
-                self.sock.send(cmd)
+                self.sock.send(cmd.encode())
 
                 res = self.wait_for_command_execution(timeout = self.timeout)
                 # read all data which is not covered by the regex used for stream searching

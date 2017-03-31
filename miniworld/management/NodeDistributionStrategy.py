@@ -1,13 +1,13 @@
 import json
+import math
 from collections import defaultdict, OrderedDict
 from pprint import pprint
 
-import math
-
 from miniworld import Scenario
-from miniworld.Scenario import scenario_config
 from miniworld.Config import config
+from miniworld.Scenario import scenario_config
 from miniworld.management.ServerScore import ServerScore
+
 
 def factory():
     if config.is_distributed_scheduler_equal():
@@ -17,7 +17,7 @@ def factory():
     else:
         raise ValueError("Value unknown!")
 
-class NodeDistributionStrategy(object):
+class NodeDistributionStrategy:
 
     '''
     Attributes
@@ -119,7 +119,7 @@ class NDSScore(NodeDistributionStrategy):
 
         '''
         server_node_distribution = {}
-        server_score_sorted_cpu_ranking_desc = OrderedDict(sorted(self.server_score.items(), key=lambda x: ServerScore.get_cpu_score(x[1]), reverse=True)).keys()
+        server_score_sorted_cpu_ranking_desc = list(OrderedDict(sorted(self.server_score.items(), key=lambda x: ServerScore.get_cpu_score(x[1]), reverse=True)).keys())
 
         # calculate for each server how mandy VMs fit into the RAM
         vm_size = scenario_config.get_qemu_memory_mb()
@@ -162,7 +162,7 @@ if __name__ == '__main__':
     # pprint(nds.distribute_emulation_nodes(range(1, 128 + 1), 64))
 
     nds = NDSScore()
-    print nds.__class__.__name__
+    print(nds.__class__.__name__)
     Scenario.set_scenario_config(json.dumps({"qemu" : {"ram" : "128M"}}), raw=True)
 
     nds.server_score = {1: {"cpu": 1000, "free_mem": 128}, 2: {"cpu": 2000, "free_mem": 255},

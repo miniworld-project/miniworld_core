@@ -1,12 +1,11 @@
 import os
 from copy import deepcopy
-from multiprocessing import cpu_count
 
+import miniworld.ScenarioConstants
 import miniworld.model.network.backends.vde.VDEConstants
+import miniworld.model.network.interface.Interface
 from miniworld import log
 from miniworld.errors import ConfigMalformed
-import miniworld.model.network.interface.Interface
-import miniworld.ScenarioConstants
 from miniworld.model.network.linkqualitymodels.LinkQualityConstants import *
 from miniworld.util import JSONConfig, ConcurrencyUtil
 from miniworld.util.JSONConfig import customizable_attrs, json2dict
@@ -479,7 +478,7 @@ class ScenarioConfig(JSONConfig.JSONConfig):
         pass
 
     def get_distributed_server_ids(self):
-        return self.get_distributed_server_node_mapping().keys()
+        return list(self.get_distributed_server_node_mapping().keys())
 
     def set_distributed_server_node_mapping(self, server_node_mapping):
         '''
@@ -548,4 +547,4 @@ if __name__ == '__main__':
           }
         }
     }
-    print  sc.get_core_scenarios()
+    print(sc.get_core_scenarios())

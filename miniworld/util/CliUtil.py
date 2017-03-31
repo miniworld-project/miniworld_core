@@ -1,14 +1,12 @@
 import argparse
 import json
-import xmlrpclib
-from collections import OrderedDict
-
 import time
+import xmlrpc
+from collections import OrderedDict
 from threading import Thread
 
-import miniworld.rpc.RPCUtil
-from miniworld import log, Constants
 from miniworld import Scenario
+from miniworld import log
 from miniworld.errors import ConfigMalformed
 from miniworld.util import JSONConfig, DictUtil
 
@@ -80,8 +78,8 @@ def start_scenario(scenario_config, autostepping=None, blocking=True, connection
     from miniworld.management.events.CLIEventDisplay import CLIEventDisplay
 
     if connection is None:
-        con_progress = xmlrpclib.ServerProxy('http://localhost:5001/RPC2')
-        con = xmlrpclib.ServerProxy('http://localhost:5001/RPC2')
+        con_progress = xmlrpc.ServerProxy('http://localhost:5001/RPC2')
+        con = xmlrpc.ServerProxy('http://localhost:5001/RPC2')
     else:
         con_progress = con = connection
 
