@@ -1,6 +1,10 @@
 # MiniWorld Core
 
-Work-in-Progress! Code and documentation are following ...
+Work-in-Progress! Documentation is created step by step.
+Code is available in the nightly branch atm.
+We are currently working on first acceptance and func local tests.
+We are looking forward to provide a basically tested version soon in the master branch.
+
 
 ## About
 MiniWorld (Mobile Infrastructure'n'Network Integrated World) enables network emulation in Linux.
