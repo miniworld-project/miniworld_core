@@ -4,7 +4,7 @@ matrix:
       dist: trusty
       sudo: required
   python:
-    - "3.5"
+    - "3.6"
 install:
     - sudo apt-get update && sudo apt-get install git ebtables qemu-kvm bridge-utils bison flex libdb-dev
     - pip install pytest
@@ -15,10 +15,10 @@ install:
     - make
     - sudo make install
     - popd
-    - sudo bash -c "source /home/travis/virtualenv/python3.5/bin/activate && pip install -r requirements.txt"
+    - sudo bash -c "source /home/travis/virtualenv/python3.6/bin/activate && pip install -r requirements.txt"
 language: python
 script:
     - pushd ~/build/miniworld-project/miniworld_core
     - uname -a
     - pwd
-    - sudo bash -c "source /home/travis/virtualenv/python3.5/bin/activate && PYTHONPATH=$PWD pytest tests"
+    - sudo bash -c "source /home/travis/virtualenv/python3.6/bin/activate && PYTHONPATH=$PWD ENV=CI pytest tests"
