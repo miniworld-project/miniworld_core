@@ -20,3 +20,4 @@ zmq
 msgpack-python
 psutil
 netifaces
+sphinx
