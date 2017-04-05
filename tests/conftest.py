@@ -69,6 +69,8 @@ def create_runner(tmpdir_factory, request, config_path):
             config['logging']['level'] = 'DEBUG'
             #config['logging']['debug'] = True
             config['logging']['log_provisioning'] = True
+            if os.environ.get('ENV', '').lower() == 'ci':
+                config['provisioning']['boot_wait_timeout'] = 240
             self.set_config(config)
 
         def set_config(self, config):
