@@ -16,6 +16,8 @@ install:
     - sudo make install
     - popd
     - sudo bash -c "source /home/travis/virtualenv/python3.6/bin/activate && pip install -r requirements.txt"
+language: python
+python: "3.6"
 script:
     - pushd ~/build/miniworld-project/miniworld_core
     - uname -a
