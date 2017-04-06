@@ -3,8 +3,6 @@ matrix:
     - os: linux
       dist: trusty
       sudo: required
-  python:
-    - "3.6"
 install:
     - sudo apt-get update && sudo apt-get install git ebtables qemu-kvm bridge-utils bison flex libdb-dev
     - pip install pytest
