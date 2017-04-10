@@ -21,4 +21,4 @@ Bridged LAN uses for each connection between two nodes one tap device. Link shap
 
 Two connected tap devices are put onto the same bridge.
 
-The bridged WiFi network backend multiplexes connections via a single tap device.
+The bridged WiFi network backend multiplexes connections via a single tap device. The different connections are marked in the Linux kernel such that for each connection a different link impairment can be set. All connections are put on the same hub (Linux bridge). For connected nodes ebtable rules allow communication. The broadcast behaviour of wireless networks is simulated with the hub mode. 
