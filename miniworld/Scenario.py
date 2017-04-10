@@ -142,8 +142,12 @@ class ScenarioConfig(JSONConfig.JSONConfig):
 
     WALK_MODEL_NAME_ARMA = 'arma'
     WALK_MODEL_NAME_CORE = 'core'
+    WALK_MODEL_NAME_RANDOM_WALK = 'RandomWalk'
+    WALK_MODEL_NAME_MOVE_ON_BIG_STREETS = 'MoveOnBigStreets'
+    WALK_MODEL_NAMES = [WALK_MODEL_NAME_ARMA, WALK_MODEL_NAME_CORE, WALK_MODEL_NAME_RANDOM_WALK, WALK_MODEL_NAME_MOVE_ON_BIG_STREETS]
 
-    @customizable_attrs("walk_model", "name")
+    # TODO: add ignore case arguemt
+    @customizable_attrs("walk_model", "name", expected=WALK_MODEL_NAMES)
     def get_walk_model_name(self):
         pass
 
