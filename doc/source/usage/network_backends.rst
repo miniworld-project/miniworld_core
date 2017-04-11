@@ -11,7 +11,7 @@ The bridged network backends are based on Linux Bridges.
 Bridged LAN
 -----------
 
-Bridged LAN uses for each connection between two nodes one tap device. Link shaping is done on the tap device since each tap device represents a connection. The number of connections have to be known beforehand, hence it is only usable with the Core Mobility Pattern. TODO: link
+Bridged LAN uses for each connection between two nodes one tap device. Link shaping is done on the tap device since each tap device represents a connection. The number of connections have to be known beforehand, hence it is only usable with the Core Mobility Pattern. TODO: link 
 
 Two connected tap devices are put onto the same bridge.
 
