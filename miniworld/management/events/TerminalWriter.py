@@ -7,12 +7,12 @@ try:
     from blessings import Terminal
     term = Terminal()
 
-    print term.enter_fullscreen
+    print(term.enter_fullscreen)
     curses_ok = True
 except curses.error:
     pass
 
-class TerminalWriter(object):
+class TerminalWriter:
     """Create an object with a write method that writes to a
     specific place on the screen, defined at instantiation.
 
@@ -46,11 +46,11 @@ class TerminalWriter(object):
         if curses_ok:
             # clear line
             with term.location(self.x_location, 0):
-                print " " * term.width
+                print(" " * term.width)
 
             # print line
             with term.location(self.x_location, term.height - self.idx - 2):
                 print(msg)
         # no terminal support :/ e.g. IDE
         else:
-            print msg
+            print(msg)

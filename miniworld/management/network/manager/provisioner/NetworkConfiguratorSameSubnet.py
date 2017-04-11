@@ -74,7 +74,7 @@ class NetworkConfiguratorSameSubnet(NetworkConfiguratorConnectionLess):
         normal_ifaces = emulation_node.network_mixin.interfaces.filter_normal_interfaces()
         for idx, interface in enumerate(normal_ifaces):
             idx_iface = self.get_interface_index_fun(emulation_node, interface)
-            c = Counter(c.keys() + [interface])
+            c = Counter(list(c.keys()) + [interface])
             subnet = self.get_subnet(interface)
 
             key = self.get_key_ip_dict(emulation_node, interface)

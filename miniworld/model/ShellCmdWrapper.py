@@ -1,6 +1,6 @@
 __author__ = 'Nils Schmidt'
 
-class ShellCmdWrapper(object):
+class ShellCmdWrapper:
 
     '''
     Attributes

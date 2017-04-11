@@ -1,6 +1,6 @@
+import os
 from copy import deepcopy
 
-import os
 import pytest
 
 from tests.conftest import create_runner
@@ -109,4 +109,4 @@ def test_info_distances(snapshot_runner):
 
 def test_info_addr(snapshot_runner):
     snapshot_runner.step()
-    print snapshot_runner.get_addr()
+    print(snapshot_runner.get_addr())

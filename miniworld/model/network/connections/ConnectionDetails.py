@@ -1,6 +1,6 @@
 
 # TODO: DOC
-class ConnectionDetails(object):
+class ConnectionDetails:
 
     def __init__(self, connection, link_quality):
         self.connection = connection

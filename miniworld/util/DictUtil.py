@@ -1,7 +1,6 @@
 from collections import defaultdict
 
 # TODO: RENAME
-from copy import deepcopy
 
 def to_fully_staffed_matrix_3(d):
     '''
@@ -63,7 +62,7 @@ def to_fully_staffed_matrix_2(d):
         fully_staffed[k] = vals
         # make it fully staffed, reverse keys and values
         k2 = type(k)(reversed(k))
-        fully_staffed[k2] = map(lambda x: type(x)(reversed(x)), vals)
+        fully_staffed[k2] = list(map(lambda x: type(x)(reversed(x)), vals))
 
     return fully_staffed
 
@@ -124,6 +123,6 @@ if __name__ == '__main__':
     d = {'foo': {'bar': 1, 'rest': 'foO'}}
     d2 =  {'foo': {'bar': 2}}
 
-    print merge_recursive_in_place(d, d2)
-    print merge_recursive_in_place({}, d2)
-    print merge_recursive_in_place(d, {})
+    print(merge_recursive_in_place(d, d2))
+    print(merge_recursive_in_place({}, d2))
+    print(merge_recursive_in_place(d, {}))

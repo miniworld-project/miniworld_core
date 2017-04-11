@@ -5,7 +5,7 @@ from miniworld.model.singletons.Singletons import singletons
 __author__ = "Patrick Lampe"
 __email__ = "uni at lampep.de"
 
-class Road(object):
+class Road:
     ''' 
     Parameter
     ---------

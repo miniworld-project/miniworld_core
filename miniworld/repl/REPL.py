@@ -1,6 +1,6 @@
 import socket
 import sys
-from StringIO import StringIO
+from io import StringIO
 from itertools import repeat
 from multiprocessing.pool import ThreadPool
 
@@ -83,7 +83,7 @@ class REPL:
 
                 # always let print help and exit
                 if uq_cmd == REPL_CMD_HELP:
-                    print self.fmt_help()
+                    print(self.fmt_help())
                     continue
                 elif uq_cmd == REPL_CMD_EXIT:
                     log.info("user quit session")
@@ -92,15 +92,15 @@ class REPL:
                 # mode chosen ?
                 if uq_cmd.startswith(REPL_CMD_MODE):
                     # get value after "mode"
-                    mode = filter(None, uq_cmd.split(REPL_CMD_MODE))[0].lower().strip()
+                    mode = list(filter(None, uq_cmd.split(REPL_CMD_MODE)))[0].lower().strip()
                     if mode in REPL_MODES:
                         self.mode = mode
-                        print "mode => %s" % mode
+                        print("mode => %s" % mode)
                     else:
-                        print "Unknown mode '%s'" % mode
+                        print("Unknown mode '%s'" % mode)
                 else:
                     if self.mode is None:
-                        print "Choose a mode first!"
+                        print("Choose a mode first!")
                         continue
                     # may be empty or enter
                     elif cmd:
@@ -149,7 +149,7 @@ class REPL:
 
         elif self.mode == REPL_MODE_WIREFILTER:
             # TODO:
-            print "N/A"
+            print("N/A")
 
         for uds_socket in uds_socket_gen:
             if isinstance(uds_socket, socket.socket):

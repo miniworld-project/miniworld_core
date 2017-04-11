@@ -4,12 +4,11 @@ from miniworld.model.emulation.nodes.virtual.VirtualNode import VirtualNode
 from miniworld.model.network.backends.NetworkBackendNotifications import ConnectionInfo
 from miniworld.model.network.interface import Interfaces
 from miniworld.model.network.interface.Interface import Management
-from miniworld.Config import config
 
 __author__ = 'Nils Schmidt'
 
 # TODO: DOC  Ticket 34#
-MANAGEMENT_NODE_ID = sys.maxint
+MANAGEMENT_NODE_ID = sys.maxsize
 
 class ManagementNode(VirtualNode):
     '''

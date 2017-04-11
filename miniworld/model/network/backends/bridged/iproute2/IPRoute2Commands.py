@@ -17,7 +17,7 @@ def find_empty_group(start = 1, end=10000):
     -------
     int
     '''
-    for idx in xrange(start, end + 1):
+    for idx in range(start, end + 1):
         # no links for this group
         if not run_shell("ip link list group {}".format(idx)):
             return idx

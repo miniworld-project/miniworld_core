@@ -1,6 +1,6 @@
-import netifaces
+import subprocess
 
-import subprocess32
+import netifaces
 from ordered_set import OrderedSet
 
 from miniworld import log
@@ -74,7 +74,7 @@ def NetworkBackendBridgedIproute2():
                         cmd, PATH_SHELL_COMMANDS))
                         ShellHelper.run_shell_with_input(cmd, ip_commands)
 
-                    except subprocess32.CalledProcessError as e:
+                    except subprocess.CalledProcessError as e:
                         raise NetworkBackendBridgedError(
                             """Could not execute all iproute2 shell_commands!
                             An old version of iproute2 may not have full bridge support!

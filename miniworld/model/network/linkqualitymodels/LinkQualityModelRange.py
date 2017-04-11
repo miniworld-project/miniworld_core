@@ -1,6 +1,5 @@
 from miniworld import log
 from miniworld.Scenario import scenario_config
-from miniworld.decorators import memoize_pos_args
 from miniworld.model.network.linkqualitymodels import LinkQualityModel
 from miniworld.model.network.linkqualitymodels.LinkQualityConstants import *
 
@@ -158,5 +157,5 @@ if __name__ == '__main__':
         vals2 = LinkQualityModelWiFiExponential()._distance_2_link_quality(x)
         values.append([x] + list(vals1) + list(vals2))
 
-    print '\n'.join(
-        [("\\trowgray\n" if val[0] % 2 == 0 else "") + "\\hline\n%s & %.00f & %s & %s & %.00f & %s & %s \\\\" % tuple(val) for val in values])
+    print('\n'.join(
+        [("\\trowgray\n" if val[0] % 2 == 0 else "") + "\\hline\n%s & %.00f & %s & %s & %.00f & %s & %s \\\\" % tuple(val) for val in values]))

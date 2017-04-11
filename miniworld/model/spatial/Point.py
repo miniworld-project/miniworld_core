@@ -4,7 +4,7 @@
 __author__ = "Patrick Lampe"
 __email__ = "uni at lampep.de"
 
-class Point(object):
+class Point:
     def __init__(self, id, location):
         self.id = id
         self.location = location

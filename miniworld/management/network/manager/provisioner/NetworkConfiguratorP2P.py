@@ -1,6 +1,5 @@
 from collections import defaultdict
 
-
 from miniworld.management.network.manager.provisioner.NetworkConfiguratorConnectionBased import \
     NetworkConfiguratorConnectionBased
 from miniworld.util import DictUtil
@@ -70,7 +69,7 @@ class NetworkConfiguratorP2P(NetworkConfiguratorConnectionBased):
             subnet = self.used_subnets[key]
         else:
             # new subnet -> remember
-            subnet = self.subnet_generator.next()
+            subnet = next(self.subnet_generator)
             self.used_subnets[key] = subnet
 
         # new subnet -> 0, else 1

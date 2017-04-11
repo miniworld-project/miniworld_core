@@ -1,17 +1,17 @@
-import UserDict
+import collections
 from collections import defaultdict
 
 from miniworld import singletons
 from miniworld.model.singletons.Resetable import Resetable
 
 
-class InterfaceStates(UserDict.UserDict):
+class InterfaceStates(collections.UserDict):
     '''
     No reset needed. Reset is done by :py:class:`.ConnectionBookKeeper`
     '''
 
     def __init__(self, *args, **kwargs):
-        UserDict.UserDict.__init__(self, *args, **kwargs)
+        collections.UserDict.__init__(self, *args, **kwargs)
 
     def __getitem__(self, item):
         '''
@@ -21,7 +21,7 @@ class InterfaceStates(UserDict.UserDict):
         '''
         try:
             # old-style class, no super
-            res = UserDict.UserDict.__getitem__(self, item)
+            res = collections.UserDict.__getitem__(self, item)
         except KeyError:
             res = self[item] = False
         return res
@@ -34,7 +34,7 @@ class InterfaceStates(UserDict.UserDict):
         self[dev_name] = up
 
 
-class ConnectionBookKeeper(object, Resetable):
+class ConnectionBookKeeper(Resetable):
     '''
     Keeps track of connections between hosts and the used tap devices.
 

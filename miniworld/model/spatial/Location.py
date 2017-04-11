@@ -4,9 +4,9 @@
 __author__ = "Patrick Lampe"
 __email__ = "uni at lampep.de"
 
-from LatLon import LatLon, Latitude, Longitude
+from LatLon23 import LatLon, Latitude, Longitude
 
-class Location(object):
+class Location:
     ''' 
     Parameters
     ----------

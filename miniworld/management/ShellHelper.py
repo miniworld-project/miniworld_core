@@ -1,27 +1,16 @@
-import commands
 import os
 import re
+import selectors
 import shlex
+import subprocess
 from collections import defaultdict
-from pprint import pprint, pformat
-
-from time import sleep
-import selectors34 as selectors
-
-import subprocess32
+from subprocess import CalledProcessError
 from threading import Lock
 
-from subprocess32 import CalledProcessError
-
 from miniworld.concurrency.ExceptionStopThread import ExceptionStopThread
-from miniworld.model.singletons.Singletons import singletons
 from miniworld.log import get_node_logger, log
-from miniworld.model import StartableObject
 from miniworld.model.singletons.Resetable import Resetable
-from miniworld.util import PathUtil, ConcurrencyUtil
-import threading
-import select
-import sys
+from miniworld.util import PathUtil
 
 # TODO:
 #BUF_SIZE = 16184
@@ -56,7 +45,7 @@ def run_shell(cmd, *args, **kwargs):
     bufsize = kwargs.get("buf_size", -1)
     cmd_as_list = shlex.split(cmd)
     # TODO: check if bufsize improves performance
-    return subprocess32.check_output(cmd_as_list, *args, bufsize=bufsize, **kwargs)
+    return subprocess.check_output(cmd_as_list, *args, bufsize=bufsize, **kwargs)
 
     # TODO: check if commands improves performance in constrast to subprocess
     # exit_code, stdout = commands.getstatusoutput(cmd)
@@ -83,7 +72,7 @@ def run_shell_get_output(cmd, shell=False):
     ------
     MyCalledProcessError
     '''
-    p, cmd = run_sub_process_popen(cmd, stdout=subprocess32.PIPE, stderr=subprocess32.PIPE, shell=shell)
+    p, cmd = run_sub_process_popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=shell)
     stdout, stderr = p.communicate()
     if p.returncode != 0 and stderr:
         raise MyCalledProcessError(p.returncode, p.args, output=stderr)
@@ -113,7 +102,7 @@ def run_sub_process_popen(cmd, stdout=None, stderr=None, stdin=None, **kwargs):
     # if dev_null_used:
     #     devnull.close()
 
-    p = subprocess32.Popen(cmd_as_list, close_fds=True, stdout=stdout, stderr=stderr, stdin=stdin, **kwargs)
+    p = subprocess.Popen(cmd_as_list, close_fds=True, stdout=stdout, stderr=stderr, stdin=stdin, **kwargs)
     log.debug("started %s", ' '.join(p.args) + (" (PID = %s)" % p.pid))
     return p, cmd
 
@@ -137,9 +126,9 @@ def run_shell_with_input(cmd, _input):
     log.info("'%s <<<\"%s\"'", cmd, _input)
 
     cmd = shlex.split(cmd)
-    p = subprocess32.Popen(cmd, close_fds=True, stdin=subprocess32.PIPE, stdout=subprocess32.PIPE)
+    p = subprocess.Popen(cmd, close_fds=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 
-    stdout, stderr = p.communicate(_input)
+    stdout, stderr = p.communicate(_input.encode())
     if p.returncode == 0:
         return stdout
     else:
@@ -160,7 +149,7 @@ def fmt_cmd_template(cmd):
 # TODO: FINISH
 # TODO: use selectors instead of epoll!
 # TODO: DOC
-class LogWriter(object, Resetable):
+class LogWriter(Resetable):
     '''
     Read from all log files (stdout + stderr) and write line-buffered into a log file.
 
@@ -249,7 +238,7 @@ class LogWriter(object, Resetable):
                 data = fd.read(1)
 
                 if data:
-                    self.descriptor_buffers[fd] += data
+                    self.descriptor_buffers[fd] += data.decode('utf-8')
 
                     # line-buffered
                     try:
@@ -286,7 +275,7 @@ class ShellHelper(Resetable):
     ----------
     log_writer
     lock
-    subprocess : list<subprocess32.Popen>
+    subprocess : list<subprocess.Popen>
     bg_checker_thread : ExceptionStopThread
     '''
 
@@ -384,9 +373,9 @@ class ShellHelper(Resetable):
 
             return output
         # TODO:
-        except subprocess32.CalledProcessError as e:
+        except subprocess.CalledProcessError as e:
             log.exception(e)
-            raise e, None, sys.exc_info()[2]
+            raise
 
     # TODO: Ticket #2
     def run_shell_async(self, node_name, cmd, prefixes = None, take_process_ownership=True, supervise_process=True):
@@ -417,8 +406,8 @@ class ShellHelper(Resetable):
         nlog = get_node_logger(node_name)
         # TODO: #2 : catch/reraise exception if command malformed!
         if supervise_process:
-            stdout = subprocess32.PIPE
-            stderr = subprocess32.PIPE
+            stdout = subprocess.PIPE
+            stderr = subprocess.PIPE
         else:
             stdout, stderr = ["devnull"] * 2
         p, cmd = run_sub_process_popen(cmd, stdout=stdout, stderr=stderr)
@@ -465,7 +454,7 @@ class ShellHelper(Resetable):
                     subproc.wait(timeout = TIMEOUT)
                     log.debug("terminated %s", subproc_info)
 
-                except subprocess32.TimeoutExpired as e:
+                except subprocess.TimeoutExpired as e:
                     log.warn("Subprocess: '%s' did not shutdown in time (%s). Killing ..." % (subproc_info, TIMEOUT))
                     subproc.kill()
                     subproc.wait()

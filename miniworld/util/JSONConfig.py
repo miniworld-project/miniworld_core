@@ -1,11 +1,9 @@
 '''
 Utility functions and class to use json as config file format.
 '''
-import sys
 import json
-
 import re
-from UserDict import UserDict
+from collections import UserDict
 from functools import wraps
 
 from miniworld.errors import ConfigError, ConfigNotSet, ConfigMalformed, ConfigOptionNotSupported
@@ -135,7 +133,7 @@ def _pretty_format(keys):
 ### Subclassable Config object
 ###############################################
 
-class JSONConfig(UserDict, object):
+class JSONConfig(UserDict):
     '''
     `JSONConfig` leverages JSON to form a config system.
     Access to the values in the config are provided by decorating functions.
@@ -209,7 +207,7 @@ def read_json_config(config = None, raw = False):
         data = re.sub("%s.*?(\n|\r\n)" % CONFIG_COMMENT, "", config)
         return json.loads(data)
     except (ValueError, IOError):
-        raise ConfigError("Config file '%s' could not be opened!" % config), None, sys.exc_info()[2]
+        raise ConfigError("Config file '%s' could not be opened!" % config)
 
 def get_dict_nested_value(d, keys):
     '''
@@ -258,5 +256,5 @@ if __name__ == '__main__':
     c.config = {'foo': {'bar': '5'}, 'node_details': {'1': {'foo': {'bar': '2'}}}}
     # print c.get_bar()
     # print c.get_bar(node_id = 1)
-    print c.get_default()
-    print c.get_non_default()
+    print(c.get_default())
+    print(c.get_non_default())

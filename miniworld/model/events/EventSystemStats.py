@@ -1,4 +1,4 @@
-class EventSystemStats(object):
+class EventSystemStats:
 
     def get_average_progress(self):
         '''

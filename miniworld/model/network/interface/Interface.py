@@ -1,7 +1,6 @@
+import ipaddress
 from functools import total_ordering
 from threading import Lock
-
-import ipaddress
 
 from miniworld.script.TemplateContentProvider import TemplateContentProvider
 from miniworld.util import NetUtil
@@ -11,7 +10,7 @@ __author__ = 'Nils Schmidt'
 NODE_MAC_PREFIX = "%02x:%06x"
 
 @total_ordering
-class Interface(object, TemplateContentProvider):
+class Interface(TemplateContentProvider):
 
     node_class = 0
     node_class_name = "abstract"
@@ -34,7 +33,6 @@ class Interface(object, TemplateContentProvider):
     '''
 
     def __init__(self, nr_host_interface = 1):
-        object.__init__(self)
 
         if not nr_host_interface >= 1:
             raise ValueError("The number of the interface has to be greater 0!")

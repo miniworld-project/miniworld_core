@@ -23,5 +23,5 @@ class VirtualizationLayer(StartableSimulationStateObject):
 
         self.id = id
 
-
-    pass
+    def reset(self):
+        pass

@@ -1,16 +1,10 @@
 import threading
-
-import sys
 from collections import defaultdict
-
-from pyroute2.iproute import IPBatch
 
 from miniworld import log
 from miniworld.log import get_logger, get_file_handler
 from miniworld.management.ShellHelper import run_shell
-from miniworld.model.singletons.Singletons import singletons
 from miniworld.model.network.backends.bridged import NetworkBackendBridged
-from miniworld.model.network.backends.bridged.NetworkBackendBridged import NetworkBackendBridgedDummy
 
 lock = threading.Lock()
 
@@ -144,7 +138,7 @@ def NetworkBackendBridgedPyroute2():
                     # except:
                     #     pass
 
-                    raise e, None, sys.exc_info()[2]
+                    raise
 
         def reset(self):
             super(NetworkBackendBridgedPyroute2, self).reset()

@@ -4,8 +4,9 @@
 __author__ = "Patrick Lampe"
 __email__ = "uni at lampep.de"
 
-from AbstractNode import AbstractNode
 from miniworld.model.spatial.MovementPattern.RandomWalk import RandomWalk
+from .AbstractNode import AbstractNode
+
 
 class DefaultNode(AbstractNode):
     '''

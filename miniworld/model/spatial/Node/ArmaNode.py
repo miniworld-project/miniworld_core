@@ -4,9 +4,11 @@
 __author__ = "Patrick Lampe"
 __email__ = "uni at lampep.de"
 
-from AbstractNode import AbstractNode
-from miniworld.model.spatial.LocationArma import LocationArma
 import random
+
+from miniworld.model.spatial.LocationArma import LocationArma
+from .AbstractNode import AbstractNode
+
 
 class ArmaNode(AbstractNode):
     def __init__(self, crnt_node_id_in_type):

@@ -1,9 +1,10 @@
-import UserDict
+import collections
 from collections import OrderedDict
 
 from miniworld.model.events.EventSystemStats import EventSystemStats
 
-class EventProgressStore(UserDict.UserDict, EventSystemStats):
+
+class EventProgressStore(collections.UserDict, EventSystemStats):
     '''
     Stores the progress for some events.
     Can be used like a normal dictionary. The default value for non-existing keys is 0.

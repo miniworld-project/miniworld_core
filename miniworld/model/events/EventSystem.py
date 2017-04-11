@@ -1,19 +1,18 @@
-import UserDict
+import collections
 import threading
 from collections import OrderedDict
 from contextlib import contextmanager
 from threading import Lock
 
-from miniworld import log
-from miniworld.model.events.EventSystemStats import EventSystemStats
-from miniworld.model.events.EventProgressStore import EventProgressStore
-from miniworld.model.events.Event import Event
-
 from ordered_set import OrderedSet
 
+from miniworld.model.events.Event import Event
+from miniworld.model.events.EventProgressStore import EventProgressStore
+from miniworld.model.events.EventSystemStats import EventSystemStats
 from miniworld.model.singletons import Resetable
 
-class EventSystem(UserDict.UserDict, EventSystemStats, Resetable.Resetable):
+
+class EventSystem(collections.UserDict, EventSystemStats, Resetable.Resetable):
     '''
     Thread-safe event system. The model is usable like a normal dict.
     The default value for non existing keys is: :py:class:`.NodeEventSystem`
@@ -96,7 +95,7 @@ class EventSystem(UserDict.UserDict, EventSystemStats, Resetable.Resetable):
         >>> print es.get_progress(), es.items(
         '''
         if init_ids is None:
-            init_ids = self.keys()
+            init_ids = list(self.keys())
 
         event = Event(event_name, self)
         event.init(init_ids)
@@ -104,7 +103,7 @@ class EventSystem(UserDict.UserDict, EventSystemStats, Resetable.Resetable):
 
         # NOTE: do this after yielding, we may have new ids
         if finish_ids is None:
-            finish_ids = self.keys()
+            finish_ids = list(self.keys())
         event.finish(finish_ids)
 
     def event_no_init_finish(self, event_name):
@@ -291,7 +290,7 @@ class EventSystem(UserDict.UserDict, EventSystemStats, Resetable.Resetable):
 
         if node_ids is None and all_nodes is None:
             raise ValueError("Either `node_id` or `all_nodes` must be supplied.")
-        node_ids = node_ids if node_ids is not None else self.keys()
+        node_ids = node_ids if node_ids is not None else list(self.keys())
 
         def check_progress(progress):
             if progress > 1.0:
@@ -317,7 +316,6 @@ class EventSystem(UserDict.UserDict, EventSystemStats, Resetable.Resetable):
 
 if __name__ == '__main__':
     from miniworld.model.events.EventSystem import EventSystem
-    from miniworld.management.events.MyCLIEventDisplay import MyCLIEventDisplay
     from miniworld.model.events.MyEventSystem import MyEventSystem
     import time
     from pprint import pprint, pformat
@@ -333,11 +331,11 @@ if __name__ == '__main__':
             time.sleep(0.2)
             event_boot.update([1], 0.2 * i)
             event_boot.update([2], 0.1 * i)
-            print "avg: %s" % dict(es.get_progress())
-            print "per node: %s" % pformat(es)
+            print("avg: %s" % dict(es.get_progress()))
+            print("per node: %s" % pformat(es))
         # progress is not 100% yet
         time.sleep(5)
         # but after the context manager exits
-        print "finishing ..."
-    print es.get_progress()
+        print("finishing ...")
+    print(es.get_progress())
     pprint(es)

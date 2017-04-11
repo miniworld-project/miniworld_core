@@ -1,4 +1,5 @@
 import os
+
 import pytest
 
 from tests.conftest import create_runner
@@ -26,7 +27,7 @@ def runner(tmpdir_factory, image_path, request, config_path, core_topologies_dir
                         "until ifconfig br-lan ; do echo -n . && sleep 1; done",
                         "ifconfig eth0 down",
                         "ifconfig br-lan down",
-                        "brctl delbr br-lan",
+                        "brctl delif br-lan eth0",
                         "ifconfig eth0 up",
                         "ifconfig -a",
                         "brctl show"

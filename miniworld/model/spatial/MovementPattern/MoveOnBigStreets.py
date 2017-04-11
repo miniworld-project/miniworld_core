@@ -5,7 +5,9 @@ __author__ = "Patrick Lampe"
 __email__ = "uni at lampep.de"
 
 from random import randint
-from AbstractMovementPattern import AbstractMovementPattern
+
+from .AbstractMovementPattern import AbstractMovementPattern
+
 
 class MoveOnBigStreets(AbstractMovementPattern):
 

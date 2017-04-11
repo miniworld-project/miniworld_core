@@ -1,5 +1,5 @@
 
-from UserDict import UserDict
+from collections import UserDict
 from collections import defaultdict
 
 def transform_distance_matrix(distance_matrix):
@@ -53,7 +53,7 @@ class DistanceMatrix:
         pass
 
     def filter_empty(self):
-        return factory()(filter(lambda x:x[1] >= 0, self.data.items()))
+        return factory()(list(filter(lambda x:x[1] >= 0, self.data.items())))
 
     @staticmethod
     def factory():
@@ -120,11 +120,11 @@ class DistanceMatrixNumpy(DistanceMatrix):
 
 if __name__ == '__main__':
     x = {(1,2) : 1, (2,1) : 3}
-    print x
+    print(x)
     x = transform_distance_matrix(x)
-    print x
+    print(x)
     x = detransform_distance_matrix(x)
-    print x
+    print(x)
 
 
     x = DistanceMatrix()

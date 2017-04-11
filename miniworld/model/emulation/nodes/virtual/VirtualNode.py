@@ -1,13 +1,9 @@
-import pyroute2
-
 from miniworld import log
-from miniworld.errors import NetworkBridgeNotExisting
 from miniworld.Config import config
 from miniworld.model.emulation.nodes.EmulationNode import EmulationNode
 from miniworld.model.network.backends.NetworkBackendNotifications import ConnectionInfo
-from miniworld.model.network.interface.Interface import Management
 from miniworld.model.singletons.Singletons import singletons
-import netifaces
+
 
 class VirtualNode(EmulationNode):
     '''
@@ -58,7 +54,7 @@ class VirtualNode(EmulationNode):
         '''
 
         self.network_mixin.start(bridge_dev_name = bridge_dev_name, switch = switch)
-        self.switch = self.network_mixin.switches.values()[0]
+        self.switch = next(iter(self.network_mixin.switches.values()))
 
     def init_connection_info(self):
         '''

@@ -46,4 +46,4 @@ class QemuVDE(Qemu.Qemu):
         return cmd_setup_nics
 
     def reset(self):
-        pass
+        super(QemuVDE, self).reset()

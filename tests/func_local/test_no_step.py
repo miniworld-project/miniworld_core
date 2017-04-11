@@ -32,11 +32,11 @@ def snapshot_runner(runner):
 
 
 def test_info_scenario(snapshot_runner):
-    res = subprocess.check_output(['./mw.py', 'info', 'scenario'])
+    res = subprocess.check_output(['./mw.py', 'info', 'scenario']).decode()
     with open(snapshot_runner.scenario, 'r') as f:
-        assert strip_output(res) == json.dumps(json.load(f), indent=4)
+        assert json.loads(strip_output(res)) ==json.load(f)
 
 
 def test_ping(snapshot_runner):
-    res = subprocess.check_output(['./mw.py', 'ping'])
+    res = subprocess.check_output(['./mw.py', 'ping']).decode()
     assert strip_output(res) == 'pong'
