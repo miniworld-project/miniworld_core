@@ -2,9 +2,8 @@ from time import time
 from timeit import timeit
 
 from miniworld import log
-from miniworld.concurrency.ExceptionStopThread import ExceptionStopThread
-
 from miniworld.Config import config
+from miniworld.concurrency.ExceptionStopThread import ExceptionStopThread
 
 __author__ = 'Nils Schmidt'
 
@@ -36,7 +35,7 @@ class RunLoop(ExceptionStopThread):
             # measure method execution time
             exec_time = timeit(self.execute_this, number = 1)
             if exec_time > self.time_step:
-                self.logger.critical("the execution time of the '%s' method is longer than a time step (%s). Took %s", self._run.func_name, self.time_step, exec_time)
+                self.logger.critical("the execution time of the '%s' method is longer than a time step (%s). Took %s", self._run.__name__, self.time_step, exec_time)
 
             # wait the remaining time until a time step passed
             wait_time = self.time_step - exec_time

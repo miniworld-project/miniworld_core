@@ -2,9 +2,9 @@ import logging
 from threading import Lock
 
 from miniworld import Constants
+from miniworld.Config import config
 from miniworld.decorators import memoize_pos_args
 from miniworld.errors import Unsupported
-from miniworld.Config import config
 
 __author__ = 'Nils Schmidt'
 
@@ -28,7 +28,7 @@ def add_logger(logger):
 def set_log_level(level):
     with lock:
         for logger in loggers:
-            print "setting log level '%s' for '%s'" % (level, logger)
+            print("setting log level '%s' for '%s'" % (level, logger))
             logger.setLevel(level)
 
 @memoize_pos_args
@@ -91,7 +91,6 @@ def get_node_logger(node_id, log_level = None):
     '''
 
     from colorlog import ColoredFormatter
-    from miniworld.util import PathUtil
 
     if log_level is None:
         log_level = get_log_level()

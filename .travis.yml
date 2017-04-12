@@ -1,0 +1,23 @@
+language: python
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      sudo: required
+      python: '3.6'
+install:
+    - sudo apt-get update && sudo apt-get install git ebtables qemu-kvm bridge-utils bison flex libdb-dev
+    - pip install pytest
+    - pushd /tmp/
+    - git clone https://kernel.googlesource.com/pub/scm/linux/kernel/git/shemminger/iproute2
+    - cd iproute2
+    - git checkout v4.2.0
+    - make
+    - sudo make install
+    - popd
+    - sudo bash -c "source /home/travis/virtualenv/python3.6/bin/activate && pip install -r requirements.txt"
+script:
+    - pushd ~/build/miniworld-project/miniworld_core
+    - uname -a
+    - pwd
+    - sudo bash -c "source /home/travis/virtualenv/python3.6/bin/activate && PYTHONPATH=$PWD ENV=CI pytest tests"

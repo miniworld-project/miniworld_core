@@ -1,4 +1,4 @@
-from UserDict import UserDict
+from collections import UserDict
 from collections import defaultdict
 
 from miniworld.errors import Base
@@ -7,12 +7,12 @@ from miniworld.model.network.connections.JSONEncoder import JSONStrMixin
 from miniworld.model.network.connections.NICConnectionStore import NICConnectionStore
 from miniworld.model.network.connections.NodeConnectionStore import NodeConnectionStore
 from miniworld.model.network.connections.NodeDictMixin import NodeDict
-from miniworld.model.network.linkqualitymodels.LinkQualityConstants import LINK_QUALITY_KEY_LOSS
+
 
 class UnknownConnection(Base):
     pass
 
-class ConnectionStore(object, UserDict, JSONStrMixin):
+class ConnectionStore(UserDict, JSONStrMixin):
 
     KEY_CONN_ACTIVE = 'active'
     KEY_CONN_NOT_ACTIVE = 'not_active'
@@ -308,7 +308,7 @@ class ConnectionStore(object, UserDict, JSONStrMixin):
         was_active = was_active_str == self.KEY_CONN_ACTIVE
 
         # there is only one element for this particular key
-        connection_details = nic_connection_store.items()[0][1]
+        connection_details = list(nic_connection_store.items())[0][1]
 
         if not nic_connection_store:
             raise UnknownConnection("There is no connection between %s@%s <->%s@%s" % (emu_node_x, emu_node_y, interface_x, interface_y))

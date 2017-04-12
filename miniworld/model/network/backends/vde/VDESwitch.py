@@ -1,6 +1,6 @@
 import random
 import re
-from StringIO import StringIO
+from io import StringIO
 
 from miniworld import log
 from miniworld.errors import Base

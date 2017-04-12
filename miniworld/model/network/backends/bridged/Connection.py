@@ -1,4 +1,7 @@
+import subprocess
 from collections import defaultdict
+
+from ordered_set import OrderedSet
 
 from miniworld import log
 from miniworld.Scenario import scenario_config
@@ -6,8 +9,6 @@ from miniworld.model.network.backends.AbstractConnection import AbstractConnecti
 from miniworld.model.network.linkqualitymodels.LinkQualityConstants import *
 from miniworld.model.network.linkqualitymodels.LinkQualityModelRange import LinkQualityModelNetEm
 from miniworld.model.singletons.Singletons import singletons
-
-from ordered_set import OrderedSet
 __author__ = 'Nils Schmidt'
 
 def get_superclass_dynamic():
@@ -33,7 +34,8 @@ def ConnectionDummy():
 
         PREFIXES = ["connection"]
 
-        SHAPED_IFACES = defaultdict(lambda: False)
+        shaped_ifaces = defaultdict(lambda: False)
+        cleanup_commands = set()
 
         # TODO: INTERFACE FOR ShellCommandSerializer STUFF?
         # COMMON VARIABLES AND THIS METHOD
@@ -130,12 +132,12 @@ def ConnectionDummy():
                 if default_class:
                     default_class = "default %s" % default_class
 
-                if not self.SHAPED_IFACES[dev_name]:
+                if not self.shaped_ifaces[dev_name]:
                     postfix = ' htb {}'.format(default_class)
                     self.add_shell_command(self.EVENT_LINK_SHAPE_ADD_QDISC,
                                            # TODO: ADD/REMOVE default 1
                                            "tc qdisc replace dev {} root handle 1:0{}".format(dev_name, postfix))
-                self.SHAPED_IFACES[dev_name] = True
+                self.shaped_ifaces[dev_name] = True
 
                 # add first and only class, use htb shaping algorithm
                 self.add_shell_command(self.EVENT_LINK_SHAPE_ADD_CLASS,
@@ -162,6 +164,7 @@ def ConnectionDummy():
                 netem_command += ' {}'.format(build_netem_options())
                 self.add_shell_command(self.EVENT_LINK_SHAPE_ADD_CLASS, netem_command)
                 self._add_filter_cmd(dev_name, connection_id)
+                self.add_cleanup(dev_name)
 
             else:
                 log.info("not shaping device %s", dev_name)
@@ -231,7 +234,19 @@ def ConnectionDummy():
                 self.tap_link_up(tap_y, tap_x, up=up)
 
         def reset(self):
-            ConnectionDummy.SHAPED_IFACES = defaultdict(lambda: False)
+            ConnectionDummy.shaped_ifaces = defaultdict(lambda: False)
+
+            # we stored the commands since the tap dev mapping is already reseted at this point
+            for cleanup_cmd in ConnectionDummy.cleanup_commands:
+                try:
+                    self.run(cleanup_cmd)
+                except subprocess.CalledProcessError as e:
+                    log.exception(e)
+
+            ConnectionDummy.cleanup_commands = set()
+
+        def add_cleanup(self, dev_name):
+            self.cleanup_commands.add('tc qdisc del dev {dev_name} root'.format(dev_name=dev_name))
 
         ###############################################
         ### Subclass for custom execution mode

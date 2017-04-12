@@ -14,6 +14,7 @@
    "logging" : {
      // INFO, WARN, ERROR, DEBUG
      "level" : "INFO",
+     "log_provisioning": false,
     "debug" : false
    },
    "ramdisk" : true,

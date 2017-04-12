@@ -1,21 +1,17 @@
-import os
 import re
 import socket
 
-import time
-
 from miniworld import log
+from miniworld.Config import config
 from miniworld.Scenario import scenario_config
-from miniworld.management.ShellHelper import run_shell
 from miniworld.repl.errors import REPLUnexpectedResult, REPLTimeout
 from miniworld.util import NetUtil
 from miniworld.util.NetUtil import read_remaining_data, Timeout
-from miniworld.Config import config
 
 # buffer size for for non-bytewise operations
 SOCKET_READ_BUF_SIZE = 65536
 
-class CommandRunner(object):
+class CommandRunner:
     '''
     This class is responsible for the command execution of the :py:class:`.REPL`.
 
@@ -94,6 +90,9 @@ class CommandRunner(object):
         self.sock = None
         self.re_shell_prompt = re.compile(shell_prompt, flags=re.DOTALL | re.MULTILINE)
 
+    def is_reuse_socket(self):
+        return hasattr(self.replable, 'uds_socket')
+
     def __call__(self, *args, **kwargs):
         '''
         Execute the code lazily in the REPL.
@@ -115,9 +114,17 @@ class CommandRunner(object):
         '''
 
         try:
+            self.sock = None
             # wait until uds is reachable
-            self.sock = self.replable.wait_until_uds_reachable(return_sock=True)
+            if self.is_reuse_socket():
+                if self.replable.uds_socket is None:
+                    self.replable.uds_socket = self.replable.wait_until_uds_reachable(return_sock=True)
+                self.sock = self.replable.uds_socket
+            else:
+                self.sock = self.replable.wait_until_uds_reachable(return_sock=True)
 
+
+            # TODO: old stuff
             # return socket object first
             yield self.sock
 
@@ -129,24 +136,25 @@ class CommandRunner(object):
             for x in self.execute_script():
                 yield x
 
-        except socket.error, e:
+        except socket.error as e:
             self.brief_logger.exception(e)
         except Timeout as e:
-            raise REPLTimeout("The REPL '%s' encountered a timeout (%s)!" % (self.replable, self.timeout))
+            raise REPLTimeout("The REPL '%s' encountered a timeout (%s) while looking for shell prompt (%s)" % (self.replable, self.timeout, self.shell_prompt))
 
         # finally close socket
         finally:
 
             try:
-                try:
-                    self.sock.shutdown(socket.SHUT_RDWR)
-                except socket.error:
-                    log.exception(e)
+                if not self.is_reuse_socket():
+                    try:
+                        self.sock.shutdown(socket.SHUT_RDWR)
+                    except socket.error as e:
+                        log.exception(e)
 
-                try:
-                    self.sock.close()
-                except socket.error:
-                    log.exception(e)
+                    try:
+                        self.sock.close()
+                    except socket.error as e:
+                        log.exception(e)
 
             except AttributeError as e:
                 log.exception(e)
@@ -171,7 +179,7 @@ class CommandRunner(object):
                 self.verbose_logger.debug("sending '%s', timeout: %s [done]", ENTER_SHELL_CMD, self.timeout)
 
             if self.enter_shell_send_newline:
-                self.sock.send("\n")
+                self.sock.send(b"\n")
             if self.wait_for_command_execution(timeout=self.timeout):
                 break
         if self.verbose_logger:
@@ -209,7 +217,7 @@ class CommandRunner(object):
 
                 # execute command
                 cmd = cmd + "\n"
-                self.sock.send(cmd)
+                self.sock.send(cmd.encode())
 
                 res = self.wait_for_command_execution(timeout = self.timeout)
                 # read all data which is not covered by the regex used for stream searching
@@ -266,6 +274,7 @@ class CommandRunner(object):
         '''
         if check_fun is None:
             def check_fun2(buf, whole_data):
+                # TODO: expose via logging config entry
                 if self.verbose_logger is not None:
                     self.verbose_logger.debug("expecting '%s', got: '%s'", self.shell_prompt, buf)
 

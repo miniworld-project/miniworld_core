@@ -1,12 +1,10 @@
-from UserDict import UserDict
+from collections import UserDict
 
-
-# TODO: DOC
 from miniworld.model.network.connections.JSONEncoder import JSONStrMixin
 
 
 # TODO: REMOVE
-class NodeDictMixin():
+class NodeDictMixin:
     '''
     '''
 

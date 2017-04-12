@@ -1,9 +1,9 @@
-import UserList
+import collections
 
 from miniworld.model.singletons import Resetable
 
 
-class SimulationErrors(UserList.UserList, Resetable.Resetable):
+class SimulationErrors(collections.UserList, Resetable.Resetable):
     '''
     Attributes
     ----------

@@ -1,14 +1,12 @@
 from pprint import pformat
-
+from subprocess import check_output
 
 from ordered_set import OrderedSet
 
-from subprocess32 import check_output
-
 from miniworld.errors import NetworkBackendBridgedBridgeError
+from miniworld.model.network.backends.bridged.Bridge import Bridge
 from miniworld.model.network.backends.bridged.iproute2 import IPRoute2Commands
 from miniworld.model.singletons.Singletons import singletons
-from miniworld.model.network.backends.bridged.Bridge import Bridge
 
 # TODO: use group mgmt functions!
 

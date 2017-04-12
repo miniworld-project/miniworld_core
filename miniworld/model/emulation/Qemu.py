@@ -1,36 +1,23 @@
 import hashlib
-import json
-import logging
 import re
 import socket
-import threading
-from UserDict import UserDict
-from pprint import pformat
-from time import sleep
 import time
-from StringIO import StringIO
-
-import selectors34
+from collections import UserDict
+from io import StringIO
 
 import miniworld.model.network.interface.Interface
 from miniworld.Config import config
 from miniworld.Scenario import scenario_config
 from miniworld.management.ShellHelper import run_shell
-
-from miniworld.model import StartableObject
 from miniworld.model.emulation.QemuMonitorRepl import QemuMonitorRepl, QemuMonitorSnapshotLoadError
 from miniworld.model.emulation.VirtualizationLayer import VirtualizationLayer
-
 from miniworld.util.NetUtil import Timeout
-
 
 __author__ = 'Nils Schmidt'
 
 from os.path import basename, abspath
 from os.path import splitext
-import pexpect
-from miniworld.errors import QemuBootWaitTimeout, QemuNoShell
-from miniworld.log import get_node_logger, get_file_handler
+from miniworld.errors import QemuBootWaitTimeout
 from miniworld.util import PathUtil, NetUtil
 from miniworld.model.singletons.Singletons import singletons
 
@@ -152,6 +139,20 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
 
         # unix domain socket paths
         self.path_uds_socket = self.get_qemu_sock_path(self.id)
+        #self.uds_socket = None
+
+    def reset(self):
+        # try:
+        #     self.uds_socket.shutdown(socket.SHUT_RDWR)
+        # except socket.error as e:
+        #     self.nlog.exception(e)
+        #
+        # try:
+        #     self.uds_socket.close()
+        # except socket.error as e:
+        #     self.nlog.exception(e)
+            
+        super(Qemu, self).reset()
 
     # TODO: #54,#55: DOC
     def after_start(self):
@@ -296,7 +297,7 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
                                                                    # we are responsible ourselves for killing the process
                                                                    take_process_ownership=take_process_ownership)
 
-            # we need to connect to both sockets once, first to the qmp socket (this creates the serial shell socket)
+            # we need to connect to both sockets once, first to the qemu monitor socket (this creates the serial shell socket)
             self.monitor_repl.run_commands_eager(StringIO("\n"))
             #NetUtil.wait_until_uds_reachable(self.path_uds_socket)
 
@@ -320,12 +321,6 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
                                             timeout = config.get_repl_timeout()
                                             )
 
-            elif scenario_config.is_provisioning_boot_mode_pexpect():
-
-                self.wait_until_qemu_booted_pexpect(self.path_uds_socket, self.log_path_qemu_boot,
-                                            booted_signal = scenario_config.get_signal_boot_completed(node_id = self.id),
-                                            timeout = config.get_repl_timeout()
-                                            )
             else:
                 raise ValueError("Unknown boot mode!")
 
@@ -416,7 +411,7 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
             # TODO: REMOVE SELF REF
             # TODO: USE PARTIAL BUFFER ONLY!
             def check_fun(buf, whole_data):
-                f.write(buf)
+                f.write(buf.decode())
                 # TODO: #35: more efficient!!!
                 if compiled_regex.search(whole_data) is not None:
                     return True
@@ -434,85 +429,9 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
         sock.shutdown(socket.SHUT_RDWR)
         sock.close()
 
-    # TODO: REMOVE
-    ##########################################################
-    ### Keep for performance testing only: pexpect waiting
-    ##########################################################
-
-    def wait_until_qemu_booted_pexpect(self, path_unix_sock, path_log_file, booted_signal = None, timeout = None):
-        '''
-        Wait until the qemu instance has been booted.
-
-        Parameters
-        ---------
-        path_unix_sock : str
-        path_log_file : str
-        booted_signal : str
-            Regexp to detect that the VM has booted.
-        timeout : int (optional, default is the value from the global config file)
-            After which time to give up and raise QemuBootWaitTimeout
-
-        Returns
-        -------
-        pexpect child
-
-        Raises
-        ------
-        QemuBootWaitTimeout
-        '''
-
-        self.wait_until_uds_reachable()
-        child = pexpect.spawn('socat - UNIX-CONNECT:%s' % path_unix_sock)
-
-        self.nlog.info("pexpect logging from %s to %s", path_unix_sock, path_log_file)
-        # redirect from unix domain socket to logfile
-        child.logfile = open(path_log_file, "w")
-
-        self.nlog.info("waiting for qemu instance to boot ...")
-        try:
-
-            self.nlog.info("waiting for %s", booted_signal)
-            child.expect([booted_signal, pexpect.EOF], timeout = timeout)
-
-            self.nlog.info("qemu boot completed ...")
-            self.nlog.info("qemu instance reacting to commands ...")
-
-            # we need to enter the console
-            #self.exec_cmd_stdout(child, "\n", scenario_config.get_shell_prompt(self.id))
-            #self.nlog.info("got shell prompt")
-        except pexpect.TIMEOUT:
-            raise QemuBootWaitTimeout("Timeout occurred while waiting for shell prompt of QEMU instance: %s", self)
-
-        return child
-
     def make_snapshot(self, name=None):
         if not self.booted_from_snapshot:
             self.monitor_repl.make_snapshot(name=None)
-
-    #
-    #
-    #
-    # def exec_cmd_stdout(self, child, cmd, regex_shell_prompt, *args, **kwargs):
-    #     '''
-    #     Returns
-    #     -------
-    #     str
-    #         The boot log
-    #     regex_shell_prompt : str
-    #         Needed to detect if the shell is available.
-    #
-    #     Raises
-    #     ------
-    #     ExceptionPexpect
-    #     '''
-    #     child.sendline(cmd)
-    #     log.info("waiting for %s", regex_shell_prompt)
-    #     try:
-    #         child.expect([regex_shell_prompt, pexpect.EOF], *args, **kwargs)
-    #         return child.after
-    #     except pexpect.ExceptionPexpect as e:
-    #         raise QemuNoShell("Could not enter the shell of the qemu instance! Waited for shell prompt: ''" % regex_shell_prompt)
-
 
     ###############################################
     ### REPLable
@@ -526,7 +445,8 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
 
 
         commands = []
-        for cmd in flo.buf.split("\n"):
+        flo.seek(0)
+        for cmd in flo.read().split("\n"):
             # append return value checker
             commands.append( "%s%s" % (cmd, self.exit_code_shell_cmd_checker) )
 
@@ -544,7 +464,7 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
 
         kwargs.update({
             'brief_logger': self.nlog,
-            'verbose_logger': self.verbose_logger,
+            'verbose_logger': self.nlog if config.is_log_provisioning() else None,
             'shell_prompt' : scenario_config.get_shell_prompt(node_id = self.id)
         })
         return REPLable.run_commands(self, *args, **kwargs)

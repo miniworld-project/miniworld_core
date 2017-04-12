@@ -1,7 +1,7 @@
-from UserDict import UserDict
+from collections import UserDict
 
 
-class TupleUserDict(UserDict, object):
+class TupleUserDict(UserDict):
 
     #########################################
     ### Implement these in a subclass

@@ -1,7 +1,6 @@
-import re
+import subprocess
 
 import netifaces
-import subprocess32
 from ordered_set import OrderedSet
 
 from miniworld import log
@@ -9,15 +8,12 @@ from miniworld.Scenario import scenario_config
 from miniworld.errors import NetworkBackendBridgedError
 from miniworld.management import ShellHelper
 from miniworld.model.network.backends.bridged import NetworkBackendBridged
-from miniworld.model.network.backends.bridged.NetworkBackendBridged import re_tc, re_find_ip, \
+from miniworld.model.network.backends.bridged.NetworkBackendBridged import re_find_ip, \
     PATH_SHELL_COMMANDS
 from miniworld.model.network.backends.bridged.iproute2 import Constants
-from miniworld.util import PathUtil
 
 
 def NetworkBackendBridgedIproute2():
-
-
     class NetworkBackendBridgedIproute2(NetworkBackendBridged.NetworkBackendBridged()):
         '''
         Use iproute2 to setup the network.
@@ -74,43 +70,23 @@ def NetworkBackendBridgedIproute2():
                     # NOTE: run shell_commands in batch mode, this is much faster than doing it sequentially
                     try:
                         cmd = "ip -d -batch -"
-                        log.info("changing network topology with '%s'. See '%s' for the commands." % (cmd, PATH_SHELL_COMMANDS))
+                        log.info("changing network topology with '%s'. See '%s' for the commands." % (
+                        cmd, PATH_SHELL_COMMANDS))
                         ShellHelper.run_shell_with_input(cmd, ip_commands)
 
-                    except subprocess32.CalledProcessError as e:
+                    except subprocess.CalledProcessError as e:
                         raise NetworkBackendBridgedError(
-    """Could not execute all iproute2 shell_commands!
-    An old version of iproute2 may not have full bridge support!
-    Try to use the brctl mode! Or run './install_newest_compatible_iproute2.sh'!
-    Executed commands: %s
-    Interface listing: %s """ % (ip_commands, netifaces.interfaces()), caused_by=e)
+                            """Could not execute all iproute2 shell_commands!
+                            An old version of iproute2 may not have full bridge support!
+                            Try to use the brctl mode! Or run './install_newest_compatible_iproute2.sh'!
+                            Executed commands: %s
+                            Interface listing: %s """ % (ip_commands, netifaces.interfaces()), caused_by=e)
 
                 # Use iproute2 only
                 execute_batch_iproute2_commands()
             # execute all commands in non-batch parallel mode
             else:
                 self.shell_command_executor.run_commands()
-
-        # def do_queueing_discipline(self):
-        #     '''
-        #     Execute the linux qdisc commands for traffic shaping etc.
-        #     '''
-        #
-        #     # for the other modes the class :py:class:`.ShellCommandSerializer` takes over
-        #     if scenario_config.is_network_backend_bridged_execution_mode_batch():
-        #         # shell shell_commands
-        #         shell_commands = self.shell_command_executor.get_all_commands()
-        #         # list->str
-        #         shell_commands = '\n'.join(shell_commands)
-        #
-        #         # strip "tc " prefix
-        #         commands_tc = '\n'.join(re_tc.findall(shell_commands))
-        #         # NOTE: run shell_commands in batch mode, this is much faster than doing it sequentially
-        #
-        #         cmd = "tc -d -batch -"
-        #         # TODO: add log file
-        #         log.info("changing network topology with '%s'. See '%s' for the commands." % (cmd, PATH_SHELL_COMMANDS))
-        #         ShellHelper.run_shell_with_input(cmd, commands_tc)
 
         def after_distance_matrix_changed(self, *args, **kwargs):
             '''
@@ -148,7 +124,6 @@ def NetworkBackendBridgedIproute2():
 
             return self.tunnels[tunnel_name]
 
-
         def get_tunnel_name(self, emulation_node_x_id, emulation_node_y_id):
             '''
             Order of arguments does not matter!
@@ -166,7 +141,7 @@ def NetworkBackendBridgedIproute2():
 
             def get_tunnel_name(prefix):
                 return "{prefix}_{id_fmt}_{id_fmt}".format(prefix=prefix, id_fmt=Constants.NODE_ID_FMT) % (
-                node_id_1, node_id_2)
+                    node_id_1, node_id_2)
 
             # NOTE: we cannot choose the prefix longer due to the maximum device name length
             if scenario_config.is_network_backend_bridged_distributed_mode_vlan():

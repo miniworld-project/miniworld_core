@@ -21,7 +21,7 @@ try:
 except curses.error:
     pass
 
-class CLIEventDisplay(object):
+class CLIEventDisplay:
 
     '''
     CLI-based view for the :py:class:`.EventSystem`.
@@ -130,4 +130,4 @@ class CLIEventDisplay(object):
             msg = 'Scenario starting: %s' % next(self.progress_gen)
             self.info_writer.write(msg)
         else:
-            print json.dumps(progress_dict, indent=4)
+            print(json.dumps(progress_dict, indent=4))

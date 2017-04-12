@@ -2,16 +2,15 @@ import importlib
 import sys
 
 from miniworld import log
-from miniworld.decorators import memoize_pos_args
 from miniworld.model.network.linkqualitymodels.LinkQualityConstants import *
 
 VAL_DISTANCE_ZERO = 0
-VAL_DISTANCE_UNLIMITED = sys.maxint
+VAL_DISTANCE_UNLIMITED = sys.maxsize
 
 __author__ = 'Nils Schmidt'
 
 # TODO: DOC
-class LinkQualityModel(object):
+class LinkQualityModel:
 
     def __init__(self,
                  # link quality stuff
@@ -42,7 +41,7 @@ class LinkQualityModel(object):
     def precalculate(self):
 
         log.info("precalculating link qualities ...")
-        for distance in xrange(0, sys.maxint):
+        for distance in range(0, sys.maxsize):
             connected, link_quality_dict = self.distance_2_link_quality(distance)
             if not connected:
                 self.max_connected_distance = distance
@@ -73,7 +72,7 @@ class LinkQualityModel(object):
         '''
         mod = '.'.join(pn.split(".")[:-1])
         cls = pn.split(".")[-1]
-        print mod, cls
+        print(mod, cls)
 
         try:
             module = importlib.import_module(mod)

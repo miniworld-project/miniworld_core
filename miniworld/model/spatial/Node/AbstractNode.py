@@ -6,7 +6,7 @@ __email__ = "uni at lampep.de"
 
 import random
 
-class AbstractNode(object):
+class AbstractNode():
     ''' 
     Parameter
     ---------

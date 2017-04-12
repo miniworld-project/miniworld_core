@@ -1,4 +1,3 @@
-from miniworld.log import log
 from miniworld.errors import Base
 from miniworld.model.singletons.Singletons import singletons
 
@@ -35,7 +34,7 @@ class StartableObject(object):
 
     def get_already_called_once_msg(self, fun):
         return "The method '%s' of class '%s' has already been called once!" % (
-            fun.func_name, self.__class__.__name__)
+            fun.__name__, self.__class__.__name__)
 
     def _shutdown(self, *args, **kwargs):
         raise NotImplementedError

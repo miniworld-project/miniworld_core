@@ -1,12 +1,11 @@
 # TODO:
-from StringIO import StringIO
 from ordered_set import OrderedSet
 
-from miniworld.model.singletons.Singletons import singletons
-from miniworld.model import StartableObject
 from miniworld.log import log
-from miniworld.util import NetworkBackendUtil
+from miniworld.model import StartableObject
 from miniworld.model.network.backends.bridged.iproute2 import IPRoute2Commands
+from miniworld.model.singletons.Singletons import singletons
+from miniworld.util import NetworkBackendUtil
 
 # TODO: move to base package!
 GRETAP_MTU = 1458

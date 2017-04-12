@@ -1,7 +1,7 @@
 from collections import OrderedDict
 
 
-class SwitchMixin(object):
+class SwitchMixin:
 
     def create_switches(self):
         # create one switch for each node interface

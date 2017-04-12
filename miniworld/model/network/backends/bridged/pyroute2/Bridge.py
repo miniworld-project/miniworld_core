@@ -1,13 +1,12 @@
 from pprint import pformat
+from subprocess import check_output
 
-# for pyroute 0.4.x
 from pyroute2.ipdb.exceptions import CreateException
 from pyroute2.netlink import NetlinkError
-from subprocess32 import check_output
 
-from miniworld.errors import NetworkBackendStartError, NetworkBackendBridgedBridgeError, NetworkBackendErrorReset
-from miniworld.model.singletons.Singletons import singletons
+from miniworld.errors import NetworkBackendStartError, NetworkBackendBridgedBridgeError
 from miniworld.model.network.backends.bridged.Bridge import Bridge
+from miniworld.model.singletons.Singletons import singletons
 
 
 def BridgePyroute2():

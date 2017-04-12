@@ -1,12 +1,9 @@
 import atexit
 import logging
 import os
-import shlex
 import shutil
 import signal
 import sys
-
-from subprocess32 import check_output
 
 from miniworld.Config import set_global_config, PATH_GLOBAL_CONFIG, config
 from miniworld.Constants import PATH_TMP, PATH_LOGS, PROJECT_NAME, PATH_CLEANUP_SCRIPT
@@ -21,9 +18,15 @@ __author__ = 'Nils Schmidt'
 
 def init(do_init_singletons=True):
     ''' Init the module by installing signal handlers and creating the temp files '''
+    
+    if not os.path.exists(PATH_GLOBAL_CONFIG):
+        # TODO: render config.json from config sleeve
+        log.info('creating config ...')
+        shutil.copy2('sample_configs/config.json', '.')
+
     # TODO: Ticket #2
     install_signal_handlers()
-    set_global_config(PATH_GLOBAL_CONFIG)
+    set_global_config(os.getenv('CONFIG') or PATH_GLOBAL_CONFIG)
     set_log_level(config.get_log_level())
 
     clean_miniworld_dir()

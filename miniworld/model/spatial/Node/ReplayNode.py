@@ -7,7 +7,7 @@ __email__ = "uni at lampep.de"
 
 from miniworld.model.spatial.MovementPattern.ReplayMovementPattern import ReplayMovementPattern
 
-class ReplayNode(object):
+class ReplayNode():
     def __init__(self, node_id):
         self.crnt_movement_pattern = ReplayMovementPattern(singletons.spatial_singleton.file_path, node_id)
 

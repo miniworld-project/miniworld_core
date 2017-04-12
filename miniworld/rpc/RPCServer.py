@@ -1,32 +1,30 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import argparse
-import contextlib
 import json
 import logging
 import os
 import pprint
 import sys
 import threading
-from SimpleXMLRPCServer import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
-from StringIO import StringIO
 from collections import OrderedDict
 from functools import wraps
 from threading import Lock
+from xmlrpc.server import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
+
+import netifaces
 
 # set PYTHONPATH
-import netifaces
+sys.path.append(os.getcwd())
+
 
 from miniworld.management.spatial import MovementDirectorFactory
 from miniworld.model.emulation.Qemu import Qemu
 from miniworld.model.network.connections.JSONEncoder import ConnectionEncoder
 from miniworld.rpc import RPCUtil
 from miniworld.rpc.zeromq import ZeroMQProtoServer, ZeroMQProtoClient
-from miniworld.util import ConcurrencyUtil
-sys.path.append(os.getcwd())
 
 import miniworld
-from miniworld import Scenario
 from miniworld.Scenario import scenario_config
 from miniworld.Config import config
 from miniworld.log import get_logger, log
@@ -40,6 +38,11 @@ RPC_LOG_FILE_PATH = "rpc_server"
 # TODO: REMOVE
 _logger = None
 
+def to_json(fun):
+    def wrap(*args, **kwargs):
+        return json.dumps(fun(*args, **kwargs), indent=4)
+    return wrap
+
 def logger():
     global _logger
     if _logger is None:
@@ -47,12 +50,15 @@ def logger():
         _logger.addHandler(logging.FileHandler(PathUtil.get_log_file_path("%s.txt" % RPC_LOG_FILE_PATH)))
     return _logger
 
+
 # TODO: DOC
 def escape_decorator(fun):
     def wrapper(*args, **kwargs):
         res = fun(*args, **kwargs)
         return ''.join(map(escape, res))
+
     return wrapper
+
 
 def dec_requires_simulation_running(fun):
     @wraps(fun)
@@ -60,24 +66,16 @@ def dec_requires_simulation_running(fun):
         if singletons.simulation_manager and singletons.simulation_manager.running:
             return fun(*args, **kwargs)
         raise ValueError("Simulation not running yet!")
+
     return wrap
+
 
 def escape(c):
     # skipt 0 - 31 (https://docs.python.org/2/library/xmlrpclib.html)
-    if ord(c) >= 32:# and ord(c) <= ord('z'):
-       return c
+    if ord(c) >= 32:  # and ord(c) <= ord('z'):
+        return c
     else:
         return ''
-
-def dict_keys_to_int(d):
-    return OrderedDict((str(k), v) for k, v in d.items())
-
-# ToDo: check every call if json encoder is not a better solution
-def dec_dict_keys_to_int(fun):
-    @wraps(fun)
-    def wrap(*args, **kwargs):
-        return dict_keys_to_int(fun(*args, **kwargs))
-    return wrap
 
 # TODO: DOC
 def assert_node_id_is_int(fun):
@@ -88,7 +86,7 @@ def assert_node_id_is_int(fun):
     '''
 
     # TODO: use wraps in all decorators!
-    #@wraps(fun)
+    # @wraps(fun)
     def wrap(*args, **kwargs):
         node_id = args[1]
 
@@ -99,6 +97,7 @@ def assert_node_id_is_int(fun):
 
     return wrap
 
+
 def node_id_2_int(fun):
     '''
     Raises
@@ -107,13 +106,14 @@ def node_id_2_int(fun):
     '''
 
     # TODO: use wraps in all decorators!
-    #@wraps(fun)
+    # @wraps(fun)
     def wrap(*args, **kwargs):
         node_id = args[1]
 
         return fun(args[0], int(node_id), *args[2:], **kwargs)
 
     return wrap
+
 
 # TODO: DOC
 def assert_simulation_manager_started(fun):
@@ -122,8 +122,8 @@ def assert_simulation_manager_started(fun):
     ------
     RuntimeError
     '''
-    def wrap(*args, **kwargs):
 
+    def wrap(*args, **kwargs):
         _self = args[0]
         simulation_manager = singletons.simulation_manager
 
@@ -133,10 +133,10 @@ def assert_simulation_manager_started(fun):
 
         return fun(*args, **kwargs)
 
+
 # TODO: set response type to json in all method responses!
 # TODO: refactor!!
-class MiniWorldRPC(object):
-
+class MiniWorldRPC:
     '''
     Attributes
     ----------
@@ -145,12 +145,13 @@ class MiniWorldRPC(object):
     lock
 
     '''
+
     def __init__(self):
         self.lock = Lock()
 
-#########################################
-# RPC Rewrite
-#########################################
+    #########################################
+    # RPC Rewrite
+    #########################################
 
     def ping(self):
         return "pong"
@@ -158,24 +159,24 @@ class MiniWorldRPC(object):
     def get_shell_variables(self):
         return pprint.pformat(Qemu.get_repl_variables_static(1))
 
-    @dec_requires_simulation_running
+    @to_json
     @node_id_2_int
     def get_server_for_node(self, node_id):
         return singletons.simulation_manager.get_server_for_node(node_id)
 
-    # TODo: use different json encoder instead of dec_dict_keys_to_int
-    @dec_requires_simulation_running
+    # @dec_requires_simulation_running
     def get_connections(self):
         return json.dumps(
-                    OrderedDict(sorted(singletons.network_manager.connection_store.get_connections_per_node().items())),
-                    indent=4, cls=ConnectionEncoder)
+            OrderedDict(sorted(singletons.network_manager.connection_store.get_connections_per_node().items())),
+            indent=4, cls=ConnectionEncoder)
 
     @dec_requires_simulation_running
     def get_links(self, include_interfaces, key=None):
-        return singletons.network_manager.connection_store.get_link_quality_matrix(include_interfaces=include_interfaces, key=key).to_json()
+        return singletons.network_manager.connection_store.get_link_quality_matrix(
+            include_interfaces=include_interfaces, key=key).to_json()
 
+    @to_json
     @dec_requires_simulation_running
-    @dec_dict_keys_to_int
     def get_distributed_address_mapping(self):
         res = scenario_config.get_network_backend_bridged_tunnel_endpoints()
         if not res:
@@ -194,9 +195,8 @@ class MiniWorldRPC(object):
         return json.dumps(singletons.simulation_manager.exec_node_cmd(cmd, node_id=node_id, validation=validation))
 
     @dec_requires_simulation_running
-    @dec_dict_keys_to_int
     def get_distributed_node_mapping(self):
-        return scenario_config.get_distributed_server_node_mapping()
+        return json.dumps(scenario_config.get_distributed_server_node_mapping(), indent=4)
 
     # TODO: requires first step!
     @dec_requires_simulation_running
@@ -205,7 +205,6 @@ class MiniWorldRPC(object):
             OrderedDict(sorted(singletons.simulation_manager.distance_matrix.items())),
             indent=4, cls=ConnectionEncoder
         )
-
 
     def simulation_run_loop_encountered_exception(self):
         try:
@@ -300,7 +299,9 @@ class MiniWorldRPC(object):
     def simulation_get_scenarios(self):
         return ["scenario1", "scenario2"]
 
+
 yappi_started = False
+
 
 def signal_profiling_handler(signum, *args, **kwargs):
     '''
@@ -330,8 +331,8 @@ def signal_profiling_handler(signum, *args, **kwargs):
 
         yappi_started = False
 
-class MiniWorldRPCClient(MiniWorldRPC):
 
+class MiniWorldRPCClient(MiniWorldRPC):
     '''
     Attributes
     ----------
@@ -348,20 +349,20 @@ class MiniWorldRPCClient(MiniWorldRPC):
         self.zeromq_thread.daemon = True
         self.zeromq_thread.start()
 
-class MiniWorldRPCServer(MiniWorldRPC):
 
+class MiniWorldRPCServer(MiniWorldRPC):
     '''
     Attributes
     ----------
     zeromq_thread : Thread
     zmq_server : ZeroMQServer
     '''
+
     def __init__(self):
         super(MiniWorldRPCServer, self).__init__()
 
         self.zmq_server = None
         if config.is_mode_distributed():
-
             log.info("starting in distributed mode ...")
             self.zmq_server = ZeroMQProtoServer.factory()()
             singletons.zeromq_server = self.zmq_server
@@ -394,7 +395,6 @@ class MiniWorldRPCServer(MiniWorldRPC):
 
         singletons.simulation_manager.start(scenario_config_content, auto_stepping=auto_stepping, blocking=blocking)
 
-
     def simulation_pause(self):
         singletons.simulation_manager.pause()
 
@@ -409,10 +409,9 @@ class MiniWorldRPCServer(MiniWorldRPC):
             self.zmq_server.shutdown()
             log.debug("zmq shutdown [done]")
 
-
         if self.zmq_server:
             log.info("restarting zmq server ...")
-            #self.__zeromq_server_start()
+            # self.__zeromq_server_start()
             self.start_zmq_thread()
 
     @node_id_2_int
@@ -423,15 +422,17 @@ class MiniWorldRPCServer(MiniWorldRPC):
             log.exception(e)
             raise
 
+
 # Restrict to a particular path.
 class RequestHandler(SimpleXMLRPCRequestHandler):
     rpc_paths = ('/RPC2',)
 
+
 MODE_SERVER = "server"
 MODE_CLIENT = "client"
 
-def mode_client(args):
 
+def mode_client(args):
     config.set_is_coordinator(False)
 
     if args.tunnel_address:
@@ -448,10 +449,12 @@ def mode_client(args):
     log.info("tunnel address: %s", tunnel_addr)
     return MiniWorldRPCClient, [server_addr, tunnel_addr], {}
 
+
 def mode_server(args):
     config.set_is_coordinator(True)
 
     return MiniWorldRPCServer, [], {}
+
 
 def configure_client_parser(client_parser):
     # at least one of the mutually exclusive arguments is required
@@ -462,6 +465,7 @@ def configure_client_parser(client_parser):
     client_parser.add_argument("server_address", help="Address of the ZeroMQServer")
 
     client_parser.set_defaults(func=mode_client)
+
 
 def configure_server_parser(server_parser):
     server_parser.set_defaults(func=mode_server)
@@ -511,4 +515,3 @@ if __name__ == '__main__':
     logger().info("rpc server running")
     log.debug("registered functions: %s", pprint.pformat(server.system_listMethods()))
     server.serve_forever()
-

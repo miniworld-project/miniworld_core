@@ -5,7 +5,7 @@ __email__ = "uni at lampep.de"
 
 from time import strptime
 
-class ArmaMovementPattern(object):
+class ArmaMovementPattern:
     def __init__(self, file_path, node_id):
         self.file = open(file_path, "r")
         self.node_id = node_id

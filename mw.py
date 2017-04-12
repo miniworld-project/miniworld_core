@@ -2,79 +2,18 @@
 
 import argparse
 import json
-import xmlrpclib
 import sys
+import xmlrpc.client
 
 from miniworld import Constants, Config
-from miniworld.Scenario import scenario_config
-from miniworld.management.events import CLIEventDisplay
+from miniworld.Config import config
+from miniworld.log import log
 from miniworld.rpc import RPCUtil
 from miniworld.util import CliUtil
 from miniworld.util.CliUtil import rpc_parser
-from miniworld.log import log
-from miniworld.Config import config
-
-'''
-mw start -cs <json> -cc <json> <scenario_config>
 
 
-./mw ping
-"pong"
-
-./mw.py info addr
-{
-    "1": "172.17.0.1",
-    "2": "172.17.0.3"
-}
-
- ./mw.py info addr --node-id 1
-"172.17.0.1"
-
-./mw.py info server
-{
-    "1": [
-        1,
-        2,
-        5
-    ],
-    "2": [
-        3,
-        4
-    ]
-}
-
-./mw.py info server --node-id 3
-2
-
-
-mw info connections --include-interfaces
-
-mw info links
-mw info scenario
-mw info config
-mw info node <id> boot
-
-
-mw info network commands
-mw info network commands [step] [--node <id>]
-
-mw info node <id> all
-
-
-mw logs boot --node-id 1
-
-
-mw exec 1
-mw exec 1 cmd
-mw exec_all
-mw exec_all cmd
-
-mw pause # let rpc call block new step()
-
-mw error
-'''
-
-class Action(object):
+class Action():
 
     '''
     Models an action that is associated with a argparse parser.
@@ -84,7 +23,7 @@ class Action(object):
 
     Attributes
     ----------
-    connection : xmlrpclib.ServerProxy
+    connection : xmlrpc.ServerProxy
     address : str
         The RPC connection address string.
     '''
@@ -93,7 +32,7 @@ class Action(object):
 
     @staticmethod
     def get_connection(addr):
-        return xmlrpclib.ServerProxy(addr, allow_none=True)
+        return xmlrpc.client.ServerProxy(addr, allow_none=True)
 
     def get_connection_server(self, node_id=None, server_id=None):
 
@@ -106,7 +45,7 @@ class Action(object):
             else:
                 server_id = server_id
 
-            print >> sys.stderr, "using server: %s" % server_id
+            print("using server: %s" % server_id, file=sys.stderr)
             addr = self.connection.get_distributed_address_mapping()[str(server_id)]
             addr = RPCUtil.addr_from_ip(addr, RPCUtil.PORT_CLIENT)
             log.info("switching to rpc server '%s'", addr)
@@ -169,9 +108,9 @@ def new_action_decorator(fun):
 def action_info_addr(self, args):
     res = self.connection.get_distributed_address_mapping()
     if args.node_id:
-        res = res[args.node_id]
+        res = json.loads(res)[args.node_id]
 
-    return res
+    print(res)
 
 @new_action_decorator
 def action_info_server(self, args):
@@ -183,23 +122,23 @@ def action_info_server(self, args):
 
 @new_action_decorator
 def action_info_connections(self, args):
-    print self.connection.get_connections()
+    print(self.connection.get_connections())
 
 @new_action_decorator
 def action_info_links(self, args):
-    print self.connection.get_links(args.include_interfaces)
+    print(self.connection.get_links(args.include_interfaces))
 
 @new_action_decorator
 def action_info_distances(self, args):
-    print self.connection.get_distance_matrix()
+    print(self.connection.get_distance_matrix())
 
 @new_action_decorator
 def action_info_scenario(self, args):
     return self.connection.get_scenario()
 
-@new_action_decorator
-def action_info_shell_vars(self, args):
-    print self.connection.get_shell_variables(args.node_id)
+# @new_action_decorator
+# def action_info_shell_vars(self, args):
+#     print self.connection.get_shell_variables(args.node_id)
 
 #################################################
 ### ping
@@ -207,7 +146,7 @@ def action_info_shell_vars(self, args):
 
 @new_action_decorator
 def action_ping(self, args):
-    print self.connection.ping()
+    print(self.connection.ping())
 
 
 #################################################
@@ -216,7 +155,7 @@ def action_ping(self, args):
 
 @new_action_decorator
 def action_logs_boot(self, args):
-    print json.loads(self.connection.node_get_qemu_boot_log(args.node_id))
+    print(json.loads(self.connection.node_get_qemu_boot_log(args.node_id)))
 
 @new_action_decorator
 def action_start(self, args):
@@ -250,13 +189,13 @@ def action_exec(self, args, single=False):
         cmds = '\n'.join(cmds)
 
     if node_id:
-        print json.loads(self.connection.exec_node_cmd(cmds, node_id, args.validate))
+        print(json.loads(self.connection.exec_node_cmd(cmds, node_id, args.validate)))
     else:
         # only switch to the rpc server which holds the node
         for server_id in self.connection.get_distributed_address_mapping():
             self.connection = self.get_connection_server(server_id=server_id)
-            print >> sys.stderr, "%s >>>" % server_id
-            print json.loads(self.connection.exec_node_cmd(cmds, node_id, args.validate))
+            print("%s >>>" % server_id, file=sys.stderr)
+            print(json.loads(self.connection.exec_node_cmd(cmds, node_id, args.validate)))
 
 
 @new_action_decorator
@@ -274,13 +213,13 @@ def action_shell(self):
         cmds = '\n'.join(cmds)
 
     if node_id:
-        print json.loads(self.connection.exec_node_cmd(cmds, node_id, args.validate))
+        print(json.loads(self.connection.exec_node_cmd(cmds, node_id, args.validate)))
     else:
         # only switch to the rpc server which holds the node
         for server_id in self.connection.get_distributed_address_mapping():
             self.connection = self.get_connection_server(server_id=server_id)
-            print >> sys.stderr, "%s >>>" % server_id
-            print json.loads(self.connection.exec_node_cmd(cmds, node_id, args.validate))
+            print("%s >>>" % server_id, file=sys.stderr)
+            print(json.loads(self.connection.exec_node_cmd(cmds, node_id, args.validate)))
 
 if __name__ == '__main__':
     ACTION_START = "start"
@@ -296,7 +235,7 @@ if __name__ == '__main__':
     ACTION_PING = "ping"
 
     ACTION_INFO = "info"
-    ACTION_INFO_SHELL_VARS = "shell_vars"
+    # ACTION_INFO_SHELL_VARS = "shell_vars"
     ACTION_INFO_ADDR = "addr"
     ACTION_INFO_SERVER = "server"
     ACTION_INFO_CONNECTIONS = "connections"
@@ -356,9 +295,9 @@ if __name__ == '__main__':
             distances_parser.set_defaults(func=action_info_distances)
 
             # shell variables
-            shell_vars_parser = info_subparser.add_parser(ACTION_INFO_SHELL_VARS)
-            add_node_id_arg_optional(shell_vars_parser)
-            shell_vars_parser.set_defaults(func=action_info_shell_vars)
+            # shell_vars_parser = info_subparser.add_parser(ACTION_INFO_SHELL_VARS)
+            # add_node_id_arg_optional(shell_vars_parser)
+            # shell_vars_parser.set_defaults(func=action_info_shell_vars)
 
             # scenario parser
             scenario_parser = info_subparser.add_parser(ACTION_INFO_SCENARIO)
@@ -419,10 +358,10 @@ if __name__ == '__main__':
     create_subparsers(subparser)
 
     args = root_parser.parse_args()
-    print >> sys.stderr, "parser args: %s" % args
+    print("parser args: %s" % args, file=sys.stderr)
 
     # give the actions the option to print themselves to stdout
     res = args.func(args)
     # but if a value is returned, print it here
     if res:
-        print json.dumps(res, indent=4)
+        print(json.dumps(res, indent=4))

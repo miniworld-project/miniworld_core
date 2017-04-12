@@ -1,11 +1,11 @@
 import os
 import re
 from os.path import dirname
-from collections import defaultdict
-from ordered_set import OrderedSet
-from subprocess32 import check_output
+from subprocess import check_output
 
-from miniworld import run_shell
+from ordered_set import OrderedSet
+from collections import defaultdict
+
 from miniworld.Scenario import scenario_config
 from miniworld.log import log
 from miniworld.management import ShellHelper
@@ -21,7 +21,7 @@ from miniworld.util import PathUtil
 __author__ = 'Nils Schmidt'
 
 
-class EventMonitor(object, Resetable):
+class EventMonitor(Resetable):
     '''
     Monitors new bridge events.
 
@@ -402,28 +402,10 @@ def NetworkBackendBridged():
 
     return NetworkBackendBridged
 
-    # def __new__(cls, *args, **kwargs):
-    #
-    #     # from miniworld.model.network.backends.bridged.multidevice.NetworkBackendBridgedMultiDevice import \
-    #     #     NetworkBackendBridgedMultiDevice
-    #     # from miniworld.model.network.backends.bridged.singledevice.NetworkBackendBridgedSingleDevice import \
-    #     #     NetworkBackendBridgedSingleDevice
-    #     #
-    #     # if scenario_config.is_connection_mode_single():
-    #     #     return NetworkBackendBridgedSingleDevice
-    #     # elif scenario_config.is_connection_mode_multi():
-    #     #     return NetworkBackendBridgedMultiDevice
-    #     # else:
-    #     #     raise ValueError("NetworkBackend connection mode not set!")
-    #
-    #     class custom(cls, get_mixin_class()):
-    #         pass
-    #
-    #     return custom(*args, **kwargs)
 
 if __name__ == '__main__':
     from collections import defaultdict
     from pprint import pformat
 
     connections = {1: [2], 2: [3, 1], 3: [2]}
-    print pformat(configure_network(connections))
+    print(pformat(configure_network(connections)))

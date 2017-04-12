@@ -1,28 +1,23 @@
 #!/usr/bin/env python
 import argparse
 import json
+import random
+import sys
 from pprint import pformat
 
-
 import netifaces
-import sys
-from timeit import timeit
-
-import time
 import zmq
-import random
 
 import miniworld
+from miniworld.Config import config
 from miniworld.Scenario import scenario_config
+from miniworld.log import log
 from miniworld.management import ServerScore
 from miniworld.model.collections import DistanceMatrix
 from miniworld.model.singletons.Resetable import Resetable
 from miniworld.model.singletons.Singletons import singletons
-from miniworld.log import log
 from miniworld.rpc import Protocol
 from miniworld.rpc.zeromq import States
-from miniworld.Config import config
-from miniworld.util import PathUtil
 
 
 def factory():
@@ -43,7 +38,7 @@ def factory():
 class ZeroMQException(BaseException):
     pass
 
-class ZeroMQClient(object):
+class ZeroMQClient:
 
     '''
     This is a client for the :py:class:`.ZeroMQService` which uses a request socket.
@@ -148,7 +143,7 @@ class ZeroMQClient(object):
 
     def send_multi_part(self, *args):
         self.svc.send_multipart(
-            map(self.serialize, args)
+            list(map(self.serialize, args))
         )
 
     def send_no_server_id(self, *args):

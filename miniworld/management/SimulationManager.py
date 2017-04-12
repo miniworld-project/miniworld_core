@@ -2,10 +2,10 @@ import contextlib
 import logging
 import math
 import threading
-from StringIO import StringIO
 from collections import OrderedDict, defaultdict
 from contextlib import contextmanager
 from copy import deepcopy
+from io import StringIO
 from pprint import pformat
 from threading import Lock
 
@@ -16,7 +16,7 @@ from miniworld import Scenario
 from miniworld.Config import config
 from miniworld.Scenario import scenario_config, LINK_QUALITY_VAL_LOSS_NONE
 from miniworld.concurrency.ExceptionStopThread import ExceptionStopThread
-from miniworld.errors import SimulationStateAlreadyStarted, SimulationStateStartFailed
+from miniworld.errors import SimulationStateAlreadyStarted, SimulationStateStartFailed, Base
 from miniworld.log import get_logger, get_stdout_handler
 from miniworld.log import log
 from miniworld.management.RunLoop import RunLoop
@@ -29,7 +29,6 @@ from miniworld.model.emulation.nodes.virtual.CentralNode import is_central_node
 from miniworld.model.events.MyEventSystem import MyEventSystem
 from miniworld.model.network.backends import NetworkBackends
 from miniworld.model.network.backends.NetworkBackendNotifications import ConnectionInfo
-from miniworld.model.network.interface import Interface
 from miniworld.model.network.interface import Interfaces
 from miniworld.model.network.interface.Interface import HubWiFi, Management
 from miniworld.model.network.linkqualitymodels import LinkQualityModel
@@ -95,6 +94,14 @@ class SimulationManager(Resetable, object):
     resets : int
         The number of times an experiment has been started/stopped
     '''
+
+    class Error(Base):
+        pass
+
+    class NoMovementDirector(Error):
+        pass
+
+
     def __init__(self):
         self.lock = Lock()
 
@@ -156,7 +163,7 @@ class SimulationManager(Resetable, object):
         list<int>
         '''
         # filter out virtual nodes!
-        return filter(lambda x: isinstance(x, int), self.nodes_id_mapping.keys())
+        return list(filter(lambda x: isinstance(x, int), self.nodes_id_mapping.keys()))
 
     ###############################################
     ### CentralHub
@@ -251,7 +258,8 @@ class SimulationManager(Resetable, object):
             # exception
             raise_objects = self.run_loop.raise_objects
             self.abort()
-            raise raise_objects[0], raise_objects[1], raise_objects[2]
+
+            raise raise_objects[0]
 
         # no run-loop yet
         return False
@@ -463,7 +471,7 @@ class SimulationManager(Resetable, object):
             self.pre_calculate_hubwifi_distance_matrix(emulation_nodes)
 
             # TODO: check!
-            self.nodes_id_mapping = {node.id : node for node in (emulation_nodes + self.central_nodes_id_mapping.values())}
+            self.nodes_id_mapping = {node.id : node for node in (emulation_nodes + list(self.central_nodes_id_mapping.values()))}
 
             self.logger.debug("nodes: %s", pformat(self.nodes_id_mapping))
             self.logger.info("topology mode : '%s'", scenario_config.get_walk_model_name())
@@ -603,8 +611,8 @@ class SimulationManager(Resetable, object):
         # TODO: #52: maybe numpy is faster for comparing matrices
         # new dict with entries present in the first set, but not in the second
         # do not take the distance matrix for the CentralHub into account (doesn't change)
-        distance_matrix_diff = OrderedDict(
-            OrderedSet(new_distance_matrix.items()) - OrderedSet(self.distance_matrix.items()))
+        distance_matrix_diff = OrderedDict(list(
+            OrderedSet(new_distance_matrix.items()) - OrderedSet(self.distance_matrix.items())))
 
         self.distance_matrix = deepcopy(new_distance_matrix)
 
@@ -698,7 +706,7 @@ class SimulationManager(Resetable, object):
                 return distance_matrix_diff
 
             else:
-                self.logger.critical("No movement director existing! Function is not usable without it!")
+                raise self.NoMovementDirector()
 
         with mylock(self.lock):
 
@@ -822,7 +830,7 @@ class SimulationManager(Resetable, object):
         '''
 
         # TODO: put into connection_info
-        is_exactly_one_central_node = len(filter(lambda x: x is True, (is_central_node(emulation_node_x), is_central_node(emulation_node_y)))) == 1
+        is_exactly_one_central_node = len(list(filter(lambda x: x is True, (is_central_node(emulation_node_x), is_central_node(emulation_node_y))))) == 1
 
         # only connect equal interfaces
         # for management interface: do not connect nodes with each other and do not apply link quality adjustments!
@@ -910,9 +918,10 @@ class SimulationManager(Resetable, object):
                 emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info)
 
         if key in singletons.network_manager.connection_store.get_active_node_connection_store():
-            assert singletons.network_manager.connection_store.get_active_node_connection_store()[key] > 0
-
+            vals = []
             for (interface_x, interface_y), connection_details in singletons.network_manager.connection_store.get_active_node_connection_store()[key].items():
+                vals.append((interface_x, interface_y, connection_details))
+            for interface_x, interface_y, connection_details in vals:
 
                 # get the connection
                 connection = connection_details.connection
@@ -1039,7 +1048,7 @@ class SimulationManagerDistributedClient(DistributedModeSimulationManager):
         -------
         list<int>
         '''
-        return self.nodes_id_mapping.keys()
+        return list(self.nodes_id_mapping.keys())
 
     def get_local_distance_matrix_to_servers(self, whole_distance_matrix):
         '''

@@ -1,21 +1,17 @@
-import UserDict
-from collections import  OrderedDict
-from multiprocessing import cpu_count
-
+import collections
 import math
+from collections import  OrderedDict
 from concurrent import futures
-
-from miniworld.model.singletons.Singletons import singletons
-from miniworld.Scenario import scenario_config
-from miniworld.management import ShellHelper
-from miniworld.model.singletons.Resetable import Resetable
 
 from ordered_set import OrderedSet
 
+from miniworld.Scenario import scenario_config
+from miniworld.model.singletons.Resetable import Resetable
+from miniworld.model.singletons.Singletons import singletons
 from miniworld.util import ConcurrencyUtil
 
 
-class ShellCommandSerializer(object, Resetable):
+class ShellCommandSerializer(Resetable):
     '''
     This class can serialize commands into a given order and prevent duplicate commands!
     A group contains a list of events that belong to it. The events have an order.
@@ -230,7 +226,7 @@ class ShellCommandSerializer(object, Resetable):
                 cs = self.mapping_group_to_event_order_to_cs[group][event]
                 cs.run_commands(max_workers=max_workers)
 
-class Group2EventMapping(UserDict.UserDict):
+class Group2EventMapping(collections.UserDict):
     '''
     Stores for each group a :py:class:`.Event2CommandStoreMapping` which defines an event oder for the group.
 
@@ -268,10 +264,10 @@ class Event2CommandStoreMapping(OrderedDict):
             return super(Event2CommandStoreMapping, self).__getitem__(key)
 
     def get_event_order(self):
-        return self.keys()
+        return list(self.keys())
 
 
-class CommandStore(object, Resetable):
+class CommandStore(Resetable):
 
     def __init__(self, name):
         '''
@@ -381,4 +377,4 @@ class CommandStore(object, Resetable):
                 with futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
                     executor.map(fun, self.shell_command_args)
             elif not scenario_config.is_network_backend_parallel():
-                map(fun, self.shell_command_args)
+                list(map(fun, self.shell_command_args))

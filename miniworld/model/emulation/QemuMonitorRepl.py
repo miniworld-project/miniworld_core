@@ -1,21 +1,15 @@
-import json
-import logging
-import random
 import re
-
-from StringIO import StringIO
+from io import StringIO
 
 from miniworld.Config import config
-from miniworld.Scenario import scenario_config
 from miniworld.errors import Base
 from miniworld.repl.errors import REPLUnexpectedResult
 from miniworld.util import PathUtil
 
 __author__ = 'Nils Schmidt'
 
-from miniworld.log import get_node_logger, get_file_handler
+from miniworld.log import get_node_logger
 
-from miniworld.script.TemplateEngine import *
 from miniworld.repl.REPLable import REPLable
 
 class QemuMonitorSnapshotLoadError(Base):

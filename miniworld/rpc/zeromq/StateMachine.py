@@ -1,5 +1,3 @@
-from pprint import pformat
-
 from miniworld import log
 
 '''
@@ -22,7 +20,7 @@ There are different responders for different responder patterns:
     The arguments are passed as dictionary where each entry contains the server id.
 '''
 
-class Expecter(object):
+class Expecter:
 
     '''
     Expects a multi part messages from each client with a specific number of message parts.
@@ -119,7 +117,7 @@ class Expecter(object):
         expected_msg_parts = self.cnt_minimal_args_per_message + self.cnt_message_parts
         if len(msgs) == expected_msg_parts:
             # address, empty, state
-            msgs[2:] = map(self.protocol.deserialize, msgs[2:])
+            msgs[2:] = list(map(self.protocol.deserialize, msgs[2:]))
             state = msgs[2]
 
             if state == self.state:

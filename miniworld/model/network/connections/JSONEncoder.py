@@ -1,9 +1,8 @@
 import json
 import numbers
-from UserDict import UserDict
-
 import re
 from collections import OrderedDict
+from collections import UserDict
 
 
 class ConnectionEncoder(json.JSONEncoder):
@@ -22,16 +21,16 @@ class ConnectionEncoder(json.JSONEncoder):
             return '%s => %s' % (obj, obj2)
 
         if isinstance(obj, (dict, UserDict)):
-            items = map(self.default, obj.items())
+            items = list(map(self.default, obj.items()))
                 # escape keys -> string
             if escape_keys:
-                items = map(lambda (x,y) : (str(x), y), items)
+                items = list(map(lambda x_y : (str(x_y[0]), x_y[1]), items))
             res = OrderedDict( items )
             # print p(res)
             return res
 
         elif isinstance(obj, EmulationNode):
-            res = obj.id
+            res = obj.name
             # print p(res)
             return res
 
@@ -50,13 +49,18 @@ class ConnectionEncoder(json.JSONEncoder):
             # print p(res)
             return res
 
+        elif isinstance(obj, int):
+            res = str(obj)
+            # print p(res)
+            return res
+
         elif isinstance(obj, numbers.Number):
             res = str(obj)
             # print p(res)
             return res
 
         elif hasattr(obj, "__iter__"):
-            res = map(self.default, obj)
+            res = list(map(self.default, obj))
             res = tuple(res)
             # print p(res)
             return res
@@ -85,17 +89,17 @@ class ConnectionDecoder(json.JSONDecoder):
     def my_decode(self, obj, escape_keys=False):
 
         if isinstance(obj, (dict, UserDict)):
-            items = map(self.my_decode, obj.items())
+            items = list(map(self.my_decode, obj.items()))
             res = dict( items )
             return res
         elif isinstance(obj, tuple):
-            return map(lambda x : self.my_decode(x, escape_keys=True), obj)
+            return list(map(lambda x : self.my_decode(x, escape_keys=True), obj))
         elif isinstance(obj, (str, unicode)):
             if escape_keys:
                 # e.g.  u'(10, 15)' => ('10', '15')
                 res = self.regex_str_tuple.search(obj).groups()
                 # ('10', '15') => (10, 15)
-                res = map(int, res)
+                res = list(map(int, res))
                 return tuple(res)
 
         return obj
@@ -157,6 +161,6 @@ if __name__ == '__main__':
         "(2, 9)": 9223372036854775807
     }'''
 
-    print encoded_json
+    print(encoded_json)
     decoded_json = json.loads(encoded_json, cls = ConnectionDecoder)
-    print decoded_json
+    print(decoded_json)
