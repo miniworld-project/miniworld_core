@@ -12,7 +12,6 @@ class AbstractMovementPattern:
         self.location = self.current_map_node.location
         self.speed_in_m_per_s = self.get_speed()
         self.next_map_node = self.get_next_map_node(self.current_map_node, None)
-        self.roads = singletons.spatial_singleton.get_roads()
         if self.next_map_node is not None:
             self.distance_to_next_map_node_in_m = self.current_map_node.get_distance_in_m(self.next_map_node)
             self.heading = self.current_map_node.get_heading(self.next_map_node)

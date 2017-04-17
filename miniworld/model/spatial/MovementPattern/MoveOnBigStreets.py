@@ -1,5 +1,6 @@
 
 # encoding: utf-8
+from miniworld.model.singletons.Singletons import singletons
 
 __author__ = "Patrick Lampe"
 __email__ = "uni at lampep.de"
@@ -11,17 +12,15 @@ from .AbstractMovementPattern import AbstractMovementPattern
 
 class MoveOnBigStreets(AbstractMovementPattern):
 
-    def __init__(self):
-        super(MoveOnBigStreets, self).__init__()
-
     def get_next_map_node(self, crt_map_node, last_map_node):
+        roads = singletons.spatial_singleton.roads
         quality = 5
-        list_of_possible_roads = self.roads.get_list_of_next_roads_with_quality_restriction_for_cars(crt_map_node, quality)
+        list_of_possible_roads = roads.get_list_of_next_roads_with_quality_restriction_for_cars(crt_map_node, quality)
         length = len(list_of_possible_roads)
         while(length < 1 and quality > 0):
             quality -= 1
-            list_of_possible_roads = self.roads.get_list_of_next_roads_with_quality_restriction_for_cars(crt_map_node, quality)
-            less_quality_list_of_roads = self.roads.get_list_of_next_roads_with_quality_restriction_for_cars(crt_map_node, quality -1)
+            list_of_possible_roads = roads.get_list_of_next_roads_with_quality_restriction_for_cars(crt_map_node, quality)
+            less_quality_list_of_roads = roads.get_list_of_next_roads_with_quality_restriction_for_cars(crt_map_node, quality -1)
             list_of_possible_roads.extend(less_quality_list_of_roads)
             length = len(list_of_possible_roads)
             if(quality == 1 and length == 0):
