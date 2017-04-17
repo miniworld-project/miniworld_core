@@ -13,11 +13,13 @@ def init_singletons():
     from miniworld.errors import SimulationErrors
     from miniworld.management import SimulationStateGarbageCollector
     from miniworld.model.emulation.Qemu import QemuProcessSingletons
+    from miniworld.model.spatial.Roads import Roads
 
     # create singletons here
     singletons.network_manager = NetworkManager.NetworkManager()
     singletons.shell_helper = ShellHelper.ShellHelper()
     singletons.spatial_singleton = Singleton.Singleton()
+    singletons.spatial_singleton.roads = Roads()
     singletons.event_system = miniworld.model.events.MyEventSystem.MyEventSystem()
     singletons.simulation_errors = SimulationErrors.SimulationErrors()
     singletons.simulation_state_gc = SimulationStateGarbageCollector.SimulationStateGarbageCollector()

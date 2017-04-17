@@ -68,39 +68,42 @@ def test_shell_provisioning(image_path, runner):
 # def test_link_quality_models(runner):
 #     pass
 
-# TODO:
-# @pytest.mark.parametrize('walk_model', ('RandomWalk', 'MoveOnBigStreets'))
-# def test_random_walk(runner, image_path, walk_model):
-#     scenario = {
-#         "scenario": "acceptance_boot",
-#         "walk_model": {
-#             "name": walk_model,
-#         },
-#         "cnt_nodes": 5,
-#         "provisioning": {
-#             "image": image_path,
-#             "regex_shell_prompt": "root@OpenWrt:/#"
-#         },
-#         "shell": {
-#             "pre_network_start": {
-#                 "shell_cmds": [
-#                     # we need to wait for the NICs to be up
-#                     "until ifconfig eth0; do echo -n . && sleep 1; done",
-#                     "until ifconfig br-lan ; do echo -n . && sleep 1; done",
-#                     "ifconfig eth0 down",
-#                     "ifconfig br-lan down",
-#                     "brctl delbr br-lan",
-#                     "ifconfig eth0 up",
-#                     "ifconfig -a",
-#                     "brctl show"
-#                 ]
-#             }
-#         }
-#     }
-#
-#     with runner() as r:
-#         r.start_scenario(scenario)
-#
-#         for i in range(10):
-#             r.step()
-#             # get positions
+# TODO: how to test? we want a scenario where nodes are connected
+@pytest.mark.parametrize('walk_model', ('RandomWalk', 'MoveOnBigStreets'))
+def test_random_walk(runner, image_path, walk_model):
+    scenario = {
+        "scenario": "acceptance_boot",
+        "walk_model": {
+            "name": walk_model,
+        },
+        # TODO:
+        "cnt_nodes": 2,
+        "provisioning": {
+            "image": image_path,
+            "regex_shell_prompt": "root@OpenWrt:/#"
+        },
+        "shell": {
+            "pre_network_start": {
+                "shell_cmds": [
+                    # we need to wait for the NICs to be up
+                    "until ifconfig eth0; do echo -n . && sleep 1; done",
+                    "until ifconfig br-lan ; do echo -n . && sleep 1; done",
+                    "ifconfig eth0 down",
+                    "ifconfig br-lan down",
+                    "brctl delbr br-lan",
+                    "ifconfig eth0 up",
+                    "ifconfig -a",
+                    "brctl show"
+                ]
+            }
+        }
+    }
+
+    with runner() as r:
+        r.start_scenario(scenario)
+
+        for i in range(10):
+            r.step()
+            # get positions
+            print(r.get_connections())
+            print(r.get_distances())

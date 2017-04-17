@@ -111,8 +111,3 @@ class Roads:
                 amenity = "Baseball Stadium"
             )
         )
-
-
-# TODO: DOC
-
-singletons.spatial_singleton.roads = Roads()
