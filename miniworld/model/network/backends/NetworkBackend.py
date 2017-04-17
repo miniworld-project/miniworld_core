@@ -1,7 +1,5 @@
 from miniworld.Scenario import scenario_config
 from miniworld.model import StartableObject
-from miniworld.model.singletons.Singletons import singletons
-from miniworld.model.emulation.nodes.virtual.CentralNode import is_central_node
 from miniworld.model.network.backends import NetworkBackendNotifications
 
 from miniworld.model.singletons import Resetable
@@ -13,7 +11,7 @@ def get_superclass_dynamic():
     import miniworld.model.network.backends.NetworkBackendStatic
     assert scenario_config.is_network_backend_bridged_connection_mode_set()
 
-    return miniworld.model.network.backends.NetworkBackendStatic.NetworkBackendStatic() if scenario_config.get_core_scenarios() is not None else miniworld.model.network.backends.NetworkBackendDynamic.NetworkBackendDynamic()
+    return miniworld.model.network.backends.NetworkBackendStatic.NetworkBackendStatic() if scenario_config.get_walk_model_name() == scenario_config.WALK_MODEL_NAME_CORE is not None else miniworld.model.network.backends.NetworkBackendDynamic.NetworkBackendDynamic()
 
 
 # TODO: #82: doc code used by network backends and NetworkBackendEmulationNode!
