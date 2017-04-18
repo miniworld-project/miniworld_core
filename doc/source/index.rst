@@ -13,6 +13,7 @@ Use MiniWorld
    :maxdepth: 2
 
    usage/introduction
+   usage/install
    usage/use_a_custom_vm
    usage/network_backends
    usage/link_quality_models
