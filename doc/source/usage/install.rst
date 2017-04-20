@@ -3,6 +3,11 @@ Install
 
 .. code-block:: bash
 
+   git clone https://github.com/miniworld-project/miniworld_core.git
+   git checkout <master|nightly>
+
+.. code-block:: bash
+
    sudo apt-get update
    sudo apt-get install git ebtables qemu-kvm bridge-utils bison flex libdb-dev
 

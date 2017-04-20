@@ -1,0 +1,48 @@
+{
+  "scenario": "batman-adv",
+  "cnt_nodes": 3,
+  "walk_model": {
+    "name": "core"
+  },
+  "provisioning": {
+    "image": "examples/openwrt-15.05-x86-kvm_guest-combined-ext4_batman_adv.img",
+    "regex_shell_prompt": "root@OpenWrt:/#",
+    "shell": {
+      "pre_network_start": {
+        "shell_cmds": [
+          "until ifconfig eth0; do echo -n . && sleep 1; done",
+          "ifconfig eth0 0.0.0.0",
+          "modprobe batman-adv",
+          "batctl if add eth0",
+          "iperf -s &"
+        ]
+      }
+    }
+  },
+  "qemu": {
+    "nic": {
+      "model": "virtio-net-pci"
+    }
+  },
+  "network": {
+    "links": {
+      "configuration": {
+        "nic_prefix": "bat"
+      },
+      "model": "miniworld.model.network.linkqualitymodels.LinkQualityModelRange.LinkQualityModelWiFiExponential"
+    },
+    "core": {
+      "topologies": [
+        [
+          0,
+          "tests/core_topologies/chain5.xml"
+        ],
+        [
+          0,
+          "tests/core_topologies/wheel5.xml"
+        ]
+      ],
+      "mode": "lan"
+    }
+  }
+}

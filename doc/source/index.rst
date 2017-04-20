@@ -14,6 +14,10 @@ Use MiniWorld
 
    usage/introduction
    usage/install
+   usage/concepts
+   usage/examples
+   usage/vm_shell_access
+   usage/openwrt_custom
    usage/use_a_custom_vm
    usage/network_backends
    usage/link_quality_models
