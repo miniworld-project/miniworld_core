@@ -123,7 +123,6 @@ class CommandRunner:
             else:
                 self.sock = self.replable.wait_until_uds_reachable(return_sock=True)
 
-
             # TODO: old stuff
             # return socket object first
             yield self.sock
@@ -139,26 +138,32 @@ class CommandRunner:
         except socket.error as e:
             self.brief_logger.exception(e)
         except Timeout as e:
+            self.brief_logger.info('sending CTRL-C to shell ...')
+            self.sock.send(b'\x03')
             raise REPLTimeout("The REPL '%s' encountered a timeout (%s) while looking for shell prompt (%s)" % (self.replable, self.timeout, self.shell_prompt))
 
         # finally close socket
         finally:
 
             try:
-                if not self.is_reuse_socket():
-                    try:
-                        self.sock.shutdown(socket.SHUT_RDWR)
-                    except socket.error as e:
-                        log.exception(e)
-
-                    try:
-                        self.sock.close()
-                    except socket.error as e:
-                        log.exception(e)
+                self.close_sockets()
 
             except AttributeError as e:
                 log.exception(e)
                 raise ValueError("The REPLable subclass '%s' did not return a valid socket!" % self.replable.__class__.__name__)
+
+    def close_sockets(self):
+
+        if not self.is_reuse_socket():
+            try:
+                self.sock.shutdown(socket.SHUT_RDWR)
+            except socket.error as e:
+                log.exception(e)
+
+            try:
+                self.sock.close()
+            except socket.error as e:
+                log.exception(e)
 
     def enter_shell(self):
         '''
@@ -293,8 +298,6 @@ class CommandRunner:
             # netstat_uds = run_shell("netstat -ape -A unix")
             # open_fds = run_shell('ls -l /proc/%s/fd/' % os.getpid())
             # lsof = run_shell('lsof -U')
-            try:
-                raise REPLTimeout("""Timeout occurred while waiting for the shell (%s).""" % timeout)
 # debug:
 
 # Active Unix Domain Sockets:
@@ -304,11 +307,11 @@ class CommandRunner:
 # lsof:
 # %s
 # % (netstat_uds, open_fds, lsof))
-            except REPLTimeout as e:
-                # log exception to node log
-                if self.brief_logger:
-                    self.brief_logger.exception(e)
-                raise e
+            # log exception to node log
+            if self.brief_logger:
+                self.brief_logger.exception(e)
+
+            raise
         return res
 
 

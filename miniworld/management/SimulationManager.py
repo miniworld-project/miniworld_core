@@ -1,4 +1,5 @@
 import contextlib
+import functools
 import logging
 import math
 import threading
@@ -353,7 +354,7 @@ class SimulationManager(Resetable, object):
             raise SimulationStateStartFailed("Failed to start the simulation! Check the rpc log for details!", caused_by=e)
 
     # TODO: DOC
-    def exec_node_cmd(self, cmd, node_id=None, validation=False):
+    def exec_node_cmd(self, cmd, node_id=None, validation=True, timeout=None):
         '''
 
         Parameters
@@ -370,7 +371,8 @@ class SimulationManager(Resetable, object):
         nodes = self.get_emulation_nodes()
 
         def get_fun(node):
-            return node.virtualization_layer.run_commands_eager_check_ret_val if validation else node.virtualization_layer.run_commands_eager
+            fun = node.virtualization_layer.run_commands_eager_check_ret_val if validation else node.virtualization_layer.run_commands_eager
+            return functools.partial(fun, timeout=timeout)
 
         if node_id is None:
             jobs = {}

@@ -187,7 +187,7 @@ class MiniWorldRPC:
         return scenario_config.data
 
     @dec_requires_simulation_running
-    def exec_node_cmd(self, cmd, node_id=None, validation=False):
+    def exec_node_cmd(self, cmd, node_id=None, validation=None, timeout=None):
         # NOTE: we cannot use @node_id_2_int here because node_id is optional
         if node_id is not None:
             node_id = int(node_id)

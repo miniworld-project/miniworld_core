@@ -189,7 +189,8 @@ def action_exec(self, args, single=False):
         cmds = '\n'.join(cmds)
 
     if node_id:
-        print(json.loads(self.connection.exec_node_cmd(cmds, node_id, args.validate)))
+        # TODO: use kwargs
+        print(json.loads(self.connection.exec_node_cmd(cmds, node_id, args.validate, args.timeout)))
     else:
         # only switch to the rpc server which holds the node
         for server_id in self.connection.get_distributed_address_mapping():
@@ -331,6 +332,8 @@ if __name__ == '__main__':
             add_node_id_arg_optional(exec_parser)
             exec_parser.add_argument("cmds", nargs="+", help="The commands to be executed on the node")
             exec_parser.add_argument("-v", "--validate", action="store_true", default=False, help="Validate the return code of the command. Default is: %(default)s")
+            exec_parser.add_argument("-t", "--timeout", default=10,
+                                     help="Time to wait for the command to complete. Default is: %(default)s")
             exec_parser.set_defaults(func=action_exec)
 
         def create_execs_parsers():
