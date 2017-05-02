@@ -7,7 +7,6 @@ matrix:
       python: '3.6'
 install:
     - sudo apt-get update && sudo apt-get install git ebtables qemu-kvm bridge-utils bison flex libdb-dev
-    - pip install pytest
     - pushd /tmp/
     - git clone https://kernel.googlesource.com/pub/scm/linux/kernel/git/shemminger/iproute2
     - cd iproute2

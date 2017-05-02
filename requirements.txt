@@ -15,3 +15,4 @@ psutil
 sphinx
 LatLon23
 requests
+pytest
