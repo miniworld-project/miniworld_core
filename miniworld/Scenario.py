@@ -260,7 +260,7 @@ class ScenarioConfig(JSONConfig.JSONConfig):
 
     EXECUTION_MODES = ["iproute2", "pyroute2", "brctl"]
 
-    @customizable_attrs("network", "backend", "execution_mode", "name", default="iproute2", expected=EXECUTION_MODES)
+    @customizable_attrs("network", "backend", "execution_mode", "name", default="brctl", expected=EXECUTION_MODES)
     def get_network_backend_bridged_execution_mode(self):
         pass
 
