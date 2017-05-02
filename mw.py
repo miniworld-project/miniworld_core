@@ -332,7 +332,7 @@ if __name__ == '__main__':
             add_node_id_arg_optional(exec_parser)
             exec_parser.add_argument("cmds", nargs="+", help="The commands to be executed on the node")
             exec_parser.add_argument("-v", "--validate", action="store_true", default=False, help="Validate the return code of the command. Default is: %(default)s")
-            exec_parser.add_argument("-t", "--timeout", default=10,
+            exec_parser.add_argument("-t", "--timeout", default=5,
                                      help="Time to wait for the command to complete. Default is: %(default)s")
             exec_parser.set_defaults(func=action_exec)
 
