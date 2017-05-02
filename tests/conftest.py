@@ -59,6 +59,7 @@ def create_runner(tmpdir_factory, request, config_path):
             self.debug = True
 
             if not os.path.exists(config_path):
+                # TODO: #15 use minimal config
                 shutil.copy2('sample_configs/config.json', config_path)
                 if self.debug:
                     self.enable_debug()
