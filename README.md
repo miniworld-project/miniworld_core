@@ -1,6 +1,8 @@
 # MiniWorld Core
 
-Work-in-Progress! Code and documentation are following ...
+## Demo
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/j6D-43Tso04/0.jpg)](https://youtu.be/j6D-43Tso04?list=PLU2J7CyV0Bom-gBxH_NdKPX8jfrQDtS5v)
 
 ## About
 MiniWorld (Mobile Infrastructure'n'Network Integrated World) enables network emulation in Linux.
@@ -8,6 +10,11 @@ MiniWorld (Mobile Infrastructure'n'Network Integrated World) enables network emu
 Distributed applications, routing algorithms, etc. can be tested with MiniWorld.
 
 For that purpose, the software-under-test has to be deployed in a KVM VM. Afterwards, the VMs can be interconnected by a network backend. For each connection, different static or event-based link-impairment can be applied. The network topology changes with a step.
+
+## Documentation
+
+The documentation is hosted on [readthedocs](http://miniworld-core.readthedocs.io/en/nightly/).
+Until the documentation is fully ready, please use the nightly branch.
 
 ## Features
 - Network emulation with Linux Bridges and VDE
@@ -29,12 +36,3 @@ Do not hesitate to contact us!
 - Android-based emulation with location (lat/lon) set via adb
 - Lightweight virtualization for cases where full-system virt. is not needed
 - Web UI
-
-## Demo
-
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/j6D-43Tso04/0.jpg)](https://youtu.be/j6D-43Tso04?list=PLU2J7CyV0Bom-gBxH_NdKPX8jfrQDtS5v)
-
-## Documentation
-
-The documentation is hosted on [readthedocs](http://miniworld-core.readthedocs.io/en/nightly/).
-Until the documentation is fully ready, please use the nightly branch.
