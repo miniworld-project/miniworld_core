@@ -261,7 +261,7 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
         InvalidImage
         '''
 
-        if os.path.gesize(path_qemu_base_image) == 0:
+        if os.path.getsize(path_qemu_base_image) == 0:
             raise self.InvalidImage()
 
         es = singletons.event_system
