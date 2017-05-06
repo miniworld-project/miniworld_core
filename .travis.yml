@@ -24,7 +24,7 @@ after_success:
  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
  - export REPO=miniworldproject/miniworld_core
  - docker build -t $REPO:$TAG -f ci/Dockerfile .
- - docker login -u $DOCKER_USER -p $DOCKER_PASS
+ - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
  - docker tag $REPO:$COMMIT $REPO:$TAG
  - docker tag $REPO:$COMMIT $REPO:$TRAVIS_BUILD_NUMBER
  - docker push $REPO
