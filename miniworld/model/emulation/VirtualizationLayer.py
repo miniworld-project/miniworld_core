@@ -1,3 +1,4 @@
+from miniworld.errors import Base
 from miniworld.log import get_node_logger
 from miniworld.model.StartableObject import StartableSimulationStateObject
 
@@ -24,4 +25,7 @@ class VirtualizationLayer(StartableSimulationStateObject):
         self.id = id
 
     def reset(self):
+        pass
+
+    class InvalidImage(Base):
         pass

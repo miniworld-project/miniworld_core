@@ -1,4 +1,5 @@
 import hashlib
+import os
 import re
 import socket
 import time
@@ -257,7 +258,11 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
             Timeout while booting the vm.
         REPLTimeout
             Timeout while doing stuff on the shell.
+        InvalidImage
         '''
+
+        if os.path.gesize(path_qemu_base_image) == 0:
+            raise self.InvalidImage()
 
         es = singletons.event_system
         self.process = None
