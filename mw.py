@@ -364,7 +364,8 @@ if __name__ == '__main__':
     print("parser args: %s" % args, file=sys.stderr)
 
     # give the actions the option to print themselves to stdout
-    res = args.func(args)
-    # but if a value is returned, print it here
-    if res:
-        print(json.dumps(res, indent=4))
+    if hasattr(args, 'func'):
+        res = args.func(args)
+        # but if a value is returned, print it here
+        if res:
+            print(json.dumps(res, indent=4))
