@@ -5,7 +5,7 @@
     "name": "core"
   },
   "provisioning": {
-    "image": "examples/openwrt-15.05-x86-kvm_guest-combined-ext4_batman_adv.img",
+    "image": "examples/openwrt-15.05-x86-kvm_guest-combined-ext4_batman_adv.img.1",
     "regex_shell_prompt": "root@OpenWrt:/#",
     "shell": {
       "pre_network_start": {

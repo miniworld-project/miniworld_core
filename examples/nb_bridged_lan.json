@@ -5,7 +5,7 @@
   },
   "cnt_nodes": 3,
   "provisioning": {
-    "image": "examples/openwrt-15.05.1-x86-kvm_guest-combined-ext4.img",
+    "image": "examples/openwrt-15.05.1-x86-kvm_guest-combined-ext4.img.1",
     "regex_shell_prompt": "root@OpenWrt:/#",
     "shell": {
       "pre_network_start": {
