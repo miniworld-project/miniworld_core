@@ -1,5 +1,6 @@
 import json
 import subprocess
+from collections import OrderedDict
 
 import pytest
 
@@ -34,7 +35,7 @@ def snapshot_runner(runner):
 def test_info_scenario(snapshot_runner):
     res = subprocess.check_output(['./mw.py', 'info', 'scenario']).decode()
     with open(snapshot_runner.scenario, 'r') as f:
-        assert json.loads(strip_output(res)) ==json.load(f)
+        assert json.loads(strip_output(res), object_pairs_hook=OrderedDict) == json.load(f, object_pairs_hook=OrderedDict)
 
 
 def test_ping(snapshot_runner):

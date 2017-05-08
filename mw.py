@@ -134,7 +134,7 @@ def action_info_distances(self, args):
 
 @new_action_decorator
 def action_info_scenario(self, args):
-    return self.connection.get_scenario()
+    print(self.connection.get_scenario())
 
 # @new_action_decorator
 # def action_info_shell_vars(self, args):

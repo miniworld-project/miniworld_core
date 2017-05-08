@@ -274,23 +274,37 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
         else:
             take_process_ownership = True
 
+        def kill_qemu_snapshot_process():
+
+            # kill old qemu process and snapshot
+            # terminate old qemu process
+            self.process.kill()
+            self.process.wait()
+            self.process = None
+
         # check if a snapshot exists
         if self.process is not None:
-            id_snapshot = self.get_snapshot_id()
-            self.nlog.info("loading vm snapshot %s", id_snapshot)
-            t_start = time.time()
-            try:
-                self.monitor_repl.loadvm(id_snapshot)
-                t_end = time.time()
-                log.debug("loaded snapshot in %0.2f seconds", t_end - t_start)
-                self.booted_from_snapshot = True
 
-            except QemuMonitorSnapshotLoadError:
-                # kill old qemu process and snapshot
+            # only snapshot boot if scenario did not change
+            # TODO: unit test
+            if singletons.simulation_manager.scenario_changed:
                 snapshot_load_failed = True
-                # terminate old qemu process
-                self.process.kill()
-                self.process.wait()
+                log.info('scenario config changed -> no snapshot boot possible')
+            else:
+                id_snapshot = self.get_snapshot_id()
+                self.nlog.info("loading vm snapshot %s", id_snapshot)
+                t_start = time.time()
+                try:
+                    self.monitor_repl.loadvm(id_snapshot)
+                    t_end = time.time()
+                    log.debug("loaded snapshot in %0.2f seconds", t_end - t_start)
+                    self.booted_from_snapshot = True
+
+                except QemuMonitorSnapshotLoadError:
+                    snapshot_load_failed = True
+
+        if snapshot_load_failed:
+            kill_qemu_snapshot_process()
 
         if self.process is None or snapshot_load_failed:
             self.monitor_repl = QemuMonitorRepl(self)
