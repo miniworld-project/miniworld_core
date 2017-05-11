@@ -1,5 +1,11 @@
 # MiniWorld Core
 
+Work-in-Progress! Documentation is created step by step.
+
+We are currently working on first acceptance and functional tests. We are looking forward to provide a basically tested version soon in the master branch.
+
+Code is available in the [nightly branch](https://github.com/miniworld-project/miniworld_core/tree/nightly) atm.
+
 ## Demo
 
 A short demo shows 3 KVM OpenWRT nodes with B.A.T.M.A.N. advanced routing:
@@ -38,7 +44,7 @@ The API documentation introduces MiniWorld from a user perspective.
 
 For more information about the technical details you should read the paper or even the master thesis (for a very detailed documentation).
 
-- [Master Thesis](https://github.com/miniworld-project/miniworld_core/blob/nightly/doc/master_thesis_nils_schmidt.pdf)
+- [Master Thesis](https://www.dropbox.com/s/rgyfqgkh2freq82/master_thesis_nils_schmidt_two_side.pdf?dl=0)
 - Paper: Link following if paper is published
 
 ## Contribute
