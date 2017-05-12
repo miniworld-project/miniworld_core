@@ -19,6 +19,7 @@ script:
     - pushd ~/build/miniworld-project/miniworld_core
     - uname -a
     - pwd
+    - ls -l examples/
     - sudo bash -c "source /home/travis/virtualenv/python3.6/bin/activate && PYTHONPATH=$PWD ENV=CI pytest -s -k test_examples tests"
 after_success:
  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
