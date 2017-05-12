@@ -2,7 +2,7 @@ from functools import partial
 
 import os
 import pytest
-
+import subprocess
 from miniworld import Scenario
 
 
@@ -65,11 +65,20 @@ def _create_scenarios():
 
 
 @pytest.mark.parametrize('scenario_fun', **dict(zip(['argvalues', 'ids'], zip(*_create_scenarios()))))
-def test_network_switching(scenario_fun, runner, image_path, request, core_topologies_dir):
+def test_network_switching_bridged_backends(scenario_fun, runner, image_path, request, core_topologies_dir):
     scenario = scenario_fun(image_path, request, core_topologies_dir)
 
+    brctl_output_before = subprocess.check_call(['brctl', 'show'])
+    ebtables_before = subprocess.check_call(['ebtables', '-L'])
     with runner() as r:
         r.start_scenario(scenario)
 
         for i in range(len(scenario['network']['core']['topologies'])):
             r.step()
+        brctl_output_after = subprocess.check_call(['brctl', 'show'])
+        ebtables_after = subprocess.check_call(['ebtables', '-L'])
+
+        # check cleanup done correctly
+        assert brctl_output_before == brctl_output_after, 'network backend cleanup not working'
+        assert ebtables_before == ebtables_after, 'network backend cleanup not working'
+
