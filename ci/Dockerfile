@@ -25,3 +25,7 @@ RUN (cd examples && ./get_images.sh)
 CMD ["bash", "/app/start_server.sh"]
 
 EXPOSE 5000
+
+# TODO: decrease timeout and retries when there is an async rpc service :)
+# TODO: use docker stack for deployment ?
+# HEALTHCHECK --timeout=5 --retries=1 CMD "./mw.py ping"

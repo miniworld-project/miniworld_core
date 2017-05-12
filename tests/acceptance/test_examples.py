@@ -1,3 +1,4 @@
+import os
 import subprocess
 
 import pytest
@@ -9,6 +10,7 @@ from miniworld.util import JSONConfig
 @pytest.fixture(scope='session')
 def download_examples():
     subprocess.check_call(['./get_images.sh'], cwd='examples/')
+    os.system('ls -l examples/')
 
 
 @pytest.mark.usefixtures('download_examples')
