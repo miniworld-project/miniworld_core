@@ -26,5 +26,4 @@ after_success:
  - BRANCH=$TRAVIS_BRANCH docker build --pull -t $REPO:$TAG -f ci/Dockerfile .
  - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
  - docker tag $REPO:$COMMIT $REPO:$TAG
- - docker tag $REPO:$COMMIT $REPO:$TRAVIS_BUILD_NUMBER
  - docker push $REPO
