@@ -20,7 +20,7 @@ script:
     - uname -a
     - pwd
     - ls -l examples/
-    - sudo bash -c "source /home/travis/virtualenv/python3.6/bin/activate && PYTHONPATH=$PWD ENV=CI pytest -s -k test_examples tests"
+    - sudo bash -c "source /home/travis/virtualenv/python3.6/bin/activate && PYTHONPATH=$PWD ENV=CI pytest -x tests"
 after_success:
  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
  - export REPO=miniworldproject/miniworld_core
