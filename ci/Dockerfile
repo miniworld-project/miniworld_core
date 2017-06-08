@@ -2,10 +2,10 @@ FROM ubuntu:16.04
 MAINTAINER Nils Schmidt <miniworldproject@gmail.com>
 
 RUN apt-get update && \
-# python3
-apt-get -y install python3 python3-pip && \
-# apt dependencies
-apt-get -y install git ebtables iproute2 qemu-kvm bridge-utils bison flex libdb-dev psmisc curl wget kmod libdb5.3-dev
+    # python3
+    apt-get -y install python3 python3-pip && \
+    # apt dependencies
+    apt-get -y install git ebtables iproute2 qemu-kvm bridge-utils bison flex libdb-dev psmisc curl wget kmod libdb5.3-dev
 
 # miniworld
 ARG BRANCH=nightly
@@ -20,7 +20,7 @@ WORKDIR /app
 #RUN (cd examples && ./get_images.sh)
 
 RUN pip3 install --upgrade pip && \
-    pip3 install /app\[server,develop]
+    pip3 install /app\[server,develop\]
 
 CMD bash -c '(./install_iproute2.sh) ; modprobe ebtables ; mwserver'
 
