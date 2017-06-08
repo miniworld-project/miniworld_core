@@ -20,7 +20,7 @@ WORKDIR /app
 #RUN (cd examples && ./get_images.sh)
 
 RUN pip3 install --upgrade pip && \
-    pip3 install /app/[server,develop]
+    pip3 install /app[server,develop]
 
 CMD bash -c '(./install_iproute2.sh) ; modprobe ebtables ; mwserver'
 
