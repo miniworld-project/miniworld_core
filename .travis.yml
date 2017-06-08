@@ -6,6 +6,13 @@ matrix:
       sudo: required
       python: '3.6'
 install:
+    - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
+    - export REPO=miniworldproject/miniworld_core
+    - pushd ~/build/miniworld-project/miniworld_core
+    - BRANCH=$TRAVIS_BRANCH ci/build_container.sh
+    - docker tag $REPO:$COMMIT $REPO:$TAG
+    - docker tag $REPO:$COMMIT $REPO:$TRAVIS_BUILD_NUMBER
+
     - sudo apt-get update && sudo apt-get install git ebtables qemu-kvm bridge-utils bison flex libdb-dev
     - pushd /tmp/
     - git clone https://kernel.googlesource.com/pub/scm/linux/kernel/git/shemminger/iproute2
@@ -21,10 +28,5 @@ script:
     - pwd
     - sudo bash -c "source /home/travis/virtualenv/python3.6/bin/activate && PYTHONPATH=$PWD ENV=CI pytest tests"
 after_success:
- - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
- - export REPO=miniworldproject/miniworld_core
- - BRANCH=$TRAVIS_BRANCH docker build --pull -t $REPO:$TAG -f ci/Dockerfile .
- - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
- - docker tag $REPO:$COMMIT $REPO:$TAG
- - docker tag $REPO:$COMMIT $REPO:$TRAVIS_BUILD_NUMBER
- - docker push $REPO
+    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+    - docker push $REPO

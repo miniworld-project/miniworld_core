@@ -14,17 +14,13 @@ RUN git clone -b $BRANCH https://github.com/miniworld-project/miniworld_core.git
 WORKDIR /app
 
 # for development:
-# COPY . /miniworld/
-# RUN pip3 install /miniworld\[develop,server\]
+#COPY . /miniworld/
+#COPY install_iproute2.sh /app/
+#RUN pip3 install /miniworld\[develop,server\]
+#RUN (cd examples && ./get_images.sh)
 
 RUN pip3 install --upgrade pip && \
     pip3 install /app/[server,develop]
-
-RUN (cd examples && ./get_images.sh)
-COPY install_iproute2.sh /app/
-
-# iproute2
-# RUN apt-get -y install pkg-config
 
 CMD bash -c '(./install_iproute2.sh) ; modprobe ebtables ; mwserver'
 
