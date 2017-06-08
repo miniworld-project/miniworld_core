@@ -1,0 +1,17 @@
+version: '3.2'
+
+services:
+  core:
+    image: miniworldproject/miniworld_core:${BRANCH-nightly}
+    cap_add:
+    - ALL
+    privileged: true
+    volumes:
+    - /lib/modules:/lib/modules
+    - .:/app/
+    devices:
+    # kvm access
+    - "/dev/kvm:/dev/kvm"
+    ports:
+    - 5000:5000
+    - 5001:5001

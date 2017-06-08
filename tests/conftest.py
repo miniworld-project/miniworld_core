@@ -8,9 +8,11 @@ import sys
 import tempfile
 from copy import deepcopy
 from io import BytesIO
+from typing import List, Dict
 
 import pytest
 import requests
+import time
 
 from miniworld.util import JSONConfig
 
@@ -81,7 +83,7 @@ def create_runner(tmpdir_factory, request, config_path):
             with open(config_path, "w") as f:
                 f.write(json.dumps(config, indent=4))
 
-        def __enter__(self):
+        def __enter__(self) -> 'Runner':
             self.start()
             return self
 
@@ -91,18 +93,27 @@ def create_runner(tmpdir_factory, request, config_path):
         def start(self):
             env = deepcopy(os.environ)
             env.update({'CONFIG': self.config})
-            if self.is_start_server:
-                self.server_proc = subprocess.Popen(['./start_server.sh'], env=env)
-                sys.stderr.write('server started\n')
-            else:
-                sys.stderr.write('please start the server yourself')
+            # if self.is_start_server:
+            #     # self.server_proc = subprocess.Popen(['docker-compose', 'up', '-d'], env=env)
+            #     sys.stderr.write('server started\n')
+            # else:
+            #     sys.stderr.write('please start the server yourself')
             self.connect_to_server()
+
+        @staticmethod
+        def run_mwcli_command(custom_args: List[str], *args, **kwargs) -> bytes:
+            return subprocess.check_output(['mwcli', '--addr', os.environ.get('MW_SERVER_ADRR', '127.0.0.1')] + custom_args,
+                                           *args, **kwargs)
+
+        @staticmethod
+        def run_mwcli_command_json_result(custom_args: List[str]) -> Dict:
+            return json.loads(strip_output(Runner.run_mwcli_command(custom_args).decode()))
 
         def stop(self, hard=True):
             # check for rpc errors
             self.check_for_errors()
             # shut down gracefully
-            subprocess.check_call(['./mw.py', 'stop'])
+            self.run_mwcli_command(['stop'])
             if hard:
                 if self.server_proc:
                     self.server_proc.kill()
@@ -134,13 +145,13 @@ def create_runner(tmpdir_factory, request, config_path):
                 f.write(scenario_json)
                 f.flush()
                 print(('scenario:\n{}'.format(scenario_json)))
-                subprocess.check_call(['./mw.py', 'start', f.name])
+                self.run_mwcli_command(['start', f.name])
 
         def check_for_errors(self):
-            subprocess.check_call(['./mw.py', 'ping'])
+            self.run_mwcli_command(['ping'])
 
         def step(self):
-            subprocess.check_call(['./mw.py', 'step'])
+            self.run_mwcli_command(['step'])
 
         def get_connections(self):
             '''
@@ -148,7 +159,7 @@ def create_runner(tmpdir_factory, request, config_path):
             -------
             dict
             '''
-            return json.loads(strip_output(subprocess.check_output(['./mw.py', 'info', 'connections']).decode()))
+            return self.run_mwcli_command_json_result(['info', 'connections'])
 
         def get_links(self):
             '''
@@ -156,7 +167,7 @@ def create_runner(tmpdir_factory, request, config_path):
             -------
             dict
             '''
-            return json.loads(strip_output(subprocess.check_output(['./mw.py', 'info', 'links']).decode()))
+            return self.run_mwcli_command_json_result(['info', 'links'])
 
         def get_distances(self):
             '''
@@ -164,7 +175,7 @@ def create_runner(tmpdir_factory, request, config_path):
             -------
             dict
             '''
-            return json.loads(strip_output(subprocess.check_output(['./mw.py', 'info', 'distances']).decode()))
+            return self.run_mwcli_command_json_result(['info', 'distances'])
 
         def get_addr(self):
             '''
@@ -172,14 +183,14 @@ def create_runner(tmpdir_factory, request, config_path):
             -------
             dict
             '''
-            return json.loads(strip_output(subprocess.check_output(['./mw.py', 'info', 'addr']).decode()))
+            return self.run_mwcli_command_json_result(['info', 'addr'])
 
         @staticmethod
         def connect_to_server():
             print('connecting to server')
             while 1:
                 try:
-                    subprocess.check_call(['./mw.py', 'ping'], stdout=devnull, stderr=devnull)
+                    Runner.run_mwcli_command(['ping'])
                     sys.stderr.write('.')
                     return
                 except subprocess.CalledProcessError:

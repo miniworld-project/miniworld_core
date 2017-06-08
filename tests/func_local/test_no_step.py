@@ -33,11 +33,12 @@ def snapshot_runner(runner):
 
 
 def test_info_scenario(snapshot_runner):
-    res = subprocess.check_output(['./mw.py', 'info', 'scenario']).decode()
+    res = snapshot_runner.run_mwcli_command(['info', 'scenario']).decode()
     with open(snapshot_runner.scenario, 'r') as f:
-        assert json.loads(strip_output(res), object_pairs_hook=OrderedDict) == json.load(f, object_pairs_hook=OrderedDict)
+        assert json.loads(strip_output(res), object_pairs_hook=OrderedDict) == json.load(f,
+                                                                                         object_pairs_hook=OrderedDict)
 
 
 def test_ping(snapshot_runner):
-    res = subprocess.check_output(['./mw.py', 'ping']).decode()
+    res = snapshot_runner.run_mwcli_command(['ping']).decode()
     assert strip_output(res) == 'pong'
