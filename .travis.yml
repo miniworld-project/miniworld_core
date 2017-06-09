@@ -6,26 +6,21 @@ matrix:
       sudo: required
       python: '3.6'
 install:
+    # build miniworld container
     - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
     - export REPO=miniworldproject/miniworld_core
     - pushd ~/build/miniworld-project/miniworld_core
     - BRANCH=$TRAVIS_BRANCH ci/build_container.sh
 
-    - sudo apt-get update && sudo apt-get install git ebtables qemu-kvm bridge-utils bison flex libdb-dev
-    - pushd /tmp/
-    - git clone https://kernel.googlesource.com/pub/scm/linux/kernel/git/shemminger/iproute2
-    - cd iproute2
-    - git checkout v4.2.0
-    - make
-    - sudo make install
-    - popd
-    - sudo bash -c "source /home/travis/virtualenv/python3.6/bin/activate && pip install -r requirements.txt"
+    # clone miniworld_playground
+    - git clone https://github.com/miniworld-project/miniworld_playground.git
+    - pushd miniworld_playground
 script:
-    - pushd ~/build/miniworld-project/miniworld_core
     - uname -a
-    - pwd
-    - sudo bash -c "source /home/travis/virtualenv/python3.6/bin/activate && PYTHONPATH=$PWD ENV=CI pytest tests"
+    # run tests
+    - docker-compose exec core pytest -x -s tests
 after_success:
     - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
     - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
+    # push docker image
     - docker push $REPO:$TAG
