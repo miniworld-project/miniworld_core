@@ -24,7 +24,7 @@ install:
 script:
     - uname -a
     # run tests
-    - BRACH=$TRAVIS_BRANCH docker-compose up -d
+    - BRANCH=$TRAVIS_BRANCH docker-compose up -d
     - docker-compose exec core pytest -x -s tests
 after_success:
     - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
