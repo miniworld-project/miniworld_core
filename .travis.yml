@@ -6,6 +6,10 @@ matrix:
       sudo: required
       python: '3.6'
 install:
+    - sudo apt-get update
+    - sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine
+    - docker-compose --version
+
     # build miniworld container
     - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
     - export REPO=miniworldproject/miniworld_core
