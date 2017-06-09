@@ -190,7 +190,7 @@ def create_runner(tmpdir_factory, request, config_path):
             print('connecting to server')
             while 1:
                 try:
-                    Runner.run_mwcli_command(['ping'])
+                    Runner.run_mwcli_command(['ping'], stdout=devnull, stderr=devnull)
                     sys.stderr.write('.')
                     return
                 except subprocess.CalledProcessError:
