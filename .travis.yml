@@ -10,10 +10,7 @@ install:
     - sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine
     - docker-compose --version
     - sudo rm /usr/local/bin/docker-compose
-    - sudo curl -L https://github.com/docker/compose/releases/download/$dockerComposeVersion/docker-compose-`uname -s`-`uname -m` > docker-compose
-    - chmod +x docker-compose
-    - sudo mv docker-compose /usr/local/bin/
-    - docker-compose --version
+    - sudo pip install docker-compose
 
     # build miniworld container
     - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
