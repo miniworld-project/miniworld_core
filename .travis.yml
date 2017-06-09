@@ -24,10 +24,12 @@ install:
 script:
     - uname -a
     # run tests
-    - docker-compose up -d
+    - BRACH=$TRAVIS_BRANCH docker-compose up -d
     - docker-compose exec core pytest -x -s tests
 after_success:
     - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
     - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
     # push docker image
     - docker push $REPO:$TAG
+after_failure:
+    - docker-compose logs
