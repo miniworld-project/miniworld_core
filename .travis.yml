@@ -6,6 +6,7 @@ matrix:
       sudo: required
       python: '3.6'
 install:
+    - echo $TRAVIS_BRANCH
     - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
     - export REPO=miniworldproject/miniworld_core
     - pushd ~/build/miniworld-project/miniworld_core
