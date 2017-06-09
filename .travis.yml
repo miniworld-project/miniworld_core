@@ -10,8 +10,8 @@ install:
     - sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine
     - docker-compose --version
     - sudo rm /usr/local/bin/docker-compose
-    - curl -L https://github.com/docker/compose/releases/download/$dockerComposeVersion/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
-    - chmod +x /usr/local/bin/docker-compose
+    - sudo curl -L https://github.com/docker/compose/releases/download/$dockerComposeVersion/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+    - sudo chmod +x /usr/local/bin/docker-compose
     - docker-compose --version
 
     # build miniworld container
