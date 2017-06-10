@@ -192,7 +192,7 @@ class MiniWorldRPC:
         if node_id is not None:
             node_id = int(node_id)
 
-        return json.dumps(singletons.simulation_manager.exec_node_cmd(cmd, node_id=node_id, validation=validation))
+        return json.dumps(singletons.simulation_manager.exec_node_cmd(cmd, node_id=node_id, validation=validation, timeout=timeout))
 
     @dec_requires_simulation_running
     def get_distributed_node_mapping(self):
