@@ -3,7 +3,7 @@ import os
 import pytest
 
 from tests.conftest import create_runner
-from tests.func_local.conftest import assert_topologies_equal
+from tests.functional.conftest import assert_topologies_equal
 
 
 @pytest.fixture(scope='module')

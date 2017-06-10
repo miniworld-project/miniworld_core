@@ -5,7 +5,8 @@ RUN apt-get update && \
     # python3
     apt-get -y install python3 python3-pip && \
     # apt dependencies
-    apt-get -y install git ebtables iproute2 qemu-kvm bridge-utils bison flex libdb-dev psmisc curl wget kmod libdb5.3-dev
+    apt-get -y install git ebtables iproute2 qemu-kvm bridge-utils bison flex libdb-dev psmisc curl wget kmod libdb5.3-dev && \
+    apt-get -y clean && rm -rf /var/lib/apt/lists/*
 
 # miniworld
 ARG BRANCH=nightly
@@ -27,3 +28,5 @@ CMD bash -c '(./install_iproute2.sh) ; modprobe ebtables ; mwserver'
 VOLUME ['/app/scenarios', '/app/examples']
 EXPOSE 5000
 EXPOSE 5001
+
+HEALTHCHECK --timeout=5 --retries=1 CMD "./mw.py ping"
