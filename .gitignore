@@ -63,3 +63,4 @@ libs/
 MiniWorld_Images/
 
 *.pyc
+config.json

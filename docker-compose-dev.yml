@@ -8,7 +8,9 @@ services:
     privileged: true
     volumes:
     - /lib/modules:/lib/modules
-    - .:/app/
+    - type: bind
+      source: ./
+      target: /app/
     devices:
     # kvm access
     - "/dev/kvm:/dev/kvm"
