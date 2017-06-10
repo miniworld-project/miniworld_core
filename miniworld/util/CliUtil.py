@@ -5,7 +5,7 @@ import xmlrpc
 from collections import OrderedDict
 from threading import Thread
 
-from miniworld import Scenario
+from miniworld import Scenario, Config
 from miniworld import log
 from miniworld.errors import ConfigMalformed
 from miniworld.util import JSONConfig, DictUtil
@@ -23,7 +23,13 @@ scenario_config_parser.add_argument('--customize-scenario', "-cs", default='{}',
 
 # TODO: use
 rpc_parser = argparse.ArgumentParser(add_help=False)
-rpc_parser.add_argument("--addr", default="127.0.0.1", help="The address of the rpc server, default is: '%(default)s'")
+def get_default_rpc_addr():
+    try:
+        Config.set_global_config(Config.PATH_GLOBAL_CONFIG)
+        return Config.config.get_server_addr()
+    except Exception:
+        return "127.0.0.1"
+rpc_parser.add_argument("--addr", default=get_default_rpc_addr(), help="The address of the rpc server, default is: '%(default)s'")
 
 def parse_scenario_config(scenario_config = None, customize_scenario = None):
     '''
