@@ -29,4 +29,4 @@ VOLUME ['/app/scenarios', '/app/examples']
 EXPOSE 5000
 EXPOSE 5001
 
-HEALTHCHECK --timeout=5 --retries=1 CMD "./mw.py ping"
+# HEALTHCHECK --timeout=5s --retries=3 CMD "./mw.py ping"
