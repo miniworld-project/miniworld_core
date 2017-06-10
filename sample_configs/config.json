@@ -15,6 +15,7 @@
      // INFO, WARN, ERROR, DEBUG
      "level" : "INFO",
      "log_provisioning": false,
+     "log_cleanup": false,
     "debug" : false
    },
    "ramdisk" : false,

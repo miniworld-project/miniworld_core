@@ -25,6 +25,7 @@ class SimulationStateGarbageCollector(defaultdict):
 
     def reset_simulation_scenario_state(self):
         from miniworld import log
+        from miniworld.Config import config
         log.info("resetting simulation_scenario_state")
 
         # objects may require singletons, hence first garbage collect objects
@@ -35,14 +36,16 @@ class SimulationStateGarbageCollector(defaultdict):
             except NotImplementedError:
                 log.critical("Object '%s@%s' did not implement the reset() method!", obj, obj.__class__)
             except Exception as e:
-                log.exception(e)
+                if config.is_log_cleanup():
+                    log.exception(e)
 
         for singleton in self[KEY_SINGLETON]:
             log.debug("resetting '%s'", singleton)
             try:
                 singleton.reset()
             except Exception as e:
-                log.exception(e)
+                if config.is_log_cleanup():
+                    log.exception(e)
 
         log.info("clearing simulate state objects ...")
         self[KEY_OBJECT] = []
