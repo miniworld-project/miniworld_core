@@ -11,12 +11,10 @@ killall -9 qemu-system-x86_64
 killall -9 vde_switch
 killall -9 wirefilter
 killall -9 vde_plug
-killall -9 netmon.py
 
 umount /tmp/MiniWorld
 rm -r /tmp/MiniWorld
 
-ifconfig mgmt down
 brctl delbr mgmt
 ip link del miniworld_tap
 ip l d mgmt
@@ -30,8 +28,6 @@ remove_links "gre_"
 remove_links "wifi"
 remove_links "vln"
 remove_links "vxl"
-
-
 
 ebtables --atomic-file /tmp/ebtables_atommic --atomic-init
 ebtables --atomic-file /tmp/ebtables_atommic --atomic-commit
