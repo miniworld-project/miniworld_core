@@ -148,12 +148,12 @@ class SocketExpect(object):
         '''
         try:
             self.selector.register(self.sock, selectors.EVENT_READ)
-
+            t_start = time.time()
             while 1:
                 # data available or timeout occurred ?
-                events = self.selector.select(self.timeout)
-                if not events:
-                    raise Timeout("Timeout occurred!")
+                events = self.selector.select(self.timeout / 2.0)
+                if time.time() - t_start > self.timeout:
+                    raise Timeout("Timeout (%s) occurred!" % self.timeout)
 
                 for key, mask in events:
                     if mask == selectors.EVENT_READ:
@@ -180,6 +180,7 @@ class SocketExpect(object):
 def wait_for_socket_result(*args, **kwargs):
     buffered_socket_reader = SocketExpect(*args, **kwargs)
     return buffered_socket_reader.read()
+
 
 def wait_for_boot(*args, **kwargs):
     '''
