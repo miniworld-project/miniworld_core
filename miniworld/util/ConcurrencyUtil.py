@@ -62,5 +62,4 @@ def tpe(cnt_minions):
 
 def cpu_count():
     cnt_minions = multiprocessing.cpu_count()
-    cnt_minions *= config.get_thread_scaler()
     return int(round(cnt_minions))
