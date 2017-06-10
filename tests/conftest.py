@@ -12,7 +12,6 @@ from typing import List, Dict
 
 import pytest
 import requests
-import time
 
 from miniworld.util import JSONConfig
 
@@ -76,7 +75,7 @@ def create_runner(tmpdir_factory, request, config_path):
             # config['logging']['debug'] = True
             config['logging']['log_provisioning'] = True
             if os.environ.get('ENV', '').lower() == 'ci':
-                config['provisioning']['boot_wait_timeout'] = 240
+                config['provisioning']['boot_wait_timeout'] = 480
             self.set_config(config)
 
         def set_config(self, config):
