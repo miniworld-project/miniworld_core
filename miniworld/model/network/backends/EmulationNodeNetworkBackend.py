@@ -62,7 +62,7 @@ class EmulationNodeNetworkBackend(NetworkMixin):
     #############################################################
 
     # TODO: DOC
-    def after_pre_shell_commands(self, emulation_node, use_vlan):
+    def after_pre_shell_commands(self, emulation_node):
         pass
 
     def do_network_config_after_pre_shell_commands(self, emulation_node):

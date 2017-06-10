@@ -209,9 +209,8 @@ class EmulationNode(StartableObject.StartableSimulationStateObject, ShellCmdWrap
     #############################################################
 
     # TODO: create interface
-    # TODO: REMOVE VLAN PARAM?
     def after_pre_shell_commands(self):
-        self.network_mixin.after_pre_shell_commands(self, config.is_vlan_enabled())
+        self.network_mixin.after_pre_shell_commands(self)
 
     def do_network_config_after_pre_shell_commands(self):
         self.network_mixin.do_network_config_after_pre_shell_commands(self)

@@ -21,7 +21,7 @@ class EmulationNodeNetworkBackendVDE(EmulationNodeNetworkBackend, SwitchMixin):
     def _start(self, *args, **kwargs):
         self.start_switches()
 
-    def after_pre_shell_commands(self, emulation_node, use_vlan):
+    def after_pre_shell_commands(self, emulation_node):
         '''
         1. Set switch size
         2. Color interfaces
@@ -34,8 +34,7 @@ class EmulationNodeNetworkBackendVDE(EmulationNodeNetworkBackend, SwitchMixin):
 
         self.color_interfaces()
         self.nlog.info("coloring interfaces ...")
-        if use_vlan:
-            self.move_interfaces_to_vlan()
+        self.move_interfaces_to_vlan()
 
     # TODO: MOVE TO VDESWITCH
     def color_interfaces(self):
