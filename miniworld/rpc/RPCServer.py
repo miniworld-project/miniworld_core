@@ -414,6 +414,7 @@ class MiniWorldRPCServer(MiniWorldRPC):
             # self.__zeromq_server_start()
             self.start_zmq_thread()
 
+    @dec_requires_simulation_running
     @node_id_2_int
     def simulation_step(self, steps):
         try:
