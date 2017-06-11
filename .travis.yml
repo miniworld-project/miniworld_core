@@ -21,11 +21,11 @@ install:
     # clone miniworld_playground
     - git clone https://github.com/miniworld-project/miniworld_playground.git
     - pushd miniworld_playground
+    - (cd examples && ./get_images.sh)
 script:
     - uname -a
     # run tests
     - MW_CONFIG=tests/config.json BRANCH=$TRAVIS_BRANCH docker-compose up -d
-    - docker-compose exec core cd examples && ./get_images.sh
     - docker-compose exec core pytest -x -v tests
 after_success:
     - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
