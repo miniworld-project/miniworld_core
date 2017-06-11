@@ -24,7 +24,7 @@ class GlobalConfig(JSONConfig.JSONConfig):
     def get_server_addr(self):
         pass
 
-    @customizable_attrs("distributed", "use")
+    @customizable_attrs("distributed", "use", default=False)
     def is_mode_distributed(self):
         pass
 

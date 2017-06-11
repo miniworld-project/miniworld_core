@@ -1,4 +1,4 @@
 #!/bin/bash
 
 export PYTHONPATH=$PWD:$PYTHONPATH
-./miniworld/rpc/RPCServer.py server
+./miniworld/rpc/RPCServer.py $@ server

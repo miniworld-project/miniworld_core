@@ -52,35 +52,11 @@ def image_path():
 
 def create_runner(tmpdir_factory, request, config_path):
     class Runner(object):
-        def __init__(self, debug=True):
+        def __init__(self):
             self.scenario = str(tmpdir_factory.mktemp('scenarios').join('scenario.json'))
             self.config = config_path
             self.server_proc = None
-            self.is_start_server = not request.config.getoption("--no-server")
-            self.debug = True
-
-            if not os.path.exists(config_path):
-                # TODO: #15 use minimal config
-                shutil.copy2('sample_configs/config.json', config_path)
-                if self.debug:
-                    self.enable_debug()
-                print(('config: {}:'.format(config_path)))
-                with open(config_path, "r") as f:
-                    print((f.read()))
-            os.environ['CONFIG'] = config_path
-
-        def enable_debug(self):
-            config = JSONConfig.read_json_config(self.config)
-            config['logging']['level'] = 'DEBUG'
-            # config['logging']['debug'] = True
-            config['logging']['log_provisioning'] = True
-            if os.environ.get('ENV', '').lower() == 'ci':
-                config['provisioning']['boot_wait_timeout'] = 480
-            self.set_config(config)
-
-        def set_config(self, config):
-            with open(config_path, "w") as f:
-                f.write(json.dumps(config, indent=4))
+            # self.is_start_server = not request.config.getoption("--no-server")
 
         def __enter__(self) -> 'Runner':
             self.start()
@@ -92,11 +68,6 @@ def create_runner(tmpdir_factory, request, config_path):
         def start(self):
             env = deepcopy(os.environ)
             env.update({'CONFIG': self.config})
-            # if self.is_start_server:
-            #     # self.server_proc = subprocess.Popen(['docker-compose', 'up', '-d'], env=env)
-            #     sys.stderr.write('server started\n')
-            # else:
-            #     sys.stderr.write('please start the server yourself')
             self.connect_to_server()
 
         @staticmethod

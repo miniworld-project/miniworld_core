@@ -475,6 +475,11 @@ def configure_server_parser(server_parser):
 if __name__ == '__main__':
 
     root_parser = argparse.ArgumentParser(description='')
+    def get_config_path():
+        config_path_rel = os.environ.get('MW_CONFIG')
+        if config_path_rel is not None:
+            return os.path.abspath(config)
+    root_parser.add_argument('-c', '--config', default=os.environ.get('MW_CONFIG'))
 
     subparser = root_parser.add_subparsers(help='Mode')
     server_parser = subparser.add_parser(MODE_SERVER)
@@ -485,7 +490,9 @@ if __name__ == '__main__':
 
     args = root_parser.parse_args()
 
-    miniworld.init(do_init_singletons=False)
+    config_path = os.path.abspath(args.config) if args.config is not None else None
+
+    miniworld.init(config_path=config_path, do_init_singletons=False)
     # create the server or client rpc class, store in the global config if this is a coordinator or client
     rpc_type, args, kwargs = args.func(args)
     # the singletons rely on the mode set in the argparser func

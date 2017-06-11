@@ -11,9 +11,14 @@ services:
     - type: bind
       source: ./
       target: /app/
+    - type: bind
+      source: ../miniworld_playground/examples
+      target: /app/examples
     devices:
     # kvm access
     - "/dev/kvm:/dev/kvm"
     ports:
     - 5000:5000
     - 5001:5001
+    environment:
+      - MW_CONFIG=${MW_CONFIG}

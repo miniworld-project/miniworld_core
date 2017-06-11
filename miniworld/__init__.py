@@ -16,7 +16,7 @@ from miniworld.util import PathUtil
 
 __author__ = 'Nils Schmidt'
 
-def init(do_init_singletons=True):
+def init(config_path: str=None, do_init_singletons=True):
     ''' Init the module by installing signal handlers and creating the temp files '''
     
     if not os.path.exists(PATH_GLOBAL_CONFIG):
@@ -26,7 +26,9 @@ def init(do_init_singletons=True):
 
     # TODO: Ticket #2
     install_signal_handlers()
-    set_global_config(os.getenv('CONFIG') or PATH_GLOBAL_CONFIG)
+    set_global_config(config_path or PATH_GLOBAL_CONFIG)
+    # TODO: REMOVE
+    print(config_path)
     set_log_level(config.get_log_level())
 
     clean_miniworld_dir()
