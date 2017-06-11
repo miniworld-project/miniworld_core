@@ -9,6 +9,9 @@ from miniworld.util import JSONConfig
 
 @pytest.fixture(scope='session')
 def download_examples():
+    if not os.path.isdir('examples/'):
+        pytest.skip('examples not mounted')
+
     subprocess.check_call(['./get_images.sh'], cwd='examples/')
     os.system('ls -l examples/')
 
