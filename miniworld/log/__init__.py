@@ -28,7 +28,7 @@ def add_logger(logger):
 def set_log_level(level):
     with lock:
         for logger in loggers:
-            print("setting log level '%s' for '%s'" % (level, logger))
+            log.debug("setting log level '%s' for '%s'" % (level, logger.name))
             logger.setLevel(level)
 
 @memoize_pos_args

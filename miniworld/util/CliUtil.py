@@ -9,7 +9,7 @@ from miniworld import Scenario, Config
 from miniworld import log
 from miniworld.errors import ConfigMalformed
 from miniworld.util import JSONConfig, DictUtil
-
+from miniworld.Config import config
 __author__ = "Nils Schmidt"
 
 
@@ -25,7 +25,8 @@ scenario_config_parser.add_argument('--customize-scenario', "-cs", default='{}',
 rpc_parser = argparse.ArgumentParser(add_help=False)
 def get_default_rpc_addr():
     try:
-        Config.set_global_config(Config.PATH_GLOBAL_CONFIG)
+        if not config.config:
+            Config.set_global_config(Config.PATH_GLOBAL_CONFIG)
         return Config.config.get_server_addr()
     except Exception:
         return "127.0.0.1"
