@@ -35,6 +35,6 @@ after_success:
     - docker push $REPO:$TAG
 addons:
   artifacts:
-    s3_region: "eu-central-1" # defaults to "us-east-1"
+    s3_region: "eu-central-1"
     paths:
     - docker-compose.txt

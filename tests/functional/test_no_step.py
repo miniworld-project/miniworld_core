@@ -1,5 +1,4 @@
 import json
-import subprocess
 from collections import OrderedDict
 
 import pytest
@@ -11,14 +10,14 @@ from tests.conftest import create_runner, strip_output
 def runner(tmpdir_factory, image_path, request, config_path):
     runner = create_runner(tmpdir_factory, request, config_path)
 
-    scenario = {
-        "scenario": "acceptance_boot",
-        "cnt_nodes": 1,
-        "provisioning": {
-            "image": image_path,
-            "regex_shell_prompt": "root@OpenWrt:/#"
-        }
-    }
+    scenario = OrderedDict([
+        ("scenario", "acceptance_boot"),
+        ("cnt_nodes", 1),
+        ("provisioning", OrderedDict([
+            ("image", image_path),
+            ("regex_shell_prompt", "root@OpenWrt:/#")
+        ]))
+    ])
 
     with runner() as r:
         yield r, scenario
