@@ -25,11 +25,16 @@ script:
     - uname -a
     # run tests
     - MW_CONFIG=tests/config.json BRANCH=$TRAVIS_BRANCH docker-compose up -d
-    - if $SHOW_OUTPUT; then docker-compose exec core pytest -x -v -s tests; else docker-compose exec core pytest -x -v -s tests ; fi
+    - eval $TEST_COMMAND
 after_script:
-    - docker-compose logs
+    - docker-compose logs > docker-compose.txt
 after_success:
     - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
     - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
     # push docker image
     - docker push $REPO:$TAG
+addons:
+  artifacts:
+    s3_region: "eu-central-1" # defaults to "us-east-1"
+    paths:
+    - docker-compose.txt
