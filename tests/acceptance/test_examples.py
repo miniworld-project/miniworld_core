@@ -16,6 +16,7 @@ def download_examples():
     os.system('ls -l examples/')
 
 
+@pytest.mark.examples
 @pytest.mark.usefixtures('download_examples')
 class TestExamples:
     # TODO: examples/batman_adv.json, problem is configurator
