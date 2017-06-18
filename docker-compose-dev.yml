@@ -8,9 +8,7 @@ services:
     privileged: true
     volumes:
     - /lib/modules:/lib/modules
-    - type: bind
-      source: ./
-      target: /app/
+    - ./:/app/
     - type: bind
       source: ../miniworld_playground/examples
       target: /app/examples
@@ -21,4 +19,5 @@ services:
     - 5000:5000
     - 5001:5001
     environment:
-      - MW_CONFIG=${MW_CONFIG}
+      - MW_CONFIG=${MW_CONFIG-/app/config.json}
+    entrypoint: ./scripts/dev_start.sh

@@ -170,9 +170,9 @@ def action_start(self, args):
     scenario_config, _, scenario_config_json = CliUtil.parse_scenario_config(args.scenario_config, args.custom_scenario)
 
     if args.progress:
-        return CliUtil.start_scenario(scenario_config_json, args.auto_stepping, blocking=False)
+        return CliUtil.start_scenario(scenario_config_json, args.auto_stepping, False, args.force_snapshot_boot)
 
-    return self.connection.simulation_start(scenario_config_json, args.auto_stepping)
+    return self.connection.simulation_start(scenario_config_json, args.auto_stepping, True, args.force_snapshot_boot)
 
 
 @new_action_decorator
@@ -334,6 +334,9 @@ def main(args=None):
                                       help="Show the progress via the CLI.")
             start_parser.add_argument("scenario_config",
                                       help="The scenario config (.json) that describes the scenario you want to start.")
+            start_parser.add_argument("-fs", "--force-snapshot-boot", default=False, action="store_true",
+                                      help="Use the snapshot boot and disable the internal scenario changed check.")
+
             start_parser.set_defaults(func=action_start)
 
         def create_stop_parsers():

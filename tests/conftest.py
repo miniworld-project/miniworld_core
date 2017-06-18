@@ -107,7 +107,7 @@ def create_runner(tmpdir_factory, request, config_path):
             self.stop(hard=False)
             self.start_scenario(self.scenario)
 
-        def start_scenario(self, scenario):
+        def start_scenario(self, scenario, force_snapshot_boot=False):
             '''
             Parameters
             ----------
@@ -118,7 +118,10 @@ def create_runner(tmpdir_factory, request, config_path):
                 f.write(scenario_json)
                 f.flush()
                 print(('scenario:\n{}'.format(scenario_json)))
-                self.run_mwcli_command(['start', f.name])
+                options = []
+                if force_snapshot_boot:
+                    options += ['-fs']
+                self.run_mwcli_command(['start'] + options + [f.name])
 
         def check_for_errors(self):
             self.run_mwcli_command(['ping'])

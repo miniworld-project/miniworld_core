@@ -280,7 +280,7 @@ class SimulationManager(Resetable, object):
         hasher.update(config_json.encode())
         return hasher.hexdigest()
 
-    def start(self, scenario_config_content, auto_stepping=False, blocking=True):
+    def start(self, scenario_config_content, auto_stepping=False, blocking=True, force_snapshot_boot=False):
         '''
         Parse the scenario config and run the simulation.
 
@@ -290,6 +290,8 @@ class SimulationManager(Resetable, object):
             Scenario config file (json).
         auto_stepping
         blocking : bool, optional (default is True)
+        force_snapshot_boot: bool, optional (default is False)
+            Disable snapshoot boot scenario comparison check and force snapshot boot
 
         Raises
         ------
@@ -302,6 +304,10 @@ class SimulationManager(Resetable, object):
             Scenario.set_scenario_config(scenario_config_content, raw=True)
             new_scenario_digest = self._get_scenario_hash()
             self.scenario_changed = old_scenario_digest != new_scenario_digest
+
+            # force snapshot boot
+            if force_snapshot_boot:
+                self.scenario_changed = False
 
             # init EventSystem after scenario config is set
             event_system = singletons.event_system

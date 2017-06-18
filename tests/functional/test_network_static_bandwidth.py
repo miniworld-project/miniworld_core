@@ -66,7 +66,7 @@ def runner(tmpdir_factory, image_path, request, config_path, core_topologies_dir
 @pytest.fixture
 def snapshot_runner(runner):
     runner, scenario = runner
-    runner.start_scenario(scenario)
+    runner.start_scenario(scenario, force_snapshot_boot=True)
     yield runner
     runner.stop(hard=False)
 

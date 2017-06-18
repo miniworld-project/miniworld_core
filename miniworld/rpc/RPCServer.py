@@ -386,14 +386,14 @@ class MiniWorldRPCServer(MiniWorldRPC):
     #########################################
 
     # TODO: reset if error occured during simulation start
-    def simulation_start(self, scenario_config_content, auto_stepping, blocking=True):
+    def simulation_start(self, scenario_config_content, auto_stepping, blocking=True, force_snapshot_boot=False):
 
         if config.is_mode_distributed():
             log.info("starting in distributed mode ...")
         else:
             log.info("starting in local mode ...")
 
-        singletons.simulation_manager.start(scenario_config_content, auto_stepping=auto_stepping, blocking=blocking)
+        singletons.simulation_manager.start(scenario_config_content, auto_stepping=auto_stepping, blocking=blocking, force_snapshot_boot=force_snapshot_boot)
 
     def simulation_pause(self):
         singletons.simulation_manager.pause()
