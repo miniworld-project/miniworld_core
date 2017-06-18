@@ -34,8 +34,7 @@ def snapshot_runner(runner):
 def test_info_scenario(snapshot_runner):
     res = snapshot_runner.run_mwcli_command(['info', 'scenario']).decode()
     with open(snapshot_runner.scenario, 'r') as f:
-        assert json.loads(strip_output(res), object_pairs_hook=OrderedDict) == json.load(f,
-                                                                                         object_pairs_hook=OrderedDict)
+        assert json.dumps(json.loads(strip_output(res)), sort_keys=True) == json.dumps(json.load(f), sort_keys=True)
 
 
 def test_ping(snapshot_runner):

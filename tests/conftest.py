@@ -114,7 +114,7 @@ def create_runner(tmpdir_factory, request, config_path):
             scenario: dict
             '''
             with open(self.scenario, 'w') as f:
-                scenario_json = json.dumps(scenario, indent=4)
+                scenario_json = json.dumps(scenario, indent=4, sort_keys=True)
                 f.write(scenario_json)
                 f.flush()
                 print(('scenario:\n{}'.format(scenario_json)))

@@ -275,7 +275,7 @@ class SimulationManager(Resetable, object):
 
     @staticmethod
     def _get_scenario_hash():
-        config_json = json.dumps(scenario_config.data)
+        config_json = json.dumps(scenario_config.data, sort_keys=True)
         hasher = hashlib.sha256()
         hasher.update(config_json.encode())
         return hasher.hexdigest()
