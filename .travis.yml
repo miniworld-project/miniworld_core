@@ -8,7 +8,7 @@ matrix:
       group: edge
 install:
     - sudo apt-get update
-    - sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine
+    - sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-ce
     - docker-compose --version
     - sudo rm /usr/local/bin/docker-compose
     - sudo pip install docker-compose
