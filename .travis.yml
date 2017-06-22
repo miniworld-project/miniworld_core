@@ -5,6 +5,7 @@ matrix:
       dist: trusty
       sudo: required
       python: '3.6'
+      group: edge
 install:
     - sudo apt-get update
     - sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-engine
