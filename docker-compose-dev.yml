@@ -9,9 +9,7 @@ services:
     volumes:
     - /lib/modules:/lib/modules
     - ./:/app/
-    - type: bind
-      source: ../miniworld_playground/examples
-      target: /app/examples
+    - ./examples:/app/examples
     devices:
     # kvm access
     - "/dev/kvm:/dev/kvm"

@@ -25,7 +25,8 @@ RUN pip3 install --upgrade pip && \
 
 CMD bash -c '(./install_iproute2.sh) ; modprobe ebtables ; mwserver'
 
-VOLUME ['/app/scenarios', '/app/examples']
+VOLUME '/app/scenarios'
+VOLUME '/app/examples'
 EXPOSE 5000
 EXPOSE 5001
 

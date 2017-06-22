@@ -1,11 +1,7 @@
 
 # a cleanup script in case the backend does not exit correctly
 
-pkill -fe RPCServer.py
-while pkill -0 $pid
-	do
-	sleep 1
-done
+pkill -fe -9 mwserver
 pkill -fe -9 RPCServer.py
 killall -9 qemu-system-x86_64
 killall -9 vde_switch
@@ -33,3 +29,4 @@ ebtables --atomic-file /tmp/ebtables_atommic --atomic-init
 ebtables --atomic-file /tmp/ebtables_atommic --atomic-commit
 
 for i in `brctl show|grep br_| awk '{print $1}'`; do ifconfig $i down && brctl delbr $i; done
+find . -name '*.pyc' -delete
