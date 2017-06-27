@@ -433,17 +433,19 @@ MODE_SERVER = "server"
 MODE_CLIENT = "client"
 
 
-def mode_client(args):
+def mode_server(args):
     config.set_is_coordinator(False)
 
     if args.tunnel_address:
         tunnel_addr = args.tunnel_address
-    else:
+    elif args.tunnel_interface:
         # {2: [{'addr': '192.168.0.14',
         # 'broadcast': '192.168.0.255',
         # 'netmask': '255.255.255.0'}],
         # 18: [{'addr': 'a4:5e:60:ca:5c:0f'}]}
         tunnel_addr = netifaces.ifaddresses(args.tunnel_interface)[netifaces.AF_INET][0]['addr']
+    else:
+        raise ValueError('Address required')
 
     server_addr = args.server_address
     log.info("server address: %s", server_addr)
@@ -451,53 +453,42 @@ def mode_client(args):
     return MiniWorldRPCClient, [server_addr, tunnel_addr], {}
 
 
-def mode_server(args):
+def mode_coordinator(args):
     config.set_is_coordinator(True)
 
     return MiniWorldRPCServer, [], {}
 
+def main():
 
-def configure_client_parser(client_parser):
+    root_parser = argparse.ArgumentParser(description='MiniWorld network emulator')
+    root_parser.add_argument('-c', '--config', default=os.environ.get('MW_CONFIG'), help="The config file")
+
+    mode_group = root_parser.add_argument_group('mode')
+    mode_group.add_argument('--distributed', action='store_true', help='Run in the distributed mode')
+    mode_group.add_argument('--server', action='store_true', help='Run as server. By default run as the coordinator in the distributed mode. Only works with --distributed')
+
+    server_group = root_parser.add_argument_group('server')
+    address_group = server_group.add_mutually_exclusive_group()
     # at least one of the mutually exclusive arguments is required
-    meg = client_parser.add_mutually_exclusive_group(required=True)
-    meg.add_argument("-ta", "--tunnel-address", help="")
-    meg.add_argument("-ti", "--tunnel-interface", help="")
+    address_group.add_argument("-ta", "--tunnel-address", help="")
+    address_group.add_argument("-ti", "--tunnel-interface", help="")
 
-    client_parser.add_argument("server_address", help="Address of the ZeroMQServer")
-
-    client_parser.set_defaults(func=mode_client)
-
-
-def configure_server_parser(server_parser):
-    server_parser.set_defaults(func=mode_server)
-
-
-if __name__ == '__main__':
-
-    root_parser = argparse.ArgumentParser(description='')
-    def get_config_path():
-        config_path_rel = os.environ.get('MW_CONFIG')
-        if config_path_rel is not None:
-            return os.path.abspath(config)
-    root_parser.add_argument('-c', '--config', default=os.environ.get('MW_CONFIG'))
-
-    subparser = root_parser.add_subparsers(help='Mode')
-    server_parser = subparser.add_parser(MODE_SERVER)
-    client_parser = subparser.add_parser(MODE_CLIENT)
-
-    configure_client_parser(client_parser)
-    configure_server_parser(server_parser)
+    server_group.add_argument("--coordinator-address", "-ca", help="Address of the ZeroMQServer")
 
     args = root_parser.parse_args()
+    # create the server or client rpc class, store in the global config if this is a coordinator or client
+    if args.server:
+        rpc_type, rpc_args, rpc_kwargs = mode_server(args)
+    else:
+        rpc_type, rpc_args, rpc_kwargs = mode_coordinator(args)
 
     config_path = os.path.abspath(args.config) if args.config is not None else None
 
     miniworld.init(config_path=config_path, do_init_singletons=False)
-    # create the server or client rpc class, store in the global config if this is a coordinator or client
-    rpc_type, args, kwargs = args.func(args)
+
     # the singletons rely on the mode set in the argparser func
     miniworld.init_singletons()
-    rpc_instance = rpc_type(*args, **kwargs)
+    rpc_instance = rpc_type(*rpc_args, **rpc_kwargs)
 
     server = SimpleXMLRPCServer(("0.0.0.0", RPCUtil.get_rpc_port()),
                                 requestHandler=RequestHandler,
@@ -523,3 +514,6 @@ if __name__ == '__main__':
     logger().info("rpc server running")
     log.debug("registered functions: %s", pprint.pformat(server.system_listMethods()))
     server.serve_forever()
+
+if __name__ == '__main__':
+    main()
