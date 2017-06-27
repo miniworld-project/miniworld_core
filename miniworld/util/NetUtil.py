@@ -3,6 +3,7 @@ import time
 import socket
 import selectors
 from miniworld.errors import Base
+from miniworld.log import get_logger
 
 __author__ = 'Nils Schmidt'
 
@@ -104,7 +105,7 @@ class SocketExpect(object):
 
     # TODO: REMOVE expected_length
     # TODO: support timeout!
-    def __init__(self, sock, check_fun, read_buf_size = 1, timeout = None):
+    def __init__(self, sock, check_fun, read_buf_size = 1, timeout = None, send_data = None):
         '''
         Read from the socket `sock` until the function
         `check_fun` return True.
@@ -116,6 +117,7 @@ class SocketExpect(object):
             Currently received data, whole data, expected result?
         read_buf_size : int, optional (default is 1)
             Reads bytewise from the socket.
+        send_data: bytes
         '''
 
         if timeout is not None and timeout < 0:
@@ -130,6 +132,9 @@ class SocketExpect(object):
         self.selector = selectors.DefaultSelector()
 
         self.timeout = timeout
+
+        self.send_data = send_data
+        self.logger = get_logger(self.__class__.__name__)
 
     # TODO: DOC
     def read(self):
@@ -149,17 +154,27 @@ class SocketExpect(object):
         try:
             self.selector.register(self.sock, selectors.EVENT_READ)
             t_start = time.time()
+            last_check = None
+
             while 1:
+                if last_check is None:
+                    last_check = time.time()
+
                 # data available or timeout occurred ?
-                events = self.selector.select(self.timeout / 2.0)
+                events = self.selector.select(0.5)
                 if time.time() - t_start > self.timeout:
                     raise Timeout("Timeout (%s) occurred!" % self.timeout)
 
+                if self.send_data is not None and time.time() - last_check > 1:
+                    last_check = time.time()
+                    self.sock.send(self.send_data)
+                    self.logger.debug('sending {}'.format(self.send_data))
                 for key, mask in events:
                     if mask == selectors.EVENT_READ:
                         res = self.process_socket()
                         if res:
                             return self.output
+
         finally:
             self.selector.unregister(self.sock)
 
@@ -188,26 +203,10 @@ def wait_for_boot(*args, **kwargs):
     ------
     Timeout
     '''
-    sock = args[0]
-    wait_time = 0
-    timeout = kwargs["timeout"]
-
-    while 1:
-        start = time.time()
-        try:
-            kwargs["timeout"] = 0.1
-            buffered_socket_reader = SocketExpect(*args, **kwargs)
-            sock.send(b"\n")
-            res = buffered_socket_reader.read()
-            if res:
-                return res
-
-        except Timeout:
-            pass
-        finally:
-            wait_time += time.time() - start
-            if wait_time > timeout:
-                raise Timeout("waited %d seconds for the VM boot ... giving up ...")
+    # enter shell after each select timeout
+    kwargs['send_data'] = b'\n'
+    buffered_socket_reader = SocketExpect(*args, **kwargs)
+    return buffered_socket_reader.read()
 
 if __name__ == '__main__':
     import selectors
