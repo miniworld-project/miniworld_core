@@ -2,14 +2,20 @@
 
 import argparse
 import json
+import os
+import selectors
+import shlex
+import socket
 import sys
 import xmlrpc.client
+import subprocess
 
 from miniworld import Constants, Config
 from miniworld.Config import config
 from miniworld.log import log
+from miniworld.model.emulation.Qemu import Qemu
 from miniworld.rpc import RPCUtil
-from miniworld.util import CliUtil
+from miniworld.util import CliUtil, PathUtil
 from miniworld.util.CliUtil import rpc_parser
 
 
@@ -210,28 +216,27 @@ def action_exec(self, args, single=False):
             print(json.loads(self.connection.exec_node_cmd(cmds, node_id, args.validate)))
 
 
-@new_action_decorator
-def action_shell(self):
-    # TODO: we need to print deserialized json here due to the rpc server hack
-    if not hasattr(args, "node_id"):
-        node_id = None
-    else:
-        node_id = args.node_id
+def action_shell(args):
+    path = os.path.join(Constants.PATH_TMP, 'qemu_{}.sock'.format(args.node_id))
 
-    cmds = args.cmds
-    if single:
-        cmds = ' '.join(cmds)
-    else:
-        cmds = '\n'.join(cmds)
+    input_device = None
+    if os.isatty(sys.stdout.fileno()):
+        try:
+            input_device = os.ttyname(sys.stdin.fileno())  # type: str
+        # we get this error on a non-tty device for `ttyname`
+        except OSError as e:
+            if not e.errno == 0:
+                raise
+            print('not connected to a tty', file=sys.stderr)
+    if not input_device:
+        input_device = '/dev/stdin'
 
-    if node_id:
-        print(json.loads(self.connection.exec_node_cmd(cmds, node_id, args.validate)))
-    else:
-        # only switch to the rpc server which holds the node
-        for server_id in self.connection.get_distributed_address_mapping():
-            self.connection = self.get_connection_server(server_id=server_id)
-            print("%s >>>" % server_id, file=sys.stderr)
-            print(json.loads(self.connection.exec_node_cmd(cmds, node_id, args.validate)))
+    print('redirecting between "{}" and "{}"'.format(path, input_device), file=sys.stderr)
+    print('you may need to press enter to see the shell prompt ', file=sys.stderr)
+    print('detach with CTRL-D', file=sys.stderr)
+    os.system('socat {},raw,echo=0,escape=0x4 UNIX-Connect:{}'.format(input_device, path))
+    # subprocess.Popen('socat {},raw,echo=0,escape=0x4 UNIX-Connect:{}'.format(input_device, path).split(' '), stdin=sys.stdin,
+    #                 stdout=sys.stdout, stderr=sys.stderr, shell=True)
 
 
 def main(args=None):
@@ -243,6 +248,7 @@ def main(args=None):
     ACTION_LOGS_BOOT = "boot"
 
     ACTION_EXEC = "exec"
+    ACTION_SHELL = "shell"
     ACTION_EXEC_SINGLE = "execs"
 
     ACTION_PING = "ping"
@@ -279,6 +285,7 @@ def main(args=None):
         stop_parser = subparser.add_parser(ACTION_STOP)
         step_parser = subparser.add_parser(ACTION_STEP)
         exec_parser = subparser.add_parser(ACTION_EXEC)
+        shell_parser = subparser.add_parser(ACTION_SHELL)
         execs_parser = subparser.add_parser(ACTION_EXEC_SINGLE)
         ping_parser = subparser.add_parser(ACTION_PING)
 
@@ -356,6 +363,10 @@ def main(args=None):
                                      help="Time to wait for the command to complete. Default is: %(default)s")
             exec_parser.set_defaults(func=action_exec)
 
+        def create_shell_parsers():
+            add_node_id_arg_positional(shell_parser)
+            shell_parser.set_defaults(func=action_shell)
+
         def create_execs_parsers():
             add_node_id_arg_optional(execs_parser)
             execs_parser.add_argument("cmds", nargs="+", help="The command to be executed on the node")
@@ -370,6 +381,7 @@ def main(args=None):
         create_start_parsers()
         create_stop_parsers()
         create_exec_parsers()
+        create_shell_parsers()
         create_execs_parsers()
         create_step_parsers()
         create_info_parsers()

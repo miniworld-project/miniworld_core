@@ -1,7 +1,11 @@
 import json
+import subprocess
 from collections import OrderedDict
 
 import pytest
+import sys
+
+import time
 
 from tests.conftest import create_runner, strip_output
 
@@ -31,12 +35,21 @@ def snapshot_runner(runner):
     runner.stop(hard=False)
 
 
+def test_ping(snapshot_runner):
+    res = snapshot_runner.run_mwcli_command(['ping']).decode()
+    assert strip_output(res) == 'pong'
+
+
 def test_info_scenario(snapshot_runner):
     res = snapshot_runner.run_mwcli_command(['info', 'scenario']).decode()
     with open(snapshot_runner.scenario, 'r') as f:
         assert json.dumps(json.loads(strip_output(res)), sort_keys=True) == json.dumps(json.load(f), sort_keys=True)
 
 
-def test_ping(snapshot_runner):
-    res = snapshot_runner.run_mwcli_command(['ping']).decode()
-    assert strip_output(res) == 'pong'
+@pytest.mark.skip(reason='Stdout not passed from pytest :/ How to fix this?')
+def test_shell(snapshot_runner):
+    shell = subprocess.Popen(['mwcli', 'shell', '--node-id', '1'], stdin=subprocess.PIPE, stdout=sys.stdout,
+                             stderr=sys.stderr)
+    time.sleep(5)
+    shell.communicate(b'\n')
+    shell.communicate(b'ifconfig')
