@@ -1,4 +1,4 @@
-import subprocess
+from subprocess import CalledProcessError
 
 import pytest
 
@@ -51,6 +51,62 @@ def test_shell_provisioning(image_path, runner):
     }
     with runner() as r:
         r.start_scenario(scenario)
+
+
+@pytest.fixture(scope='session')
+def invalid_image(tmpdir_factory):
+    image_path = str(tmpdir_factory.getbasetemp().join('1_byte_image.qcow2'))
+    with open(image_path, 'w') as f:
+        f.write('\\x0\\x1')
+
+    return image_path
+
+
+@pytest.mark.skip(reason='Requires server reload config to use the smallest possible timeout')
+def test_invalid_image_boot_mode_shell_prompt_timeout_works(runner, invalid_image):
+    scenario = {
+        "scenario": "acceptance_boot",
+        "cnt_nodes": 1,
+        "provisioning": {
+            "image": invalid_image,
+            "regex_shell_prompt": "root@OpenWrt:/#",
+        },
+        "shell": {
+            "pre_network_start": {
+                "shell_cmds": [
+                    "ifconfig"
+                ]
+            }
+        }
+    }
+    # TODO: check also that a timeout exception is thrown, but how
+    with pytest.raises(CalledProcessError):
+        with runner() as r:
+            r.start_scenario(scenario)
+
+
+@pytest.mark.skip(reason='Requires server reload config to use the smallest possible timeout')
+def test_invalid_image_boot_mode_boot_prompt_timeout_works(runner, invalid_image):
+    scenario = {
+        "scenario": "acceptance_boot",
+        "cnt_nodes": 1,
+        "provisioning": {
+            "image": invalid_image,
+            "regex_shell_prompt": "root@OpenWrt:/#",
+            "regex_boot_completed": "procd: - init complete -.*",
+        },
+        "shell": {
+            "pre_network_start": {
+                "shell_cmds": [
+                    "ifconfig"
+                ]
+            }
+        }
+    }
+    # TODO: check also that a timeout exception is thrown, but how
+    with pytest.raises(CalledProcessError):
+        with runner() as r:
+            r.start_scenario(scenario)
 
 
 # def test_address_configurator(runner):
