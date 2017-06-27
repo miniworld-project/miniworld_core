@@ -205,7 +205,7 @@ def read_json_config(config = None, raw = False):
 
         # remove all comments
         data = re.sub("%s.*?(\n|\r\n)" % CONFIG_COMMENT, "", config)
-        return json.loads(data)
+        return json.loads(data, object_pairs_hook=collections.OrderedDict)
     except (ValueError, IOError):
         raise ConfigError("Config file '%s' could not be opened!" % config)
 
