@@ -27,8 +27,6 @@ def init(config_path: str=None, do_init_singletons=True):
     # TODO: Ticket #2
     install_signal_handlers()
     set_global_config(config_path or PATH_GLOBAL_CONFIG)
-    # TODO: REMOVE
-    print(config_path)
     set_log_level(config.get_log_level())
 
     clean_miniworld_dir()

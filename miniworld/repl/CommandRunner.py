@@ -139,7 +139,10 @@ class CommandRunner:
             self.brief_logger.exception(e)
         except Timeout as e:
             self.brief_logger.info('sending CTRL-C to shell ...')
-            self.sock.send(b'\x03')
+            try:
+                self.sock.send(b'\x03')
+            except socket.error:
+                pass
             raise REPLTimeout("The REPL '%s' encountered a timeout (%s) while looking for shell prompt (%s)" % (self.replable, self.timeout, self.shell_prompt))
 
         # finally close socket

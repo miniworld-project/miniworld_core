@@ -28,6 +28,9 @@ setup(
                    'requests', 'msgpack-python', 'zmq'],
         'develop': ['pytest', 'sphinx'],
     },
-    scripts=['mwcli', 'mwserver']
+    scripts=['mwcli'],
+    entry_points={
+        'console_scripts': ['mwserver=miniworld.rpc.RPCServer:main'],
+    }
 )
 

@@ -203,7 +203,7 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
             kvm_support = CMD_TEMPLATE_QEMU_KVM if is_kvm_usable() else "",
             path_serial_uds_socket = self.path_uds_socket,
             path_qmp_uds_socket = self.monitor_repl.path_uds_socket,
-            path_overlay_image = self.create_qemu_overlay_image(abspath(path_qemu_base_image)),
+            path_overlay_image = self.create_qemu_overlay_image(os.path.realpath(abspath(path_qemu_base_image))),
             network_interfaces = self._build_qemu_nic_command(),
             overlay_images = self._build_qemu_overlay_images_command(),
             user_addition = qemu_user_addition,
