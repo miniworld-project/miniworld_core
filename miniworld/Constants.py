@@ -5,7 +5,7 @@ __author__ = 'Nils Schmidt'
 
 PROJECT_NAME = "MiniWorld"
 
-PATH_CLEANUP_SCRIPT = os.path.relpath("cleanup.sh", os.getcwd())
+PATH_CLEANUP_SCRIPT = os.path.relpath("scripts/cleanup.sh", os.getcwd())
 
 # temp files ho here
 PATH_TMP = "/tmp/%s" % PROJECT_NAME
