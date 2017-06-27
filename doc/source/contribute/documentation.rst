@@ -1,6 +1,8 @@
 Documentation
 =============
 
+.. contents:: Table of Contents
+   :local:
 
 Documentation should be edited and tested locally.
 If you push to a remote branch for which there are hooks on `readthedocs.org <http://readthedocs.org/projects/miniworld-core>`_ (currently master and nightly), the documentation will be build and updated accordingly.
@@ -27,7 +29,7 @@ Open the html file:
 
 .. code-block:: bash
 
-   # open build/html/index.html
+   open build/html/index.html
 
 .. note::
 
@@ -37,6 +39,6 @@ Open the html file:
 
       pip install virtualenvwrapper
       source virtualenvwrapper_lazy.sh
-      mkvirtualenv -p python2.7 <envname>
+      mkvirtualenv -p python3 <envname>
       workon <envname>
       # try again ...
