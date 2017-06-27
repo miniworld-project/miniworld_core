@@ -16,14 +16,14 @@ WORKDIR /app
 
 # for development:
 #COPY . /miniworld/
-#COPY install_iproute2.sh /app/
+#COPY scripts/install_iproute2.sh /scripts/app/
 #RUN pip3 install /miniworld\[develop,server\]
 #RUN (cd examples && ./get_images.sh)
 
 RUN pip3 install --upgrade pip && \
     pip3 install /app\[server,develop\]
 
-CMD bash -c '(./install_iproute2.sh) ; modprobe ebtables ; mwserver'
+CMD bash -c '(./scripts/install_iproute2.sh) ; modprobe ebtables ; mwserver'
 
 VOLUME '/app/scenarios'
 VOLUME '/app/examples'
