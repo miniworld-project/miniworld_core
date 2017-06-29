@@ -206,3 +206,12 @@ Further starts of the same scenario use the **snapshot boot mode** which uses KV
 .. note::
 
    You may need to kill the server process when switching between different scenarios.
+
+Get a shell
+^^^^^^^^^^^
+
+Now you can further explore the VMs by getting shell access.
+
+.. code-block:: bash
+
+   mwcli shell 1
