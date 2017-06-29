@@ -29,11 +29,13 @@ Install system dependencies
 You should install the python packages as ``root`` since advanced privileges are required for kvm, network switching etc.
 
 .. code-block:: bash
+
    sudo su
 
 Use a virtualenv for MiniWorld or set python3 as system default.
 
 .. code-block:: bash
+
    pip install virtualenv
    virtualenv -p python3 mw
    source mw/bin/activate
