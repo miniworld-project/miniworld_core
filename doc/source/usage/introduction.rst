@@ -18,6 +18,10 @@ B.A.T.M.A.N Demo
 In the following, a short demo on how to use MiniWorld is given.
 For that purpose, we are going to start 3 OpenWRT nodes running the B.A.T.M.A.N. advanced routing algorithm.
 
+.. note::
+
+   All MiniWorld commands such as 'meserver' and 'mwcli' have to be run wih docker-compose if MiniWorld is installed via docker-compose. You can either get a shell with 'docker-compose exec core bash' or run a single command like 'docker-compose exec core mwcli start'. 
+
 Preparation
 ^^^^^^^^^^^
 
