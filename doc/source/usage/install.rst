@@ -26,14 +26,23 @@ Install system dependencies
    sudo apt-get update
    sudo apt-get install ebtables iproute2 qemu-kvm bridge-utils bison flex libdb-dev psmisc curl wget kmod libdb5.3-dev
 
-Install python dependencies:
+You should install the python packages as ``root`` since advanced privileges are required for kvm, network switching etc.
+
+.. code-block:: bash
+   sudo su
 
 Use a virtualenv for MiniWorld or set python3 as system default.
-You should install the python packages as root since advanced privileges are required.
+
+.. code-block:: bash
+   pip install virtualenv
+   virtualenv -p python3 mw
+   source mw/bin/activate
+
+Install python dependencies:
 
 .. code-block:: bash
 
    cd miniworld_core
    pip install --upgrade .\[server,develop\]
-
+   ./scripts/install_iproute2.sh
 
