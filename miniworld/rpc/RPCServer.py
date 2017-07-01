@@ -447,10 +447,10 @@ def mode_server(args):
     else:
         raise ValueError('Address required')
 
-    server_addr = args.server_address
-    log.info("server address: %s", server_addr)
+    coordinator_address = args.coordinator_address
+    log.info("coordinator address: %s", coordinator_address)
     log.info("tunnel address: %s", tunnel_addr)
-    return MiniWorldRPCClient, [server_addr, tunnel_addr], {}
+    return MiniWorldRPCClient, [coordinator_address, tunnel_addr], {}
 
 
 def mode_coordinator(args):
@@ -476,21 +476,25 @@ def main():
     server_group.add_argument("--coordinator-address", "-ca", help="Address of the ZeroMQServer")
 
     args = root_parser.parse_args()
+
+    # first create config since the mode_* functions need it
+    config_path = os.path.abspath(args.config) if args.config is not None else None
+    miniworld.init(config_path=config_path, do_init_singletons=False)
+
     # create the server or client rpc class, store in the global config if this is a coordinator or client
     if args.server:
         rpc_type, rpc_args, rpc_kwargs = mode_server(args)
     else:
         rpc_type, rpc_args, rpc_kwargs = mode_coordinator(args)
 
-    config_path = os.path.abspath(args.config) if args.config is not None else None
-
-    miniworld.init(config_path=config_path, do_init_singletons=False)
-
     # the singletons rely on the mode set in the argparser func
     miniworld.init_singletons()
     rpc_instance = rpc_type(*rpc_args, **rpc_kwargs)
 
-    server = SimpleXMLRPCServer(("0.0.0.0", RPCUtil.get_rpc_port()),
+
+    ip, port = "0.0.0.0", RPCUtil.get_rpc_port()
+    log.info('running server at {}:{}'.format(ip, port))
+    server = SimpleXMLRPCServer((ip, port),
                                 requestHandler=RequestHandler,
                                 logRequests=True,
                                 allow_none=True)

@@ -1117,8 +1117,6 @@ class SimulationManagerDistributedCoordinator(DistributedModeSimulationManager):
 
     def _start(self, scenario_name, cnt_nodes, path_qemu_image, post_boot_script_string_io, interfaces,
               link_quality_model, network_backend_name,
-              topology_mode, topology_mode_kwargs=None,
-              walk_model_name=None,
               parallel=True, auto_stepping=False,
               node_ids=None):
 

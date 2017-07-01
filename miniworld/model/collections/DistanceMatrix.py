@@ -32,7 +32,7 @@ def detransform_distance_matrix(distance_matrix):
     res = {}
     for x, entries in distance_matrix.items():
         for (y, distance) in entries:
-            res[(x, y)] = distance
+            res[(int(x), y)] = distance
     return factory()(res)
 
 def factory():

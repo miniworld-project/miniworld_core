@@ -64,10 +64,10 @@ import json
 class JSONProtocol(Protocol):
 
     def serialize(self, obj):
-        return json.dumps(obj)
+        return json.dumps(obj).encode()
 
     def deserialize(self, obj):
-        return json.loads(obj)
+        return json.loads(obj.decode())
 
 
 
