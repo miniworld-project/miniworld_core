@@ -54,10 +54,10 @@ def BridgeIproute2():
 
             self.bridge_dev_name = bridge_dev_name
             br_add_cmd = self._get_bridge_add_cmd()
-            br_set_group_cmd = IPRoute2Commands.get_add_interface_to_group_cmd(self.bridge_dev_name, IPRoute2Commands.GROUP_BRIDGES)
+            # br_set_group_cmd = IPRoute2Commands.get_add_interface_to_group_cmd(self.bridge_dev_name, IPRoute2Commands.GROUP_BRIDGES)
 
             self.add_shell_command(self.EVENT_BRIDGE_ADD, br_add_cmd)
-            self.add_shell_command(self.EVENT_BRIDGE_SET_GROUP_IF, br_set_group_cmd)
+            # self.add_shell_command(self.EVENT_BRIDGE_SET_GROUP_IF, br_set_group_cmd)
 
             if not switch:
                 br_set_hub_cmd = self._get_bridge_set_hub_mode_cmd()
