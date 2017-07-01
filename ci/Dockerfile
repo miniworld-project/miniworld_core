@@ -7,8 +7,12 @@ RUN apt-get update && \
     # apt dependencies
     apt-get -y install git ebtables iproute2 qemu-kvm bridge-utils bison flex libdb-dev psmisc curl wget kmod libdb5.3-dev socat && \
     # iproute2
-    libxtables11 iptables-dev pkg-config && \
+    apt-get -y install libxtables11 iptables-dev pkg-config && \
     apt-get -y clean && rm -rf /var/lib/apt/lists/*
+
+# install iproute2
+ADD scripts/install_iproute2.sh /tmp
+RUN /tmp/install_iproute2.sh
 
 # miniworld
 ARG BRANCH=nightly
