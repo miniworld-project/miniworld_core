@@ -92,7 +92,7 @@ class GlobalConfig(JSONConfig.JSONConfig):
 
     @customizable_attrs("network", "protocol", "name",
                         expected=[PROTOCOL_JSON, PROTOCOL_MSG_PACK],
-                        default=PROTOCOL_MSG_PACK)
+                        default=PROTOCOL_JSON)
     def get_protocol(self):
         pass
 
