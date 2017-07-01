@@ -6,6 +6,8 @@ RUN apt-get update && \
     apt-get -y install python3 python3-pip && \
     # apt dependencies
     apt-get -y install git ebtables iproute2 qemu-kvm bridge-utils bison flex libdb-dev psmisc curl wget kmod libdb5.3-dev socat && \
+    # iproute2
+    libxtables11 iptables-dev pkg-config && \
     apt-get -y clean && rm -rf /var/lib/apt/lists/*
 
 # miniworld
