@@ -4,7 +4,7 @@ set -e
 
 kernel_version=$(cut -d- -f1 <<< `uname -r`)
 echo "found kernel version: '$kernel_version'"
-tag="v4.11.0"
+tag="v4.2.0"
 
 if [ ! -d /tmp/iproute2 ]; then
     pushd /tmp
