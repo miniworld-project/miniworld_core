@@ -18,7 +18,6 @@ from miniworld.rpc import RPCUtil
 from miniworld.util import CliUtil, PathUtil
 from miniworld.util.CliUtil import rpc_parser
 
-
 class Action:
     '''
     Models an action that is associated with a argparse parser.
@@ -40,9 +39,9 @@ class Action:
     def get_connection(addr):
         return xmlrpc.client.ServerProxy(addr, allow_none=True)
 
-    def get_connection_server(self, node_id=None, server_id=None):
+    def get_connection_server(self, node_id=None, server_id=None, is_distributed:bool=None):
 
-        if config.is_mode_distributed():
+        if is_distributed:
 
             # ask local rpc for ip of the server which holds the node
 
@@ -52,7 +51,7 @@ class Action:
                 server_id = server_id
 
             print("using server: %s" % server_id, file=sys.stderr)
-            addr = self.connection.get_distributed_address_mapping()[str(server_id)]
+            addr = json.loads(self.connection.get_distributed_address_mapping())[str(server_id)]
             addr = RPCUtil.addr_from_ip(addr, RPCUtil.PORT_CLIENT)
             log.info("switching to rpc server '%s'", addr)
             # drop local connection and use remote server
@@ -76,7 +75,7 @@ class Action:
 
         # only switch to the rpc server which holds the node
         if hasattr(args, "node_id") and args.node_id is not None:
-            self.connection = self.get_connection_server(node_id=args.node_id)
+            self.connection = self.get_connection_server(node_id=args.node_id, is_distributed=args.distributed)
 
     def __new__(cls, *args, **kwargs):
         cls._instance = super(Action, cls).__new__(cls)
@@ -126,7 +125,7 @@ def action_info_server(self, args):
     if node_id:
         return self.connection.get_server_for_node(node_id)
     else:
-        return self.connection.get_distributed_node_mapping()
+        print(self.connection.get_distributed_node_mapping())
 
 
 @new_action_decorator
@@ -192,28 +191,32 @@ def action_step(self, args):
 
 
 @new_action_decorator
-def action_exec(self, args, single=False):
+def action_exec(self, args, single=True):
     # TODO: we need to print deserialized json here due to the rpc server hack
     if not hasattr(args, "node_id"):
         node_id = None
     else:
         node_id = args.node_id
 
-    cmds = args.cmds
-    if single:
-        cmds = ' '.join(cmds)
-    else:
-        cmds = '\n'.join(cmds)
+    cmd = args.cmd
 
-    if node_id:
-        # TODO: use kwargs
-        print(json.loads(self.connection.exec_node_cmd(cmds, node_id, args.validate, args.timeout)))
+    if not args.distributed:
+        print(json.loads(self.connection.exec_node_cmd(cmd, node_id, args.validate, args.timeout)))
     else:
-        # only switch to the rpc server which holds the node
-        for server_id in self.connection.get_distributed_address_mapping():
-            self.connection = self.get_connection_server(server_id=server_id)
-            print("%s >>>" % server_id, file=sys.stderr)
-            print(json.loads(self.connection.exec_node_cmd(cmds, node_id, args.validate)))
+        if node_id is not None:
+            # only switch to the rpc server which holds the node
+            self.connection = self.get_connection_server(node_id=node_id, is_distributed=args.distributed)
+            print(json.loads(self.connection.exec_node_cmd(cmd, node_id, args.validate, args.timeout)))
+        else:
+            for server_id in json.loads(self.connection.get_distributed_address_mapping()):
+
+                # only switch to the rpc server which holds the node
+                print("\nServer %s >>>" % server_id)
+                self.connection = self.get_connection_server(server_id=server_id, is_distributed=args.distributed)
+                result = json.loads(self.connection.exec_node_cmd(cmd, node_id, args.validate, args.timeout))
+                for _node_id, output in result.items():
+                    print("\nNode %s >>>" % _node_id)
+                    print(output)
 
 
 def action_shell(args):
@@ -249,7 +252,7 @@ def main(args=None):
 
     ACTION_EXEC = "exec"
     ACTION_SHELL = "shell"
-    ACTION_EXEC_SINGLE = "execs"
+    # ACTION_EXEC_SINGLE = "execs"
 
     ACTION_PING = "ping"
 
@@ -266,6 +269,8 @@ def main(args=None):
                                           conflict_handler='resolve')
     root_parser.add_argument("--no-check", "-nc", action="store_true",
                              help="Do not check for exceptions in the RunLoop first")
+    root_parser.add_argument("--distributed", action="store_true", help="MiniWorld is run in the distributed mode.")
+
     subparser = root_parser.add_subparsers(help='Subcommands')
 
     def add_node_id_arg_optional(parser):
@@ -286,7 +291,7 @@ def main(args=None):
         step_parser = subparser.add_parser(ACTION_STEP)
         exec_parser = subparser.add_parser(ACTION_EXEC)
         shell_parser = subparser.add_parser(ACTION_SHELL)
-        execs_parser = subparser.add_parser(ACTION_EXEC_SINGLE)
+        # execs_parser = subparser.add_parser(ACTION_EXEC_SINGLE)
         ping_parser = subparser.add_parser(ACTION_PING)
 
         def create_info_parsers():
@@ -356,7 +361,7 @@ def main(args=None):
 
         def create_exec_parsers():
             add_node_id_arg_optional(exec_parser)
-            exec_parser.add_argument("cmds", nargs="+", help="The commands to be executed on the node")
+            exec_parser.add_argument("cmd", help="The command to be executed on the node")
             exec_parser.add_argument("-v", "--validate", action="store_true", default=False,
                                      help="Validate the return code of the command. Default is: %(default)s")
             exec_parser.add_argument("-t", "--timeout", default=5,
@@ -367,12 +372,12 @@ def main(args=None):
             add_node_id_arg_positional(shell_parser)
             shell_parser.set_defaults(func=action_shell)
 
-        def create_execs_parsers():
-            add_node_id_arg_optional(execs_parser)
-            execs_parser.add_argument("cmds", nargs="+", help="The command to be executed on the node")
-            execs_parser.add_argument("-v", "--validate", action="store_true", default=False,
-                                      help="Validate the return code of the command. Default is: %(default)s")
-            execs_parser.set_defaults(func=lambda *args: action_exec(*args, single=True))
+        # def create_execs_parsers():
+        #     add_node_id_arg_optional(execs_parser)
+        #     execs_parser.add_argument("cmds", nargs="+", help="The command to be executed on the node")
+        #     execs_parser.add_argument("-v", "--validate", action="store_true", default=False,
+        #                               help="Validate the return code of the command. Default is: %(default)s")
+        #     execs_parser.set_defaults(func=lambda *args: action_exec(*args, single=True))
 
         def create_ping_parsers():
             # ping parser
@@ -382,7 +387,7 @@ def main(args=None):
         create_stop_parsers()
         create_exec_parsers()
         create_shell_parsers()
-        create_execs_parsers()
+        # create_execs_parsers()
         create_step_parsers()
         create_info_parsers()
         create_log_parsers()

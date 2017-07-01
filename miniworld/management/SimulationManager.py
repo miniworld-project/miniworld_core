@@ -11,6 +11,7 @@ from copy import deepcopy
 from io import StringIO
 from pprint import pformat
 from threading import Lock
+from typing import Dict, Union
 
 from ordered_set import OrderedSet
 
@@ -373,20 +374,16 @@ class SimulationManager(Resetable, object):
             self.abort()
             raise SimulationStateStartFailed("Failed to start the simulation! Check the rpc log for details!", caused_by=e)
 
-    # TODO: DOC
-    def exec_node_cmd(self, cmd, node_id=None, validation=True, timeout=None):
+    def exec_node_cmd(self, cmd, node_id=None, validation=True, timeout=None) -> Union[str, Dict[int, str]]:
         '''
+        Execute a command on a node or all nodes.
 
         Parameters
         ----------
         node_id
         cmd
         validation
-        all
-
-        Returns
-        -------
-        str
+        timeout
         '''
         nodes = self.get_emulation_nodes()
 
@@ -396,24 +393,22 @@ class SimulationManager(Resetable, object):
 
         if node_id is None:
             jobs = {}
+            res = {}
             with ConcurrencyUtil.node_start_parallel() as executor:
                 for node in nodes:
                     fun = get_fun(node)
                     jobs[node.id] = executor.submit(fun, StringIO(cmd))
-                    # TODO: REMOVE
-                    jobs[node.id].result()
 
-                res = []
                 for node_id, job in jobs.items():
+                    res[node_id] = job.result()
 
-                    res.append("%s: %s" % (node_id, job.result()))
-
-            return '\n'.join(res)
+            return res
 
         else:
             fun = get_fun(self.nodes_id_mapping[node_id])
 
             return fun(StringIO(cmd))
+
 
     @contextlib.contextmanager
     def try_simulation(self, scenario_name):
