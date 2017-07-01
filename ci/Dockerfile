@@ -29,7 +29,7 @@ WORKDIR /app
 RUN pip3 install --upgrade pip && \
     pip3 install /app\[server,develop\]
 
-CMD bash -c '(./scripts/install_iproute2.sh) ; modprobe ebtables ; mwserver'
+CMD bash -c 'modprobe ebtables ; mwserver'
 
 VOLUME '/app/scenarios'
 VOLUME '/app/examples'
