@@ -2,5 +2,5 @@
 
 modprobe ebtables
 set -e
-pip3 install --upgrade .
+pip3 install --upgrade .\[server,develop\]
 mwserver
