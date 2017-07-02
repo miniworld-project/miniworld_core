@@ -2,7 +2,7 @@ version: '3.2'
 
 services:
   core:
-    image: miniworldproject/miniworld_core:${BRANCH-nightly}
+    image: miniworldproject/miniworld_core:${BRANCH-master}
     cap_add:
     - ALL
     privileged: true

@@ -13,7 +13,6 @@ install:
     - sudo pip install docker-compose
 
     # build miniworld container
-    - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
     - export REPO=miniworldproject/miniworld_core
     - pushd ~/build/miniworld-project/miniworld_core
     - BRANCH=$TRAVIS_BRANCH ci/build_container.sh
@@ -32,7 +31,7 @@ after_success:
     - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
     - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
     # push docker image
-    - docker push $REPO:$TAG
+    - docker push $REPO:$TRAVIS_BRANCH
 addons:
   artifacts:
     s3_region: "eu-central-1"

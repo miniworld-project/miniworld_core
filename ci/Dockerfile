@@ -15,7 +15,7 @@ ADD scripts/install_iproute2.sh /tmp
 RUN /tmp/install_iproute2.sh
 
 # miniworld
-ARG BRANCH=nightly
+ARG BRANCH=master
 RUN mkdir /app
 RUN git clone -b $BRANCH https://github.com/miniworld-project/miniworld_core.git app
 WORKDIR /app
