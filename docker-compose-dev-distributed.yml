@@ -1,0 +1,60 @@
+version: '3.2'
+
+services:
+  coordinator:
+    image: miniworldproject/miniworld_core:${BRANCH-nightly}
+    cap_add:
+    - ALL
+    privileged: true
+    volumes:
+    - /lib/modules:/lib/modules
+    - ./:/app/
+    - ./examples:/app/examples
+    - ./scenarios:/app/scenarios
+    devices:
+    # kvm access
+    - "/dev/kvm:/dev/kvm"
+    ports:
+    - 5001:5001
+    - 5561:5561
+    - 5562:5562
+    - 5563:5563
+    environment:
+      - MW_CONFIG=/app/coordinator.json
+    entrypoint: ./scripts/dev_start_distributed.sh mwserver --distributed -c coordinator.json
+  server1:
+    image: miniworldproject/miniworld_core:${BRANCH-nightly}
+    cap_add:
+    - ALL
+    privileged: true
+    volumes:
+    - /lib/modules:/lib/modules
+    - ./:/app/
+    - ./examples:/app/examples
+    - ./scenarios:/app/scenarios
+    devices:
+    # kvm access
+    - "/dev/kvm:/dev/kvm"
+    ports:
+    - 5002:5000
+    environment:
+      - MW_CONFIG=/app/server.json
+    entrypoint: ./scripts/dev_start_distributed.sh mwserver -c server.json --distributed --coordinator-address coordinator -ti eth0 --server
+  server2:
+    image: miniworldproject/miniworld_core:${BRANCH-nightly}
+    cap_add:
+    - ALL
+    privileged: true
+    volumes:
+    - /lib/modules:/lib/modules
+    - ./:/app/
+    - ./examples:/app/examples
+    - ./scenarios:/app/scenarios
+    devices:
+    # kvm access
+    - "/dev/kvm:/dev/kvm"
+    ports:
+    - 5003:5000
+    environment:
+      - MW_CONFIG=/app/server.json
+    entrypoint: ./scripts/dev_start_distributed.sh mwserver -c server.json --distributed --coordinator-address coordinator -ti eth0 --server
