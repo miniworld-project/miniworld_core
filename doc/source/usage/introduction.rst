@@ -18,6 +18,21 @@ B.A.T.M.A.N Demo
 In the following, a short demo on how to use MiniWorld is given.
 For that purpose, we are going to start 3 OpenWRT nodes running the B.A.T.M.A.N. advanced routing algorithm.
 
+.. note::
+
+   All MiniWorld commands such as 'mwserver' and 'mwcli' have to be run wih docker-compose if MiniWorld is installed via docker-compose.
+   You can either get a shell with 
+   
+   .. code-block:: bash
+   
+      docker-compose exec core bash
+   
+   or run a single command like this
+
+   .. code-block:: bash
+   
+      docker-compose exec core mwcli start
+
 Preparation
 ^^^^^^^^^^^
 
@@ -28,7 +43,7 @@ In **shell 1** start the server process:
 
 .. code-block:: bash
 
-   $ ./start_server.sh
+   $ mwserver
 
 .. note::
 
@@ -38,7 +53,7 @@ In **shell 2**, start the scenario and wait until the command returns:
 
 .. code-block:: bash
 
-   ./mw.py start examples/batman_adv.json
+   mwcli start examples/batman_adv.json
 
 In **shell 1** you should see the 3 OpenWRT VMs booting.
 
@@ -54,7 +69,7 @@ This is due do the management where nodes are connected internally to a virtual 
 
 .. code-block:: bash
 
-   $ ./mw.py info connections
+   $ mwcli info connections
 
    {
        "1": [
@@ -70,7 +85,7 @@ This is due do the management where nodes are connected internally to a virtual 
 
 .. code-block:: bash
 
-   $ ./mw.py info links
+   $ mwcli info links
 
    {
        "('1', 'mgmt')": null,
@@ -85,14 +100,14 @@ Let's switch to the first topology and check the connections/links again.
 
 .. code-block:: bash
 
-   ./mw.py step
+   mwcli step
 
 
 You can see that the first topology is a chain: 1 <-> 2 <-> 3.
 
 .. code-block:: bash
 
-   $ ./mw.py info connections
+   $ mwcli info connections
 
    {
        "1": [
@@ -112,7 +127,7 @@ To both connections (1 <-> 2 and  2 <-> 3), a link impairment with 54000 bytes/s
 
 .. code-block:: bash
 
-   $ ./mw.py info links
+   $ mwcli info links
 
    {
        "('1', '2')": {
@@ -145,7 +160,7 @@ We can now check the neighbours of node 1:
 
 .. code-block:: bash
 
-   $ ./mw.py exec --node-id 1 'batctl o'
+   $ mwcli exec --node-id 1 'batctl o'
 
    [B.A.T.M.A.N. adv 2014.4.0, MainIF/MAC: eth0/02:01:00:00:00:01 (bat0 BATMAN_IV)]
      Originator      last-seen (#/255)           Nexthop [outgoingIF]:   Potential nexthops ...
@@ -156,7 +171,7 @@ Node 2 and node 3 are both reachable via node 2, hence the routing works since t
 
 .. code-block:: bash
 
-   $ ./mw.py exec --node-id 1 'batctl tr 02:01:00:00:00:03'
+   $ mwcli exec --node-id 1 'batctl tr 02:01:00:00:00:03'
 
    traceroute to 02:01:00:00:00:03 (02:01:00:00:00:03), 50 hops max, 20 byte packets
     1: 02:01:00:00:00:02  2.648 ms  2.586 ms  2.644 ms
@@ -166,13 +181,13 @@ If we switch to the wheel topology where all nodes are connected with node 1, we
 
 .. code-block:: bash
 
-   ./mw.py step
+   mwcli step
 
 Node 3 is now reachable directly from node 1:
 
 .. code-block:: bash
 
-   $ ./mw.py exec --node-id 1 'batctl tr 02:01:00:00:00:03'
+   $ mwcli exec --node-id 1 'batctl tr 02:01:00:00:00:03'
 
    traceroute to 02:01:00:00:00:03 (02:01:00:00:00:03), 50 hops max, 20 byte packets
     1: 02:01:00:00:00:03  2.687 ms  2.803 ms  3.050 ms
@@ -186,8 +201,17 @@ Further starts of the same scenario use the **snapshot boot mode** which uses KV
 
 .. code-block:: bash
 
-   ./mw.py stop
+   mwcli stop
 
 .. note::
 
    You may need to kill the server process when switching between different scenarios.
+
+Get a shell
+^^^^^^^^^^^
+
+Now you can further explore the VMs by getting shell access.
+
+.. code-block:: bash
+
+   mwcli shell 1

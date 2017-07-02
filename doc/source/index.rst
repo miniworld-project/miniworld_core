@@ -16,7 +16,6 @@ Use MiniWorld
    usage/install
    usage/concepts
    usage/examples
-   usage/vm_shell_access
    usage/openwrt_custom
    usage/use_a_custom_vm
    usage/network_backends
@@ -25,16 +24,13 @@ Use MiniWorld
    usage/scenario_options
    usage/distributed_mode
 
-Get your hands dirty
---------------------
+Links
+-----
 
 .. toctree::
    :maxdepth: 2
 
-   framework/network_backend
-   framework/movement_pattern
-   framework/link_qualtiy_model
-   framework/node_virtualization
+   usage/links
 
 Contribute
 ----------

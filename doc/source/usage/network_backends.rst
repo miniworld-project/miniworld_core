@@ -22,7 +22,7 @@ Example
 
 .. code-block:: bash
 
-   ./mw.py start examples/nb_bridged_lan.json
+   mwcli start examples/nb_bridged_lan.json
 
 
 Details
@@ -53,7 +53,7 @@ The bridged WiFi network backend multiplexes connections via a single tap device
 
 .. code-block:: bash
 
-   ./mw.py start examples/nb_bridged_wifi.json
+   mwcli start examples/nb_bridged_wifi.json
 
 Details
 ^^^^^^^

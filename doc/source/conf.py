@@ -19,7 +19,8 @@
 import os
 import sys
 
-import subprocess
+# on_rtd is whether we are on readthedocs.org
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 path=os.path.abspath('../../')
 sys.path.insert(0, path)
@@ -29,10 +30,8 @@ print('pwd: {}'.format(os.getcwd()))
 
 # generate api documentation
 os.system('make clean')
-try:
-    subprocess.check_call(['sphinx-apidoc', '-o', 'source/apidoc', '../'])
-except subprocess.CalledProcessError as e:
-    print(e)
+# generate api doc
+os.system("sphinx-apidoc -f ../../ -o apidoc/")
 
 # -- General configuration ------------------------------------------------
 
@@ -67,8 +66,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'MiniWorld'
-copyright = u'2017, Nils Schmidt, Patrick Lampe'
-author = u'Nils Schmidt, Patrick Lampe'
+copyright = u'2017, Nils Schmidt, Patrick Lampe, Lars Baumgärtner'
+author = u'Nils Schmidt, Patrick Lampe, Lars Baumgärtner'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -103,7 +102,13 @@ todo_include_todos = True
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+# html_theme = 'alabaster'
+import os
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+if not on_rtd:  # only import and set the theme if we're building docs locally
+    import sphinx_rtd_theme
+    html_theme = 'sphinx_rtd_theme'
+    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
