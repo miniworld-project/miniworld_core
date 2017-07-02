@@ -24,7 +24,7 @@ Install system dependencies
 
    # Mostly copied from the `MiniWorld Dockerfile <https://github.com/miniworld-project/miniworld_core>`_:
    sudo apt-get update
-   sudo apt-get install ebtables iproute2 qemu-kvm bridge-utils bison flex libdb-dev psmisc curl wget kmod libdb5.3-dev
+   sudo apt-get install ebtables iproute2 qemu-kvm bridge-utils bison flex libdb-dev psmisc curl wget kmod libdb5.3-dev libxtables11 iptables-dev pkg-config socat
 
 You should install the python packages as ``root`` since advanced privileges are required for kvm, network switching etc.
 
@@ -46,5 +46,10 @@ Install python dependencies:
 
    cd miniworld_core
    pip install --upgrade .\[server,develop\]
+
+Install iproute2:
+
+.. code-block:: bash
+
    ./scripts/install_iproute2.sh
 
