@@ -4,11 +4,19 @@ Install
 .. contents:: Table of Contents
    :local:
 
+.. note::
+
+   MiniWorld is tested on Ubuntu 16.04.2 LTS and Ubuntu 14.04.5 LTS (Travis CI).
+   Probably the latest HWE stack is required.
+
 Docker-compose
 --------------
 
 For ease of use we decided to use docker-compose instead of "pure" Docker since the Docker commands can get very long.
-If you decide to use MiniWorld with docker-compose which is highly recommended, just follow the steps at https://docs.docker.com/compose/install/ and step over to the :doc:`introduction` or :doc:`examples` page.
+If you decide to use MiniWorld with docker-compose which is highly recommended, just follow the steps at https://docs.docker.com/compose/install/ to install docker-compose.
+
+Then follow the instructions at the `MiniWorld Playground repository <https://github.com/miniworld-project/miniworld_playground/>`_ on how to use docker-compose.
+Afterwards you should visit the :doc:`introduction page <introduction>`.
 
 Without Docker
 --------------
