@@ -1,7 +1,8 @@
 
-from setuptools import setup, find_packages
 from codecs import open
 from os import path
+
+from setuptools import setup, find_packages
 
 here = path.abspath(path.dirname(__file__))
 
@@ -10,11 +11,11 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 setup(
     name='miniworld',
     version='0.1',
-    description='MiniWorld',
+    description='MiniWorld network emulation tool',
     long_description=long_description,
     url='https://github.com/miniworld-project/miniworld_core',
     author='Nils Schmidt',
-    author_email='miniworldproject at gmail.com',
+    author_email='miniworldproject ät gmail.com',
 
     packages=find_packages(exclude=['tests*']),
     # by default only requirements for thw mw console script are installed
