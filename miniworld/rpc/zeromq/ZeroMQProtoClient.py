@@ -3,9 +3,12 @@ import argparse
 import json
 import random
 import sys
+import uuid
 from pprint import pformat
 
 import netifaces
+from uuid import uuid5
+
 import zmq
 
 import miniworld
@@ -88,8 +91,8 @@ class ZeroMQClient:
         self.init_req_socket()
 
         self.reset_socket = self.context.socket(zmq.SUB)
-        self.reset_socket.setsockopt(zmq.SUBSCRIBE, '')
-        self.reset_socket.setsockopt(zmq.IDENTITY, bytes(random.randrange(1, sys.maxint)))
+        self.reset_socket.setsockopt(zmq.SUBSCRIBE, b'')
+        # self.reset_socket.setsockopt(zmq.IDENTITY, uuid.uuid4())
         addr = "tcp://{}:{}".format(self.server_addr, Protocol.PORT_PUB_RESET_SERVICE)
         self.reset_socket.connect(addr)
         log.info("connecting to: %s ...", addr)
@@ -296,7 +299,7 @@ class ZeroMQClientSub(ZeroMQClient, Resetable):
         super(ZeroMQClientSub, self).__init__(*args, **kwargs)
 
         self.sub_socket = self.context.socket(zmq.SUB)
-        self.sub_socket.setsockopt(zmq.SUBSCRIBE, '')
+        self.sub_socket.setsockopt(zmq.SUBSCRIBE, b'')
 
         addr = "tcp://{}:{}".format(self.server_addr, Protocol.PORT_PUB_SERVICE)
         self.sub_socket.connect(addr)

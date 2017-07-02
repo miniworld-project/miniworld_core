@@ -100,7 +100,7 @@ class NDSEqual(NodeDistributionStrategy):
 
     # TODO: for core mode, we can minimize the number of tunnels!
     def distribute_emulation_nodes(self, node_ids, cnt_servers):
-        server_node_distribution = {node_id : max(1, len(node_ids) / cnt_servers) for node_id in node_ids}
+        server_node_distribution = {node_id : max(1, len(node_ids) // cnt_servers) for node_id in node_ids}
         return self.apply_distribution_strategy(node_ids, cnt_servers, server_node_distribution)
 
 

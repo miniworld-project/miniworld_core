@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 import argparse
-import random
-import sys
 import threading
 import time
 from pprint import pformat
@@ -12,7 +10,6 @@ import miniworld
 from miniworld import Scenario
 from miniworld.Config import config
 from miniworld.log import log
-from miniworld.model.StartableObject import StartableObject
 from miniworld.model.collections import DistanceMatrix
 from miniworld.model.singletons.Singletons import singletons
 from miniworld.rpc import Protocol
@@ -34,7 +31,7 @@ CNT_ZMQ_THREADS = 1
 
 
 # TODO: if not all emulation servers are needed, these could be excluded from the current simulation, resulting in faster communication and less overhead
-class ZeroMQServer(StartableObject):
+class ZeroMQServer:
     '''
     For an introduction to the zeromq services, see :py:class:`.ZeroMQClient`.
 
@@ -61,8 +58,6 @@ class ZeroMQServer(StartableObject):
         last_step_time : int
         '''
 
-        StartableObject.__init__(self)
-
         self.context = zmq.Context.instance(CNT_ZMQ_THREADS)
 
         # create the router socket
@@ -76,7 +71,7 @@ class ZeroMQServer(StartableObject):
 
         # create the publish socket
         self.reset_socket = self.context.socket(zmq.PUB)
-        self.reset_socket.setsockopt(zmq.IDENTITY, bytes(random.randrange(1, sys.maxint)))
+        # self.reset_socket.setsockopt(zmq.IDENTITY, uuid.uuid4())
         addr = "tcp://*:{}".format(Protocol.PORT_PUB_RESET_SERVICE)
         self.reset_socket.bind(addr)
         log.info("listening on '%s'", addr)
@@ -110,7 +105,7 @@ class ZeroMQServer(StartableObject):
         #self.sync_subscribers()
         self.reset()
 
-    def _start(self, cnt_peers):
+    def start(self, cnt_peers):
         '''
         Start the server by expecting the clients to register in the first state.
         This method controls the whole communication expect the distribution of the distance matrix.
@@ -136,7 +131,7 @@ class ZeroMQServer(StartableObject):
         # TODO: let NetworkBackend inject communication steps for needed information
         self.handle_state_start_nodes()
 
-    def _shutdown(self):
+    def shutdown(self):
         log.info("sending reset to clients ...")
         self.send_reset()
         # NOTE: finally do the reset (as last command)
@@ -186,7 +181,7 @@ class ZeroMQServer(StartableObject):
         node_ids = miniworld.Scenario.scenario_config.get_local_node_ids()
 
         # distribute nodes among emulation server
-        server_node_mapping = singletons.node_distribution_strategy.distribute_emulation_nodes(node_ids, self.cnt_peers)
+        server_node_mapping = singletons.node_distribution_strategy.distribute_emulation_nodes(list(node_ids), self.cnt_peers)
         log.info("nodes mapping: %s", pformat(server_node_mapping))
         log.info("nodes per server: %s", pformat({k:len(v) for k,v in server_node_mapping.items()}))
 
@@ -203,7 +198,7 @@ class ZeroMQServer(StartableObject):
         '''
         log.info("state: %s", States.STATE_START_NODES)
         expect_state = self.get_expecter_state(States.STATE_START_NODES, 1)
-        ResponderArgument(self.router_socket, self.protocol, expect_state, b'')()
+        ResponderArgument(self.router_socket, self.protocol, expect_state, '')()
         self.wait_for_nodes_started.set()
 
     def sync_subscribers(self):
@@ -220,7 +215,7 @@ class ZeroMQServer(StartableObject):
 
         expect_distance_matrix = self.get_expecter_state(States.STATE_DISTANCE_MATRIX, 1, after_response_fun)
         # sync clients and send each his distance matrix
-        ResponderArgument(self.router_socket, self.protocol, expect_distance_matrix, b'')()
+        ResponderArgument(self.router_socket, self.protocol, expect_distance_matrix, '')()
         log.info("syncing subscribers [done]")
 
     def handle_state_distance_matrix(self, distance_matrix):
@@ -324,9 +319,9 @@ class ZeroMQCServerPubSub(ZeroMQServer):
         self.pub_socket.bind(addr)
         log.info("listening on '%s'", addr)
 
-    def _shutdown(self):
+    def shutdown(self):
         # finally call context.term()
-        super(ZeroMQCServerPubSub, self)._shutdown()
+        super(ZeroMQCServerPubSub, self).shutdown()
 
     def send_distance_matrix(self, distance_matrix):
         '''
