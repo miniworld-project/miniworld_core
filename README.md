@@ -33,6 +33,11 @@ For that purpose, the software-under-test has to be deployed in a KVM VM. Afterw
 - Movement Patterns such as RandomWalk and [CORE](https://www.nrl.navy.mil/itd/ncs/products/core) integration
 - Basic Link Quality Models based on Linux HTB and netem
 
+## Get started
+
+A special repository called [MiniWorld Playground](https://github.com/miniworld-project/miniworld_playground) contains some example VM images and scenario files. For example you can play with the B.A.T.M.A.N. advanced routing algorithm (deployed in a lightweight OpenWRT VM image). You only need docker and docker-compose!
+Further reference is provided in the documentation section.
+
 ## Documentation
 
 Documentation is hosted on [readthedocs](http://miniworld-core.readthedocs.io/).
