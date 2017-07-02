@@ -64,3 +64,8 @@ MiniWorld_Images/
 
 *.pyc
 config.json
+server.json
+coordinator.json
+scenarios/
+examples/
+doc/source/apidoc
