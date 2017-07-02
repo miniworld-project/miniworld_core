@@ -1,10 +1,6 @@
 # MiniWorld Core
 
-Work-in-Progress! Documentation is created step by step.
-
-We are currently working on first acceptance and functional tests. We are looking forward to provide a basically tested version soon in the master branch.
-
-Code is available in the [nightly branch](https://github.com/miniworld-project/miniworld_core/tree/nightly) atm.
+Network emulation tool for wired and wireless networks.
 
 ## Demo
 
@@ -39,7 +35,7 @@ For that purpose, the software-under-test has to be deployed in a KVM VM. Afterw
 
 ## Documentation
 
-We are currently creating the API documentation for MiniWorld on [readthedocs](http://miniworld-core.readthedocs.io/en/nightly/). Until the documentation is fully ready, please use the nightly branch.
+Documentation is hosted on [readthedocs](http://miniworld-core.readthedocs.io/).
 The API documentation introduces MiniWorld from a user perspective.
 
 For more information about the technical details you should read the paper or even the master thesis (for a very detailed documentation).
@@ -51,7 +47,7 @@ For more information about the technical details you should read the paper or ev
 MiniWorld is an open-source project.
 Do you have some good ideas, improvements, or even want to get your hands dirty?
 There is a lot of work in the backlog and we can assign you small issues such that you can have a closer look at the source code.
-Do not hesitate to contact us!
+Do not hesitate to contact us at miniworldproject ät gmail.com !
 
 ## Backlog
 - Documentation

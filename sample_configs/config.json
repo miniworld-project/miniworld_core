@@ -1,0 +1,47 @@
+  {
+  "management" : {
+    "use" : true,
+    "device" : "mgmt"
+  },
+   // TODO: REMOVE
+   "vlan_enabled" :true,
+    "qemu" : {
+      "snapshot_boot" : true
+    },
+   "provisioning" : {
+       "boot_wait_timeout" : 60
+   },
+   "logging" : {
+     // INFO, WARN, ERROR, DEBUG
+     "level" : "INFO",
+     "log_provisioning": false,
+     "log_cleanup": false,
+    "debug" : false
+   },
+   "ramdisk" : false,
+   "network" : {
+     // json, msgpack
+     "protocol" : {
+       "name" :  "msgpack",
+       "zeromq" : {
+         // p2p vs multicast
+         "mode" : "multicast",
+         "publish_only_new_distance_matrices" : true,
+         "publish_individual_distance_matrices" : false
+       }
+     }
+   },
+    "concurrency" : {
+      "thread_scaler" : 0.5
+    },
+    "simulation" : {
+      "time_step" : 1.0
+    },
+   "distributed" : {
+     "use" : false,
+     "cnt_servers" : 2,
+     // equal vs. score
+     "scheduler" : "equal"
+   }
+}
+

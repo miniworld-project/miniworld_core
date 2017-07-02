@@ -1,3 +1,39 @@
-language: bash
+language: python
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      sudo: required
+      python: '3.6'
+install:
+    - sudo apt-get update
+    - sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-ce
+    - docker-compose --version
+    - sudo rm /usr/local/bin/docker-compose
+    - sudo pip install docker-compose
+
+    # build miniworld container
+    - export REPO=miniworldproject/miniworld_core
+    - pushd ~/build/miniworld-project/miniworld_core
+    - BRANCH=$TRAVIS_BRANCH ci/build_container.sh
+
+    # clone miniworld_playground
+    - git clone https://github.com/miniworld-project/miniworld_playground.git
+    - pushd miniworld_playground
 script:
-  - echo PASSED
+    - uname -a
+    # run tests
+    - MW_CONFIG=tests/config.json BRANCH=$TRAVIS_BRANCH docker-compose up -d
+    - eval $TEST_COMMAND
+after_script:
+    - docker-compose logs > docker-compose.txt
+after_success:
+    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+    - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
+    # push docker image
+    - docker push $REPO:$TRAVIS_BRANCH
+addons:
+  artifacts:
+    s3_region: "eu-central-1"
+    paths:
+    - docker-compose.txt

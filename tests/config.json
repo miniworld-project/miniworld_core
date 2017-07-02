@@ -1,0 +1,15 @@
+{
+  "management": {
+    "use": true,
+    "device": "mgmt"
+  },
+  "provisioning": {
+    "boot_wait_timeout": 480
+  },
+  "logging": {
+    "level": "DEBUG",
+    "log_provisioning": true,
+    "debug": false
+  }
+}
+

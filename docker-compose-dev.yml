@@ -1,0 +1,21 @@
+version: '3.2'
+
+services:
+  core:
+    image: miniworldproject/miniworld_core:${BRANCH-master}
+    cap_add:
+    - ALL
+    privileged: true
+    volumes:
+    - /lib/modules:/lib/modules
+    - ./:/app/
+    - ./examples:/app/examples
+    devices:
+    # kvm access
+    - "/dev/kvm:/dev/kvm"
+    ports:
+    - 5000:5000
+    - 5001:5001
+    environment:
+      - MW_CONFIG=${MW_CONFIG-/app/config.json}
+    entrypoint: ./scripts/dev_start.sh
