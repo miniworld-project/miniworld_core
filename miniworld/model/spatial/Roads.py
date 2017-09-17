@@ -12,7 +12,6 @@ import geojson
 from .Road import Road
 
 
-
 class Roads:
     '''
     Attributes
@@ -22,7 +21,8 @@ class Roads:
     geo_json :                                                      geojson
     list_of_roads_with_quality_more_or_equal_than_one_for_car :     list
     list_of_roads_with_quality_more_or_equal_than_one_for_bike :    list
-    '''  
+    '''
+
     def __init__(self):
 
         cursor = singletons.spatial_singleton.get_connection_to_database().cursor()
@@ -66,7 +66,6 @@ class Roads:
         '''
         return [road for road in self.list_of_roads if road.has_more_or_equal_qualitaty_for_bike_then(quality)]
 
-
     def get_list_of_next_roads_with_quality_restriction_for_cars(self, end_point, quality):
         '''
         Parameters
@@ -93,21 +92,21 @@ class Roads:
 
     def __convert_sql_line_to_road(self, line):
         return Road(line[0], line[1], line[2], line[3], line[4], line[5], line[6])
-           
+
     def __get_geo_json_object_for_road(self, road):
         source = road.get_start_point()
         target = road.get_end_point()
         quality = road.get_car_quality()
-        
+
         return OrderedDict(
-            type = "Feature",
-            geometry = OrderedDict(
-                type = "LineString",
-                coordinates = [[float(source.get_lon()) , float(source.get_lat())], [float(target.get_lon()) , float(target.get_lat())]]
+            type="Feature",
+            geometry=OrderedDict(
+                type="LineString",
+                coordinates=[[float(source.get_lon()), float(source.get_lat())], [float(target.get_lon()), float(target.get_lat())]]
             ),
-            properties= OrderedDict(
-                type = str(quality),
-                name = "Coors Field",
-                amenity = "Baseball Stadium"
+            properties=OrderedDict(
+                type=str(quality),
+                name="Coors Field",
+                amenity="Baseball Stadium"
             )
         )

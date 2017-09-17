@@ -5,6 +5,7 @@ __email__ = "uni at lampep.de"
 
 from time import strptime
 
+
 class ArmaMovementPattern:
     def __init__(self, file_path, node_id):
         self.file = open(file_path, "r")
@@ -23,10 +24,10 @@ class ArmaMovementPattern:
             list_of_coordinates.append(self.__extract_coordinates_from_line(self.crnt_line))
             self.crnt_line = self.file.readline()
         self.next_step = (next_time, list_of_coordinates)
-        
+
     def __extract_coordinates_from_line(self, line):
         first_index = line.find("\"[") + 2
-        second_index =line.find("]\"")
+        second_index = line.find("]\"")
         coordinates = line[first_index:second_index]
         list_of_cords = coordinates.split(",")
         return (float(list_of_cords[0]), float(list_of_cords[1]))

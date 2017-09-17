@@ -15,6 +15,7 @@ class DefaultNode(AbstractNode):
     crnt_movement_pattern :                  AbstractMovementPattern
     dict_of_movement_pattern :               dict<String, AbstractMovementPattern>
     '''
+
     def __init__(self, node_id):
         super(DefaultNode, self).__init__(node_id)
         self.crnt_movement_pattern = RandomWalk()

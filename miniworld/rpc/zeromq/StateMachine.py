@@ -20,6 +20,7 @@ There are different responders for different responder patterns:
     The arguments are passed as dictionary where each entry contains the server id.
 '''
 
+
 class Expecter:
 
     '''
@@ -55,8 +56,9 @@ class Expecter:
     cnt_message_parts : int
         How much parts the messages is expected to have
     '''
+
     def __init__(self, socket, cnt_peers, protocol, state,
-                 cnt_message_parts = 1,
+                 cnt_message_parts=1,
                  after_response_fun=None
                  ):
         '''
@@ -96,7 +98,7 @@ class Expecter:
         for idx in range(1, self.cnt_peers + 1):
 
             # wait until we have a valid expect call
-            while 1:
+            while True:
                 if self.expect():
                     break
 
@@ -128,9 +130,8 @@ class Expecter:
         else:
             log.critical("Received invalid message: %s, expected %d parts in the message, has: %d", msgs, expected_msg_parts, len(msgs))
 
-
     ############################################################
-    ### Access the message parts
+    # Access the message parts
     ############################################################
 
     def get_message_parts_no_id(self):
@@ -229,6 +230,7 @@ class Responder(object):
     def respond(self):
         raise NotImplementedError
 
+
 class ResponderArgument(Responder):
     '''
     Send each client the same response/argument.
@@ -295,6 +297,7 @@ class ResponderPerServerID(Responder):
     responses : dict<int, obj>
         For each server the object to send.
     '''
+
     def __init__(self, socket, protocol, expecter, responses):
         super(ResponderPerServerID, self).__init__(socket, protocol, expecter)
         self.responses = responses

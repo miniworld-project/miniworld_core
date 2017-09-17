@@ -14,7 +14,7 @@ class EmulationNodes(Objects):
         '''
 
         from miniworld.model.emulation.nodes.virtual.VirtualNode import VirtualNode
-        return self.filter_type(fun = lambda node : not isinstance(node, VirtualNode))
+        return self.filter_type(fun=lambda node: not isinstance(node, VirtualNode))
 
     def filter_central_nodes(self):
         '''
@@ -36,8 +36,6 @@ class EmulationNodes(Objects):
         '''
         from miniworld.model.emulation.nodes.virtual.ManagementNode import is_management_node
         return self.filter_type(fun=is_management_node)
-
-
 
     def sort_by_locality(self):
         '''
@@ -61,5 +59,3 @@ class EmulationNodes(Objects):
             return EmulationNodes([emulation_node_y, emulation_node_x])
 
         return self
-
-

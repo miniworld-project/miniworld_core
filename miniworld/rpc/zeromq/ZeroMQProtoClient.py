@@ -38,8 +38,10 @@ def factory():
         log.info("distance matrix distribution via request-reply pattern")
         return ZeroMQClientReq
 
+
 class ZeroMQException(BaseException):
     pass
+
 
 class ZeroMQClient:
 
@@ -84,6 +86,7 @@ class ZeroMQClient:
     serialize : see :py:meth:`Protocol.serialize`
     deserialize : :py:meth:`Protocol.deserialize`
     '''
+
     def __init__(self, server_addr):
         self.server_addr = server_addr
         self.context = zmq.Context()
@@ -171,7 +174,7 @@ class ZeroMQClient:
         return self.deserialize(self.svc.recv())
 
     #####################################################################
-    ### State handling
+    # State handling
     #####################################################################
 
     def start(self, tunnel_ip):
@@ -191,7 +194,7 @@ class ZeroMQClient:
         self.tunnel_ip = tunnel_ip
 
         #########################################################
-        ### State: Register
+        # State: Register
         #########################################################
 
         self.myprint("registering at server ...")
@@ -207,7 +210,7 @@ class ZeroMQClient:
 
         # TODO: RENAME state!
         #########################################################
-        ### State: Information exchange
+        # State: Information exchange
         #########################################################
 
         server_score = ServerScore.factory()()
@@ -218,7 +221,7 @@ class ZeroMQClient:
         self.myprint("scenario config: %s" % pformat(scenario_config))
 
         #########################################################
-        ### State: Start Nodes
+        # State: Start Nodes
         #########################################################
 
         self.myprint("starting nodes")
@@ -232,7 +235,7 @@ class ZeroMQClient:
         return scenario_config
 
     #####################################################################
-    ### Helpers
+    # Helpers
     #####################################################################
 
     def start_nodes(self, scenario_config_json):
@@ -240,25 +243,27 @@ class ZeroMQClient:
         log.info("starting nodes ...")
         singletons.simulation_manager.start(scenario_config_json)
 
+
 class ZeroMQClientReq(ZeroMQClient):
 
     '''
     This subclass implements step 4 by receiving the local distance matrix via the request socket.
     NOTE: the client does not see the whole distance matrix!
     '''
+
     def start(self, tunnel_ip):
         # do steps 1-3
         scenario_config = super(ZeroMQClientReq, self).start(tunnel_ip)
 
         #########################################################
-        ### State: Distance Matrix
+        # State: Distance Matrix
         #########################################################
 
         # wait for new distance matrices ...
         self.enter_run_loop()
 
     def enter_run_loop(self):
-        while 1:
+        while True:
             self.send_server_id(States.STATE_DISTANCE_MATRIX)
 
             distance_matrix = self.recv_distance_matrix()
@@ -281,6 +286,7 @@ class ZeroMQClientReq(ZeroMQClient):
         '''
 
         return DistanceMatrix.factory()(DistanceMatrix.detransform_distance_matrix(self.recv()))
+
 
 class ZeroMQClientSub(ZeroMQClient, Resetable):
 
@@ -309,7 +315,7 @@ class ZeroMQClientSub(ZeroMQClient, Resetable):
         scenario_config = super(ZeroMQClientSub, self).start(tunnel_ip)
 
         #########################################################
-        ### State: Distance Matrix
+        # State: Distance Matrix
         #########################################################
 
         self.enter_run_loop()
@@ -339,7 +345,7 @@ class ZeroMQClientSub(ZeroMQClient, Resetable):
         -------
         DistanceMatrix
         '''
-        whole_distance_matrix = DistanceMatrix.detransform_distance_matrix(self.deserialize( self.sub_socket.recv() ))
+        whole_distance_matrix = DistanceMatrix.detransform_distance_matrix(self.deserialize(self.sub_socket.recv()))
 
         if config.is_debug():
             log.info("server id: %d", scenario_config.get_distributed_server_id())
@@ -376,10 +382,10 @@ class ZeroMQClientSub(ZeroMQClient, Resetable):
         self.sync()
 
         # enable CTRL-C
-        while 1:
+        while True:
             def step():
 
-                #self.sync()
+                # self.sync()
                 rlist, _, xlist = zmq.select([self.reset_socket, self.sub_socket], [], [])
 
                 def handle_select(rlist, xlist):
@@ -409,7 +415,7 @@ class ZeroMQClientSub(ZeroMQClient, Resetable):
                         if handle_select(rlist, xlist):
                             return True
 
-                        #self.sync()
+                        # self.sync()
 
                         if config.is_debug():
                             log.debug("stepped ...")
@@ -418,7 +424,6 @@ class ZeroMQClientSub(ZeroMQClient, Resetable):
                         self.recv_sync()
                         return True
 
-
                 if handle_select(rlist, xlist):
                     return
 
@@ -426,6 +431,7 @@ class ZeroMQClientSub(ZeroMQClient, Resetable):
                 return
             # exec_time = timeit(step, number=1)
             # log.info("took %0.2f seconds (sync + step)", exec_time)
+
 
 if __name__ == '__main__':
 

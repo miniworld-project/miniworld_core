@@ -10,6 +10,8 @@ def factory():
     return ServerScore
 
 # TODO: add kvm capability
+
+
 class ServerScore(object):
 
     SCORE_CPU = "cpu"
@@ -24,8 +26,8 @@ class ServerScore(object):
         # network_speed =
         return \
             {
-                self.SCORE_CPU : total_bogomips,
-                self.SCORE_FREE_MEM : free_mem
+                self.SCORE_CPU: total_bogomips,
+                self.SCORE_FREE_MEM: free_mem
             }
 
     @staticmethod

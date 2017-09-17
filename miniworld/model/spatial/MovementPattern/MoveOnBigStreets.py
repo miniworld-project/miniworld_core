@@ -20,7 +20,7 @@ class MoveOnBigStreets(AbstractMovementPattern):
         while(length < 1 and quality > 0):
             quality -= 1
             list_of_possible_roads = roads.get_list_of_next_roads_with_quality_restriction_for_cars(crt_map_node, quality)
-            less_quality_list_of_roads = roads.get_list_of_next_roads_with_quality_restriction_for_cars(crt_map_node, quality -1)
+            less_quality_list_of_roads = roads.get_list_of_next_roads_with_quality_restriction_for_cars(crt_map_node, quality - 1)
             list_of_possible_roads.extend(less_quality_list_of_roads)
             length = len(list_of_possible_roads)
             if(quality == 1 and length == 0):
@@ -29,7 +29,7 @@ class MoveOnBigStreets(AbstractMovementPattern):
         index = 0
         if(length >= 2):
             if last_map_node is not None:
-                list_of_possible_roads = [road for road in list_of_possible_roads if (road.get_start_point().getId() != last_map_node.getId() and road.get_end_point().getId() !=  last_map_node.getId())]
+                list_of_possible_roads = [road for road in list_of_possible_roads if (road.get_start_point().getId() != last_map_node.getId() and road.get_end_point().getId() != last_map_node.getId())]
             index = randint(0, len(list_of_possible_roads) - 1)
 
         possible_road = list_of_possible_roads[index]

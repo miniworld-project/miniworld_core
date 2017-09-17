@@ -14,7 +14,7 @@ class ManagementNodeBridged(ManagementNode.ManagementNode, Resetable.Resetable):
         ManagementNode.ManagementNode.__init__(self, network_backend_bootstrapper)
 
     # TODO: intergrate with vdeswitch backend, bridge by default up? autpcreation? tap vs bridge
-    def _start(self, switch = True, bridge_dev_name=None):
+    def _start(self, switch=True, bridge_dev_name=None):
         # TODO: DOC, NetlinkError: (34, 'Numerical result out of range')
 
         self.name = config.get_bridge_tap_name()

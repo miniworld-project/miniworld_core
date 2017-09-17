@@ -7,6 +7,7 @@ from miniworld.model.emulation.nodes import EmulationNode
 from miniworld.util import DictUtil
 from miniworld.log import log
 
+
 class NetworkConfiguratorConnectionLess(NetworkConfigurator):
     '''
     This IP provisioner iterates over the list of nodes instead of the connections.
@@ -60,10 +61,9 @@ class NetworkConfiguratorConnectionLess(NetworkConfigurator):
             check_commands_per_node = DictUtil.list_merge_values(check_commands_per_node, _check_commands_per_node)
 
         self.nic_check_commands = DictUtil.list_merge_values(self.nic_check_commands,
-                                    check_commands_per_node)
+                                                             check_commands_per_node)
 
         return commands_per_node
-
 
     def get_emulation_nodes(self):
         return singletons.simulation_manager.get_emulation_nodes()
@@ -85,7 +85,6 @@ class NetworkConfiguratorConnectionLess(NetworkConfigurator):
         bool
         '''
         return True
-
 
     def configure_connection(self, emulation_node):
         '''

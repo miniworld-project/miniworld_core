@@ -1,6 +1,7 @@
 from miniworld.management.spatial.MovementDirectorAbstract import MovementDirectorAbstract
 from miniworld.model.collections import DistanceMatrix
 
+
 class MovementDirectorNoMobility(MovementDirectorAbstract):
 
     def get_distances_from_nodes(self):

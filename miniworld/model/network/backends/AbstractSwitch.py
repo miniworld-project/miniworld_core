@@ -37,7 +37,7 @@ class AbstractSwitch(StartableObject.StartableSimulationStateObject, InterfaceDe
     def __repr__(self):
         return '%s(%s)' % (self.__class__.__name__, self.id, self.interface)
 
-    def _start(self, bridge_dev_name = None, switch = False):
+    def _start(self, bridge_dev_name=None, switch=False):
         '''
 
         Parameters
@@ -55,7 +55,7 @@ class AbstractSwitch(StartableObject.StartableSimulationStateObject, InterfaceDe
         ------
         NetworkBridgeNotExisting
         '''
-        if bridge_dev_name and not bridge_dev_name in netifaces.interfaces():
+        if bridge_dev_name and bridge_dev_name not in netifaces.interfaces():
             raise NetworkBridgeNotExisting("""The bridge with name '%s' does not exist!
             Run "sudo ip tuntap add dev %s mode tap"
             """ % (bridge_dev_name, bridge_dev_name))

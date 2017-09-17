@@ -21,6 +21,7 @@ try:
 except curses.error:
     pass
 
+
 class CLIEventDisplay:
 
     '''
@@ -28,6 +29,7 @@ class CLIEventDisplay:
     Used a progressbar to display the progress of each event as well as the overall progress.
     For terminals that don't support it, the progress is prettyprinted as json to the terminal.
     '''
+
     def __init__(self):
         '''
         Parameters
@@ -53,7 +55,7 @@ class CLIEventDisplay:
         bool, ProgressBar.
             If the progressbar is newly created, the progressbar object.
         '''
-        if not event in self.pbars:
+        if event not in self.pbars:
 
             def get_shared_widgets(event_name):
                 event_name = event_name.ljust(event_length)[:event_length]
@@ -126,7 +128,7 @@ class CLIEventDisplay:
                     pbar.update(progress)
 
             if self.info_writer is None:
-                self.info_writer = TerminalWriter(0, idx = self.get_progressbar_idx() + INFOBAR_PADDING_VERTICAL)
+                self.info_writer = TerminalWriter(0, idx=self.get_progressbar_idx() + INFOBAR_PADDING_VERTICAL)
             msg = 'Scenario starting: %s' % next(self.progress_gen)
             self.info_writer.write(msg)
         else:

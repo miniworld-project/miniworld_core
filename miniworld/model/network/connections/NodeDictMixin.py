@@ -9,7 +9,7 @@ class NodeDictMixin:
     '''
 
     #########################################
-    ### Structure Converting
+    # Structure Converting
     #########################################
 
     def to_ids(self):
@@ -27,8 +27,9 @@ class NodeDictMixin:
         >>> x.to_ids()
         {('1', '1'): {'loss': 0.5, 'bandwidth': 500}}
         '''
-        converted_to_ids = {(emu_node_x.id, emu_node_y.id) : val_inner for (emu_node_x, emu_node_y), val_inner in self.items()}
+        converted_to_ids = {(emu_node_x.id, emu_node_y.id): val_inner for (emu_node_x, emu_node_y), val_inner in self.items()}
         return self.__class__(converted_to_ids)
+
 
 class NodeDict(JSONStrMixin, UserDict):
     pass

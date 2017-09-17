@@ -4,6 +4,7 @@ from miniworld.management.network.manager.provisioner.NetworkConfiguratorConnect
     NetworkConfiguratorConnectionBased
 from miniworld.util import DictUtil
 
+
 class NetworkConfiguratorP2P(NetworkConfiguratorConnectionBased):
 
     '''
@@ -18,7 +19,7 @@ class NetworkConfiguratorP2P(NetworkConfiguratorConnectionBased):
     '''
 
     ################################################
-    ### NetworkConfigurator
+    # NetworkConfigurator
     ################################################
 
     def __init__(self, *args, **kwargs):

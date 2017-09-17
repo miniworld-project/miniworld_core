@@ -43,7 +43,7 @@ class EventMonitor(Resetable):
         self.new_bridges.add(br)
 
 #############################################################
-### Execution Modes
+# Execution Modes
 #############################################################
 
 
@@ -57,6 +57,7 @@ def get_superclass_dynamic():
 
     return NetworkBackendBridgedSingleDevice() if scenario_config.is_network_backend_bridged_connection_mode_single() else NetworkBackendBridgedMultiDevice()
 
+
 # NOTE: note matching against "'" and ";" is done for a execution mode (see :py:meth.`Scenario.is_network_backend_bridged_execution_mode_one_shell_call`)
 re_find_ip = re.compile("^ip\s+(.*)", re.MULTILINE)
 
@@ -65,6 +66,7 @@ re_tc = re.compile("^tc\s+(.*)", re.MULTILINE)
 
 # regex to strip ip prefix
 PATH_SHELL_COMMANDS = PathUtil.get_log_file_path("network_backend_%s.txt" % "shell_commands")
+
 
 def NetworkBackendBridgedDummy():
     class NetworkBackendBridgedDummy(NetworkBackend.NetworkBackend()):
@@ -125,9 +127,9 @@ def NetworkBackendBridgedDummy():
             self._br_id_mapping = {}
 
             self._tap_id_mapping = {}
-            self._current_tap_dev_nr = defaultdict(lambda : 1)
+            self._current_tap_dev_nr = defaultdict(lambda: 1)
 
-            self._current_br_dev_nr = defaultdict(lambda : 1)
+            self._current_br_dev_nr = defaultdict(lambda: 1)
             self.event_monitor = EventMonitor()
 
             self.reset_shell_command_executor()
@@ -147,7 +149,7 @@ def NetworkBackendBridgedDummy():
             self._shutdown()
 
         ###########################################################
-        ### Bridge/Tap device mapping
+        # Bridge/Tap device mapping
         ###########################################################
 
         def get_br_name(self, node_id, interface):
@@ -163,7 +165,7 @@ def NetworkBackendBridgedDummy():
             -------
             str
             '''
-            return 'br_%s_{id_fmt}'.format(id_fmt =NODE_ID_FMT) % (node_id, self.get_id_br_postfix(node_id, interface))
+            return 'br_%s_{id_fmt}'.format(id_fmt=NODE_ID_FMT) % (node_id, self.get_id_br_postfix(node_id, interface))
 
         def get_id_br_postfix(self, node_id, interface):
             long_id = '%s_%s_%s' % (node_id, interface.node_class, interface.nr_host_interface)
@@ -188,11 +190,11 @@ def NetworkBackendBridgedDummy():
             str
             '''
             node_id = int(node_id)
-            return 'tap_{id_fmt}_%x'.format(id_fmt =NODE_ID_FMT) % (node_id, self.get_id_tap_postfix(node_id, interface))
+            return 'tap_{id_fmt}_%x'.format(id_fmt=NODE_ID_FMT) % (node_id, self.get_id_tap_postfix(node_id, interface))
 
         def get_id_tap_postfix(self, node_id, interface):
             # log.debug("get_id_tap_postfix interface: '%s'", repr(interface))
-            long_id = '%s_{id_fmt}_{id_fmt}'.format(id_fmt =NODE_ID_FMT) % (node_id, interface.node_class, interface.nr_host_interface)
+            long_id = '%s_{id_fmt}_{id_fmt}'.format(id_fmt=NODE_ID_FMT) % (node_id, interface.node_class, interface.nr_host_interface)
             short_id = self._current_tap_dev_nr[node_id]
             if long_id in self._tap_id_mapping:
                 return self._tap_id_mapping[long_id]
@@ -210,7 +212,7 @@ def NetworkBackendBridgedDummy():
             return "{prefix}_{id_fmt}_{id_fmt}".format(prefix=prefix, id_fmt=NODE_ID_FMT)
 
         #############################################################
-        ### NetworkBackendNotifications
+        # NetworkBackendNotifications
         #############################################################
 
         # TODO: create abstract event system
@@ -258,25 +260,24 @@ def NetworkBackendBridgedDummy():
             if connection:
                 connection.link_up(link_quality_dict)
 
-
         def link_down(self, connection, link_quality_dict,
                       network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info,
                       **kwargs):
             if connection:
                 connection.link_down(link_quality_dict)
                 # TODO:
-                #if connection_info.is_remote_conn():
+                # if connection_info.is_remote_conn():
                 #    run_shell("ip l del {}".format(self.get_tunnel_name(emulation_node_x.id, emulation_node_y.id)))
 
         #############################################################
-        ### NIC configuration
+        # NIC configuration
         #############################################################
 
         def get_interface_index(self, emulation_node, interface):
             return self.get_id_tap_postfix(emulation_node.id, interface) - 1
 
         #############################################################
-        ### Actual connection changing/qdisc
+        # Actual connection changing/qdisc
         #############################################################
 
         def do_network_topology_change(self):
@@ -303,7 +304,7 @@ def NetworkBackendBridgedDummy():
                 ShellHelper.run_shell_with_input(cmd, commands_tc)
 
         #############################################################
-        ### Bridge/Connection handling
+        # Bridge/Connection handling
         #############################################################
 
         def create_n_store_switch(self, emulation_node_x, emulation_node_y, interface_x):
@@ -327,7 +328,7 @@ def NetworkBackendBridgedDummy():
             if emulation_node_x.id > max_id or emulation_node_y.id > max_id:
                 raise ValueError("Only %d nodes supported!" % max_id)
 
-            br_name = 'br_{id_fmt}_{id_fmt}'.format(id_fmt =NODE_ID_FMT) % (emulation_node_x.id, emulation_node_y.id)
+            br_name = 'br_{id_fmt}_{id_fmt}'.format(id_fmt=NODE_ID_FMT) % (emulation_node_x.id, emulation_node_y.id)
 
             bridge = self.network_backend_bootstrapper.switch_type(br_name, interface_x)
             bridge.start(switch=False, bridge_dev_name=br_name)
@@ -364,7 +365,7 @@ def NetworkBackendBridgedDummy():
                 # TODO: #54: make amount of nodes configurable
                 count_central_nodes = 1
                 for i in range(0, count_central_nodes):
-                    central_node = self.network_backend_bootstrapper.central_node_type(self.network_backend_bootstrapper, id = i+1)
+                    central_node = self.network_backend_bootstrapper.central_node_type(self.network_backend_bootstrapper, id=i + 1)
                     #central_node.id = self.get_br_name(central_node.id, central_node.interface)
                     # TODO: #54 make configurable!
                     log.debug("creating CentralNode with id: %s", central_node.id)
@@ -385,10 +386,10 @@ def NetworkBackendBridgedDummy():
                 log.info("connecting %s<->%s", emulation_node_x, emulation_node_y)
                 self.connection_across_servers(self, emulation_node_x, emulation_node_y)
 
-
             return central_nodes_dict
 
     return NetworkBackendBridgedDummy
+
 
 def NetworkBackendBridged():
     '''

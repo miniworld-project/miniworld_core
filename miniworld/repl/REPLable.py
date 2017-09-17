@@ -5,6 +5,7 @@ from miniworld.repl.CommandRunner import CommandRunner
 
 __author__ = 'Nils Schmidt'
 
+
 class REPLable(object):
 
     '''
@@ -23,7 +24,7 @@ class REPLable(object):
     '''
 
     ############################################
-    ### Set these variables in a subclass
+    # Set these variables in a subclass
     ############################################
 
     def __init__(self):
@@ -33,7 +34,7 @@ class REPLable(object):
         self.verbose_logger = get_logger('verbose_%s' % name, handlers=[get_file_handler(name)]) if config.is_debug() else None
 
     ############################################
-    ### Implement these methods
+    # Implement these methods
     ############################################
 
     def render_script_from_flo(self, flo, **kwargs):
@@ -49,7 +50,7 @@ class REPLable(object):
         return flo.read()
 
     ############################################
-    ### UDS stuff
+    # UDS stuff
     ############################################
 
     def wait_until_uds_reachable(self, return_sock=False):
@@ -69,7 +70,7 @@ class REPLable(object):
         return NetUtil.wait_until_uds_reachable(self.path_uds_socket, return_sock=return_sock)
 
     ############################################
-    ### Command execution
+    # Command execution
     ############################################
 
     def run_commands_eager_check_ret_val(self, *args, **kwargs):
@@ -107,7 +108,7 @@ class REPLable(object):
         For the documentation of the parameters, see the constructor of :py:class:`.CommandRunner`.
 
         '''
-        timeout=kwargs.get("timeout") or config.get_repl_timeout()
+        timeout = kwargs.get("timeout") or config.get_repl_timeout()
         if "timeout" in kwargs:
             del kwargs["timeout"]
 
@@ -125,7 +126,7 @@ class REPLable(object):
         return CommandRunner(self, timeout, *args, **kwargs)()
 
     ############################################
-    ### Misc
+    # Misc
     ############################################
 
     def get_verbose_logger_path(self):

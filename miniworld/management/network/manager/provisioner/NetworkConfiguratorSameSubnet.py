@@ -27,7 +27,7 @@ class NetworkConfiguratorSameSubnet(NetworkConfiguratorConnectionLess):
     '''
 
     ################################################
-    ### NetworkConfigurator
+    # NetworkConfigurator
     ################################################
 
     def __init__(self, *args, **kwargs):
@@ -52,7 +52,7 @@ class NetworkConfiguratorSameSubnet(NetworkConfiguratorConnectionLess):
         ------
         NoMoreSubnetsAvailable
         '''
-        if not interface in self.subnets:
+        if interface not in self.subnets:
             try:
                 self.subnets[interface] = next(self.subnet_generator)
             except StopIteration:
@@ -88,8 +88,8 @@ class NetworkConfiguratorSameSubnet(NetworkConfiguratorConnectionLess):
                 # NOTE: we do not use the type here! instead the count the interfaces (different eq operation)!
                 cnt_type_ifaces = c[interface]
 
-                offset = emulation_node.id * (cnt_total_type_ifaces-cnt_type_ifaces+1)
-                ip_addr = self.get_ip(subnet, offset=offset-1)
+                offset = emulation_node.id * (cnt_total_type_ifaces - cnt_type_ifaces + 1)
+                ip_addr = self.get_ip(subnet, offset=offset - 1)
             netmask = subnet.netmask
 
             ip_set_command_up = NetworkConfigurator.get_ip_addr_change_cmd(self.get_nic_name(idx_iface), ip_addr, netmask)
@@ -164,7 +164,7 @@ class NetworkConfiguratorSameSubnet(NetworkConfiguratorConnectionLess):
         self.counter = 0
 
     ################################################
-    ### Own impl
+    # Own impl
     ################################################
 
     def get_key_ip_dict(self, emulation_node, interface):

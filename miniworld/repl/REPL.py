@@ -23,6 +23,7 @@ REPL_MODE_VDE = "vde"
 REPL_MODE_WIREFILTER = "wirefilter"
 REPL_MODES = REPL_MODE_QEMU, REPL_MODE_VDE, REPL_MODE_WIREFILTER
 
+
 class REPL:
     '''
     Models a read-eval-print-loop for all given qemu nodes.
@@ -41,7 +42,7 @@ class REPL:
         The active REPL mode.
     '''
 
-    def __init__(self, number_of_nodes, async = False):
+    def __init__(self, number_of_nodes, async=False):
         '''
         Parameters
         ----------
@@ -51,11 +52,10 @@ class REPL:
         '''
         # TODO: refactor to list<REPLable> ?
 
-
         # NOTE: give each node an own copy of the NetworkBackend and an own copy of the interfaces
         self.nodes = [EmulationNode(i,
                                     NetworkBackends.get_current_network_backend_bootstrapper().network_backend_type(NetworkBackends.get_current_network_backend_bootstrapper()),
-                                    interfaces = Interfaces.Interfaces.factory_from_interface_names(scenario_config.get_interfaces())) for i in range(1, number_of_nodes + 1)]
+                                    interfaces=Interfaces.Interfaces.factory_from_interface_names(scenario_config.get_interfaces())) for i in range(1, number_of_nodes + 1)]
         self.async = async
         self.active_qemu_uds_sockets = []
         self.mode = None
@@ -72,7 +72,7 @@ class REPL:
         log.info("enter '%s' to exit'", REPL_CMD_EXIT)
 
         # TODO: use lib for interactive shell stuff ?
-        while 1:
+        while True:
             try:
                 prompt = "$ "
                 if self.mode:
@@ -137,14 +137,14 @@ class REPL:
         if self.mode == REPL_MODE_QEMU:
             uds_socket_gen = node.virtualization_layer.run_commands_get_socket(
                 StringIO(cmd),
-                interactive_result_stdout_writing = not self.async,
-                logger = node.virtualization_layer.nlog
+                interactive_result_stdout_writing=not self.async,
+                logger=node.virtualization_layer.nlog
             )
         elif self.mode == REPL_MODE_VDE:
             uds_socket_gen = node.vde_switch.run_commands_get_socket(
                 StringIO(cmd),
-                interactive_result_stdout_writing = not self.async,
-                logger = node.vde_switch.nlog
+                interactive_result_stdout_writing=not self.async,
+                logger=node.vde_switch.nlog
             )
 
         elif self.mode == REPL_MODE_WIREFILTER:
@@ -160,7 +160,7 @@ class REPL:
                 # clean up
                 try:
                     self.active_qemu_uds_sockets.remove(uds_socket)
-                except:
+                except BaseException:
                     pass
 
     def _run_command_threaded(self, cmd):
@@ -174,7 +174,7 @@ class REPL:
             The command to execute in the qemu instance
         '''
         # one thread per node for async, else 1
-        pool =  ThreadPool(processes = len(self.nodes) if self.async else 1)
+        pool = ThreadPool(processes=len(self.nodes) if self.async else 1)
         pool.map_async(self.run_command, zip(self.nodes, repeat(cmd)))
 
     def _run_command_interrupt(self, cmd):
@@ -205,7 +205,7 @@ class REPL:
         for uds_sock in to_remove:
             try:
                 self.active_qemu_uds_sockets.remove(uds_sock)
-            except:
+            except BaseException:
                 pass
 
         # finally run command

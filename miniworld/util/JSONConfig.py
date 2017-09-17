@@ -16,14 +16,16 @@ CONFIG_COMMENT = "//"
 CONFIG_KEY_NODE_DETAILS = "node_details"
 
 ###############################################
-### Decorators
+# Decorators
 ###############################################
+
 
 def arg2float(fun):
     def inner(*args, **kwargs):
         res = fun(*args, **kwargs)
         return float(res)
     return inner
+
 
 def customizable_attrs(*keys, **kwargs):
     '''
@@ -77,7 +79,7 @@ def customizable_attrs(*keys, **kwargs):
                 res = node_value
 
             if res in (None, nothing):
-                 res = get_dict_nested_value(self.data, keys)
+                res = get_dict_nested_value(self.data, keys)
 
             #log.debug("%s : %s", _pretty_format(keys), res)
 
@@ -125,15 +127,17 @@ def json2dict(func):
         res = func(*args, **kwargs)
         if res is None:
             return res
-        return {int(x) : y for x, y in res.items()}
+        return {int(x): y for x, y in res.items()}
     return func_wrapper
+
 
 def _pretty_format(keys):
     return '->'.join(keys)
 
 ###############################################
-### Subclassable Config object
+# Subclassable Config object
 ###############################################
+
 
 class JSONConfig(UserDict):
     '''
@@ -156,6 +160,7 @@ class JSONConfig(UserDict):
     >>> print c.get_non_default()
     None
     '''
+
     def __init__(self):
         self.data = {}
 
@@ -165,7 +170,7 @@ class JSONConfig(UserDict):
         pass
 
     # ONLY FOR DEMO
-    @customizable_attrs("default", default = 1)
+    @customizable_attrs("default", default=1)
     def get_default(self):
         pass
 
@@ -174,10 +179,11 @@ class JSONConfig(UserDict):
     def get_non_default(self):
         pass
 ###############################################
-### Helper methods
+# Helper methods
 ###############################################
 
-def read_json_config(config = None, raw = False):
+
+def read_json_config(config=None, raw=False):
     '''
     Read a json config file.
     Strips all lines beginning with `CONFIG_COMMENT`.
@@ -211,6 +217,7 @@ def read_json_config(config = None, raw = False):
     except (ValueError, IOError):
         raise ConfigError("Config file '%s' could not be opened!" % config)
 
+
 def get_dict_nested_value(d, keys):
     '''
     Get the nested dictionary value if present.
@@ -230,7 +237,7 @@ def get_dict_nested_value(d, keys):
     cur_dict = d
 
     def dict_check(d):
-        if not d is None:
+        if d is not None:
             if not isinstance(d, dict):
                 raise ConfigMalformed("The value for '%s' should be a dictionary! Not a value!" % _pretty_format(keys))
 
@@ -248,10 +255,13 @@ def get_dict_nested_value(d, keys):
     return cur_dict
 
 # TODO: #40: DOC
+
+
 def keys_to_int(d):
     if not isinstance(d, dict):
         return d
     return dict(zip(map(int, d.keys()), keys_to_int(d.values())))
+
 
 if __name__ == '__main__':
     c = JSONConfig()

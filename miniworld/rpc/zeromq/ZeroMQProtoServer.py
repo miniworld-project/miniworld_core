@@ -26,6 +26,7 @@ def factory():
         log.info("distance matrix distribution via request-reply pattern")
         return ZeroMQServerRouter
 
+
 # TODO: use for experiments!
 CNT_ZMQ_THREADS = 1
 
@@ -36,6 +37,7 @@ class ZeroMQServer:
     For an introduction to the zeromq services, see :py:class:`.ZeroMQClient`.
 
     '''
+
     def __init__(self):
         '''
         Parameters
@@ -68,7 +70,6 @@ class ZeroMQServer:
         # self.router_socket.setsockopt(zmq.REQ_RELAXED, 1)
         log.info("listening on '%s'", addr)
 
-
         # create the publish socket
         self.reset_socket = self.context.socket(zmq.PUB)
         # self.reset_socket.setsockopt(zmq.IDENTITY, uuid.uuid4())
@@ -94,7 +95,7 @@ class ZeroMQServer:
 
         self.wait_for_nodes_started.clear()
         self.wait_for_scenario_config.clear()
-        #self.reset_required.clear()
+        # self.reset_required.clear()
 
         self.last_step_time = None
 
@@ -102,7 +103,7 @@ class ZeroMQServer:
     def send_reset(self):
         self.reset_socket.send(b'reset')
         # NOTE: we have to sync the subscribers to ensure they got the message
-        #self.sync_subscribers()
+        # self.sync_subscribers()
         self.reset()
 
     def start(self, cnt_peers):
@@ -142,7 +143,7 @@ class ZeroMQServer:
         return Expecter(self.router_socket, self.cnt_peers, self.protocol, *args, **kwargs)
 
     ####################################################################
-    ### State handling
+    # State handling
     ####################################################################
 
     def handle_state_register(self):
@@ -183,7 +184,7 @@ class ZeroMQServer:
         # distribute nodes among emulation server
         server_node_mapping = singletons.node_distribution_strategy.distribute_emulation_nodes(list(node_ids), self.cnt_peers)
         log.info("nodes mapping: %s", pformat(server_node_mapping))
-        log.info("nodes per server: %s", pformat({k:len(v) for k,v in server_node_mapping.items()}))
+        log.info("nodes per server: %s", pformat({k: len(v) for k, v in server_node_mapping.items()}))
 
         # set server to node mapping before creating the scenario configs
         miniworld.Scenario.scenario_config.set_distributed_server_node_mapping(server_node_mapping)
@@ -211,7 +212,7 @@ class ZeroMQServer:
             log.debug("%d/%d clients synced ...", idx, cnt)
 
         # add some debug info
-        after_response_fun = fun if config.is_debug() else lambda x,y,z : None
+        after_response_fun = fun if config.is_debug() else lambda x, y, z: None
 
         expect_distance_matrix = self.get_expecter_state(States.STATE_DISTANCE_MATRIX, 1, after_response_fun)
         # sync clients and send each his distance matrix
@@ -228,6 +229,7 @@ class ZeroMQServer:
         self.wait_for_nodes_started.wait()
 
         self._handle_state_distance_matrix(distance_matrix)
+
 
 class ZeroMQServerRouter(ZeroMQServer):
 
@@ -279,13 +281,14 @@ class ZeroMQServerRouter(ZeroMQServer):
 
         distance_matrix_per_server = dict(zip(distance_matrix_per_server.keys(),
                                               list(map(DistanceMatrix.transform_distance_matrix,
-                                                  distance_matrix_per_server.values()))))
+                                                       distance_matrix_per_server.values()))))
 
         expect_distance_matrix = self.get_expecter_state(States.STATE_DISTANCE_MATRIX, 1)
         # sync clients and send each his distance matrix
         ResponderPerServerID(self.router_socket, self.protocol, expect_distance_matrix, distance_matrix_per_server)()
 
         log.info("synced nodes and send distance matrix")
+
 
 class ZeroMQCServerPubSub(ZeroMQServer):
 
@@ -333,7 +336,7 @@ class ZeroMQCServerPubSub(ZeroMQServer):
         '''
         data = self.serialize(DistanceMatrix.transform_distance_matrix(distance_matrix))
         log.info("sending %f kbytes ...", len(data) / 1024.0)
-        self.pub_socket.send( data )
+        self.pub_socket.send(data)
 
     def _handle_state_distance_matrix(self, distance_matrix):
         # # sync initially
@@ -386,6 +389,7 @@ def main(cnt_peers):
     zmq_server = factory()()
     zmq_server.start(cnt_peers)
     zmq_server.enter_run_loop()
+
 
 if __name__ == '__main__':
     miniworld.init()

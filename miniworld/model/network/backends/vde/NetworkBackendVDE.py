@@ -10,6 +10,7 @@ from miniworld.model.network.interface.Interface import HubWiFi
 
 __author__ = 'Nils Schmidt'
 
+
 class NetworkBackendVDE(NetworkBackendDummy):
 
     '''
@@ -31,7 +32,6 @@ class NetworkBackendVDE(NetworkBackendDummy):
 
     def _start(self, *args, **kwargs):
         pass
-
 
     def before_link_initial_start(self, network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y,
                                   connection_info, start_activated=False, **kwargs):
@@ -76,7 +76,7 @@ class NetworkBackendVDE(NetworkBackendDummy):
 
             # TODO: REFACTOR!
             # TODO: #54: make amount of nodes configurable
-            count_central_nodes = 1#multiprocessing.cpu_count()
+            count_central_nodes = 1  # multiprocessing.cpu_count()
             network_backend_bootstrapper = NetworkBackends.get_current_network_backend_bootstrapper()
             for _ in range(0, count_central_nodes):
                 # create an own network backend for each node

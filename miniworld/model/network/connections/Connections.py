@@ -1,5 +1,6 @@
 from miniworld.model.Objects import Objects
 
+
 class Connections(Objects):
 
     '''

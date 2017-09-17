@@ -1,5 +1,6 @@
 from miniworld.model.network.backends.bridged.iproute2.Bridge import BridgeIproute2
 
+
 def BridgeBrctl():
     class BridgeBrctl(BridgeIproute2()):
 

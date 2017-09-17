@@ -13,6 +13,7 @@ from miniworld.util import DictUtil, NetUtil, ConcurrencyUtil
 class NetworkConfiguratorError(Base):
     pass
 
+
 class NetworkConfigurator:
 
     '''
@@ -27,6 +28,7 @@ class NetworkConfigurator:
         E.g. 'eth'
     nic_check_commands : nic_check_commands
     '''
+
     def __init__(self, get_interface_index_fun, nic_prefix=None,
                  # connectivity checking stuff
                  connectivity_checker_fun=None, is_connectivity_checks_enabled=None, network_timeout=None,
@@ -153,7 +155,6 @@ class NetworkConfigurator:
             with es.event_init(es.EVENT_NETWORK_CHECK) as ev:
                 ev.finish()
 
-
     def configure_connection(self, emulation_nodes, interfaces):
         '''
         Configure a single connection.
@@ -171,7 +172,7 @@ class NetworkConfigurator:
 
     @staticmethod
     # TODO: MOVE TO NETWORK UTIL!
-    def get_ip_addr_change_cmd(dev, ip, netmask, up = True):
+    def get_ip_addr_change_cmd(dev, ip, netmask, up=True):
         return 'ifconfig {dev} {ip} netmask {netmask} {state}'.format(dev=dev, ip=ip, netmask=netmask,
                                                                       state='up' if up else '')
 
@@ -182,7 +183,7 @@ class NetworkConfigurator:
         raise NotImplementedError
 
     #########################################
-    ### Connectivity Checkers
+    # Connectivity Checkers
     #########################################
 
     # TODO: add interface? => check that the ip is reachable from the correct interface

@@ -1,5 +1,6 @@
 __author__ = 'Nils Schmidt'
 
+
 def memoize_pos_args(fun):
     ''' Memoize the functions positional arguments and return the same result for it '''
     # arguments, result

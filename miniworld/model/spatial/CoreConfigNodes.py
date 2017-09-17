@@ -23,6 +23,7 @@ def factory():
 
     raise ValueError("Core mode '%s' not supported!" % scenario_config.get_core_mode())
 
+
 class CoreConfigNodes(Resetable):
     '''
     Parameter
@@ -35,6 +36,7 @@ class CoreConfigNodes(Resetable):
     ----------
 
     '''
+
     def __init__(self, scenario_changes):
         self.orig_scenario_changes = scenario_changes
         self.reset()
@@ -64,16 +66,16 @@ class CoreConfigNodes(Resetable):
     def get_distance_matrix(self):
         # TODO: supply iterator function
         distance_matrix = DistanceMatrix.factory()()
-        for n in range(0, range(scenario_config.get_number_of_nodes()-1)):
+        for n in range(0, range(scenario_config.get_number_of_nodes() - 1)):
             for i in range(n + 1, range(scenario_config.get_number_of_nodes())):
                 if n != i:
                     if i in self.crnt_connections[n]:
                         # connected
                         distance = 0
-                        distance_matrix.set_distance(n+1, i+1, distance)
+                        distance_matrix.set_distance(n + 1, i + 1, distance)
                     else:
                         # not connected
-                        distance_matrix.set_unlimited_distance(n+1, i+1)
+                        distance_matrix.set_unlimited_distance(n + 1, i + 1)
         return distance_matrix
 
     def get_coordinates(self):
@@ -86,7 +88,7 @@ class CoreConfigNodes(Resetable):
         '''
         Stub-methode
         '''
-        return  ""
+        return ""
 
     def __get_next_scenario(self):
         '''
@@ -125,6 +127,7 @@ class CoreConfigNodes(Resetable):
 
     def _walk(self):
         raise NotImplementedError
+
 
 class CoreConfigNodesLan(CoreConfigNodes):
 

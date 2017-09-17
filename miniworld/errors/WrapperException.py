@@ -4,6 +4,7 @@
 __author__ = "Nils Tobias Schmidt"
 __email__ = "schmidt89 at informatik.uni-marburg.de"
 
+
 class WrapperException(Exception):
     '''
     Exception for simulating the caused by behavior known from java.
@@ -48,8 +49,7 @@ class WrapperException(Exception):
         Caused by: WrapperExceptionSubclass: Overwritten error message
     '''
 
-
-    def __init__(self, msg = None, caused_by = None):
+    def __init__(self, msg=None, caused_by=None):
         '''
         Parameters
         ----------
@@ -75,7 +75,7 @@ class WrapperException(Exception):
         if isinstance(self.caused_by, WrapperException):
             caused_by_msg = str(self.caused_by)
         else:
-            caused_by_msg =  '%s: %s' % (self.caused_by.__class__.__name__, str(self.caused_by))
+            caused_by_msg = '%s: %s' % (self.caused_by.__class__.__name__, str(self.caused_by))
 
         base_msg = '%s: %s' % (self.__class__.__name__, msg)
 
@@ -86,4 +86,3 @@ class WrapperException(Exception):
     def _msg(self):
         ''' Overwrite this method in a subclass. It's supposed to hold the exception message '''
         return ""
-

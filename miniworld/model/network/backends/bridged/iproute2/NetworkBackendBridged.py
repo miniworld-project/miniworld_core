@@ -71,7 +71,7 @@ def NetworkBackendBridgedIproute2():
                     try:
                         cmd = "ip -d -batch -"
                         log.info("changing network topology with '%s'. See '%s' for the commands." % (
-                        cmd, PATH_SHELL_COMMANDS))
+                            cmd, PATH_SHELL_COMMANDS))
                         ShellHelper.run_shell_with_input(cmd, ip_commands)
 
                     except subprocess.CalledProcessError as e:
@@ -107,7 +107,7 @@ def NetworkBackendBridgedIproute2():
             tunnel_name = self.get_tunnel_name(emulation_node_x.id, emulation_node_y.id)
             # TODO:
             # new = False
-            if not tunnel_name in self.tunnels:
+            if tunnel_name not in self.tunnels:
                 # new = True
                 t = self.network_backend_bootstrapper.tunnel_type(emulation_node_x, emulation_node_y, remote_ip)
                 # with open(PathUtil.get_log_file_path("d_debug.txt"), "aw") as f:

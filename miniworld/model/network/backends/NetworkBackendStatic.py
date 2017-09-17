@@ -13,6 +13,7 @@ from miniworld.util import DictUtil
 # static lock for static methods ...
 static_lock = Lock()
 
+
 def NetworkBackendStatic():
     class NetworkBackendStatic(NetworkBackendDummy):
         '''
@@ -21,6 +22,7 @@ def NetworkBackendStatic():
         They are static because the connections are known beforehand.
         There is no :py:class:`.MovevementDirector` which moves the nodes according to a model.
         '''
+
         def __init__(self, *args, **kwargs):
             super(NetworkBackendStatic, self).__init__(*args, **kwargs)
             self._all_connections = None

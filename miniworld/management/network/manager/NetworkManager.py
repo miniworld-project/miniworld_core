@@ -30,6 +30,8 @@ KEY_DISTANCE = "distance"
 # TODO: MOVE CONNECTIONS HERE ...
 # TODO: STORE EMUNODES OR NODE IDS?
 # TODO: move link_quality stuff to connections
+
+
 class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifications):
     '''
     Keeps track of the network connections.
@@ -94,7 +96,6 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
         elif scenario_config.get_network_provisioner_name() == NETWORK_CONFIGURATOR_NAME_SAME_SUBNET:
             return NetworkConfiguratorSameSubnet
 
-
     def ip_config(self):
         # NOTE: we need to reuse the existing configurators due to their internal state!
         if scenario_config.is_network_links_auto_ipv4():
@@ -122,7 +123,7 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
                     #     self.net_configurator.apply_nic_configuration_commands(check_commands_per_node)
 
     #########################################
-    ### Resettable Interface
+    # Resettable Interface
     #########################################
 
     def reset(self):
@@ -134,7 +135,7 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
         self.distance_matrix = {}
 
     #########################################
-    ### Bandwidth
+    # Bandwidth
     #########################################
 
     @property
@@ -146,7 +147,7 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
         return self._to_matrix(self.bandwidth)
 
     #########################################
-    ### Distance
+    # Distance
     #########################################
 
     @property
@@ -157,7 +158,7 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
         return self._to_matrix(self.distance)
 
     #########################################
-    ### Loss
+    # Loss
     #########################################
 
     @property
@@ -173,9 +174,9 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
         return PlotUtil.fill_quadratic_matrix(matrix, size=self.cnt_nodes, fill_in=fill_in)
 
     #############################################################
-    ### NetworkBackendNotifications
-    ### Propagate notifications to :py:class:`.NetworkBackend`
-    ### and return the result.
+    # NetworkBackendNotifications
+    # Propagate notifications to :py:class:`.NetworkBackend`
+    # and return the result.
     #############################################################
 
     def before_simulation_step(self, simulation_manager, step_cnt, network_backend, emulation_nodes, **kwargs):
@@ -214,7 +215,7 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
         self.distance_matrix = full_distance_matrix
 
         es = singletons.event_system
-        
+
         # clear progress for network backend setup
         with es.event_init(es.EVENT_NETWORK_BACKEND_SETUP, finish_ids=[]) as ev:
             pass
@@ -232,12 +233,11 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
 
         all_node_ids = list(conns_per_node.keys()) + list(self.new_conns_per_node.keys())
         self.new_conns_per_node = {
-                    node_id: (conns_per_node.get(node_id, set()) - self.new_conns_per_node.get(node_id, set())) for node_id in
+            node_id: (conns_per_node.get(node_id, set()) - self.new_conns_per_node.get(node_id, set())) for node_id in
             all_node_ids}
 
         # keep the old distance matrix
         self.distance_matrix = full_distance_matrix
-
 
         self.active_interfaces_per_connection_before_distance_matrix_changed = singletons.network_manager.connection_store.get_active_interfaces_per_connection()
 
@@ -253,7 +253,6 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
 
         self.ip_config()
         return res
-
 
     def get_new_connections_with_interfaces_since_last_distance_matrix_change(self):
         ''' Get only new connections since distance matrix changed.
@@ -289,12 +288,12 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
         #     type_check(connection, AbstractConnection.AbstractConnection)
         # except ValueError:
         #     print "foo"
-            
+
         es = singletons.event_system
 
         if network_backend_connected:
             self.connection_store.add_connection(emulation_node_x, emulation_node_y, interface_x, interface_y, connection,
-                                            network_backend_connected)
+                                                 network_backend_connected)
 
             # TODO: enable again!
             # TODO: management nodes
@@ -327,10 +326,9 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
         return network_backend.after_link_quality_adjustment(
             connection, link_quality_still_connected, link_quality_dict, network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info)
 
-
     def link_up(self, connection, link_quality_dict,
-                    network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info,
-                    **kwargs):
+                network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info,
+                **kwargs):
         # flag as active/inactive connection
         self.connection_store.change_connection_state(emulation_node_x, emulation_node_y, interface_x, interface_y, now_active=True)
         res = network_backend.link_up(
@@ -338,7 +336,6 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
             network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info,
             **kwargs)
         return res
-
 
     def link_down(self, connection, link_quality_dict,
                   network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info,
@@ -357,7 +354,7 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
         return tunnel
 
     #########################################
-    ### Helpers
+    # Helpers
     #########################################
 
     # TODO: DOC
@@ -445,7 +442,7 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
 
             # add nodes
             if not include_management_node and (
-                isinstance(emu_node_x, ManagementNode) or isinstance(emu_node_y, ManagementNode)):
+                    isinstance(emu_node_x, ManagementNode) or isinstance(emu_node_y, ManagementNode)):
                 continue
 
             if include_nodes:
@@ -460,7 +457,7 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
 
                 # add interfaces and connect them
                 for emu_node, interface, interface_str in (
-                (emu_node_x, interface_x, interface_x_str), (emu_node_y, interface_y, interface_y_str)):
+                        (emu_node_x, interface_x, interface_x_str), (emu_node_y, interface_y, interface_y_str)):
 
                     # add interfaces
                     G.add_node(interface_str, group=get_interface_group(interface), name=interface_str)
@@ -476,6 +473,7 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
 
         # log.info("topology: %s", pformat(G.edges()))
         return d
+
 
 if __name__ == '__main__':
     from miniworld import testing

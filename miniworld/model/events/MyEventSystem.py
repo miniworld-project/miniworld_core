@@ -1,6 +1,7 @@
 from miniworld.model.StartableObject import StartableSimulationStateObject
 from miniworld.model.events.EventSystem import EventSystem
 
+
 class MyEventSystem(EventSystem, StartableSimulationStateObject):
     '''
     Concrete implementation of the MiniWorld Event-System.

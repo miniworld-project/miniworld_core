@@ -21,14 +21,14 @@ class NodeConnectionStore(JSONStrMixin, TupleUserDict):
     '''
 
     #########################################
-    ### Magic Methods
+    # Magic Methods
     #########################################
 
-    def __init__(self, data = None):
+    def __init__(self, data=None):
         self.data = data if data is not None else {}
 
     #########################################
-    ### MyUserDict
+    # MyUserDict
     #########################################
 
     # TODO: implement same behaviour via magic methods ...
@@ -54,14 +54,13 @@ class NodeConnectionStore(JSONStrMixin, TupleUserDict):
         return EmulationNodes((emu_node_x, emu_node_y)).sorted()
 
 
-
 if __name__ == '__main__':
     import json
     from miniworld import testing
     testing.init_testing_environment()
 
     print(list(testing.get_pairwise_connected_nodes(3)))
-    (n1, i1, conn), (n2, i2, _), _= list(testing.get_pairwise_connected_nodes(2))
+    (n1, i1, conn), (n2, i2, _), _ = list(testing.get_pairwise_connected_nodes(2))
     ncs = NodeConnectionStore()
     ncs[EmulationNodes((n1, n2))]
     print(ncs)

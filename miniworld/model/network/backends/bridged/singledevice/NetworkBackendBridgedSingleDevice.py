@@ -41,7 +41,6 @@ def NetworkBackendBridgedSingleDevice():
         # TODO: DOC
         mark_cnt = 0
 
-
         def get_interface_filter(self):
             return InterfaceFilter.EqualInterfaceNumbers
 
@@ -170,7 +169,6 @@ def NetworkBackendBridgedSingleDevice():
                 bridge.add_if(tap_dev_name, if_up=True)
 
             return True, bridge, connection
-
 
         def do_network_topology_change(self):
             '''

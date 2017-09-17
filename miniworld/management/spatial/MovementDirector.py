@@ -13,8 +13,6 @@ from miniworld.model.singletons.Singletons import singletons
 from miniworld.model.spatial.Roads import Roads
 
 
-
-
 class MovementDirector(MovementDirectorAbstract):
     '''
     Attributes
@@ -24,6 +22,7 @@ class MovementDirector(MovementDirectorAbstract):
     roads :                                     Roads
     nodes :                                     Nodes
     '''
+
     def __init__(self, dict_of_movements_with_number_of_nodes):
         self.roads = singletons.spatial_singleton.get_roads()
         self.nodes = Nodes(dict_of_movements_with_number_of_nodes)
@@ -38,7 +37,7 @@ class MovementDirector(MovementDirectorAbstract):
         return self.nodes.get_distance_matrix()
 
     def get_geo_json_for_roads(self):
-        ''' 
+        '''
         Returns
         -------
         geo_json
@@ -75,7 +74,7 @@ class MovementDirector(MovementDirectorAbstract):
 
         for emulation_node, connected_emulation_nodes in singletons.network_manager.connection_store.get_connections_per_node().items():
             for connected_emulation_node in connected_emulation_nodes:
-                list_of_geo_json_objects.append(self.__get_geo_json_object_for_connection(emulation_node.id-1, connected_emulation_node.id-1))
+                list_of_geo_json_objects.append(self.__get_geo_json_object_for_connection(emulation_node.id - 1, connected_emulation_node.id - 1))
 
         feature_coll_roads = geojson.FeatureCollection(list_of_geo_json_objects)
         return geojson.dumps(feature_coll_roads)
@@ -85,16 +84,16 @@ class MovementDirector(MovementDirectorAbstract):
         target = self.nodes.dict_of_nodes[node_id_2]
 
         return OrderedDict(
-            type = "Feature",
-            geometry = OrderedDict(
-                type = "LineString",
-                coordinates = [[float(source.get_lon()) , float(source.get_lat())], [float(target.get_lon()) , float(target.get_lat())]]
+            type="Feature",
+            geometry=OrderedDict(
+                type="LineString",
+                coordinates=[[float(source.get_lon()), float(source.get_lat())], [float(target.get_lon()), float(target.get_lat())]]
             ),
-            properties= OrderedDict(
-                color = source.color,
-                type = str(node_id_1),
-                name = "Coors Field",
-                amenity = "Baseball Stadium"
+            properties=OrderedDict(
+                color=source.color,
+                type=str(node_id_1),
+                name="Coors Field",
+                amenity="Baseball Stadium"
             )
         )
 
@@ -109,8 +108,6 @@ class MovementDirector(MovementDirectorAbstract):
             node[1].step()
 
         #current_simulation_step = SimulationStep()
-        #current_simulation_step.set_dict_of_coordinates(self.get_coordinates_for_nodes())
-        #current_simulation_step.set_dict_of_distances(self.get_distances_from_nodes())
-        #singletons.add_next_simulated_step(current_simulation_step)
-
-
+        # current_simulation_step.set_dict_of_coordinates(self.get_coordinates_for_nodes())
+        # current_simulation_step.set_dict_of_distances(self.get_distances_from_nodes())
+        # singletons.add_next_simulated_step(current_simulation_step)

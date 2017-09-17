@@ -81,7 +81,7 @@ class GlobalConfig(JSONConfig.JSONConfig):
         return self.data.get('coordinator', False)
 
     ###############################################
-    ### Protocol
+    # Protocol
     ###############################################
 
     PROTOCOL_MSG_PACK = "msgpack"
@@ -155,7 +155,7 @@ PATH_GLOBAL_CONFIG = "config.json"
 
 
 ###############################################
-### Helper
+# Helper
 ###############################################
 
 def set_global_config(*args, **kwargs):

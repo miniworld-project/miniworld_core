@@ -3,10 +3,11 @@ from miniworld import log
 from miniworld.model.emulation.nodes.virtual import CentralNode
 from miniworld.model.network.backends.vde import VDESwitch
 
+
 class CentralVDENode(CentralNode.CentralNode):
 
     # TODO: #54,#55
-    def start(self, switch = False):
+    def start(self, switch=False):
         '''
         1. Start hub/switch
         2. Color interfaces (if switch wants so)
@@ -31,10 +32,10 @@ class CentralVDENode(CentralNode.CentralNode):
         # color tap/management device
         if self.switch.colorful:
             log.info("coloring management tap device ...")
-            self.switch.color_interface(port =miniworld.model.network.backends.vde.VDEConstants.PORT_MANAGEMENT, color = self.interface.node_class)
+            self.switch.color_interface(port=miniworld.model.network.backends.vde.VDEConstants.PORT_MANAGEMENT, color=self.interface.node_class)
 
         log.info("associating management tap device with management vlan ...")
         # associate tap/management device with management vlan
-        self.switch.move_interface_to_vlan(self.interface, port =miniworld.model.network.backends.vde.VDEConstants.PORT_MANAGEMENT)
+        self.switch.move_interface_to_vlan(self.interface, port=miniworld.model.network.backends.vde.VDEConstants.PORT_MANAGEMENT)
 
         self.after_pre_shell_commands()

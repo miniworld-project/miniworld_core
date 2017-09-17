@@ -42,6 +42,7 @@ from miniworld.util import PathUtil, ConcurrencyUtil
 
 __author__ = 'Nils Schmidt'
 
+
 @contextmanager
 def mylock(lock):
 
@@ -53,6 +54,7 @@ def mylock(lock):
         log.debug("release lock ...")
         lock.release()
 
+
 def factory():
     if config.is_mode_distributed():
         if config.is_coordinator():
@@ -63,6 +65,8 @@ def factory():
     return SimulationManager
 
 # TODO: #54: rename all wirefilter stuff to e.g. connection
+
+
 class SimulationManager(Resetable, object):
 
     '''
@@ -105,12 +109,11 @@ class SimulationManager(Resetable, object):
     class NoMovementDirector(Error):
         pass
 
-
     def __init__(self):
         self.lock = Lock()
 
         self.path_log_file = PathUtil.get_log_file_path(self.__class__.__name__)
-        self.logger = get_logger(self.__class__.__name__, handlers = [get_stdout_handler(), logging.FileHandler(self.path_log_file)])
+        self.logger = get_logger(self.__class__.__name__, handlers=[get_stdout_handler(), logging.FileHandler(self.path_log_file)])
         self.logger.info("starting ...")
 
         # NOTE: init resets first for reset()
@@ -120,7 +123,7 @@ class SimulationManager(Resetable, object):
         self.scenario_changed = False
 
     ###############################################
-    ### Resetable
+    # Resetable
     ###############################################
 
     def reset(self):
@@ -143,7 +146,7 @@ class SimulationManager(Resetable, object):
         self.simulation_fully_started_and_network_connected_event = threading.Event()
 
     ###############################################
-    ### Getter
+    # Getter
     ###############################################
 
     def _is_auto_stepping_and_running(self):
@@ -172,7 +175,7 @@ class SimulationManager(Resetable, object):
         return list(filter(lambda x: isinstance(x, int), self.nodes_id_mapping.keys()))
 
     ###############################################
-    ### CentralHub
+    # CentralHub
     ###############################################
 
     # TODO: adjust doc, remove comments
@@ -205,7 +208,7 @@ class SimulationManager(Resetable, object):
                 if idx == 0:
                     idx_central_node = 0
                 else:
-                    idx_central_node = int(math.ceil(idx / nodes_stepping)) -1
+                    idx_central_node = int(math.ceil(idx / nodes_stepping)) - 1
                 self.logger.info("idx_central_node: %s", idx_central_node)
                 bridge_node_id = self.central_nodes_id_mapping.keys()[idx_central_node]
 
@@ -219,7 +222,7 @@ class SimulationManager(Resetable, object):
             return matrix
 
     ###############################################
-    ### RunLoop stuff
+    # RunLoop stuff
     ###############################################
 
     def start_run_loop(self):
@@ -271,7 +274,7 @@ class SimulationManager(Resetable, object):
         return False
 
     ###############################################
-    ### Simulation management
+    # Simulation management
     ###############################################
 
     @staticmethod
@@ -346,7 +349,6 @@ class SimulationManager(Resetable, object):
 
             singletons.network_manager.cnt_nodes = cnt_nodes
 
-
             # TODO: add option to scenario config file
             # TODO: for what do we need the blocking stuff?
             def start():
@@ -354,17 +356,17 @@ class SimulationManager(Resetable, object):
                     # TODO: add decorator for functions which need a started simulation!
 
                     ExceptionStopThread.run_fun_threaded_n_log_exception(scenario_name, cnt_nodes, path_qemu_image,
-                                                                                post_boot_script_string_io, interfaces,
-                                                                                link_quality_model, network_backend_name,
-                                                                             parallel=parallel, auto_stepping=auto_stepping,
-                                                                             target=self._start
+                                                                         post_boot_script_string_io, interfaces,
+                                                                         link_quality_model, network_backend_name,
+                                                                         parallel=parallel, auto_stepping=auto_stepping,
+                                                                         target=self._start
                                                                          ).start()
                 else:
                     return self._start(scenario_name, cnt_nodes, path_qemu_image, post_boot_script_string_io,
-                                                  interfaces,
-                                                  link_quality_model, network_backend_name,
-                                                  parallel=parallel, auto_stepping=auto_stepping,
-                                                  node_ids=node_ids)
+                                       interfaces,
+                                       link_quality_model, network_backend_name,
+                                       parallel=parallel, auto_stepping=auto_stepping,
+                                       node_ids=node_ids)
 
             return start()
 
@@ -409,7 +411,6 @@ class SimulationManager(Resetable, object):
 
             return fun(StringIO(cmd))
 
-
     @contextlib.contextmanager
     def try_simulation(self, scenario_name):
 
@@ -421,14 +422,13 @@ class SimulationManager(Resetable, object):
                 raise SimulationStateAlreadyStarted(
                     "Refusing to start a new scenario! Scenario '%s' is running! Stop the simulation first!" % scenario_name)
 
-
     # TODO: #15: DOC
     # TODO: #15: DOC: topology_mode_kwargs
     # TODO: this is the local non distributed version!
     def _start(self, scenario_name, cnt_nodes, path_qemu_image, post_boot_script_string_io, interfaces,
-              link_quality_model, network_backend_name,
-              parallel = True, auto_stepping = False,
-              node_ids = None):
+               link_quality_model, network_backend_name,
+               parallel=True, auto_stepping=False,
+               node_ids=None):
         '''
         Start the simulation (thread-safe)
 
@@ -472,23 +472,22 @@ class SimulationManager(Resetable, object):
             singletons.network_manager.init_for_next_scenario()
 
             self.logger.info("starting network backend ...")
-            self.network_backend.start(interfaces = Interfaces.Interfaces.factory_from_interface_names(scenario_config.get_interfaces()),
-                                       management_switch = config.is_management_switch_enabled())
-
+            self.network_backend.start(interfaces=Interfaces.Interfaces.factory_from_interface_names(scenario_config.get_interfaces()),
+                                       management_switch=config.is_management_switch_enabled())
 
             # start nodes
             node_starter = NodeStarter.NodeStarter(node_ids, network_backend_name)
             emulation_nodes, _ = node_starter.start_nodes(self.network_backend,
                                                           path_qemu_image, post_boot_script_string_io,
-                                                           parallel = parallel, interfaces = interfaces,
-                                                         )
+                                                          parallel=parallel, interfaces=interfaces,
+                                                          )
 
             # NOTE: first the EmulationNodes then the CentralHubs need to be created
             self.central_nodes_id_mapping = self.network_backend.create_n_connect_central_nodes(Interfaces.Interfaces.factory_from_interface_names(interfaces))
             self.pre_calculate_hubwifi_distance_matrix(emulation_nodes)
 
             # TODO: check!
-            self.nodes_id_mapping = {node.id : node for node in (emulation_nodes + list(self.central_nodes_id_mapping.values()))}
+            self.nodes_id_mapping = {node.id: node for node in (emulation_nodes + list(self.central_nodes_id_mapping.values()))}
 
             self.logger.debug("nodes: %s", pformat(self.nodes_id_mapping))
             self.logger.info("topology mode : '%s'", scenario_config.get_walk_model_name())
@@ -519,12 +518,11 @@ class SimulationManager(Resetable, object):
             if self.auto_stepping:
                 self.start_run_loop()
 
-
     def wait_until_network_topology_was_created(self):
         # NOTE: do not block inside lock!
         # TODO: REMOVE
         self.logger.info("waiting until RunLoop created the network topology ...")
-        while 1:
+        while True:
             self.logger.debug("is set?")
             if self.simulation_fully_started_and_network_connected_event.is_set():
                 break
@@ -541,7 +539,7 @@ class SimulationManager(Resetable, object):
         #     os.kill(pid, sig)
 
     def abort(self):
-        #with mylock(self.lock):
+        # with mylock(self.lock):
         if self._is_auto_stepping_and_running():
             self.logger.info("%s aborted ... ", self)
             # TODO: REMOVE
@@ -572,7 +570,7 @@ class SimulationManager(Resetable, object):
         return False
 
     ###############################################
-    ### Helpers
+    # Helpers
     ###############################################
 
     def set_hubwifi_on_connection_info(self, interface, connection_info):
@@ -589,7 +587,7 @@ class SimulationManager(Resetable, object):
             Whether we have a HubWifi interface
         '''
         # HubWiFi interface: do not change connections, but apply link quality
-        is_hubwifi_iface = type(interface) == HubWiFi
+        is_hubwifi_iface = isinstance(interface, HubWiFi)
         connection_info.is_central = is_hubwifi_iface
 
         return is_hubwifi_iface
@@ -636,7 +634,7 @@ class SimulationManager(Resetable, object):
         return DistanceMatrix.factory()(distance_matrix_diff)
 
     ###############################################
-    ### Simulation stepping
+    # Simulation stepping
     ###############################################
 
     def step(self, steps, distance_matrix=None):
@@ -925,7 +923,7 @@ class SimulationManager(Resetable, object):
                 link_quality_dict_initial.update(link_quality_dict)
 
                 link_quality_dict = link_quality_dict_initial
- 
+
             # NetworkBackendNotifications
             singletons.network_manager.before_link_quality_adjustment(
                 connection, link_quality_model_says_connected, link_quality_dict, self.network_backend,
@@ -965,6 +963,8 @@ class SimulationManager(Resetable, object):
         return 1
 
 # TODO: merge back in normal SimulationManager ?
+
+
 class DistributedModeSimulationManager(SimulationManager):
 
     '''
@@ -996,7 +996,7 @@ class DistributedModeSimulationManager(SimulationManager):
     def all_nodes_id_mapping(self):
         if not self._all_nodes_id_mapping:
             emu_node_type = NetworkBackends.get_current_network_backend_bootstrapper().emulation_node_type
-            self._all_nodes_id_mapping =  {_id: emu_node_type.factory(_id) for _id in range(1, scenario_config.get_number_of_nodes() + 1)}
+            self._all_nodes_id_mapping = {_id: emu_node_type.factory(_id) for _id in range(1, scenario_config.get_number_of_nodes() + 1)}
         return self._all_nodes_id_mapping
 
     # TODO: REMOVE ?
@@ -1031,6 +1031,7 @@ class DistributedModeSimulationManager(SimulationManager):
                 res[self.get_server_for_node(y)][(x, y)] = distance
 
             return res
+
 
 class SimulationManagerDistributedClient(DistributedModeSimulationManager):
 
@@ -1108,12 +1109,13 @@ class SimulationManagerDistributedClient(DistributedModeSimulationManager):
         '''
         return (emulation_node_x, interface_x, emulation_node_y, interface_y) if not self.is_local_node(emulation_node_x.id) else (emulation_node_y, interface_y, emulation_node_x, interface_x)
 
+
 class SimulationManagerDistributedCoordinator(DistributedModeSimulationManager):
 
     def _start(self, scenario_name, cnt_nodes, path_qemu_image, post_boot_script_string_io, interfaces,
-              link_quality_model, network_backend_name,
-              parallel=True, auto_stepping=False,
-              node_ids=None):
+               link_quality_model, network_backend_name,
+               parallel=True, auto_stepping=False,
+               node_ids=None):
 
         with self.try_simulation(scenario_config):
 

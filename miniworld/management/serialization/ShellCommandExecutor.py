@@ -8,6 +8,7 @@ from ordered_set import OrderedSet
 from miniworld.model.singletons.Resetable import Resetable
 from miniworld.model.singletons.Singletons import singletons
 
+
 class ShellCommandSerializer(object, Resetable):
 
     def __init__(self, name):
@@ -31,17 +32,18 @@ class ShellCommandSerializer(object, Resetable):
 
     def add_command(self, id, cmd, prefixes):
         prefixes = tuple(prefixes)
-        if not cmd in self.__uniq_shell_commands:
+        if cmd not in self.__uniq_shell_commands:
             shell_command_arg = (id, cmd, prefixes)
             self.__uniq_shell_commands.add(cmd)
             self.shell_command_args.add(shell_command_arg)
 
-    def run_commands(self, max_workers = None):
+    def run_commands(self, max_workers=None):
         if max_workers is None:
             max_workers = cpu_count()
 
         with futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-           executor.map(lambda x: singletons.self.shell_helper.run_shell(*x), self.shell_command_args)
+            executor.map(lambda x: singletons.self.shell_helper.run_shell(*x), self.shell_command_args)
+
 
 class ShellCommandExecutor(object, Resetable):
     '''
@@ -55,6 +57,7 @@ class ShellCommandExecutor(object, Resetable):
     >>> sce.run_commands()
 
     '''
+
     def __init__(self):
         '''
         Parameters
@@ -69,9 +72,9 @@ class ShellCommandExecutor(object, Resetable):
     def __str__(self):
         res = "Shell commands for network provisioning: "
 
-        for (event_order_id,serializable_event), parallelizable_command_list in self.get_serialized_commands_per_event_order():
+        for (event_order_id, serializable_event), parallelizable_command_list in self.get_serialized_commands_per_event_order():
             res += "\n#Parallelizable commands for: %s, %s:\n" % (event_order_id, serializable_event)
-            res +='\n'.join(parallelizable_command_list)
+            res += '\n'.join(parallelizable_command_list)
             res += "\n"
 
         return res
@@ -101,7 +104,6 @@ class ShellCommandExecutor(object, Resetable):
         for (event_order_id, serializable_event), parallelizable_command_list in self.get_serialized_commands_per_event_order():
             res.extend(parallelizable_command_list)
         return res
-
 
     def get_serialized_commands_per_event_order(self):
         '''
@@ -162,6 +164,7 @@ class ShellCommandExecutor(object, Resetable):
     def set_event_super_order(self, event_order_id_order):
         self.event_order_id_order = event_order_id_order
 
+
 class EventOrder(collections.UserDict):
     '''
     Attributes
@@ -177,8 +180,9 @@ class EventOrder(collections.UserDict):
             self.data[key] = ShellCommandSerializer(key)
             return self.data[key]
 
+
 if __name__ == '__main__':
-    sce=ShellCommandExecutor()
+    sce = ShellCommandExecutor()
     sce.set_event_order("bridge", ["bridge_add", "bridge_set_hub", "bridge_up", "bridge_add_if"])
     sce.add_command("bridge", "bridge_add_if", "e.g 1", "brctl addif br_foobar eth0", ["bridge"])
     sce.add_command("bridge", "bridge_add_if", "e.g 1", "brctl addif br_foobar eth1", ["bridge"])
@@ -190,6 +194,6 @@ if __name__ == '__main__':
 
     #sce.set_event_order_id_order(["bridge", "connection"])
     sce.set_event_super_order(["connection", "bridge"])
-    #sce.run_commands()
+    # sce.run_commands()
     print(list(sce.get_serialized_commands_per_event_order()))
-    #sce.run_commands()
+    # sce.run_commands()

@@ -11,6 +11,7 @@ from miniworld.model.network.linkqualitymodels.LinkQualityModelRange import Link
 from miniworld.model.singletons.Singletons import singletons
 __author__ = 'Nils Schmidt'
 
+
 def get_superclass_dynamic():
     assert scenario_config.is_network_backend_bridged_connection_mode_set()
 
@@ -18,6 +19,7 @@ def get_superclass_dynamic():
     import miniworld.model.network.backends.bridged.singledevice.ConnectionEbtables
 
     return miniworld.model.network.backends.bridged.singledevice.ConnectionEbtables.ConnectionEbtables() if scenario_config.is_network_backend_bridged_connection_mode_single() else miniworld.model.network.backends.bridged.multidevice.ConnectionMultiBridges.ConnectionMultiBridges()
+
 
 def ConnectionDummy():
     class ConnectionDummy(AbstractConnection):
@@ -49,16 +51,16 @@ def ConnectionDummy():
             return self.interface
 
         ###############################################
-        ### Subclassed methods of AbstractConnection
+        # Subclassed methods of AbstractConnection
         ###############################################
 
         # TODO: #54,#55, adjust doc
         # TODO: #54, #55: refactor!
-        def start(self, start_activated = False):
+        def start(self, start_activated=False):
             pass
 
         ###############################################
-        ### Link Quality
+        # Link Quality
         ###############################################
 
         # TODO: implement adjustment with netem!
@@ -195,7 +197,7 @@ def ConnectionDummy():
         ###############################################
 
         # TODO: RENAME!
-        def set_connection_state(self,up=True):
+        def set_connection_state(self, up=True):
             '''
 
             Parameters
@@ -249,8 +251,8 @@ def ConnectionDummy():
             self.cleanup_commands.add('tc qdisc del dev {dev_name} root'.format(dev_name=dev_name))
 
         ###############################################
-        ### Subclass for custom execution mode
-        ### like iproute2 vs. pyroute2. vs brctl
+        # Subclass for custom execution mode
+        # like iproute2 vs. pyroute2. vs brctl
         ###############################################
 
         # # TODO: #84 move to NetworkBackendBridgedMultiDevice
@@ -263,13 +265,13 @@ def ConnectionDummy():
         def tap_link_up_remote(self, tap_x, tap_y, up=True):
             raise NotImplementedError
 
-
     return ConnectionDummy
+
 
 def Connection():
     class Connection(
         # choose connection for connection mode
-        get_superclass_dynamic()):
+            get_superclass_dynamic()):
         pass
 
     return Connection

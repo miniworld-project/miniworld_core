@@ -12,6 +12,8 @@ from miniworld.model.singletons import Resetable
 __author__ = "Nils Schmidt"
 
 # TODO: #54,#55: DOC
+
+
 class Bridge(AbstractSwitch.AbstractSwitch, Resetable.Resetable):
 
     '''
@@ -27,10 +29,8 @@ class Bridge(AbstractSwitch.AbstractSwitch, Resetable.Resetable):
     http://lists.openwall.net/netdev/2015/06/16/44
     '''
 
-
-
     def run(self, cmd):
-        return singletons.shell_helper.run_shell(self.id, cmd, prefixes = ["bridge"])
+        return singletons.shell_helper.run_shell(self.id, cmd, prefixes=["bridge"])
 
     def __init__(self, id, interface):
         super(Bridge, self).__init__(id, interface)
@@ -43,12 +43,12 @@ class Bridge(AbstractSwitch.AbstractSwitch, Resetable.Resetable):
         return '%s(%s)' % (self.__class__.__name__, self.id)
 
     ###############################################
-    ### Subclass stuff
+    # Subclass stuff
     ###############################################
 
     # TODO: #54,#55: arguments needed for abstract start() ??
     # TODO: only allow starting once!
-    def _start(self, bridge_dev_name = None, switch = False):
+    def _start(self, bridge_dev_name=None, switch=False):
         '''
 
         Parameters
@@ -67,7 +67,7 @@ class Bridge(AbstractSwitch.AbstractSwitch, Resetable.Resetable):
 
     # TODO: #54,#55: exceptions around all networkbackends!
     # TODO: #54,#55: recognize or delete if_up
-    def add_if(self, _if_name, if_up = True):
+    def add_if(self, _if_name, if_up=True):
         '''
 
         Parameters
@@ -102,9 +102,8 @@ Interface dump:
 %s
 """ % (self, pformat(self.get_interfaces())), caused_by=e)
 
-
     @staticmethod
     def get_interfaces():
         # ip.by_name.keys()
-        #return [x.get_attr('IFLA_IFNAME') for x in ipr.get_links()]
+        # return [x.get_attr('IFLA_IFNAME') for x in ipr.get_links()]
         return ', '.join(netifaces.interfaces())

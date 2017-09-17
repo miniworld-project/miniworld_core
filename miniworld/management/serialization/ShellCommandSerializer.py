@@ -1,6 +1,6 @@
 import collections
 import math
-from collections import  OrderedDict
+from collections import OrderedDict
 from concurrent import futures
 
 from ordered_set import OrderedSet
@@ -60,6 +60,7 @@ class ShellCommandSerializer(Resetable):
     ...
 
     '''
+
     def __init__(self):
         '''
         Parameters
@@ -83,7 +84,7 @@ class ShellCommandSerializer(Resetable):
         self.group_order = OrderedSet()
 
     #########################################################
-    ### Add a command
+    # Add a command
     #########################################################
 
     def add_command(self, group, event,
@@ -111,7 +112,7 @@ class ShellCommandSerializer(Resetable):
         return cs
 
     #########################################################
-    ### Set and get group order
+    # Set and get group order
     #########################################################
 
     def add_group(self, event):
@@ -128,7 +129,7 @@ class ShellCommandSerializer(Resetable):
         self.group_order = OrderedSet(event_order_id_order)
 
     #########################################################
-    ### Set and get event order
+    # Set and get event order
     #########################################################
 
     def set_event_order(self, group, event_order):
@@ -149,7 +150,7 @@ class ShellCommandSerializer(Resetable):
         return self.mapping_group_to_event_order[group]
 
     #########################################################
-    ### Get the commands ...
+    # Get the commands ...
     #########################################################
 
     def get_commands_event(self, group, event):
@@ -178,7 +179,7 @@ class ShellCommandSerializer(Resetable):
         res = []
         for group in self.group_order:
             for event, command_store in self.mapping_group_to_event_order_to_cs[group].items():
-                res.extend( command_store.get_shell_commands() )
+                res.extend(command_store.get_shell_commands())
 
         return res
 
@@ -194,7 +195,7 @@ class ShellCommandSerializer(Resetable):
         return res
 
     #########################################################
-    ### Run the commands ...
+    # Run the commands ...
     #########################################################
 
     def run_commands(self, max_workers=None, events_order=None):
@@ -226,6 +227,7 @@ class ShellCommandSerializer(Resetable):
                 cs = self.mapping_group_to_event_order_to_cs[group][event]
                 cs.run_commands(max_workers=max_workers)
 
+
 class Group2EventMapping(collections.UserDict):
     '''
     Stores for each group a :py:class:`.Event2CommandStoreMapping` which defines an event oder for the group.
@@ -253,7 +255,6 @@ class Event2CommandStoreMapping(OrderedDict):
     ----------
     data : dict<str, CommandStore>
     '''
-
 
     def __getitem__(self, key):
         try:
@@ -319,7 +320,6 @@ class CommandStore(Resetable):
         commands = []
         MAX_ARG_STR_LEN = 131072
 
-
         shell_commands = self.get_shell_commands()
 
         # compress commands to one command with sh -c " cmd_1; ...; cmd_n"
@@ -344,12 +344,12 @@ class CommandStore(Resetable):
         '''
         prefixes = tuple(prefixes)
         # check for unique command
-        if not cmd in self.__uniq_shell_commands:
+        if cmd not in self.__uniq_shell_commands:
             shell_command_arg = (id, cmd, prefixes)
             self.__uniq_shell_commands.add(cmd)
             self.shell_command_args.add(shell_command_arg)
 
-    def run_commands(self, max_workers = None):
+    def run_commands(self, max_workers=None):
         '''
 
         Parameters

@@ -38,10 +38,12 @@ RPC_LOG_FILE_PATH = "rpc_server"
 # TODO: REMOVE
 _logger = None
 
+
 def to_json(fun):
     def wrap(*args, **kwargs):
         return json.dumps(fun(*args, **kwargs), indent=4)
     return wrap
+
 
 def logger():
     global _logger
@@ -78,6 +80,8 @@ def escape(c):
         return ''
 
 # TODO: DOC
+
+
 def assert_node_id_is_int(fun):
     '''
     Raises
@@ -220,7 +224,7 @@ class MiniWorldRPC:
         singletons.simulation_manager.raise_run_loop_exception()
 
     #########################################
-    ### Logs
+    # Logs
     #########################################
 
     @dec_requires_simulation_running
@@ -263,7 +267,7 @@ class MiniWorldRPC:
         return singletons.simulation_manager.movement_director.get_geo_json_for_nodes()
 
     #########################################
-    ### js stuff
+    # js stuff
     #########################################
 
     def get_is_arma(self):
@@ -281,7 +285,7 @@ class MiniWorldRPC:
         return res
 
     #########################################
-    ### Topology
+    # Topology
     #########################################
 
     # TODO: JSON DECORATOR
@@ -289,7 +293,7 @@ class MiniWorldRPC:
         return json.dumps(singletons.network_manager.create_vde_switch_topology(*args, **kwargs))
 
     #########################################
-    ### Progress Stats
+    # Progress Stats
     #########################################
 
     def get_progress(self, *args):
@@ -458,6 +462,7 @@ def mode_coordinator(args):
 
     return MiniWorldRPCServer, [], {}
 
+
 def main():
 
     root_parser = argparse.ArgumentParser(description='MiniWorld network emulator')
@@ -491,7 +496,6 @@ def main():
     miniworld.init_singletons()
     rpc_instance = rpc_type(*rpc_args, **rpc_kwargs)
 
-
     ip, port = "0.0.0.0", RPCUtil.get_rpc_port()
     log.info('running server at {}:{}'.format(ip, port))
     server = SimpleXMLRPCServer((ip, port),
@@ -518,6 +522,7 @@ def main():
     logger().info("rpc server running")
     log.debug("registered functions: %s", pprint.pformat(server.system_listMethods()))
     server.serve_forever()
+
 
 if __name__ == '__main__':
     main()

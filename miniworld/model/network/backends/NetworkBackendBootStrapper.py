@@ -19,13 +19,14 @@ class NetworkBackendBootStrapper(object):
     virtual_node_network_backend_type : type
     tunnel_type : type
     '''
+
     def __init__(self, network_backend_type,
                  emulation_node_network_backend_type, emulation_node_type,
                  virtualization_layer_type, connection_type, switch_type,
                  network_configurator_type,
                  virtual_node_network_backend_type=None,
-                 central_node_type = None, management_node_type = None,
-                 tunnel_type = None
+                 central_node_type=None, management_node_type=None,
+                 tunnel_type=None
                  ):
         # TODO: #54,#55: remove some types?
         self.network_backend_type = network_backend_type
@@ -39,4 +40,3 @@ class NetworkBackendBootStrapper(object):
         self.management_node_type = management_node_type
         self.virtual_node_network_backend_type = virtual_node_network_backend_type
         self.tunnel_type = tunnel_type
-

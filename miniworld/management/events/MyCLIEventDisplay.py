@@ -22,7 +22,7 @@ class MyCLIEventDisplay(CLIEventDisplay):
     def start_progress_thread(self):
 
         def loop():
-            while 1:
+            while True:
                 progress_dict = OrderedDict(self.event_system.get_progress(asc=False))
                 self.print_progress(progress_dict)
 

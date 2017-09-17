@@ -10,12 +10,15 @@ lock = threading.Lock()
 
 
 logger = None
+
+
 def get_ipdb_logger():
     global logger
     if logger is None:
         logger = get_logger("pyroute2")
         logger.addHandler(get_file_handler("pyroute2_history.txt"))
     return logger
+
 
 '''
 code from svinota for IPROUTE caching
@@ -33,6 +36,7 @@ cache['test']
 ip.link("set", index=cache['test'], state="up")
 ip.get_links()
 '''
+
 
 def NetworkBackendBridgedPyroute2():
 
@@ -55,29 +59,29 @@ def NetworkBackendBridgedPyroute2():
                 import pyroute2.netlink.rtnl as rtnl
                 GROUPS = rtnl.RTNLGRP_LINK | rtnl.RTNLGRP_NEIGH | rtnl.RTNLGRP_IPV4_IFADDR | rtnl.RTNLGRP_IPV6_IFADDR | rtnl.RTNLGRP_IPV4_ROUTE | rtnl.RTNLGRP_IPV6_ROUTE | rtnl.RTNLGRP_IPV4_MROUTE
                 GROUPS = \
-                         rtnl.RTNLGRP_LINK |\
-                         rtnl.RTNLGRP_NEIGH |\
-                         rtnl.RTNLGRP_IPV4_IFADDR |\
-                         rtnl.RTNLGRP_IPV4_ROUTE |\
-                         rtnl.RTNLGRP_IPV4_MROUTE |\
-                         rtnl.RTNLGRP_IPV6_IFADDR |\
-                         rtnl.RTNLGRP_IPV6_ROUTE |\
-                         rtnl.RTNLGRP_MPLS_ROUTE
+                    rtnl.RTNLGRP_LINK |\
+                    rtnl.RTNLGRP_NEIGH |\
+                    rtnl.RTNLGRP_IPV4_IFADDR |\
+                    rtnl.RTNLGRP_IPV4_ROUTE |\
+                    rtnl.RTNLGRP_IPV4_MROUTE |\
+                    rtnl.RTNLGRP_IPV6_IFADDR |\
+                    rtnl.RTNLGRP_IPV6_ROUTE |\
+                    rtnl.RTNLGRP_MPLS_ROUTE
 
-                         #rtnl.RTNLGRP_NONE |\
-                         #rtnl.RTNLGRP_NOTIFY |\
-                         #rtnl.RTNLGRP_IPV4_RULE |\
-                         #rtnl.RTNLGRP_DECnet_IFADDR |\
-                         #rtnl.RTNLGRP_DECnet_ROUTE |\
-                         #rtnl.RTNLGRP_DECnet_RULE |\
-                         # rtnl.RTNLGRP_IPV6_MROUTE |\
+                # rtnl.RTNLGRP_NONE |\
+                # rtnl.RTNLGRP_NOTIFY |\
+                # rtnl.RTNLGRP_IPV4_RULE |\
+                # rtnl.RTNLGRP_DECnet_IFADDR |\
+                # rtnl.RTNLGRP_DECnet_ROUTE |\
+                # rtnl.RTNLGRP_DECnet_RULE |\
+                # rtnl.RTNLGRP_IPV6_MROUTE |\
 
-                         # rtnl.RTNLGRP_IPV6_IFINFO |\
-                         # rtnl.RTNLGRP_IPV6_PREFIX |\
-                         # rtnl.RTNLGRP_IPV6_RULE | \
-                         #rtnl.RTNLGRP_NOP2 |\
-                         #rtnl.RTNLGRP_NOP4 |\
-                         #rtnl.RTNLGRP_TC |\
+                # rtnl.RTNLGRP_IPV6_IFINFO |\
+                # rtnl.RTNLGRP_IPV6_PREFIX |\
+                # rtnl.RTNLGRP_IPV6_RULE | \
+                # rtnl.RTNLGRP_NOP2 |\
+                # rtnl.RTNLGRP_NOP4 |\
+                # rtnl.RTNLGRP_TC |\
 
 #.*_ROUTE
 # AttributeError: 'IPDB' object has no attribute 'routes'
@@ -125,7 +129,7 @@ def NetworkBackendBridgedPyroute2():
                 except Exception as e:
                     try:
                         log.critical(e.__dict__)
-                    except:
+                    except BaseException:
                         pass
 
                     # try:
@@ -189,7 +193,7 @@ def NetworkBackendBridgedPyroute2IPRoute():
             self.cache = dict([(x.get_attr('IFLA_IFNAME'), x['index']) for x in self.ipr.get_links()])
 
         def get_iface_idx(self, iface):
-            #return self.ipr.link_lookup(ifname=iface)[0]
+            # return self.ipr.link_lookup(ifname=iface)[0]
             return self.cache[iface]
 
         def do_batch(self):
@@ -214,19 +218,18 @@ def NetworkBackendBridgedPyroute2IPRoute():
             for bridge, links in self.p_links_add_bridge.items():
                 for link in set(links):
                     self.ipb.link('set', index=self.get_iface_idx(link), master=self.get_iface_idx(bridge))
-            #self.do_batch()
+            # self.do_batch()
 
             for link in self.p_links_up:
                 self.ipb.link('set', index=self.get_iface_idx(link), state='up')
             for link in self.p_links_add_bridge.keys():
                 self.ipb.link('set', index=self.get_iface_idx(link), state='up')
 
-            #self.do_batch()
+            # self.do_batch()
             for link in self.p_links_down:
                 self.ipb.link('set', index=self.get_iface_idx(link), state='down')
             self.do_batch()
 
             super(NetworkBackendBridgedPyroute2IPRoute, self).do_network_topology_change()
-
 
     return NetworkBackendBridgedPyroute2IPRoute

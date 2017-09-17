@@ -8,6 +8,7 @@ __email__ = "uni at lampep.de"
 
 from miniworld.model.spatial.ArmaNodes import ArmaNodes
 
+
 class MovementDirectorArma(MovementDirectorAbstract):
     '''
     Attributes
@@ -15,10 +16,10 @@ class MovementDirectorArma(MovementDirectorAbstract):
     node_count :                                int
     nodes :                                     ArmaNodes
     '''
+
     def __init__(self, node_count, file_path):
         self.node_count = node_count
         self.nodes = ArmaNodes(self.node_count, file_path)
-
 
     def get_distances_from_nodes(self):
         return self.nodes.get_distance_matrix()

@@ -9,6 +9,7 @@ __author__ = 'Nils Schmidt'
 
 NODE_MAC_PREFIX = "%02x:%06x"
 
+
 @total_ordering
 class Interface(TemplateContentProvider):
 
@@ -32,7 +33,7 @@ class Interface(TemplateContentProvider):
     ValueError
     '''
 
-    def __init__(self, nr_host_interface = 1):
+    def __init__(self, nr_host_interface=1):
 
         if not nr_host_interface >= 1:
             raise ValueError("The number of the interface has to be greater 0!")
@@ -88,7 +89,7 @@ class Interface(TemplateContentProvider):
         return self.get_ip_network()[-2]
 
     def get_ip_network(self):
-            return subnet_for_type()[type(self)]
+        return subnet_for_type()[type(self)]
 
     def get_mac(self, node_id):
         '''
@@ -128,15 +129,15 @@ class Interface(TemplateContentProvider):
             return s % self.node_class_name
 
         return {
-            f("ipv4_addr_%s_pred") : self.get_ip_pred(node_id),
-            f("ipv4_addr_%s_suc") : self.get_ip_suc(node_id),
-            f("ipv4_addr_%s") : self.get_ip(node_id),
-            f("ipv4_network_%s") : self.get_network(),
-            f("ipv4_netmask_%s") : self.get_netmask(),
+            f("ipv4_addr_%s_pred"): self.get_ip_pred(node_id),
+            f("ipv4_addr_%s_suc"): self.get_ip_suc(node_id),
+            f("ipv4_addr_%s"): self.get_ip(node_id),
+            f("ipv4_network_%s"): self.get_network(),
+            f("ipv4_netmask_%s"): self.get_netmask(),
         }
 
     #####################################################
-    ### Automatically implemented through `get_ip`
+    # Automatically implemented through `get_ip`
     #####################################################
 
     def get_ip_pred(self, node_id):
@@ -146,6 +147,8 @@ class Interface(TemplateContentProvider):
         return self.get_ip(node_id + 1)
 
 # TODO: DOC
+
+
 class HubWiFi(Interface):
 
     node_class = 6
@@ -153,6 +156,7 @@ class HubWiFi(Interface):
 
     def __init__(self, *args, **kwargs):
         super(HubWiFi, self).__init__(*args, **kwargs)
+
 
 class Management(Interface):
 
@@ -162,6 +166,7 @@ class Management(Interface):
     def __init__(self, *args, **kwargs):
         super(Management, self).__init__(*args, **kwargs)
 
+
 class AP(Interface):
 
     node_class = 1
@@ -169,6 +174,7 @@ class AP(Interface):
 
     def __init__(self, *args, **kwargs):
         super(AP, self).__init__(*args, **kwargs)
+
 
 class Mesh(Interface):
 
@@ -178,6 +184,7 @@ class Mesh(Interface):
     def __init__(self, *args, **kwargs):
         super(Mesh, self).__init__(*args, **kwargs)
 
+
 class ADHoc(Interface):
 
     node_class = 3
@@ -186,6 +193,7 @@ class ADHoc(Interface):
     def __init__(self, *args, **kwargs):
         super(ADHoc, self).__init__(*args, **kwargs)
 
+
 class Bluetooth(Interface):
 
     node_class = 4
@@ -193,6 +201,7 @@ class Bluetooth(Interface):
 
     def __init__(self, *args, **kwargs):
         super(Bluetooth, self).__init__(*args, **kwargs)
+
 
 class WifiDirect(Interface):
 
@@ -204,10 +213,12 @@ class WifiDirect(Interface):
 
 
 def is_management_interface(interface):
-    return type(interface) == Management
+    return isinstance(interface, Management)
+
 
 def is_hubwifi_interface(interface):
-    return type(interface) == HubWiFi
+    return isinstance(interface, HubWiFi)
+
 
 # all interface types
 INTERFACE_ALL_CLASSES_TYPES = {
@@ -224,6 +235,7 @@ INTERFACE_ALL_CLASSES_TYPES = {
 
 subnets = None
 static_lock = Lock()
+
 
 def subnet_for_type():
     '''
@@ -244,6 +256,7 @@ def subnet_for_type():
             subnets = dict(zip(INTERFACE_ALL_CLASSES_TYPES, subnets))
             subnets[Management] = ipaddress.ip_network(u"172.21.0.0/16")
         return subnets
+
 
 # all interfaces which are treated equally
 # the missing ones need sometimes special treatment

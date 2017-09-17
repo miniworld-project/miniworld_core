@@ -20,17 +20,17 @@ class EventProgressStore(collections.UserDict, EventSystemStats):
         self.data = OrderedDict()
 
     #########################################
-    ### Magic Methods
+    # Magic Methods
     #########################################
 
     def __getitem__(self, item):
-        if not item in self.data:
+        if item not in self.data:
             self.data[item] = 0.0
 
         return self.data[item]
 
     #########################################
-    ### EventSystemStats
+    # EventSystemStats
     #########################################
 
     def get_average_progress(self):

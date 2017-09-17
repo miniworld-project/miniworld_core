@@ -16,6 +16,8 @@ NETWORK_BACKENDS = {
 }
 
 # TODO: #54,#55, DOC
+
+
 def get_network_backend_bootstrapper_for_string(network_backend_name):
     '''
 
@@ -83,8 +85,8 @@ def get_network_backend_bootstrapper_for_string(network_backend_name):
         else:
             raise ValueError("Execution mode for backend '%s' unknown!" % NETWORK_BACKENDS_BRIDGED)
 
-
     raise NetworkBackendUnknown("The network backend  '%s' is unknown! Available backends: %s." % (network_backend_name, ', '.join(NETWORK_BACKENDS)))
+
 
 def _boot_strapper_backend_bridged_for_execution_mode(network_backend, connection, bridge, tunnel_type=None):
     '''
@@ -119,6 +121,8 @@ def _boot_strapper_backend_bridged_for_execution_mode(network_backend, connectio
                                       tunnel_type=tunnel_type)
 
 # TODO: #54: DOC,
+
+
 def get_current_network_backend_bootstrapper():
     '''
     Get a copy of the current :py:class:`.NetworkBackend`.

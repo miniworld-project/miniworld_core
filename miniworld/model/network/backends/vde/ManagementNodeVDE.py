@@ -6,6 +6,7 @@ from miniworld.Config import config
 from miniworld.model.network.interface import Interfaces
 from miniworld.model.network.interface.Interface import Management
 
+
 class ManagementNodeVDE(ManagementNode):
 
     def __init__(self, network_backend):
@@ -13,7 +14,7 @@ class ManagementNodeVDE(ManagementNode):
         id = config.get_bridge_tap_name()
         super(ManagementNode, self).__init__(id, network_backend, interfaces)
 
-    def _start(self, switch = True, bridge_dev_name=None):
+    def _start(self, switch=True, bridge_dev_name=None):
         '''
         1. Start hub/switch
         2. Color interfaces (if switch wants so)
@@ -28,13 +29,11 @@ class ManagementNodeVDE(ManagementNode):
         NetworkManagementSwitchBridgeNotExisting
         '''
 
-
         if bridge_dev_name is None:
             bridge_dev_name = config.get_bridge_tap_name()
 
         log.info("starting management node/switch ...")
         super(ManagementNodeVDE, self)._start(switch=switch, bridge_dev_name=bridge_dev_name)
-
 
         # start and wait for switches
         #self.switch.start(bridge_dev_name = self.bridge_name, switch = switch)

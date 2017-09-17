@@ -28,16 +28,19 @@ WIREFILTER_PROMPT = "VDEwf$"
 _logger = None
 
 # TODO: LOGGERS FOR REPL
+
+
 def logger():
     global _logger
     if _logger is None:
-        _logger = get_logger("WireFilter", handlers = [])
+        _logger = get_logger("WireFilter", handlers=[])
         _logger.addHandler(logging.FileHandler(PathUtil.get_log_file_path("wirefilter.txt")))
     return _logger
 
+
 def ensure_successful(fun, *args, **kwargs):
     kwargs['name'] = 'Wirefilter'
-    kwargs['hiccup_funs'] = [lambda x : "1000 Success" in x]
+    kwargs['hiccup_funs'] = [lambda x: "1000 Success" in x]
     # we have only hiccup if the function returns False
     kwargs['negate'] = True
     return VDESwitch.fix_hiccup(fun, *args, **kwargs)
@@ -73,11 +76,11 @@ class Wirefilter(AbstractConnection, ShellCmdWrapper, REPLable):
         self.log_path_commands = PathUtil.get_log_file_path("wirefilter_commands_%s.txt" % self.id)
 
     ###############################################
-    ### Subclassed methods
+    # Subclassed methods
     ###############################################
 
     # TODO: #54,#55, adjust doc
-    def start(self, start_activated = False):
+    def start(self, start_activated=False):
         '''
         Start the wirefilter and put the plug on `port_a` on the first node,
          on `port_b` on the second.
@@ -116,18 +119,18 @@ class Wirefilter(AbstractConnection, ShellCmdWrapper, REPLable):
 
         wirefilter_command = CMD_TEMPLATE_WIREFILTER.format(
             # connect on last port so we know the port number (necessary to move to a specific VLAN)
-            port_num_a = port_a,
-            port_num_b = port_b,
-            vde_switch_sock_path_a = VDESwitch.VDESwitch.get_vde_switch_sock_path(self.emulation_node_x_idid),
-            vde_switch_sock_path_b = VDESwitch.VDESwitch.get_vde_switch_sock_path(self.emulation_node_y_idid),
-            wirefilter_uds_socket_path = self.get_wirefilter_uds_socket_path(self.emulation_node_x.id, self.emulation_node_y.id, self.interface_x, self.interface_y),
-            wirefilter_params = wirefilter_params
-            )
+            port_num_a=port_a,
+            port_num_b=port_b,
+            vde_switch_sock_path_a=VDESwitch.VDESwitch.get_vde_switch_sock_path(self.emulation_node_x_idid),
+            vde_switch_sock_path_b=VDESwitch.VDESwitch.get_vde_switch_sock_path(self.emulation_node_y_idid),
+            wirefilter_uds_socket_path=self.get_wirefilter_uds_socket_path(self.emulation_node_x.id, self.emulation_node_y.id, self.interface_x, self.interface_y),
+            wirefilter_params=wirefilter_params
+        )
 
         self.process = singletons.shell_helper.run_shell_async(
             str((node_a_id, node_b_id)),
             wirefilter_command,
-            prefixes = [self.shell_prefix],
+            prefixes=[self.shell_prefix],
             # TODO: DOC
             supervise_process=False
         )
@@ -136,8 +139,8 @@ class Wirefilter(AbstractConnection, ShellCmdWrapper, REPLable):
         self.wait_until_uds_reachable()
         # TODO: #54,#55
         # move port to specific VLAN on both sides of the switch
-        vde_switch_x.move_interface_to_vlan(port = port_a, interface = self.interface_x)
-        vde_switch_y.move_interface_to_vlan(port = port_b, interface = self.interface_y)
+        vde_switch_x.move_interface_to_vlan(port=port_a, interface=self.interface_x)
+        vde_switch_y.move_interface_to_vlan(port=port_b, interface=self.interface_y)
 
         return True
 
@@ -157,10 +160,10 @@ class Wirefilter(AbstractConnection, ShellCmdWrapper, REPLable):
 
         commands = []
         if bandwidth is not None:
-            commands.append( self.fmt_cmd_bandwidth(bandwidth) )
+            commands.append(self.fmt_cmd_bandwidth(bandwidth))
             singletons.network_manager.set_bandwidth(self.emulation_node_x, self.emulation_node_y, bandwidth)
         if loss is not None:
-            commands.append( self.fmt_cmd_loss(loss) )
+            commands.append(self.fmt_cmd_loss(loss))
 
         # TODO: # 15: REMOVE CONNECTIONS OR JUST SET INFINITE LOSS?
         # TODO:
@@ -173,9 +176,8 @@ class Wirefilter(AbstractConnection, ShellCmdWrapper, REPLable):
         self.nlog.info("adjusting link quality: %s", commands)
         ensure_successful(self.run_commands_eager, StringIO(commands))
 
-
     ###############################################
-    ### REPLable
+    # REPLable
     ###############################################
 
     def run_commands(self, *args, **kwargs):
@@ -185,12 +187,12 @@ class Wirefilter(AbstractConnection, ShellCmdWrapper, REPLable):
             'brief_logger': self.nlog,
             'verbose_logger': self.verbose_logger,
 
-            'shell_prompt' : re.escape(WIREFILTER_PROMPT)
+            'shell_prompt': re.escape(WIREFILTER_PROMPT)
         })
         return REPLable.run_commands(self, *args, **kwargs)
 
     ###############################################
-    ### Link Quality Adjustment
+    # Link Quality Adjustment
     ###############################################
 
     def fmt_cmd_bandwidth(self, bandwidth):
@@ -200,7 +202,7 @@ class Wirefilter(AbstractConnection, ShellCmdWrapper, REPLable):
         return "loss %s" % loss
 
     ###############################################
-    ### Other
+    # Other
     ###############################################
 
     # TODO: occ

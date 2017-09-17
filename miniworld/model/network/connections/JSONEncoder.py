@@ -22,10 +22,10 @@ class ConnectionEncoder(json.JSONEncoder):
 
         if isinstance(obj, (dict, UserDict)):
             items = list(map(self.default, obj.items()))
-                # escape keys -> string
+            # escape keys -> string
             if escape_keys:
-                items = list(map(lambda x_y : (str(x_y[0]), x_y[1]), items))
-            res = OrderedDict( items )
+                items = list(map(lambda x_y: (str(x_y[0]), x_y[1]), items))
+            res = OrderedDict(items)
             # print p(res)
             return res
 
@@ -67,6 +67,7 @@ class ConnectionEncoder(json.JSONEncoder):
         else:
             return obj
 
+
 class ConnectionDecoder(json.JSONDecoder):
     def __init__(self, *args, **kwargs):
         super(ConnectionDecoder, self).__init__(*args, **kwargs)
@@ -84,16 +85,16 @@ class ConnectionDecoder(json.JSONDecoder):
         return self.my_decode(obj)
 
     def decode(self, o):
-        return self.my_decode( super(ConnectionDecoder, self).decode(o) )
+        return self.my_decode(super(ConnectionDecoder, self).decode(o))
 
     def my_decode(self, obj, escape_keys=False):
 
         if isinstance(obj, (dict, UserDict)):
             items = list(map(self.my_decode, obj.items()))
-            res = dict( items )
+            res = dict(items)
             return res
         elif isinstance(obj, tuple):
-            return list(map(lambda x : self.my_decode(x, escape_keys=True), obj))
+            return list(map(lambda x: self.my_decode(x, escape_keys=True), obj))
         elif isinstance(obj, (str, unicode)):
             if escape_keys:
                 # e.g.  u'(10, 15)' => ('10', '15')
@@ -162,5 +163,5 @@ if __name__ == '__main__':
     }'''
 
     print(encoded_json)
-    decoded_json = json.loads(encoded_json, cls = ConnectionDecoder)
+    decoded_json = json.loads(encoded_json, cls=ConnectionDecoder)
     print(decoded_json)

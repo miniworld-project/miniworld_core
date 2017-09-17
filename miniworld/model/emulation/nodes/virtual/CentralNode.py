@@ -13,7 +13,7 @@ class CentralNode(VirtualNode.VirtualNode):
 
     cnt_instances = 0
 
-    def __init__(self, network_backend_bootstrapper, id = None):
+    def __init__(self, network_backend_bootstrapper, id=None):
         '''
 
         Parameters
@@ -26,7 +26,7 @@ class CentralNode(VirtualNode.VirtualNode):
         if id is None:
             id = self.gen_bridge_node_id()
 
-        super(CentralNode, self).__init__(id, network_backend_bootstrapper, interfaces = interfaces)
+        super(CentralNode, self).__init__(id, network_backend_bootstrapper, interfaces=interfaces)
         CentralNode.cnt_instances += 1
 
     def init_connection_info(self):
@@ -50,7 +50,8 @@ class CentralNode(VirtualNode.VirtualNode):
 
 
 def is_central_node_interface(interface):
-    return type(interface) == HubWiFi
+    return isinstance(interface, HubWiFi)
+
 
 def is_central_node(node):
     return isinstance(node, CentralNode)

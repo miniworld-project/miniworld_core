@@ -5,8 +5,9 @@ from miniworld.model.singletons.Singletons import singletons
 __author__ = "Patrick Lampe"
 __email__ = "uni at lampep.de"
 
+
 class Road:
-    ''' 
+    '''
     Parameter
     ---------
     singleton :     MovmentPattern
@@ -17,7 +18,7 @@ class Road:
     bike_reverse :  boolean
     bike_quality :  int
     foot_quality :  int
-    
+
     Attributes
     ----------
     singleton :     MovmentPattern
@@ -29,6 +30,7 @@ class Road:
     bike_quality :  int
     foot_quality :  int
     '''
+
     def __init__(self, start_id, end_id, car_reverse, car_quality, bike_reverse, bike_quality, foot_quality):
         self.start_point = singletons.spatial_singleton.get_node_for_id(start_id)
         self.end_point = singletons.spatial_singleton.get_node_for_id(end_id)
@@ -48,7 +50,7 @@ class Road:
         boolean
         '''
         return self.car_reverse
-    
+
     def is_reverse_drivable_by_bike(self):
         '''
         Returns
@@ -56,31 +58,31 @@ class Road:
         boolean
         '''
         return self.bike_reverse
-        
+
     def has_more_or_equal_qualitaty_for_car_then(self, quality):
         '''
         Parameter
         ---------
         quality : int
-        
+
         Returns
         -------
         boolean
         '''
         return self.car_quality >= quality
-        
+
     def has_more_or_equal_qualitaty_for_bike_then(self, quality):
         '''
         Parameter
         ---------
         quality : int
-        
+
         Returns
         -------
         boolean
         '''
         return self.bike_quality >= quality
-        
+
     def get_start_point(self):
         '''
         Returns
@@ -88,7 +90,7 @@ class Road:
         MapNode
         '''
         return self.start_point
-    
+
     def get_end_point(self):
         '''
         Returns

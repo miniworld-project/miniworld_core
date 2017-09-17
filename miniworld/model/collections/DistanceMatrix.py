@@ -2,6 +2,7 @@
 from collections import UserDict
 from collections import defaultdict
 
+
 def transform_distance_matrix(distance_matrix):
     '''
 
@@ -15,8 +16,9 @@ def transform_distance_matrix(distance_matrix):
     '''
     res = defaultdict(list)
     for (x, y), distance in distance_matrix.items():
-        res[x].append( (y, distance) )
+        res[x].append((y, distance))
     return res
+
 
 def detransform_distance_matrix(distance_matrix):
     '''
@@ -35,8 +37,10 @@ def detransform_distance_matrix(distance_matrix):
             res[(int(x), y)] = distance
     return factory()(res)
 
+
 def factory():
     return DistanceMatrixDict
+
 
 class DistanceMatrix:
 
@@ -53,7 +57,7 @@ class DistanceMatrix:
         pass
 
     def filter_empty(self):
-        return factory()(list(filter(lambda x:x[1] >= 0, self.data.items())))
+        return factory()(list(filter(lambda x: x[1] >= 0, self.data.items())))
 
     @staticmethod
     def factory():
@@ -85,6 +89,7 @@ class DistanceMatrix:
     def get_distance(self, x, y):
         raise NotImplementedError
 
+
 class DistanceMatrixDict(UserDict, DistanceMatrix):
 
     UNLIMITED_DISTANCE = -1
@@ -101,6 +106,7 @@ class DistanceMatrixDict(UserDict, DistanceMatrix):
     def get_distance(self, x, y):
         return self.data[self.get_key((x, y))]
 
+
 class DistanceMatrixNumpy(DistanceMatrix):
 
     def __init__(self):
@@ -116,17 +122,17 @@ class DistanceMatrixNumpy(DistanceMatrix):
         pass
 
     def get_distance(self, x, y):
-        return self.data[self.get_key(x,y)]
+        return self.data[self.get_key(x, y)]
+
 
 if __name__ == '__main__':
-    x = {(1,2) : 1, (2,1) : 3}
+    x = {(1, 2): 1, (2, 1): 3}
     print(x)
     x = transform_distance_matrix(x)
     print(x)
     x = detransform_distance_matrix(x)
     print(x)
 
-
     x = DistanceMatrix()
-    x.set_distance(1, 2 ,1)
+    x.set_distance(1, 2, 1)
     x.set_distance(2, 1, 3)

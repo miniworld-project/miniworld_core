@@ -74,10 +74,12 @@ def create_runner(tmpdir_factory, request, config_path):
         def run_mwcli_command(custom_args: List[str], *args, **kwargs) -> bytes:
             return subprocess.check_output(['mwcli', '--addr', os.environ.get('MW_SERVER_ADRR', '127.0.0.1')] + custom_args,
                                            *args, **kwargs)
+
         @staticmethod
         def run_mwcli_command_silently(custom_args: List[str], *args, **kwargs) -> bytes:
             return subprocess.check_call(['mwcli', '--addr', os.environ.get('MW_SERVER_ADRR', '127.0.0.1')] + custom_args,
-                                           *args, stdout=devnull, stderr=devnull, **kwargs)
+                                         *args, stdout=devnull, stderr=devnull, **kwargs)
+
         @staticmethod
         def run_mwcli_command_json_result(custom_args: List[str]) -> Dict:
             return json.loads(strip_output(Runner.run_mwcli_command(custom_args).decode()))
@@ -164,7 +166,7 @@ def create_runner(tmpdir_factory, request, config_path):
         @staticmethod
         def connect_to_server():
             print('connecting to server')
-            while 1:
+            while True:
                 try:
                     Runner.run_mwcli_command_silently(['ping'])
                     sys.stderr.write('.')

@@ -33,9 +33,8 @@ class EventSystem(collections.UserDict, EventSystemStats, Resetable.Resetable):
         self.lock = Lock()
         self.events.extend(events)
 
-
     #########################################
-    ### Resetable
+    # Resetable
     #########################################
 
     def reset(self):
@@ -44,17 +43,17 @@ class EventSystem(collections.UserDict, EventSystemStats, Resetable.Resetable):
         self.ready = threading.Event()
 
     #########################################
-    ### Magic methods
+    # Magic methods
     #########################################
 
     def __getitem__(self, item):
-        if not item in self.data:
+        if item not in self.data:
             self.data[item] = EventProgressStore()
 
         return self.data[item]
 
     #########################################
-    ### Context Managers
+    # Context Managers
     #########################################
 
     @contextmanager
@@ -112,7 +111,6 @@ class EventSystem(collections.UserDict, EventSystemStats, Resetable.Resetable):
         '''
         return self.event_init(event_name, init_ids=[], finish_ids=[])
 
-
     def event_no_init(self, event_name, finish_ids=None):
         '''
         Same as :py:meth:`.event` but do no init.
@@ -120,7 +118,7 @@ class EventSystem(collections.UserDict, EventSystemStats, Resetable.Resetable):
         return self.event_init(event_name, init_ids=[], finish_ids=finish_ids)
 
     #########################################
-    ### EventSystemStats
+    # EventSystemStats
     #########################################
 
     def get_average_complete_progress(self):
@@ -167,7 +165,7 @@ class EventSystem(collections.UserDict, EventSystemStats, Resetable.Resetable):
         return 0.0
 
     #########################################
-    ### Event-Progress Init
+    # Event-Progress Init
     #########################################
 
     def init_events(self, events):
@@ -190,7 +188,7 @@ class EventSystem(collections.UserDict, EventSystemStats, Resetable.Resetable):
             self.update_event(event, 0.0, node_ids=[node_id])
 
     #########################################
-    ### Event-Progress Getter
+    # Event-Progress Getter
     #########################################
 
     def get_progress(self, asc=True):
@@ -252,7 +250,7 @@ class EventSystem(collections.UserDict, EventSystemStats, Resetable.Resetable):
         return self.events
 
     #########################################
-    ### Event updating
+    # Event updating
     #########################################
 
     def update_event(self, event, progress, add=False, node_ids=None, all_nodes=False):
@@ -310,9 +308,10 @@ class EventSystem(collections.UserDict, EventSystemStats, Resetable.Resetable):
 
         with self.lock:
             for node_id in node_ids:
-                updated_progress.append( update(node_id) )
+                updated_progress.append(update(node_id))
 
         return updated_progress
+
 
 if __name__ == '__main__':
     from miniworld.model.events.EventSystem import EventSystem
@@ -323,7 +322,7 @@ if __name__ == '__main__':
     es = EventSystem([MyEventSystem.EVENT_VM_BOOT])
     # instead of constructor: es.events.add(es.EVENT_VM_BOOT)
     #cli_display = MyCLIEventDisplay(es)
-    #cli_display.start_progress_thread()
+    # cli_display.start_progress_thread()
 
     es.ready.set()
     with es.event_init(MyEventSystem.EVENT_VM_BOOT) as event_boot:

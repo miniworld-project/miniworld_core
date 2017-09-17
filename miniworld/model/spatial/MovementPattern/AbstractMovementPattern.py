@@ -6,6 +6,7 @@ __email__ = "uni at lampep.de"
 
 from miniworld.model.singletons.Singletons import singletons
 
+
 class AbstractMovementPattern:
     def __init__(self):
         self.current_map_node = self.get_start_point()
@@ -29,7 +30,6 @@ class AbstractMovementPattern:
         Point
         """
         return singletons.spatial_singleton.get_random_point()
-
 
     def get_name(self):
         """

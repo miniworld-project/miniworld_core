@@ -9,7 +9,7 @@ class NetworkBackendNotifications:
     '''
 
     #########################################
-    ### Per step
+    # Per step
     #########################################
 
     def before_simulation_step(self, simulation_manager, step_cnt, network_backend, emulation_nodes, **kwargs):
@@ -39,7 +39,6 @@ class NetworkBackendNotifications:
         step_cnt
         '''
         pass
-
 
     def before_distance_matrix_changed(self, simulation_manager, network_backend, changed_distance_matrix,
                                        full_distance_matrix, **kwargs):
@@ -79,9 +78,8 @@ class NetworkBackendNotifications:
         '''
         pass
 
-
     #########################################
-    ### Per node
+    # Per node
     #########################################
 
     def before_link_initial_start(self, network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info,
@@ -139,7 +137,6 @@ class NetworkBackendNotifications:
         '''
         pass
 
-
     def before_link_quality_adjustment(self, connection, link_quality_still_connected, link_quality_dict,
                                        network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y,
                                        connection_info,
@@ -187,20 +184,18 @@ class NetworkBackendNotifications:
         '''
         pass
 
-
     def link_up(self, connection, link_quality_dict,
-                    network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info,
-                    **kwargs):
+                network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info,
+                **kwargs):
         pass
 
     def link_down(self, connection, link_quality_dict,
-                    network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info,
-                    **kwargs):
+                  network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info,
+                  **kwargs):
         pass
 
-
         #########################################
-        ### Distributed Mode
+        # Distributed Mode
         #########################################
 
     # TODO: PASS CONNECTION OBJECTS?
@@ -221,6 +216,7 @@ class NetworkBackendNotifications:
         '''
         pass
 
+
 class ConnectionInfo:
 
     '''
@@ -230,6 +226,7 @@ class ConnectionInfo:
     is_central : bool, optional (default is False)
     is_mgmt : bool, optional (default is False)
     '''
+
     def __init__(self, is_remote_conn=False, is_central=False, is_mgmt=False):
         self.is_remote_conn = is_remote_conn
         self.is_central = is_central

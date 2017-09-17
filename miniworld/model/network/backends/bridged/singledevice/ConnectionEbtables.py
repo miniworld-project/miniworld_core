@@ -44,7 +44,6 @@ def ConnectionEbtables():
 
         '''
 
-
         policy_accept = "ACCEPT"
         policy_drop = "DROP"
         ebtables_cmd = "ebtables --concurrent"
@@ -59,7 +58,7 @@ def ConnectionEbtables():
                                                                                   atomic_file=atomic_file_str)
 
         ebtable_cmd_atomic_commit = "{ebtables} {atomic_file} --atomic-commit".format(ebtables=ebtables_cmd,
-                                                                                  atomic_file=atomic_file_str)
+                                                                                      atomic_file=atomic_file_str)
 
         path_connection_log = PathUtil.get_log_file_path("ebtable_connections.txt")
 
@@ -79,10 +78,10 @@ def ConnectionEbtables():
         # TODO: we should use hosts rather than interfaces here!
         # dict<(str, str>, int>
         # for each connection a connection identifier
-        connections = defaultdict(lambda : ConnectionEbtables.inc_counter())
+        connections = defaultdict(lambda: ConnectionEbtables.inc_counter())
 
         #########################################
-        ### Overwrite connection handling methods
+        # Overwrite connection handling methods
         #########################################
 
         # TODO: #84:
@@ -113,7 +112,6 @@ def ConnectionEbtables():
         @staticmethod
         def run_shell(cmd):
             return singletons.shell_helper.run_shell(ConnectionEbtables.__class__.__name__, cmd, prefixes=["ebtables"])
-
 
         @staticmethod
         def set_ebtables_forward_policy_accept():
@@ -156,7 +154,7 @@ def ConnectionEbtables():
 
         @staticmethod
         def get_ebtables_atomix_prefix():
-            return  "--atomic-file %s" % ConnectionEbtables.atomic_file if scenario_config.is_network_backend_bridged_execution_mode_batch() else ""
+            return "--atomic-file %s" % ConnectionEbtables.atomic_file if scenario_config.is_network_backend_bridged_execution_mode_batch() else ""
 
         @staticmethod
         def get_ebtables_chain_cmd(name, policy):
@@ -189,6 +187,5 @@ def ConnectionEbtables():
         def _get_default_class(self):
             # use filter instead
             return ""
-
 
     return ConnectionEbtables

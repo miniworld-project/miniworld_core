@@ -4,7 +4,7 @@ from collections import UserDict
 class TupleUserDict(UserDict):
 
     #########################################
-    ### Implement these in a subclass
+    # Implement these in a subclass
     #########################################
 
     # TODO: implement same behaviour via magic methods ...
@@ -13,7 +13,7 @@ class TupleUserDict(UserDict):
         raise NotImplementedError
 
     #########################################
-    ### Magic Methods
+    # Magic Methods
     #########################################
 
     def __getitem__(self, item):

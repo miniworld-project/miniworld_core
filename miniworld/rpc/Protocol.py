@@ -15,6 +15,7 @@ PORT_DEFAULT_SERVICE = 5561
 PORT_PUB_RESET_SERVICE = 5562
 PORT_PUB_SERVICE = 5563
 
+
 class Protocol:
     '''
     Abstract protocol which defines how data is represented on the wire.
@@ -33,7 +34,6 @@ class Protocol:
         '''
         raise NotImplementedError
 
-
     def deserialize(self, obj):
         '''
 
@@ -48,19 +48,22 @@ class Protocol:
         raise NotImplementedError
 
     ############################################
-    ### Messages - For each message a protocol
+    # Messages - For each message a protocol
     ############################################
 
     def create_register_msg(self, tunnel_addr):
-        return {REGISTER_MSG_KEY_TUNNEL_ADDR : tunnel_addr}
+        return {REGISTER_MSG_KEY_TUNNEL_ADDR: tunnel_addr}
 
     @staticmethod
     def get_register_msg_tunnel_addr(register_msg):
         return register_msg[REGISTER_MSG_KEY_TUNNEL_ADDR]
 
+
 import json
 
 # TODO: move (en/de)coders here ...
+
+
 class JSONProtocol(Protocol):
 
     def serialize(self, obj):
@@ -70,8 +73,8 @@ class JSONProtocol(Protocol):
         return json.loads(obj.decode())
 
 
-
 import msgpack
+
 
 class MsgPackProtocol(Protocol):
 
@@ -80,6 +83,7 @@ class MsgPackProtocol(Protocol):
 
     def deserialize(self, obj):
         return msgpack.unpackb(obj)
+
 
 def factory():
     if config.is_protocol_msgpack():

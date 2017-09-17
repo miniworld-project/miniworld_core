@@ -19,7 +19,8 @@ class AbstractConnection(StartableObject.StartableSimulationStateObject, Interfa
     interface_y : Interface
     connection_info : ConnectionInfo, optional (default is None)
     '''
-    def __init__(self, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info = None):
+
+    def __init__(self, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info=None):
         StartableObject.StartableSimulationStateObject.__init__(self)
         self.emulation_node_x = emulation_node_x
         self.emulation_node_y = emulation_node_y
@@ -37,7 +38,7 @@ class AbstractConnection(StartableObject.StartableSimulationStateObject, Interfa
         self.nlog = get_node_logger(self.id)
 
     # TODO: adjust doc: set the link up ...
-    def start(self, start_activated = False):
+    def start(self, start_activated=False):
         '''
         Start the connection.
 
@@ -68,9 +69,8 @@ class AbstractConnection(StartableObject.StartableSimulationStateObject, Interfa
             pass
         raise NotImplementedError
 
-
     #####################################
-    ### Convenient methods
+    # Convenient methods
     #####################################
 
     def get_central_node(self):
@@ -78,7 +78,6 @@ class AbstractConnection(StartableObject.StartableSimulationStateObject, Interfa
         See :py:meth:`.SimulationManager`
         '''
         return singletons.simulation_manager.get_central_node(self.emulation_node_x, self.emulation_node_y, self.interface_x, self.interface_y)
-
 
     # TODO: set correct doc ref
     def get_remote_node(self):

@@ -1,5 +1,6 @@
 from miniworld.model.network.backends.NetworkBackend import NetworkBackendDummy
 
+
 def NetworkBackendDynamic():
     class NetworkBackendDynamic(NetworkBackendDummy):
 

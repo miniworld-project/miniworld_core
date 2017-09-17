@@ -18,14 +18,14 @@ class NICConnectionStore(TupleUserDict, JSONStrMixin):
     '''
 
     #########################################
-    ### Magic Methods
+    # Magic Methods
     #########################################
 
-    def __init__(self, data = None):
+    def __init__(self, data=None):
         self.data = data if data is not None else {}
 
     #########################################
-    ### TupleUserDict
+    # TupleUserDict
     #########################################
 
     # TODO: implement same behaviour via magic methods ...

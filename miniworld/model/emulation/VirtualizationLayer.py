@@ -14,6 +14,7 @@ class VirtualizationLayer(StartableSimulationStateObject):
         Extra node logger.
     id : int
     '''
+
     def __init__(self, id, emulation_node):
         StartableSimulationStateObject.__init__(self)
 

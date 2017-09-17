@@ -8,6 +8,7 @@ from miniworld import config
 
 __author__ = 'Nils Schmidt'
 
+
 def wait_until_fun_returns_true(check_fun, fun, *args, **kwargs):
     '''
     Wait until fun(*args, **kwargs) returns something True.
@@ -25,7 +26,7 @@ def wait_until_fun_returns_true(check_fun, fun, *args, **kwargs):
     if "sleep_time" in kwargs:
         del kwargs["sleep_time"]
 
-    while 1:
+    while True:
         res = fun(*args, **kwargs)
         if check_fun(res):
             return res
@@ -33,12 +34,15 @@ def wait_until_fun_returns_true(check_fun, fun, *args, **kwargs):
 
 # TODO: DOC
 # TODO: introduce more context managers!
+
+
 @contextlib.contextmanager
 def network_provision_parallel():
     from miniworld.Scenario import scenario_config
     cnt_minions = scenario_config.get_network_backend_cnt_minions()
     with tpe(cnt_minions) as executor:
         yield executor
+
 
 @contextlib.contextmanager
 def node_start_parallel():
@@ -55,10 +59,12 @@ def node_start_parallel():
 #     with tpe(cnt_minions) as executor:
 #         yield executor
 
+
 @contextlib.contextmanager
 def tpe(cnt_minions):
     with futures.ThreadPoolExecutor(max_workers=cnt_minions) as executor:
         yield executor
+
 
 def cpu_count():
     cnt_minions = multiprocessing.cpu_count()

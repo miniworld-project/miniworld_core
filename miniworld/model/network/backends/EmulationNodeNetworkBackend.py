@@ -9,6 +9,7 @@ from miniworld.model.network.interface.Interface import *
 from miniworld.util import NetUtil
 __author__ = 'Nils Schmidt'
 
+
 def get_cmd_rename_mgmt_interface():
     # TODO: #63: generic solution? works only if image has iproute2 installed :/
     CMD_RENAME_MANAGEMENT_INTERFACE = """
@@ -16,9 +17,10 @@ def get_cmd_rename_mgmt_interface():
 last_eth=$(ls -1 /sys/class/net/|grep {iface_prefix}|tail -n 1)
 ip link set name {mgmt_iface} $last_eth
 ifconfig {mgmt_iface} up
-""".format(mgmt_iface = config.get_bridge_tap_name(), iface_prefix=scenario_config.get_network_links_nic_prefix())
+""".format(mgmt_iface=config.get_bridge_tap_name(), iface_prefix=scenario_config.get_network_links_nic_prefix())
 
     return CMD_RENAME_MANAGEMENT_INTERFACE
+
 
 class EmulationNodeNetworkBackend(NetworkMixin):
     '''
@@ -32,8 +34,8 @@ class EmulationNodeNetworkBackend(NetworkMixin):
     '''
 
     def __init__(self, network_backend_bootstrapper, node_id,
-              # network
-              interfaces = None, management_switch = False):
+                 # network
+                 interfaces=None, management_switch=False):
         super(EmulationNodeNetworkBackend, self).__init__(network_backend_bootstrapper)
 
         self.node_id = node_id
@@ -58,7 +60,7 @@ class EmulationNodeNetworkBackend(NetworkMixin):
         pass
 
     #############################################################
-    ### EmulationNode notifications
+    # EmulationNode notifications
     #############################################################
 
     # TODO: DOC
@@ -74,7 +76,7 @@ class EmulationNodeNetworkBackend(NetworkMixin):
         self.nic_ipv4_config(emulation_node)
 
     #########################################
-    ### Network Config
+    # Network Config
     #########################################
 
     # TODO: DOC, sublcass methods
@@ -89,7 +91,6 @@ class EmulationNodeNetworkBackend(NetworkMixin):
                                                            ip, netmask)
             emulation_node.virtualization_layer.run_commands_eager(StringIO(cmd_ip_change))
 
-
     def _nic_mgmt_ipv4_config(self, emulation_node):
         for _if in self.interfaces.filter_mgmt():
             ip = _if.get_ip(emulation_node.id)
@@ -97,7 +98,6 @@ class EmulationNodeNetworkBackend(NetworkMixin):
             # TODO: #63: we dont know if renaming worked, therefore try to rename both ethX and mgmt
             cmd_ip_change = NetUtil.get_ip_addr_change_cmd(config.get_bridge_tap_name(), ip, netmask)
             emulation_node.virtualization_layer.run_commands_eager(StringIO(cmd_ip_change))
-
 
     def nic_ipv4_config(self, emulation_node):
         pass

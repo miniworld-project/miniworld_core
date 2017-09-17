@@ -27,7 +27,7 @@ from miniworld.repl.REPLable import REPLable
 from miniworld.model.ShellCmdWrapper import ShellCmdWrapper
 
 ###############################################
-### Command templates
+# Command templates
 ###############################################
 
 CMD_TEMPLATE_QEMU_CREATE_OVERLAY_IMAGE = """
@@ -39,6 +39,8 @@ qemu-img create
 
 # TODO: check for kvm!
 # Ticket: #8
+
+
 def is_kvm_usable():
     '''
     Check if the system has kvm support and the module is not used.
@@ -52,6 +54,7 @@ def is_kvm_usable():
         return False
     return True
 
+
 def log_kvm_usable():
     kvm_usable = is_kvm_usable()
     if kvm_usable:
@@ -61,6 +64,8 @@ def log_kvm_usable():
 
 # TODO: CHANGE RAM
 # Ticket: #10
+
+
 def get_qemu_cmd_template():
     '''
     Delay the command creation until some variables are accessable.
@@ -80,6 +85,7 @@ def get_qemu_cmd_template():
     """
     return CMD_TEMPLATE_QEMU
 
+
 CMD_TEMPLATE_QEMU_KVM = """
     -enable-kvm
     -cpu host
@@ -91,14 +97,16 @@ CMD_TEMPLATE_QEMU_MOUNT_DISK = """
 
 READ_BUF_SIZE = 8192 * 5
 
+
 def get_nic_models():
     output = run_shell("kvm -device ?")
     output = output.split("Network devices:")[1:]
     return re.findall('name\s+"([^"]+)', output, re.MULTILINE)
 
 ###############################################
-### Other constants
+# Other constants
 ###############################################
+
 
 class QemuProcessSingletons(UserDict):
     pass
@@ -152,7 +160,7 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
         #     self.uds_socket.close()
         # except socket.error as e:
         #     self.nlog.exception(e)
-            
+
         super(Qemu, self).reset()
 
     # TODO: #54,#55: DOC
@@ -174,7 +182,7 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
 
         for image_path in scenario_config.get_overlay_images():
             overlay_image_path = self.create_qemu_overlay_image(abspath(image_path))
-            overlay_image_cmd += "%s %s" % (overlay_image_cmd, CMD_TEMPLATE_QEMU_MOUNT_DISK.format(image_path=overlay_image_path, index = index))
+            overlay_image_cmd += "%s %s" % (overlay_image_cmd, CMD_TEMPLATE_QEMU_MOUNT_DISK.format(image_path=overlay_image_path, index=index))
             index += 1
 
         return overlay_image_cmd
@@ -182,7 +190,7 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
     def _build_qemu_nic_command(self):
         raise NotImplementedError
 
-    def _build_qemu_command(self, path_qemu_base_image, qemu_user_addition = None):
+    def _build_qemu_command(self, path_qemu_base_image, qemu_user_addition=None):
         '''
         Build the qemu cli command.
 
@@ -195,21 +203,20 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
         '''
 
         if qemu_user_addition is None:
-            qemu_user_addition = scenario_config.get_qemu_user_addition(node_id = self.id) or ""
+            qemu_user_addition = scenario_config.get_qemu_user_addition(node_id=self.id) or ""
 
         log_kvm_usable()
 
         return get_qemu_cmd_template().format(
-            kvm_support = CMD_TEMPLATE_QEMU_KVM if is_kvm_usable() else "",
-            path_serial_uds_socket = self.path_uds_socket,
-            path_qmp_uds_socket = self.monitor_repl.path_uds_socket,
-            path_overlay_image = self.create_qemu_overlay_image(os.path.realpath(abspath(path_qemu_base_image))),
-            network_interfaces = self._build_qemu_nic_command(),
-            overlay_images = self._build_qemu_overlay_images_command(),
-            user_addition = qemu_user_addition,
-            memory = scenario_config.get_qemu_memory()
-            )
-
+            kvm_support=CMD_TEMPLATE_QEMU_KVM if is_kvm_usable() else "",
+            path_serial_uds_socket=self.path_uds_socket,
+            path_qmp_uds_socket=self.monitor_repl.path_uds_socket,
+            path_overlay_image=self.create_qemu_overlay_image(os.path.realpath(abspath(path_qemu_base_image))),
+            network_interfaces=self._build_qemu_nic_command(),
+            overlay_images=self._build_qemu_overlay_images_command(),
+            user_addition=qemu_user_addition,
+            memory=scenario_config.get_qemu_memory()
+        )
 
     @staticmethod
     def sha1(file_path):
@@ -224,7 +231,7 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
 
     @staticmethod
     def get_snapshot_id():
-        #return '%s_%s' % (scenario_config.get_scenario_name(), Qemu.sha1(scenario_config.get_path_image()))
+        # return '%s_%s' % (scenario_config.get_scenario_name(), Qemu.sha1(scenario_config.get_path_image()))
         return scenario_config.get_scenario_name()
 
     def _start(self, path_qemu_base_image):
@@ -312,22 +319,22 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
             # build qemu shell command from template
             qemu_cmd = self._build_qemu_command(path_qemu_base_image)
             # run the qemu command
-            self.process = singletons.shell_helper.run_shell_async(self.id, qemu_cmd, prefixes = [self.shell_prefix],
+            self.process = singletons.shell_helper.run_shell_async(self.id, qemu_cmd, prefixes=[self.shell_prefix],
                                                                    # we are responsible ourselves for killing the process
                                                                    take_process_ownership=take_process_ownership)
 
             # we need to connect to both sockets once, first to the qemu monitor socket (this creates the serial shell socket)
             self.monitor_repl.run_commands_eager(StringIO("\n"))
-            #NetUtil.wait_until_uds_reachable(self.path_uds_socket)
+            # NetUtil.wait_until_uds_reachable(self.path_uds_socket)
 
-            booted_signal = scenario_config.get_signal_boot_completed(node_id = self.id)
+            booted_signal = scenario_config.get_signal_boot_completed(node_id=self.id)
             shell_prompt = scenario_config.get_shell_prompt(node_id=self.id)
 
             # boot signal and shell prompt supplied
             # use boot signal for boot and shell prompt for entering the shell
             if booted_signal is not None and shell_prompt is not None:
                 func = NetUtil.wait_for_socket_result
-                booted_signal = scenario_config.get_signal_boot_completed(node_id = self.id)
+                booted_signal = scenario_config.get_signal_boot_completed(node_id=self.id)
             else:
                 booted_signal = scenario_config.get_shell_prompt(node_id=self.id)
                 func = NetUtil.wait_for_boot
@@ -337,7 +344,7 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
                 self.wait_until_qemu_booted(func, self.log_path_qemu_boot,
                                             booted_signal=booted_signal,
                                             # TODO:
-                                            timeout = config.get_repl_timeout()
+                                            timeout=config.get_repl_timeout()
                                             )
 
             else:
@@ -392,7 +399,7 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
         # get the temp file for the final overlay image
         overlay_image_path = PathUtil.get_temp_file_path(overlay_image_name)
         # create it
-        cmd_qemu_create_overlay_image = CMD_TEMPLATE_QEMU_CREATE_OVERLAY_IMAGE.format(base_image_path = base_image_path, overlay_image_path = overlay_image_path)
+        cmd_qemu_create_overlay_image = CMD_TEMPLATE_QEMU_CREATE_OVERLAY_IMAGE.format(base_image_path=base_image_path, overlay_image_path=overlay_image_path)
 
         # TODO: #2 : error handling
         singletons.shell_helper.run_shell(self.id, cmd_qemu_create_overlay_image, [self.shell_prefix, "create_overlay", basename(base_image_path)])
@@ -400,10 +407,10 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
         return overlay_image_path
 
     ##########################################################
-    ### Wait operations
+    # Wait operations
     ##########################################################
 
-    def wait_until_qemu_booted(self, func, path_log_file, booted_signal = None, timeout = None):
+    def wait_until_qemu_booted(self, func, path_log_file, booted_signal=None, timeout=None):
         '''
         Wait until the qemu instance has been booted.
 
@@ -453,7 +460,7 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
             self.monitor_repl.make_snapshot(name=None)
 
     ###############################################
-    ### REPLable
+    # REPLable
     ###############################################
 
     def run_commands_eager_check_ret_val(self, flo, *args, **kwargs):
@@ -462,12 +469,11 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
         NOTE: We expect that every line is a command and therefore checked for return value,
         '''
 
-
         commands = []
         flo.seek(0)
         for cmd in flo.read().split("\n"):
             # append return value checker
-            commands.append( "%s%s" % (cmd, self.exit_code_shell_cmd_checker) )
+            commands.append("%s%s" % (cmd, self.exit_code_shell_cmd_checker))
 
         def _return_value_checker(cmd, res):
             if not self.re_zero_ret_code.search(res):
@@ -484,7 +490,7 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
         kwargs.update({
             'brief_logger': self.nlog,
             'verbose_logger': self.nlog if config.is_log_provisioning() else None,
-            'shell_prompt' : scenario_config.get_shell_prompt(node_id = self.id)
+            'shell_prompt': scenario_config.get_shell_prompt(node_id=self.id)
         })
         return REPLable.run_commands(self, *args, **kwargs)
 
@@ -515,7 +521,7 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
 
         return vars
 
-    def get_repl_variables(self, vars = None):
+    def get_repl_variables(self, vars=None):
         return self.get_repl_variables_static(self.id)
 
     ###############################################

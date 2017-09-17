@@ -13,7 +13,7 @@ class Objects(UserList):
             raise ValueError("Either `_type` or `fun` must be supplied!")
 
         if fun is None and _type is not None:
-            fun = lambda _if: type(_if) == _type
+            def fun(_if): return isinstance(_if, _type)
 
         return self.__class__(list(filter(fun, self)))
 

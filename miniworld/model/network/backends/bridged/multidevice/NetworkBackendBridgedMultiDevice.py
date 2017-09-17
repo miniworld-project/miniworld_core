@@ -16,7 +16,7 @@ def NetworkBackendBridgedMultiDevice():
             return NetworkConfiguratorP2P
 
         #############################################################
-        ### NetworkBackendNotifications
+        # NetworkBackendNotifications
         #############################################################
 
         def do_network_topology_change(self):
@@ -45,7 +45,7 @@ def NetworkBackendBridgedMultiDevice():
             return connected, bridge, connection
 
         #############################################################
-        ### Bridge/Connection handling
+        # Bridge/Connection handling
         #############################################################
 
         # TODO: move connection_book_keeper here ...

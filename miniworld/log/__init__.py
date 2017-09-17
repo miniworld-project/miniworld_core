@@ -10,6 +10,7 @@ __author__ = 'Nils Schmidt'
 
 # TODO: TICKET #13 (change default log level and make it customizable via the global config)
 
+
 def get_log_level():
     import logging
     from miniworld.Config import config
@@ -19,11 +20,15 @@ def get_log_level():
 
     raise Unsupported("The specified log level '%s' is unknown!" % log_level_str)
 
+
 loggers = []
 lock = Lock()
+
+
 def add_logger(logger):
     with lock:
         loggers.append(logger)
+
 
 def set_log_level(level):
     with lock:
@@ -31,8 +36,9 @@ def set_log_level(level):
             log.debug("setting log level '%s' for '%s'" % (level, logger.name))
             logger.setLevel(level)
 
+
 @memoize_pos_args
-def get_logger(name, formatter = None, handlers = None, log_level = None, **kwargs):
+def get_logger(name, formatter=None, handlers=None, log_level=None, **kwargs):
     '''
     Get a logger with `name` and the specified `log_level`.
     A formatter from `logging.Formatter` has to be supplied too!
@@ -54,7 +60,7 @@ def get_logger(name, formatter = None, handlers = None, log_level = None, **kwar
     # configure stream handler
     if handlers is None:
 
-        handler = get_stdout_handler(formatter = formatter, log_level = log_level)
+        handler = get_stdout_handler(formatter=formatter, log_level=log_level)
         # add handler
         logger.addHandler(handler)
     else:
@@ -64,7 +70,8 @@ def get_logger(name, formatter = None, handlers = None, log_level = None, **kwar
     add_logger(logger)
     return logger
 
-def get_stdout_handler(formatter = None, log_level=None):
+
+def get_stdout_handler(formatter=None, log_level=None):
     if formatter is None:
         formatter = get_std_formatter()
     if log_level is None:
@@ -75,6 +82,7 @@ def get_stdout_handler(formatter = None, log_level=None):
     handler.setFormatter(formatter)
     return handler
 
+
 def get_std_formatter():
     return logging.Formatter("%(levelname)s %(name)s %(funcName)s: %(message)s")
 
@@ -84,8 +92,9 @@ formatter_str_time = "%(levelname)s %(name)s %(asctime)s %(module)s: %(message)s
 log = get_logger(Constants.PROJECT_NAME, logging.Formatter(formatter_str_time))
 add_logger(log)
 
+
 @memoize_pos_args
-def get_node_logger(node_id, log_level = None):
+def get_node_logger(node_id, log_level=None):
     ''' Get a colored logger for a node with id `node_id`.
     A file handler will be created which logs to the standard log directory.
     '''
@@ -101,19 +110,20 @@ def get_node_logger(node_id, log_level = None):
         datefmt=None,
         reset=True,
         log_colors={
-            'DEBUG':    'cyan',
-            'INFO':     'green',
-            'WARNING':  'yellow',
-            'ERROR':    'red',
+            'DEBUG': 'cyan',
+            'INFO': 'green',
+            'WARNING': 'yellow',
+            'ERROR': 'red',
             'CRITICAL': 'red',
         }
     )
 
-    logger = get_logger(node_id, formatter, log_level = log_level)
+    logger = get_logger(node_id, formatter, log_level=log_level)
 
     logger.addHandler(get_file_handler("node_%s.txt" % node_id))
 
     return logger
+
 
 def get_file_handler(log_file_name):
     from miniworld.util import PathUtil

@@ -49,10 +49,9 @@ class NetworkConfiguratorConnectionBased(NetworkConfigurator):
         # The commands for network checking may not be available at this time. But if they are,
         # they are stored for later retrieval so that they need to be calculated only once.
         self.nic_check_commands = DictUtil.list_merge_values(self.nic_check_commands,
-                                    check_commands_per_node)
+                                                             check_commands_per_node)
 
         return commands_per_node
-
 
     def filter_emulation_nodes(self, emulation_nodes):
         '''
@@ -70,7 +69,6 @@ class NetworkConfiguratorConnectionBased(NetworkConfigurator):
         return len(emulation_nodes.filter_real_emulation_nodes()) > 0
 
         # return True
-
 
     def filter_interfaces(self, interfaces):
         '''

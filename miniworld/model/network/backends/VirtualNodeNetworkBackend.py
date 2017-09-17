@@ -4,6 +4,7 @@ from miniworld.model.network.backends.EmulationNodeNetworkBackend import Emulati
 
 __author__ = 'Nils Schmidt'
 
+
 class VirtualNodeNetworkBackend(EmulationNodeNetworkBackend):
     '''
 
@@ -15,7 +16,7 @@ class VirtualNodeNetworkBackend(EmulationNodeNetworkBackend):
 
         # skip `EmulationNodeNetworkBackendVDE` in call hieararchy
         super(VirtualNodeNetworkBackend, self).__init__(network_backend_bootstrapper, node_id, interfaces=interfaces,
-                                           management_switch=management_switch)
+                                                        management_switch=management_switch)
         self.create_switches()
 
     def _start(self, switch=None, bridge_dev_name=None):

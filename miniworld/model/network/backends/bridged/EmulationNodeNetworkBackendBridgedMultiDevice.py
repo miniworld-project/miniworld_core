@@ -6,11 +6,12 @@ from miniworld.model.network.interface.Interface import *
 
 __author__ = 'Nils Schmidt'
 
+
 class EmulationNodeNetworkBackendBridgedMultiDevice(EmulationNodeNetworkBackend):
 
     def __init__(self, network_backend_bootstrapper, node_id,
-              # network
-              interfaces = None, management_switch = False):
+                 # network
+                 interfaces=None, management_switch=False):
         interfaces = self.adjust_interfaces_to_number_of_links(node_id, interfaces)
         super(EmulationNodeNetworkBackendBridgedMultiDevice, self).__init__(network_backend_bootstrapper, node_id, interfaces=interfaces, management_switch=management_switch)
 
@@ -30,11 +31,11 @@ class EmulationNodeNetworkBackendBridgedMultiDevice(EmulationNodeNetworkBackend)
 
         adjusted_interfaces = []
         for _if in interfaces:
-            if type(_if) != HubWiFi and type(_if) != Management:
+            if not isinstance(_if, HubWiFi) and not isinstance(_if, Management):
                 log.debug("connections for '%s':'%s'", node_id, singletons.network_backend.get_all_connections().get(node_id))
-                adjusted_interfaces.extend( type(_if) for _ in singletons.network_backend.get_all_connections()[node_id] )
+                adjusted_interfaces.extend(type(_if) for _ in singletons.network_backend.get_all_connections()[node_id])
             else:
-                adjusted_interfaces.append( type(_if) )
+                adjusted_interfaces.append(type(_if))
 
         return Interfaces.Interfaces.factory(adjusted_interfaces)
 

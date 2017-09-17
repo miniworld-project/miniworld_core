@@ -10,12 +10,14 @@ VAL_DISTANCE_UNLIMITED = sys.maxsize
 __author__ = 'Nils Schmidt'
 
 # TODO: DOC
+
+
 class LinkQualityModel:
 
     def __init__(self,
                  # link quality stuff
-                 bandwidth = None,
-                 loss = None,
+                 bandwidth=None,
+                 loss=None,
                  **kwargs):
         '''
         Parameters
@@ -37,7 +39,6 @@ class LinkQualityModel:
 
         self.precalculate()
 
-
     def precalculate(self):
 
         log.info("precalculating link qualities ...")
@@ -50,7 +51,6 @@ class LinkQualityModel:
 
         if self.max_connected_distance is None:
             raise RuntimeError("Maximum connected distance could not be calculated!")
-
 
     @staticmethod
     def import_link_quality_model(pn):
@@ -92,15 +92,15 @@ class LinkQualityModel:
             raise ValueError("Module '%s' not found!" % mod)
 
     #####################################################
-    ### Implement these methods in a subclass
+    # Implement these methods in a subclass
     #####################################################
 
     # TODO: DOC
     # TODO: REMOVE 1st ARG?
     def get_initial_link_quality(self):
         return False, {
-            LINK_QUALITY_KEY_BANDWIDTH : self.bandwidth,
-            LINK_QUALITY_KEY_LOSS : self.loss
+            LINK_QUALITY_KEY_BANDWIDTH: self.bandwidth,
+            LINK_QUALITY_KEY_LOSS: self.loss
         }
 
     # TODO: DOC: idempotent!

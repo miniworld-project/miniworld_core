@@ -11,6 +11,7 @@ from miniworld.util.NetUtil import read_remaining_data, Timeout
 # buffer size for for non-bytewise operations
 SOCKET_READ_BUF_SIZE = 65536
 
+
 class CommandRunner:
     '''
     This class is responsible for the command execution of the :py:class:`.REPL`.
@@ -25,14 +26,14 @@ class CommandRunner:
                  replable,
                  timeout,
                  flo,
-                 brief_logger = None,
-                 interactive_result_stdout_writing = True,
-                 verbose_logger = None,
-                 shell_prompt = scenario_config.get_shell_prompt(),
-                 logger_echo_commands = False,
-                 template_engine_kwargs = None,
-                 return_value_checker = None,
-                 enter_shell_send_newline = True,
+                 brief_logger=None,
+                 interactive_result_stdout_writing=True,
+                 verbose_logger=None,
+                 shell_prompt=scenario_config.get_shell_prompt(),
+                 logger_echo_commands=False,
+                 template_engine_kwargs=None,
+                 return_value_checker=None,
+                 enter_shell_send_newline=True,
                  ):
         '''
         Parameters
@@ -180,7 +181,7 @@ class CommandRunner:
         '''
         ENTER_SHELL_CMD = '\n'
 
-        while 1:
+        while True:
             if self.verbose_logger:
                 self.verbose_logger.debug("sending '%s', timeout: %s", ENTER_SHELL_CMD, self.timeout)
             if self.verbose_logger:
@@ -227,7 +228,7 @@ class CommandRunner:
                 cmd = cmd + "\n"
                 self.sock.send(cmd.encode())
 
-                res = self.wait_for_command_execution(timeout = self.timeout)
+                res = self.wait_for_command_execution(timeout=self.timeout)
                 # read all data which is not covered by the regex used for stream searching
                 # TODO: use loop here?!
                 res += read_remaining_data(self.sock, SOCKET_READ_BUF_SIZE)
@@ -251,16 +252,16 @@ class CommandRunner:
             if self.verbose_logger:
                 self.verbose_logger.info(data)
 
-        #f.write(data)
+        # f.write(data)
         # show results instantly in log file
-        #f.flush()
+        # f.flush()
 
         return data
 
         # TODO: #68: compile re for better performance
         # TODO: RENAME
 
-    def wait_for_command_execution(self, timeout = None, check_fun = None):
+    def wait_for_command_execution(self, timeout=None, check_fun=None):
         ''' Wait until the command has been seen on the REPL and the shell prompt is visible.
 
         Parameters
@@ -292,29 +293,27 @@ class CommandRunner:
         try:
             res = self.process_output(
                 NetUtil.wait_for_socket_result(self.sock,
-                   check_fun,
-                   read_buf_size = SOCKET_READ_BUF_SIZE,
-                   timeout = timeout
-                   )
+                                               check_fun,
+                                               read_buf_size=SOCKET_READ_BUF_SIZE,
+                                               timeout=timeout
+                                               )
             )
         except NetUtil.Timeout as e:
             # netstat_uds = run_shell("netstat -ape -A unix")
             # open_fds = run_shell('ls -l /proc/%s/fd/' % os.getpid())
             # lsof = run_shell('lsof -U')
-# debug:
+            # debug:
 
-# Active Unix Domain Sockets:
-# %s.
-# Open file handles (Unix):
-# %s
-# lsof:
-# %s
-# % (netstat_uds, open_fds, lsof))
+            # Active Unix Domain Sockets:
+            # %s.
+            # Open file handles (Unix):
+            # %s
+            # lsof:
+            # %s
+            # % (netstat_uds, open_fds, lsof))
             # log exception to node log
             if self.brief_logger:
                 self.brief_logger.exception(e)
 
             raise
         return res
-
-

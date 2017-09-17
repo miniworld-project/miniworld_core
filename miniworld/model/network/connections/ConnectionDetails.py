@@ -1,5 +1,7 @@
 
 # TODO: DOC
+
+
 class ConnectionDetails:
 
     def __init__(self, connection, link_quality):

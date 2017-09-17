@@ -19,6 +19,8 @@ TIME_NODE_STATUS_REFRESH = 5
 
 # TODO: RENAME TO NODES?
 # TODO: REFACTOR!
+
+
 class NodeStarter:
     '''
     Starts the emulation nodes together with all its subcomponents: qemu, vde_switch
@@ -35,6 +37,7 @@ class NodeStarter:
     event_nodes_started : Event
     lock : Lock
     '''
+
     def __init__(self, node_ids, network_backend_name):
 
         self.node_ids = node_ids
@@ -50,7 +53,7 @@ class NodeStarter:
         self.thread_check_nodes_started = None
 
     #################################################
-    ### Thread methods
+    # Thread methods
     #################################################
 
     def print_overall_node_status(self):
@@ -69,9 +72,9 @@ class NodeStarter:
     def start_nodes(self,
                     network_backend,
                     # node options
-                    path_qemu_base_image, stringio_post_boot_script, interfaces = None,
+                    path_qemu_base_image, stringio_post_boot_script, interfaces=None,
                     # start options
-                    parallel = False,
+                    parallel=False,
                     ):
         '''
         Start the nodes (a)synchronously.
@@ -99,7 +102,7 @@ class NodeStarter:
         self.assert_only_one_wifibridge_interface(interfaces)
 
         # keep track of started nodes and print the missing ones each time unit ...
-        self.thread_check_nodes_started = ExceptionStopThread.run_fun_threaded_n_log_exception(target = self.print_overall_node_status, tkwargs=dict(name="Nodes Start Progress"))
+        self.thread_check_nodes_started = ExceptionStopThread.run_fun_threaded_n_log_exception(target=self.print_overall_node_status, tkwargs=dict(name="Nodes Start Progress"))
         self.thread_check_nodes_started.daemon = True
         self.thread_check_nodes_started.start()
 
@@ -116,8 +119,8 @@ class NodeStarter:
                 args.append((i,
                              path_qemu_base_image,
                              deepcopy(stringio_post_boot_script)
-                    )
-                )
+                             )
+                            )
                 # init events for first display
                 singletons.event_system.init_events_for_node(i)
 
@@ -155,7 +158,6 @@ class NodeStarter:
             self.event_nodes_started.set()
             self.thread_check_nodes_started.join()
 
-
     @staticmethod
     def assert_only_one_wifibridge_interface(interfaces):
         if len(list(filter(lambda x: is_central_node_interface(x), interfaces))) > 1:
@@ -182,7 +184,7 @@ class NodeStarter:
                 return None
 
             management_node = network_backend_bootstrapper.management_node_type(network_backend_bootstrapper)
-            management_node.start(switch = True, bridge_dev_name=config.get_bridge_tap_name())
+            management_node.start(switch=True, bridge_dev_name=config.get_bridge_tap_name())
             for node in self.nodes:
                 management_node.connect_to_emu_node(singletons.network_backend, node)
             NetworkManager.management_node = management_node

@@ -26,7 +26,7 @@ vde_switch
     {user_additions}
 """
 
-CMD_TEMPLATE_VDE_VLAN= """
+CMD_TEMPLATE_VDE_VLAN = """
 vlan/create {vlan}
 port/setvlan {port} {vlan}
 """
@@ -39,17 +39,23 @@ port/setcolour {port} {color}
 """
 
 # TODO: REMOVE
+
+
 def get_num_tap_devices():
     ''' Get the number of tap devices associated with this switch '''
     return len(re.findall("-t", CMD_TEMPLATE_VDE_SWITCH))
+
 
 class VDESWitchHiccup(Base):
     pass
 
 # TODO: USE CONTEXTMANAGER? COULD BE MORE INTUITIVE!
+
+
 def fix_vdeswitch_hiccup(fun, *args, **kwargs):
     kwargs['name'] = 'VDESwitch'
     return fix_hiccup(fun, *args, **kwargs)
+
 
 def fix_hiccup(fun, *args, **kwargs):
     ''' Fix a bug of the VDESwitch where it responds with "Function not implemented"
@@ -75,7 +81,8 @@ def fix_hiccup(fun, *args, **kwargs):
     name = kwargs.get('name', "?")
     remove_kwargs = ['hiccup_funs', 'name', 'negate']
     negate = kwargs.get("negate", False)
-    negate_fun = lambda x: not x if negate else x
+
+    def negate_fun(x): return not x if negate else x
 
     for rm_kwarg in remove_kwargs:
         if rm_kwarg in kwargs:
@@ -83,7 +90,7 @@ def fix_hiccup(fun, *args, **kwargs):
 
     TRIES = 100
     i = 0
-    while 1:
+    while True:
 
         output = fun(*args, **kwargs)
         hiccup = False
@@ -98,7 +105,7 @@ def fix_hiccup(fun, *args, **kwargs):
 
         if i == TRIES:
             raise VDESWitchHiccup("%s responded with: '%s'! This is not the expected result (tried: %s times)!" % (name, output, i))
-        i+=1
+        i += 1
 
 
 # TODO: #54,#55: REMOVE
@@ -157,21 +164,19 @@ class VDESwitch(AbstractSwitch, ShellCmdWrapper, REPLable):
         # vde uds management socket
         self.path_uds_socket = self.get_vde_switch_mgmt_sock_path(self.id)
 
-
     def __str__(self):
         return '%s(%s, colorful=%s)' % (self.__class__.__name__, self.id, self.colorful)
 
-
     # TODO: move to abstract class
     def run_shell(self, cmd, *args, **kwargs):
-        return singletons.shell_helper.run_shell(self.id, cmd, prefixes = [self.__class__.__name__])
+        return singletons.shell_helper.run_shell(self.id, cmd, prefixes=[self.__class__.__name__])
 
     ###############################################
-    ### Subclass stuff
+    # Subclass stuff
     ###############################################
 
     # TODO: #54,#55: check arguments. Should be wrong :/
-    def _start(self, bridge_dev_name = None, switch = False):
+    def _start(self, bridge_dev_name=None, switch=False):
         '''
 
         Parameters
@@ -192,10 +197,10 @@ class VDESwitch(AbstractSwitch, ShellCmdWrapper, REPLable):
         # TODO: do not allow command-line injection!
         # NOTE: create device before superclass checks for existence!
         self.bridge_dev_name = bridge_dev_name
-        if self.bridge_dev_name :
+        if self.bridge_dev_name:
             self.run_shell("ip tuntap add dev %s mode tap" % self.bridge_dev_name)
             self.mgmt_dev_created = True
-        super(VDESwitch, self)._start(bridge_dev_name = self.bridge_dev_name, switch = switch)
+        super(VDESwitch, self)._start(bridge_dev_name=self.bridge_dev_name, switch=switch)
 
         # bridge the vde switch to a specific device
         # TODO: Ticket #22 : Check if device is present on host
@@ -204,12 +209,12 @@ class VDESwitch(AbstractSwitch, ShellCmdWrapper, REPLable):
         vde_switch_command = CMD_TEMPLATE_VDE_SWITCH.format(self.path_vde_switch_sock, self.path_uds_socket,
                                                             switch_or_hub="" if switch else "-hub",
                                                             # TODO:
-                                                            user_additions = user_additions)
+                                                            user_additions=user_additions)
 
         # start commands as subprocess
         # TODO: gitlab #2
         # TODO:
-        self.process = singletons.shell_helper.run_shell_async(self.id, vde_switch_command, prefixes = [self.shell_prefix])
+        self.process = singletons.shell_helper.run_shell_async(self.id, vde_switch_command, prefixes=[self.shell_prefix])
 
         # TODO:
         self.wait_until_uds_reachable()
@@ -219,11 +224,11 @@ class VDESwitch(AbstractSwitch, ShellCmdWrapper, REPLable):
             self.run_shell("ip l del {}".format(self.bridge_dev_name))
 
     ###############################################
-    ### Custom Switch Stuff
+    # Custom Switch Stuff
     ###############################################
 
     # TODO: MOVE TO VDESWITCH
-    def move_interface_to_vlan(self, interface, port = None):
+    def move_interface_to_vlan(self, interface, port=None):
         '''
         Move the port from the switch to a specific VLAN
 
@@ -235,8 +240,8 @@ class VDESwitch(AbstractSwitch, ShellCmdWrapper, REPLable):
         self.nlog.info("moving port %s to vlan %s", port, interface.node_class)
         fix_vdeswitch_hiccup(
             self.run_commands_eager,
-                # node class interfaces are on the same VLAN
-                StringIO(CMD_TEMPLATE_VDE_VLAN.format(port = port, vlan = interface.node_class))
+            # node class interfaces are on the same VLAN
+            StringIO(CMD_TEMPLATE_VDE_VLAN.format(port=port, vlan=interface.node_class))
         )
 
     def color_interface(self, port, color):
@@ -249,7 +254,7 @@ class VDESwitch(AbstractSwitch, ShellCmdWrapper, REPLable):
             # set color on first port on each switch (remember: one switch per interface)
             fix_vdeswitch_hiccup(
                 self.run_commands_eager,
-                    StringIO(CMD_TEMPLATE_VDE_SWITCH_COLOR.format(port = port, color = color))
+                StringIO(CMD_TEMPLATE_VDE_SWITCH_COLOR.format(port=port, color=color))
             )
 
     def get_used_ports(self):
@@ -268,8 +273,8 @@ class VDESwitch(AbstractSwitch, ShellCmdWrapper, REPLable):
         ''' Get the number of ports the switch has '''
 
         output = fix_vdeswitch_hiccup(self.run_commands_eager, StringIO("port/showinfo"),
-                     hiccup_funs = [lambda output: "Function not implemented" in output,
-                                    lambda output : re.search("^\s+vde", output) is not None])
+                                      hiccup_funs=[lambda output: "Function not implemented" in output,
+                                                   lambda output: re.search("^\s+vde", output) is not None])
 
         return int(re.search("Numports=(\d+)", output).groups()[0])
 
@@ -290,7 +295,7 @@ class VDESwitch(AbstractSwitch, ShellCmdWrapper, REPLable):
         Set the number of ports for the switch.
         '''
         fix_vdeswitch_hiccup(self.run_commands_eager,
-            StringIO(CMD_TEMPLATE_VDE_SWITCH_NUM_PORTS.format(size)))
+                             StringIO(CMD_TEMPLATE_VDE_SWITCH_NUM_PORTS.format(size)))
 
     @staticmethod
     def get_vde_switch_mgmt_sock_path(id):
@@ -325,7 +330,7 @@ class VDESwitch(AbstractSwitch, ShellCmdWrapper, REPLable):
         return PathUtil.get_temp_file_path("vde_switch_%s" % id)
 
     ###############################################
-    ### REPLable
+    # REPLable
     ###############################################
 
     def run_commands(self, *args, **kwargs):
@@ -334,7 +339,7 @@ class VDESwitch(AbstractSwitch, ShellCmdWrapper, REPLable):
         kwargs.update({
             'shell_prompt': re.escape("vde$"),
             # needed to see the executed commands in the log file
-            'logger_echo_commands' : True,
+            'logger_echo_commands': True,
             'brief_logger': self.nlog,
             'verbose_logger': get_logger('verbose_%s' % name, handlers=[get_file_handler(name)]),
         })
@@ -351,8 +356,8 @@ class VDESwitch(AbstractSwitch, ShellCmdWrapper, REPLable):
 
         return render_script_from_flo(flo,
                                       # TODO: fill dictionary for custom template (if needed at a later time
-                                         **{
-                                         }
+                                      **{
+                                      }
                                       )
 
 
@@ -398,7 +403,7 @@ class VDESwitch(AbstractSwitch, ShellCmdWrapper, REPLable):
 
 
 ###############################################
-### Connection Modes
+# Connection Modes
 ###############################################
 
 MODE_CIRCLE = "circle"
@@ -431,7 +436,7 @@ def create_node_indexes(mode, node_ids):
     '''
 
     def rand():
-        return node_ids[random.randint(0, len(node_ids) -1)]
+        return node_ids[random.randint(0, len(node_ids) - 1)]
 
     def pairwise():
         return zip(node_ids, node_ids[1:])

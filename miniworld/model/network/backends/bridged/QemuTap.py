@@ -7,6 +7,8 @@ from miniworld.model.network.interface import Interface
 
 # TODO: generic wrapper around network stuff!
 # TODO: nic model for -device?
+
+
 def get_cmd_template_qemu_nic():
     '''
 
@@ -23,6 +25,7 @@ def get_cmd_template_qemu_nic():
     -netdev tap,id=net{vlan},ifname={ifname},script=no,downscript=no
     """
     return CMD_TEMPLATE_QEMU_NIC
+
 
 class QemuTap(Qemu.Qemu):
 
@@ -60,11 +63,11 @@ class QemuTap(Qemu.Qemu):
 
     def _build_qemu_nic_command_internal(self, _if, _if_name, vlan):
         return get_cmd_template_qemu_nic().format(
-            ifname = _if_name,
+            ifname=_if_name,
             # node classes have a common mac address prefix
-            mac_addr = _if.get_mac(self.emulation_node.id),
-            vlan = vlan,
-            nic_model = scenario_config.get_qemu_nic()
+            mac_addr=_if.get_mac(self.emulation_node.id),
+            vlan=vlan,
+            nic_model=scenario_config.get_qemu_nic()
         )
 
     # TODO: REMOVE ?

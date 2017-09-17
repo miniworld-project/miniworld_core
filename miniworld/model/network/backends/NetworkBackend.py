@@ -6,6 +6,7 @@ from miniworld.model.singletons import Resetable
 
 __author__ = 'Nils Schmidt'
 
+
 def get_superclass_dynamic():
     import miniworld.model.network.backends.NetworkBackendDynamic
     import miniworld.model.network.backends.NetworkBackendStatic
@@ -19,7 +20,7 @@ def get_superclass_dynamic():
 class NetworkBackendDummy(StartableObject.StartableSimulationStateObject,
                           Resetable.Resetable,
                           NetworkBackendNotifications.NetworkBackendNotifications,
-                         ):
+                          ):
 
     '''
     Attributes
@@ -28,6 +29,7 @@ class NetworkBackendDummy(StartableObject.StartableSimulationStateObject,
     switches: dict<Interface, AbstractSwitch>
         One AbstractSwitch for each interface.
     '''
+
     def __init__(self, network_backend_boot_strapper):
         StartableObject.StartableSimulationStateObject.__init__(self)
         self.network_backend_bootstrapper = network_backend_boot_strapper
@@ -64,7 +66,6 @@ class NetworkBackendDummy(StartableObject.StartableSimulationStateObject,
         '''
         return
 
-
     def get_interface_filter(self):
         '''
         Let the network backend choose which interfaces can be connected to each other.
@@ -75,6 +76,7 @@ class NetworkBackendDummy(StartableObject.StartableSimulationStateObject,
             Return a reference to the class which shall be created.
         '''
         raise NotImplementedError
+
 
 def NetworkBackend():
     '''

@@ -95,7 +95,7 @@ def test_network_switching_bridged_backends_multi(scenario_fun, snapshot_runner,
 def _test_network_switch_bridged_backends(core_topologies_dir, image_path, request, runner, scenario_fun):
     scenario = scenario_fun(image_path, request, core_topologies_dir)
     connection_mode = scenario['network']['backend']['connection_mode']
-    if not connection_mode in runner.connection_modes:
+    if connection_mode not in runner.connection_modes:
         force_snapshot_boot = False
         runner.connection_modes.add(connection_mode)
     else:

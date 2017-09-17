@@ -7,6 +7,7 @@ KEYWORD_NODE_ID = "node_id"
 
 log = get_logger(__name__)
 
+
 class TemplateEngine:
     '''
     A template engine for writing template shell scripts.
@@ -26,6 +27,7 @@ class TemplateEngine:
 
         return self.script_str.format(**kwargs)
 
+
 def render_script_from_flo(flo, **kwargs):
     '''
     Parameters
@@ -36,20 +38,18 @@ def render_script_from_flo(flo, **kwargs):
     te = TemplateEngine(flo.read())
     return te.render(**kwargs)
 
+
 if __name__ == '__main__':
 
     #from miniworld.model.emulation.nodeclass import NodeClass
     #nc = NodeClass()
-    #nc.
+    # nc.
 
     print(render_script_from_flo("../../templates/std_network.sh"))
-    print(render_script_from_flo("../../templates/std_network.sh", ipv4_addr = "192.168.0.1"))
-    #print render_script_from_flo("../../templates/std_network.sh", **{KEYWORD_IPV4_ADDR_AP : "192.168.0.1"})
-
+    print(render_script_from_flo("../../templates/std_network.sh", ipv4_addr="192.168.0.1"))
+    # print render_script_from_flo("../../templates/std_network.sh", **{KEYWORD_IPV4_ADDR_AP : "192.168.0.1"})
 
     # with open("../../templates/std_network.sh", "r") as f:
     #     te = TemplateEngine(f.read())
     #     print te.render()
     #     print te.render(ipv4_addr = "192.168.0.1")
-
-

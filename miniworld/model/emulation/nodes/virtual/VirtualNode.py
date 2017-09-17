@@ -18,7 +18,7 @@ class VirtualNode(EmulationNode):
     '''
 
     # TODO: RENAME BRIDGE_NAME
-    def __init__(self, node_id, network_backend_bootstrapper, interfaces = None):
+    def __init__(self, node_id, network_backend_bootstrapper, interfaces=None):
         '''
 
         Parameters
@@ -32,15 +32,15 @@ class VirtualNode(EmulationNode):
         # TODO: #82: network_backend is of type NetworkBackendEmulationNode
         # this call inits the interfaces of the :py:class:`.NetworkBackend`
 
-        network_mixin=network_backend_bootstrapper.virtual_node_network_backend_type(network_backend_bootstrapper, node_id, interfaces=interfaces,
-                           management_switch=config.is_management_switch_enabled())
-        super(VirtualNode, self).__init__(node_id, network_backend_bootstrapper, interfaces = interfaces,
-                                            network_mixin=network_mixin)
+        network_mixin = network_backend_bootstrapper.virtual_node_network_backend_type(network_backend_bootstrapper, node_id, interfaces=interfaces,
+                                                                                       management_switch=config.is_management_switch_enabled())
+        super(VirtualNode, self).__init__(node_id, network_backend_bootstrapper, interfaces=interfaces,
+                                          network_mixin=network_mixin)
 
         self.interface = self.network_mixin.interfaces[0]
         self.switch = None
 
-    def _start(self, bridge_dev_name = None, switch = None):
+    def _start(self, bridge_dev_name=None, switch=None):
         '''
 
         Parameters
@@ -53,7 +53,7 @@ class VirtualNode(EmulationNode):
 
         '''
 
-        self.network_mixin.start(bridge_dev_name = bridge_dev_name, switch = switch)
+        self.network_mixin.start(bridge_dev_name=bridge_dev_name, switch=switch)
         self.switch = next(iter(self.network_mixin.switches.values()))
 
     def init_connection_info(self):
@@ -82,24 +82,22 @@ class VirtualNode(EmulationNode):
         interface = self.interface
         log.info("connecting '%s' to '%s' ...", emulation_node, self)
 
-
         # get the interface with the same type
         emu_node_if = emulation_node.network_mixin.interfaces.filter_type(type(interface))[0]
 
         connection_info = self.init_connection_info()
         # NetworkBackendNotifications
         connected, switch, connection = singletons.network_manager.before_link_initial_start(network_backend, self,
-                                                                                     emulation_node, interface,
-                                                                                     emu_node_if, connection_info, start_activated=True)
+                                                                                             emulation_node, interface,
+                                                                                             emu_node_if, connection_info, start_activated=True)
         singletons.network_manager.after_link_initial_start(connected, switch, connection, network_backend, self,
                                                             emulation_node, interface, emu_node_if, connection_info,
                                                             start_activated=True)
 
         return switch, connection, interface, emu_node_if
 
-
     #########################################
-    ### Disable shell stuff
+    # Disable shell stuff
     #########################################
 
     # TODO: #54,#55: adjust doc

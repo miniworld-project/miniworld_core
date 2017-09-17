@@ -1,5 +1,6 @@
 __author__ = 'Nils Schmidt'
 
+
 class ShellCmdWrapper:
 
     '''
@@ -9,6 +10,7 @@ class ShellCmdWrapper:
         Name of the shell command to be wrapped.
     process : subprocess32.Popen
     '''
+
     def __init__(self):
         # TODO: #2: DOC
         super(ShellCmdWrapper, self).__init__()

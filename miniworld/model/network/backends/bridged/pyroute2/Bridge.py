@@ -19,6 +19,7 @@ def BridgePyroute2():
             Name of the bridge.
         bridge: pyroute2.ipdb.interface.Interface
         '''
+
         def _start(self, bridge_dev_name=None, switch=False):
             self.bridge_dev_name = bridge_dev_name
 
@@ -32,7 +33,7 @@ def BridgePyroute2():
             except (NetlinkError, CreateException) as e:
                 raise NetworkBackendStartError("Could not create the bridge with name '%s' in hub mode!" % self.bridge_dev_name, caused_by=e)
 
-        def add_if(self, _if_name, if_up = True):
+        def add_if(self, _if_name, if_up=True):
             try:
                 tap_dev = singletons.network_backend.get_ipdb().interfaces[_if_name]
                 tap_dev_name = tap_dev['ifname']
@@ -84,6 +85,7 @@ def BridgePyroute2():
 
     return BridgePyroute2
 
+
 def BridgePyroute2IPRoute():
     class BridgePyroute2IPRoute(Bridge):
 
@@ -94,22 +96,22 @@ def BridgePyroute2IPRoute():
             Name of the bridge.
         bridge: pyroute2.ipdb.interface.Interface
         '''
+
         def _start(self, bridge_dev_name=None, switch=False):
             self.bridge_dev_name = bridge_dev_name
 
             try:
                 singletons.network_backend.p_bridges.add(self.bridge_dev_name)
 
-
                 # TODO: hub
                 #singletons.network_backend.get_batch_object().link("set", index=singletons.network_backend.get_iface_idx(self.bridge_dev_name), ageing_time=0)
-                #self.bridge.set_br_ageing_time(0)
+                # self.bridge.set_br_ageing_time(0)
 
             # TODO: check exceptions
             except (NetlinkError, CreateException) as e:
                 raise NetworkBackendStartError("Could not create the bridge with name '%s' in hub mode!" % self.bridge_dev_name, caused_by=e)
 
-        def add_if(self, _if_name, if_up = True):
+        def add_if(self, _if_name, if_up=True):
             try:
                 singletons.network_backend.p_links_add_bridge[self.bridge_dev_name].append(_if_name)
                 if if_up:

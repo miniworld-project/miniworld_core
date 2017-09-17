@@ -7,6 +7,7 @@ from miniworld.concurrency.ExceptionStopThread import ExceptionStopThread
 
 __author__ = 'Nils Schmidt'
 
+
 class RunLoop(ExceptionStopThread):
     '''
 
@@ -16,6 +17,7 @@ class RunLoop(ExceptionStopThread):
     simulation_manager : SimulationManager
     time_step : float
     '''
+
     def __init__(self, simulation_manager):
         super(RunLoop, self).__init__(Exception)
         self.__last_check = 0
@@ -33,7 +35,7 @@ class RunLoop(ExceptionStopThread):
         while not self.shall_terminate():
 
             # measure method execution time
-            exec_time = timeit(self.execute_this, number = 1)
+            exec_time = timeit(self.execute_this, number=1)
             if exec_time > self.time_step:
                 self.logger.critical("the execution time of the '%s' method is longer than a time step (%s). Took %s", self._run.__name__, self.time_step, exec_time)
 
@@ -42,9 +44,9 @@ class RunLoop(ExceptionStopThread):
             # but not more than a time step
             wait_time = 0 if wait_time > self.time_step else wait_time
             self.logger.debug("sleeping %f", wait_time)
-            self.shall_terminate_event.wait(timeout = wait_time)
+            self.shall_terminate_event.wait(timeout=wait_time)
 
-            self.logger.info("took: %s",  time() -  self.__last_check)
+            self.logger.info("took: %s", time() - self.__last_check)
 
             store_last_check_timestamp()
 

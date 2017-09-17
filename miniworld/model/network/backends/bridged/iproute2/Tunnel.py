@@ -52,6 +52,7 @@ class AbstractTunnel(StartableObject.StartableSimulationStateObject):
     def get_local_emulation_node(self):
         return self.emulation_node_x if singletons.simulation_manager.is_local_node(self.emulation_node_x.id) else self.emulation_node_y
 
+
 class TunnelIPRoute(AbstractTunnel):
 
     EVENT_ROOT = "tunnel"
@@ -82,6 +83,8 @@ class TunnelIPRoute(AbstractTunnel):
         self.add_command(self.EVENT_TUNNEL_REMOVE, tunnel_cmd)
 
 # TODO: set tunnel group
+
+
 class GreTapTunnel(TunnelIPRoute):
 
     def _start(self):
@@ -100,6 +103,8 @@ class GreTapTunnel(TunnelIPRoute):
         super(GreTapTunnel, self)._start()
 
 # TODO:
+
+
 class VLANTunnel(TunnelIPRoute):
     VLAN_BITS = 12
 
@@ -110,21 +115,23 @@ class VLANTunnel(TunnelIPRoute):
 
     def _start(self):
         self.add_command(self.EVENT_TUNNEL_ADD,
-             "ip link add link {net_dev} name {tunnel_name} type vlan id {vlan_id}".format(
-                 net_dev='eth0', tunnel_name=self.get_tunnel_name(), vlan_id=self.get_tunnel_id())
-         )
+                         "ip link add link {net_dev} name {tunnel_name} type vlan id {vlan_id}".format(
+                             net_dev='eth0', tunnel_name=self.get_tunnel_name(), vlan_id=self.get_tunnel_id())
+                         )
         # set tunnel dev group
         super(VLANTunnel, self)._start()
 
 # TODO:
+
+
 class VXLanTunnel(TunnelIPRoute):
     ''' ip link add name vxlan0 type vxlan id 42 dev eth0 group 239.0.0.1 dstport 4789 '''
 
     def _start(self):
         self.add_command(self.EVENT_TUNNEL_ADD,
-             # TODO: do we need to check for a free mcast group??
-             "ip link add name {tunnel_name} type vxlan id {vlan_id} group 239.0.0.1 dstport 4789".format(
-                 tunnel_name=self.get_tunnel_name(), vlan_id=self.get_tunnel_id())
-         )
+                         # TODO: do we need to check for a free mcast group??
+                         "ip link add name {tunnel_name} type vxlan id {vlan_id} group 239.0.0.1 dstport 4789".format(
+                             tunnel_name=self.get_tunnel_name(), vlan_id=self.get_tunnel_id())
+                         )
         # set tunnel dev group
         super(VXLanTunnel, self)._start()

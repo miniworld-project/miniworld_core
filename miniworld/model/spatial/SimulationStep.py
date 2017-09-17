@@ -5,12 +5,14 @@ from miniworld.Scenario import scenario_config
 __author__ = "Patrick Lampe"
 __email__ = "uni at lampep.de"
 
+
 class SimulationStep:
-    ''' 
+    '''
     Parameter
     ---------
 
     '''
+
     def __init__(self):
         self.dict_of_coordinates = {}
         self.distances = {}
@@ -32,7 +34,7 @@ class SimulationStep:
     def to_string(self):
         result = "#######################################\n"
         for node_id, coodinates in self.dict_of_coordinates:
-            result +=  node_id + "; (" + coodinates[0] + "," + coodinates[1] + ")\n"
+            result += node_id + "; (" + coodinates[0] + "," + coodinates[1] + ")\n"
 
         result += "-----------------------------------------\n"
         for i in range(0, scenario_config.get_number_of_nodes()):

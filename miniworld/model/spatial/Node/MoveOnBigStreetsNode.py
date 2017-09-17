@@ -14,6 +14,7 @@ class MoveOnBigStreetsNode(AbstractNode):
     crnt_movement_pattern :                  AbstractMovementPattern
     dict_of_movement_pattern :               dict<String, AbstractMovementPattern>
     '''
+
     def __init__(self, crnt_node_id_in_type):
         super(MoveOnBigStreetsNode, self).__init__(crnt_node_id_in_type)
         self.crnt_movement_pattern = MoveOnBigStreets()

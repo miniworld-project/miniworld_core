@@ -5,6 +5,7 @@ __email__ = "uni at lampep.de"
 
 from miniworld.model.spatial.Location import Location
 
+
 class ReplayMovementPattern:
     def __init__(self, file_path, node_id):
         self.file = open(file_path, "r")

@@ -2,6 +2,7 @@
 from miniworld.Scenario import scenario_config
 from miniworld.model.network.backends.bridged.iproute2.NetworkBackendBridged import NetworkBackendBridgedIproute2
 
+
 def NetworkBackendBridgedBrctl():
     class NetworkBackendBridgedBrctl(NetworkBackendBridgedIproute2()):
         '''

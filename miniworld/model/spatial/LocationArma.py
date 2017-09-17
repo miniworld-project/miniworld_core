@@ -2,6 +2,7 @@ __author__ = 'lampep'
 
 import math
 
+
 class LocationArma(object):
 
     def __init__(self, x, y):

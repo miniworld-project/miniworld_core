@@ -34,4 +34,3 @@ setup(
         'console_scripts': ['mwserver=miniworld.rpc.RPCServer:main'],
     }
 )
-

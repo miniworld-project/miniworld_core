@@ -8,6 +8,7 @@ __email__ = "uni at lampep.de"
 from .AbstractMovementPattern import AbstractMovementPattern
 from random import randint
 
+
 class WalkStub(AbstractMovementPattern):
     def __init__(self):
         super(WalkStub, self).__init__()

@@ -32,7 +32,7 @@ class ExceptionStopThread(StopThread.StopThread):
     >>> t.join()
     >>> raise t.raise_objects[0], t.raise_objects[1], t.raise_objects[2]
     '''
-    
+
     def __init__(self, exception_type, *args, **kwargs):
         '''
         Parameters
@@ -128,5 +128,4 @@ if __name__ == '__main__':
 
     ExceptionStopThread.run_fun_threaded_n_log_exception(fail)
 
-    #time.sleep(100)
-
+    # time.sleep(100)

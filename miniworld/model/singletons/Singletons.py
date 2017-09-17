@@ -34,8 +34,9 @@ class Singletons:
 
 # TODO: #54,#55: EXTRACT CLASS
 #################################################
-### Singleton reference
+# Singleton reference
 #################################################
+
 
 singletons = Singletons()
 

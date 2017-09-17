@@ -1,13 +1,17 @@
 from miniworld.errors import Base
 from miniworld.model.singletons.Singletons import singletons
 
+
 class AlreadyStartedError(Base):
     pass
+
 
 class AlreadyPerformedShutdownError(Base):
     pass
 
 # TODO: DOC
+
+
 class StartableObject(object):
 
     def __init__(self):
@@ -40,6 +44,7 @@ class StartableObject(object):
         raise NotImplementedError
 
 # TODO: #54,#55: DOC
+
 
 class StartableSimulationStateObject(StartableObject):
 

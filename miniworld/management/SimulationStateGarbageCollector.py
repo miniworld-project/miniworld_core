@@ -14,13 +14,13 @@ class SimulationStateGarbageCollector(defaultdict):
     # TODO: #55: REMOVE from this class
     def add_singleton_with_simulation_scenario_state_(self, singleton_class):
         log.debug("adding %s to resettable singletons with simulation state", singleton_class)
-        if not singleton_class in self[KEY_SINGLETON]:
+        if singleton_class not in self[KEY_SINGLETON]:
             self[KEY_SINGLETON].append(singleton_class)
 
     def add_tmp_object_with_simulation_scenario_state(self, obj):
         # NOTE: str() might have unitialized variables
         log.debug("adding tmp %s to resettable objects with simulation state", type(obj))
-        #if not obj in self[KEY_OBJECT]:
+        # if not obj in self[KEY_OBJECT]:
         self[KEY_OBJECT].append(obj)
 
     def reset_simulation_scenario_state(self):
@@ -49,4 +49,3 @@ class SimulationStateGarbageCollector(defaultdict):
 
         log.info("clearing simulate state objects ...")
         self[KEY_OBJECT] = []
-

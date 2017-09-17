@@ -12,6 +12,7 @@ from miniworld.model.network.connections.NodeDictMixin import NodeDict
 class UnknownConnection(Base):
     pass
 
+
 class ConnectionStore(UserDict, JSONStrMixin):
 
     KEY_CONN_ACTIVE = 'active'
@@ -122,7 +123,8 @@ class ConnectionStore(UserDict, JSONStrMixin):
         ]
     }
     '''
-    def __init__(self, data = None):
+
+    def __init__(self, data=None):
         '''
 
         Parameters
@@ -138,7 +140,7 @@ class ConnectionStore(UserDict, JSONStrMixin):
             self.data = data
 
     #########################################
-    ### Iterators
+    # Iterators
     #########################################
 
     def iter_connections(self):
@@ -185,12 +187,12 @@ class ConnectionStore(UserDict, JSONStrMixin):
         return network_topo
 
     #########################################
-    ### Connection Management
+    # Connection Management
     #########################################
 
     # TODO: #54,#55
     def add_connection(self, emu_node_x, emu_node_y, interface_x, interface_y,
-                       connection, active = True, link_quality_dict = None):
+                       connection, active=True, link_quality_dict=None):
         '''
 
         Parameters
@@ -230,7 +232,7 @@ class ConnectionStore(UserDict, JSONStrMixin):
         '''
         return self[self.KEY_CONN_NOT_ACTIVE]
 
-    def get_connections_explicit(self, active = True):
+    def get_connections_explicit(self, active=True):
         '''
         Get a connection.
 
@@ -278,7 +280,7 @@ class ConnectionStore(UserDict, JSONStrMixin):
 
         return None, None
 
-    def change_connection_state(self, emu_node_x, emu_node_y, interface_x, interface_y, now_active = True):
+    def change_connection_state(self, emu_node_x, emu_node_y, interface_x, interface_y, now_active=True):
         '''
         Change the connection state. Therefore, move (if state changed) e.g. from active to inactive connection.
 
@@ -323,7 +325,7 @@ class ConnectionStore(UserDict, JSONStrMixin):
                     del self[self.KEY_CONN_NOT_ACTIVE][node_key][iface_key]
                     # delete dict for nodes if no active iface any more
                     if len(self[self.KEY_CONN_NOT_ACTIVE][node_key]) == 0:
-                        del self[self.KEY_CONN_NOT_ACTIVE   ][node_key]
+                        del self[self.KEY_CONN_NOT_ACTIVE][node_key]
                     # move to active connections
                     self[self.KEY_CONN_ACTIVE][node_key][iface_key] = connection_details
 
@@ -346,7 +348,7 @@ class ConnectionStore(UserDict, JSONStrMixin):
         return False
 
     #########################################
-    ### Link Quality
+    # Link Quality
     #########################################
 
     def get_link_quality_matrix(self, include_interfaces=True, key=None):
@@ -386,7 +388,6 @@ class ConnectionStore(UserDict, JSONStrMixin):
             return res
 
         return NodeDict({get_key(emu_nodes, ifaces): get_val(emu_nodes, ifaces) for emu_nodes, ifaces in self.iter_connections()})
-
 
     def get_link_quality(self, emu_node_x, emu_node_y, interface_x, interface_y):
         '''
@@ -441,6 +442,7 @@ class ConnectionStore(UserDict, JSONStrMixin):
         conns[iface_key].update_link_quality(link_quality_dict)
 
         return dict_key
+
 
 if __name__ == "__main__":
     import doctest

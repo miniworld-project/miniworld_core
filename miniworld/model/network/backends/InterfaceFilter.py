@@ -38,8 +38,10 @@ class EqualInterfaceNumbers(InterfaceFilter):
         for i in range(self.cnt_interfaces):
             yield interfaces_x[i], interfaces_y[i]
 
+
 class CoreInterfaces(InterfaceFilter):
     pass
+
 
 class AllInterfaces(InterfaceFilter):
 

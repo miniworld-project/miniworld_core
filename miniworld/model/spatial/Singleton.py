@@ -28,7 +28,7 @@ class Singleton(Resetable):
         self.roads = None
 
     #########################################
-    ### Resettable Interface
+    # Resettable Interface
     #########################################
 
     def reset(self):
@@ -40,9 +40,8 @@ class Singleton(Resetable):
         self.list_of_simulated_steps = []
 
     #########################################
-    ### Other stuff
+    # Other stuff
     #########################################
-
 
     def get_connection_to_database(self):
         return self.conn

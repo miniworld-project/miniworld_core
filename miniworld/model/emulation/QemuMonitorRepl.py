@@ -12,8 +12,10 @@ from miniworld.log import get_node_logger
 
 from miniworld.repl.REPLable import REPLable
 
+
 class QemuMonitorSnapshotLoadError(Base):
     pass
+
 
 class QemuMonitorRepl(REPLable):
     '''
@@ -47,7 +49,6 @@ class QemuMonitorRepl(REPLable):
 
     def __init__(self, qemu):
 
-
         self.qemu = qemu
 
         # create extra node logger
@@ -64,7 +65,7 @@ class QemuMonitorRepl(REPLable):
         self.path_uds_socket = self.get_qemu_sock_path(self.id)
 
     ###############################################
-    ### Monitor Commands
+    # Monitor Commands
     ###############################################
 
     def make_snapshot(self, name=None):
@@ -92,7 +93,7 @@ class QemuMonitorRepl(REPLable):
             raise QemuMonitorSnapshotLoadError("Could not load '%s'" % name, caused_by=e)
 
     ###############################################
-    ### REPLable
+    # REPLable
     ###############################################
 
     @staticmethod
@@ -126,8 +127,8 @@ class QemuMonitorRepl(REPLable):
         kwargs.update({
             'brief_logger': self.nlog,
             'verbose_logger': self.verbose_logger,
-            'shell_prompt' : '\\(qemu\\)',
-            'enter_shell_send_newline' : False
+            'shell_prompt': '\\(qemu\\)',
+            'enter_shell_send_newline': False
         })
         res = REPLable.run_commands(self, flo, *args, **kwargs)
         # keep generator

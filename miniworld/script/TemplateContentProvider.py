@@ -1,5 +1,6 @@
 __author__ = 'Nils Schmidt'
 
+
 class TemplateContentProvider:
 
     def get_template_dict(self, *args, **kwargs):
