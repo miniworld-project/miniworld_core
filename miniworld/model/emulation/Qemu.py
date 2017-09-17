@@ -42,9 +42,9 @@ qemu-img create
 
 
 def is_kvm_usable():
-    '''
+    """
     Check if the system has kvm support and the module is not used.
-    '''
+    """
     # TODO: REMOVEs
     try:
         # Ticket: #8: CHECK IF MODULE REALLY USABLE! E.G. NOT USABLE TOGETHER WITH VIRTUALBOX
@@ -67,9 +67,9 @@ def log_kvm_usable():
 
 
 def get_qemu_cmd_template():
-    '''
+    """
     Delay the command creation until some variables are accessable.
-    '''
+    """
     CMD_TEMPLATE_QEMU = """
     qemu-system-x86_64
         {kvm_support}
@@ -113,7 +113,7 @@ class QemuProcessSingletons(UserDict):
 
 
 class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
-    '''
+    """
     Handles the starting of a Qemu instance.
 
     Attributes
@@ -121,7 +121,7 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
     log_path_qemu_boot : str
         The log for the qemu boot process.
     monitor_repl : QemuMonitorRepl
-    '''
+    """
 
     exit_code_identifier = "exit code:"
     exit_code_shell_cmd_checker = " ; echo -n %s$?" % exit_code_identifier
@@ -168,14 +168,14 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
         pass
 
     def _build_qemu_overlay_images_command(self):
-        '''
+        """
         Create an overlay image for each user supplied image.
 
         Returns
         -------
         str
 
-        '''
+        """
         # start by 1 (0 is reserved for -hda of base image!)
         index = 1
         overlay_image_cmd = ""
@@ -191,7 +191,7 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
         raise NotImplementedError
 
     def _build_qemu_command(self, path_qemu_base_image, qemu_user_addition=None):
-        '''
+        """
         Build the qemu cli command.
 
         Parameters
@@ -200,7 +200,7 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
             Path to the base image used as read layer.
         qemu_user_addition : str, optional (default is the value from the scenario config file)
             Additional parameters for QEMU.
-        '''
+        """
 
         if qemu_user_addition is None:
             qemu_user_addition = scenario_config.get_qemu_user_addition(node_id=self.id) or ""
@@ -235,7 +235,7 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
         return scenario_config.get_scenario_name()
 
     def _start(self, path_qemu_base_image):
-        '''
+        """
         Start the QEMU instance:
 
         1. Set qemu process ownership
@@ -266,7 +266,7 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
         REPLTimeout
             Timeout while doing stuff on the shell.
         InvalidImage
-        '''
+        """
 
         if os.path.getsize(path_qemu_base_image) == 0:
             raise self.InvalidImage()
@@ -375,7 +375,7 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
         return PathUtil.get_temp_file_path("qemu_%s.sock" % node_id)
 
     def create_qemu_overlay_image(self, base_image_path):
-        '''
+        """
         Create an overlay image used for write operations (based on the image `base_image_path`)
 
         Returns the path of the created overlay image.
@@ -389,7 +389,7 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
         Returns
         -------
         str
-        '''
+        """
 
         base_image_file_name = basename(base_image_path)
 
@@ -411,7 +411,7 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
     ##########################################################
 
     def wait_until_qemu_booted(self, func, path_log_file, booted_signal=None, timeout=None):
-        '''
+        """
         Wait until the qemu instance has been booted.
 
         Parameters
@@ -427,7 +427,7 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
         ------
         QemuBootWaitTimeout
             Timeout while booting the vm.
-        '''
+        """
 
         sock = self.wait_until_uds_reachable(return_sock=True)
         assert sock is not None
@@ -464,10 +464,10 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
     ###############################################
 
     def run_commands_eager_check_ret_val(self, flo, *args, **kwargs):
-        '''
+        """
         Overwrite this method to provide a way of checking the return values of commands executed in the REPL.
         NOTE: We expect that every line is a command and therefore checked for return value,
-        '''
+        """
 
         commands = []
         flo.seek(0)
@@ -495,14 +495,14 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
         return REPLable.run_commands(self, *args, **kwargs)
 
     def render_script_from_flo(self, flo, **kwargs):
-        '''
+        """
         Render the script from the file-like-object and inject some variables like ip addr and node id
         (from the `Interface` class)
 
         Returns
         -------
         str
-        '''
+        """
 
         kwargs.update(self.get_repl_variables(kwargs))
         return render_script_from_flo(flo, **kwargs)
@@ -534,11 +534,11 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
             cmd)
 
     def get_ifaces(self):
-        '''
+        """
         Returns
         -------
         list<str>
-        '''
+        """
         return ['%s%s' % (scenario_config.get_network_links_nic_prefix(), iface_idx) for iface_idx in
                 range(len(self.emulation_node.network_mixin.interfaces.filter_normal_interfaces()))]
         # res = self.run_commands_eager_check_ret_val(

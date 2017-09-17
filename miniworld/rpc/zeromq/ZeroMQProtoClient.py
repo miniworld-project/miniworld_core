@@ -24,13 +24,13 @@ from miniworld.rpc.zeromq import States
 
 
 def factory():
-    '''
+    """
     Use the config system to choose the zeromq client type.
 
     Returns
     -------
     type
-    '''
+    """
     if config.is_protocol_zeromq_mode_mcast():
         log.info("distance matrix distribution via publish-subscribe pattern")
         return ZeroMQClientSub
@@ -45,7 +45,7 @@ class ZeroMQException(BaseException):
 
 class ZeroMQClient:
 
-    '''
+    """
     This is a client for the :py:class:`.ZeroMQService` which uses a request socket.
     The socket is intended for synchronous communication in a blocking request-reply pattern.
 
@@ -85,7 +85,7 @@ class ZeroMQClient:
 
     serialize : see :py:meth:`Protocol.serialize`
     deserialize : :py:meth:`Protocol.deserialize`
-    '''
+    """
 
     def __init__(self, server_addr):
         self.server_addr = server_addr
@@ -122,12 +122,12 @@ class ZeroMQClient:
 
     # TODO: create own logger!
     def myprint(self, str):
-        '''
+        """
         Include the server id in log messages
         Parameters
         ----------
         str : str
-        '''
+        """
         log.info('%s: %s', self.server_id, str)
 
     #####################################################################
@@ -135,7 +135,7 @@ class ZeroMQClient:
     #####################################################################
 
     def send_server_id(self, state, *args):
-        '''
+        """
         Send a message including the server id.
 
         Parameters
@@ -143,7 +143,7 @@ class ZeroMQClient:
         state : str
         args : list<obj>
 
-        '''
+        """
         # let server id be the first message part
         self.send_multi_part(state, self.server_id, *args)
 
@@ -153,23 +153,23 @@ class ZeroMQClient:
         )
 
     def send_no_server_id(self, *args):
-        '''
+        """
         Send a message exluding the server id
 
         Parameters
         ----------
         args
-        '''
+        """
         self.send_multi_part(*args)
 
     def recv(self):
-        '''
+        """
         Receive a message and deserialize it with the current protocol.
 
         Returns
         -------
         obj
-        '''
+        """
 
         return self.deserialize(self.svc.recv())
 
@@ -178,7 +178,7 @@ class ZeroMQClient:
     #####################################################################
 
     def start(self, tunnel_ip):
-        '''
+        """
         This method contains steps 1-3.
 
         Parameters
@@ -189,7 +189,7 @@ class ZeroMQClient:
         -------
         scenario_config : str
             The scenario config as json.
-        '''
+        """
 
         self.tunnel_ip = tunnel_ip
 
@@ -246,10 +246,10 @@ class ZeroMQClient:
 
 class ZeroMQClientReq(ZeroMQClient):
 
-    '''
+    """
     This subclass implements step 4 by receiving the local distance matrix via the request socket.
     NOTE: the client does not see the whole distance matrix!
-    '''
+    """
 
     def start(self, tunnel_ip):
         # do steps 1-3
@@ -277,20 +277,20 @@ class ZeroMQClientReq(ZeroMQClient):
             singletons.simulation_manager.step(1, distance_matrix=distance_matrix)
 
     def recv_distance_matrix(self):
-        '''
+        """
         Receive the distance matrix and detransform it to its actual form.
 
         Returns
         -------
         DistanceMatrix
-        '''
+        """
 
         return DistanceMatrix.factory()(DistanceMatrix.detransform_distance_matrix(self.recv()))
 
 
 class ZeroMQClientSub(ZeroMQClient, Resetable):
 
-    '''
+    """
     This client receives the whole distance matrix from a publish-subscribe socket.
     Therefore, the client is responsible for cutting out the necessary part of the distance matrix.
 
@@ -299,7 +299,7 @@ class ZeroMQClientSub(ZeroMQClient, Resetable):
     Attributes
     ----------
     sub_socket : zmq.sugar.socket.Socket
-    '''
+    """
 
     def __init__(self, *args, **kwargs):
         super(ZeroMQClientSub, self).__init__(*args, **kwargs)
@@ -321,9 +321,9 @@ class ZeroMQClientSub(ZeroMQClient, Resetable):
         self.enter_run_loop()
 
     def sync(self):
-        '''
+        """
         Sync with the server. Stay in state distance matrix
-        '''
+        """
 
         self.send_sync()
         self.recv_sync()
@@ -338,13 +338,13 @@ class ZeroMQClientSub(ZeroMQClient, Resetable):
         self.recv()
 
     def recv_distance_matrix(self):
-        '''
+        """
         Receive the whole distance matrix via the publish-subscribe socket and filter out the relevant part.
 
         Returns
         -------
         DistanceMatrix
-        '''
+        """
         whole_distance_matrix = DistanceMatrix.detransform_distance_matrix(self.deserialize(self.sub_socket.recv()))
 
         if config.is_debug():
@@ -363,7 +363,7 @@ class ZeroMQClientSub(ZeroMQClient, Resetable):
 
     # TODO: adjust doc for reset ...
     def enter_run_loop(self):
-        '''
+        """
         Receive the updates of the distance matrix.
 
         Steps:
@@ -373,7 +373,7 @@ class ZeroMQClientSub(ZeroMQClient, Resetable):
         Raises
         ------
         ZeroMQException
-        '''
+        """
         log.info("entering run loop ...")
 
         # initial sync

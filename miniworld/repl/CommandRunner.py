@@ -13,14 +13,14 @@ SOCKET_READ_BUF_SIZE = 65536
 
 
 class CommandRunner:
-    '''
+    """
     This class is responsible for the command execution of the :py:class:`.REPL`.
 
     Attributes
     ----------
     sock
     re_shell_prompt
-    '''
+    """
 
     def __init__(self,
                  replable,
@@ -35,7 +35,7 @@ class CommandRunner:
                  return_value_checker=None,
                  enter_shell_send_newline=True,
                  ):
-        '''
+        """
         Parameters
         ----------
         replable : REPLable
@@ -68,7 +68,7 @@ class CommandRunner:
             Raises :py:class:`.REPLUnexpectedResult` if this method raises an exception.
         # TODO: DOC
         enter_shell_send_newline
-        '''
+        """
 
         if template_engine_kwargs is None:
             template_engine_kwargs = {}
@@ -95,7 +95,7 @@ class CommandRunner:
         return hasattr(self.replable, 'uds_socket')
 
     def __call__(self, *args, **kwargs):
-        '''
+        """
         Execute the code lazily in the REPL.
 
         1. Wait until the REPL is reachable
@@ -112,7 +112,7 @@ class CommandRunner:
             If the `return_value_checker` raised an Exception.
         REPLTimeout
             If the `timeout` occurred while waiting for results from the REPL socket.
-        '''
+        """
 
         try:
             self.sock = None
@@ -170,7 +170,7 @@ class CommandRunner:
                 log.exception(e)
 
     def enter_shell(self):
-        '''
+        """
         Enter the shell before any commands are executed on the socket.
         This is needed to ensure the first output of the socket is the one that corresponds
         to the executed command.
@@ -178,7 +178,7 @@ class CommandRunner:
         Raises
         ------
         REPLTimeout
-        '''
+        """
         ENTER_SHELL_CMD = '\n'
 
         while True:
@@ -196,7 +196,7 @@ class CommandRunner:
 
     # TODO: DOC return_value_checker
     def execute_script(self):
-        '''
+        """
         Run the code. Therefore split the string at each newline and send it to the socket.
         Wait for each command until we see the shell prompt.
 
@@ -209,7 +209,7 @@ class CommandRunner:
         ------
         REPLUnexpectedResult
             If return_value_checker
-        '''
+        """
 
         # render script variables
         script = self.replable.render_script_from_flo(self.flo, **self.template_engine_kwargs)
@@ -245,7 +245,7 @@ class CommandRunner:
                 yield res
 
     def process_output(self, data):
-        ''' Write the `data` to the log file as well as to the logger '''
+        """ Write the `data` to the log file as well as to the logger """
 
         if self.interactive_result_stdout_writing:
             self.brief_logger.debug(data)
@@ -262,7 +262,7 @@ class CommandRunner:
         # TODO: RENAME
 
     def wait_for_command_execution(self, timeout=None, check_fun=None):
-        ''' Wait until the command has been seen on the REPL and the shell prompt is visible.
+        """ Wait until the command has been seen on the REPL and the shell prompt is visible.
 
         Parameters
         ----------
@@ -280,7 +280,7 @@ class CommandRunner:
         ------
         REPLTimeout
             In case of a timeout.
-        '''
+        """
         if check_fun is None:
             def check_fun2(buf, whole_data):
                 # TODO: expose via logging config entry

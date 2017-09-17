@@ -4,7 +4,7 @@ from collections import defaultdict
 
 
 def to_fully_staffed_matrix_3(d):
-    '''
+    """
 
     Parameters
     ----------
@@ -13,7 +13,7 @@ def to_fully_staffed_matrix_3(d):
     Returns
     -------
     dict<object, object>
-    '''
+    """
     for key, val in d.items():
         d[val] = key
 
@@ -21,7 +21,7 @@ def to_fully_staffed_matrix_3(d):
 
 
 def to_fully_staffed_matrix(d):
-    '''
+    """
 
     Parameters
     ----------
@@ -30,7 +30,7 @@ def to_fully_staffed_matrix(d):
     Returns
     -------
     dict<object, set<object>>
-    '''
+    """
     fully_staffed = defaultdict(set)
 
     # copy entries
@@ -48,7 +48,7 @@ def to_fully_staffed_matrix(d):
 
 
 def to_fully_staffed_matrix_2(d):
-    '''
+    """
     Note: The key object must support the creation of the same object via its constructor.
 
     Parameters
@@ -58,7 +58,7 @@ def to_fully_staffed_matrix_2(d):
     Returns
     -------
     d : dict<reversed<object, object>>, list<reversed<object>>>
-    '''
+    """
     fully_staffed = {}
 
     for k, vals in d.items():
@@ -73,7 +73,7 @@ def to_fully_staffed_matrix_2(d):
 
 # TODO: DOC
 def list_merge_values(d, d2, in_place=True):
-    '''
+    """
 
     Parameters
     ----------
@@ -90,7 +90,7 @@ def list_merge_values(d, d2, in_place=True):
     Returns
     -------
 
-    '''
+    """
     d3 = d.copy() if not in_place else d
     for key, val in d2.items():
         if key not in d3:
@@ -101,7 +101,7 @@ def list_merge_values(d, d2, in_place=True):
 
 
 def merge_recursive_in_place(d, d2):
-    '''
+    """
 
     Parameters
     ----------
@@ -110,7 +110,7 @@ def merge_recursive_in_place(d, d2):
 
     Returns
     -------
-    '''
+    """
 
     if d2 is None:
         return d

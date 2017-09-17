@@ -13,9 +13,9 @@ from miniworld.Config import config
 __author__ = "Nils Schmidt"
 
 
-'''
+"""
 This is a base `ArgumentParser` which reads and expects a scenario config file.
-'''
+"""
 # TODO: REMOVE
 scenario_config_parser = argparse.ArgumentParser(add_help=False)
 scenario_config_parser.add_argument('scenario_config', help='The scenario description (Path to *.json)')
@@ -38,7 +38,7 @@ rpc_parser.add_argument("--addr", default=get_default_rpc_addr(), help="The addr
 
 
 def parse_scenario_config(scenario_config=None, customize_scenario=None):
-    '''
+    """
 
     Parameters
     ----------
@@ -48,7 +48,7 @@ def parse_scenario_config(scenario_config=None, customize_scenario=None):
     Returns
     -------
     str, str, str
-    '''
+    """
     def parse_args():
         return scenario_config_parser.parse_known_args()[0]
 
@@ -79,7 +79,7 @@ CLI_REFRESH_RATE = 0.25
 
 
 def start_scenario(scenario_config, autostepping=None, blocking=True, connection=None):
-    '''
+    """
 
     Parameters
     ----------
@@ -88,7 +88,7 @@ def start_scenario(scenario_config, autostepping=None, blocking=True, connection
 
     Returns
     -------
-    '''
+    """
 
     from miniworld.management.events.CLIEventDisplay import CLIEventDisplay
 

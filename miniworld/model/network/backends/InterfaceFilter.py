@@ -5,7 +5,7 @@ class InterfaceFilter:
         pass
 
     def get_interfaces(self, emulation_node_x, emulation_node_y):
-        '''
+        """
 
         Attributes
         ----------
@@ -15,16 +15,16 @@ class InterfaceFilter:
         Returns
         -------
         generator<(Interface, Interface)>
-        '''
+        """
         pass
 
 
 class EqualInterfaceNumbers(InterfaceFilter):
-    '''
+    """
     Assumes each node has the same number of interfaces.
     And that the interfaces are sorted!
 
-    '''
+    """
 
     def __init__(self, *args, **kwargs):
         self.cnt_interfaces = None

@@ -20,7 +20,7 @@ def get_ipdb_logger():
     return logger
 
 
-'''
+"""
 code from svinota for IPROUTE caching
 
 from pyroute2 import IPRoute
@@ -35,16 +35,16 @@ cache = dict([ (x.get_attr('IFLA_IFNAME'), x['index']) for x in ip.get_links() ]
 cache['test']
 ip.link("set", index=cache['test'], state="up")
 ip.get_links()
-'''
+"""
 
 
 def NetworkBackendBridgedPyroute2():
 
     class NetworkBackendBridgedPyroute2(NetworkBackendBridged.NetworkBackendBridged()):
 
-        '''
+        """
         Use pyroute2 to setup the network.
-        '''
+        """
 
         def __init__(self, network_backend_boot_strapper):
             super(NetworkBackendBridgedPyroute2, self).__init__(network_backend_boot_strapper)
@@ -160,9 +160,9 @@ def NetworkBackendBridgedPyroute2IPRoute():
 
     class NetworkBackendBridgedPyroute2IPRoute(NetworkBackendBridged.NetworkBackendBridged()):
 
-        '''
+        """
         Use pyroute2 to setup the network.
-        '''
+        """
 
         def __init__(self, network_backend_boot_strapper):
             super(NetworkBackendBridgedPyroute2IPRoute, self).__init__(network_backend_boot_strapper)

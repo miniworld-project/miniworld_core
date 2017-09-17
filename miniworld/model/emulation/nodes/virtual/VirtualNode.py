@@ -6,7 +6,7 @@ from miniworld.model.singletons.Singletons import singletons
 
 
 class VirtualNode(EmulationNode):
-    '''
+    """
     This class in contrast to an `EmulationNode`is virtual in the sense of not being backed by a qemu instance.
     This virtual node is used to have a custom hub/switch while still  being able to use existing node which requires an `EmulationNode`.
 
@@ -15,11 +15,11 @@ class VirtualNode(EmulationNode):
     interface : Interface
     switch : AbstractSwitch
     bridge_name : str
-    '''
+    """
 
     # TODO: RENAME BRIDGE_NAME
     def __init__(self, node_id, network_backend_bootstrapper, interfaces=None):
-        '''
+        """
 
         Parameters
         ----------
@@ -27,7 +27,7 @@ class VirtualNode(EmulationNode):
 
         network_backend_bootstrapper : NetworkBackendBootStrapper
         interfaces : Interfaces
-        '''
+        """
 
         # TODO: #82: network_backend is of type NetworkBackendEmulationNode
         # this call inits the interfaces of the :py:class:`.NetworkBackend`
@@ -41,7 +41,7 @@ class VirtualNode(EmulationNode):
         self.switch = None
 
     def _start(self, bridge_dev_name=None, switch=None):
-        '''
+        """
 
         Parameters
         ----------
@@ -51,23 +51,23 @@ class VirtualNode(EmulationNode):
         Returns
         -------
 
-        '''
+        """
 
         self.network_mixin.start(bridge_dev_name=bridge_dev_name, switch=switch)
         self.switch = next(iter(self.network_mixin.switches.values()))
 
     def init_connection_info(self):
-        '''
+        """
 
         Returns
         -------
         ConnectionInfo
-        '''
+        """
         raise NotImplementedError
 
     # TODO: #82: DOC
     def connect_to_emu_node(self, network_backend, emulation_node):
-        ''' Helper function to connect the virtual node to an `EmulationNode`.
+        """ Helper function to connect the virtual node to an `EmulationNode`.
 
         Parameters
         ----------
@@ -78,7 +78,7 @@ class VirtualNode(EmulationNode):
         -------
         AbstractSwitch, AbstractConnection, Interface, Interface
             The connection between the nodes and the two interfaces
-        '''
+        """
         interface = self.interface
         log.info("connecting '%s' to '%s' ...", emulation_node, self)
 

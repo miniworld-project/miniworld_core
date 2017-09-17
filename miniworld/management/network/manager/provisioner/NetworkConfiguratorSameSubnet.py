@@ -10,7 +10,7 @@ from miniworld.model.emulation.nodes.EmulationNodes import EmulationNodes
 
 class NetworkConfiguratorSameSubnet(NetworkConfiguratorConnectionLess):
 
-    '''
+    """
     This configurator uses the node list to configure each interface.
     NOTE: the configurator has to run only once to configure all interfaces (in contrast to a connection-based configurator),
         but each step the new active connections can be checked for connectivity.
@@ -24,7 +24,7 @@ class NetworkConfiguratorSameSubnet(NetworkConfiguratorConnectionLess):
         For each subnet store the number of allocated ips.
     ips : OrderedDict<tuple<EmulationNode, Interface>, str>
         For each link store the allocated ip.
-    '''
+    """
 
     ################################################
     # NetworkConfigurator
@@ -39,7 +39,7 @@ class NetworkConfiguratorSameSubnet(NetworkConfiguratorConnectionLess):
         self.ips = OrderedDict()
 
     def get_subnet(self, interface):
-        '''
+        """
 
         Parameters
         ----------
@@ -51,7 +51,7 @@ class NetworkConfiguratorSameSubnet(NetworkConfiguratorConnectionLess):
         Raises
         ------
         NoMoreSubnetsAvailable
-        '''
+        """
         if interface not in self.subnets:
             try:
                 self.subnets[interface] = next(self.subnet_generator)
@@ -60,14 +60,14 @@ class NetworkConfiguratorSameSubnet(NetworkConfiguratorConnectionLess):
         return self.subnets[interface]
 
     def configure_connection(self, emulation_node, connections):
-        '''
+        """
 
         Parameters
         ----------
         emulation_node : EmulationNode
         connections : OrderedDict<EmulationNodes, tuple<Interfaces>>
             Must be fully staffed if you want bidirectional links!
-        '''
+        """
         # dict<int, list<str>>
         commands_per_node = defaultdict(list)
         c = Counter()
@@ -112,7 +112,7 @@ class NetworkConfiguratorSameSubnet(NetworkConfiguratorConnectionLess):
             raise SubnetNoMoreIps("No more ips in subnet: '%s' available for offset: '%s'!" % (subnet, offset + 1))
 
     def get_nic_check_commands(self, connections):
-        '''
+        """
         Do link checking connection-based, there check which nodes are reachable!
 
         In the distributed mode, we perform link checking on both sides!
@@ -124,7 +124,7 @@ class NetworkConfiguratorSameSubnet(NetworkConfiguratorConnectionLess):
         Returns
         -------
 
-        '''
+        """
         log.info("assuming bidirectional links ...")
         check_commands_per_node = defaultdict(list)
 

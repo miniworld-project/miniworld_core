@@ -7,11 +7,11 @@ __email__ = "uni at lampep.de"
 
 
 class SimulationStep:
-    '''
+    """
     Parameter
     ---------
 
-    '''
+    """
 
     def __init__(self):
         self.dict_of_coordinates = {}

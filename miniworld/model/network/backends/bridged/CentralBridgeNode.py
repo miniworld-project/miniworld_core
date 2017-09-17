@@ -5,11 +5,11 @@ from miniworld.model.network.backends.bridged import Bridge
 
 class CentralBridgeNode(CentralNode.CentralNode):
 
-    '''
+    """
     Attributes
     ----------
     bridge : Bridge
-    '''
+    """
 
     def __init__(self, network_backend_bootstrapper, id=id):
         id = 'br_cn_%s' % id

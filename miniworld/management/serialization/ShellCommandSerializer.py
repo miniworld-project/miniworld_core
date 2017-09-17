@@ -12,7 +12,7 @@ from miniworld.util import ConcurrencyUtil
 
 
 class ShellCommandSerializer(Resetable):
-    '''
+    """
     This class can serialize commands into a given order and prevent duplicate commands!
     A group contains a list of events that belong to it. The events have an order.
     Adding commands to the events in the group keeps the order of the commands (sorted by event order).
@@ -59,10 +59,10 @@ class ShellCommandSerializer(Resetable):
     >>> sce.run_commands()
     ...
 
-    '''
+    """
 
     def __init__(self):
-        '''
+        """
         Parameters
         ----------
         mapping_group_to_event_order_to_cs : Group2EventMapping
@@ -70,7 +70,7 @@ class ShellCommandSerializer(Resetable):
             Keeps the order of the groups.
             We intentionally do not use the order from the `mapping_group_to_event_order_to_cs`
             because the OrderedDict does not have the possibility to reorder the groups!
-        '''
+        """
         self.reset()
 
     def __str__(self):
@@ -89,7 +89,7 @@ class ShellCommandSerializer(Resetable):
 
     def add_command(self, group, event,
                     id, cmd, prefixes):
-        '''
+        """
 
         Parameters
         ----------
@@ -102,7 +102,7 @@ class ShellCommandSerializer(Resetable):
         Returns
         -------
         CommandStore
-        '''
+        """
 
         cs = self.mapping_group_to_event_order_to_cs[group][event]
         if cs is None:
@@ -119,13 +119,13 @@ class ShellCommandSerializer(Resetable):
         self.group_order.add(event)
 
     def set_group_order(self, event_order_id_order):
-        '''
+        """
         Set the group order.
 
         Parameters
         ----------
         event_order_id_order : iterable<str>
-        '''
+        """
         self.group_order = OrderedSet(event_order_id_order)
 
     #########################################################
@@ -133,14 +133,14 @@ class ShellCommandSerializer(Resetable):
     #########################################################
 
     def set_event_order(self, group, event_order):
-        '''
+        """
         Set the order of events for a group.
 
         Parameters
         ----------
         group : str
         event_order : iterable<str>
-        '''
+        """
 
         # remember event order
         for event in event_order:
@@ -154,7 +154,7 @@ class ShellCommandSerializer(Resetable):
     #########################################################
 
     def get_commands_event(self, group, event):
-        '''
+        """
         Get all commands for the given `event` registered in the `group`.
 
         Parameters
@@ -165,17 +165,17 @@ class ShellCommandSerializer(Resetable):
         Returns
         -------
         iterable<str>
-        '''
+        """
         cs = self.mapping_group_to_event_order_to_cs[group][event]
         return cs.get_shell_commands()
 
     def get_all_commands(self):
-        '''
+        """
 
         Returns
         -------
         list<str>
-        '''
+        """
         res = []
         for group in self.group_order:
             for event, command_store in self.mapping_group_to_event_order_to_cs[group].items():
@@ -199,7 +199,7 @@ class ShellCommandSerializer(Resetable):
     #########################################################
 
     def run_commands(self, max_workers=None, events_order=None):
-        '''
+        """
 
         Parameters
         ----------
@@ -210,7 +210,7 @@ class ShellCommandSerializer(Resetable):
         Returns
         -------
 
-        '''
+        """
         if events_order is None:
             events_order = self.group_order
 
@@ -229,13 +229,13 @@ class ShellCommandSerializer(Resetable):
 
 
 class Group2EventMapping(collections.UserDict):
-    '''
+    """
     Stores for each group a :py:class:`.Event2CommandStoreMapping` which defines an event oder for the group.
 
     Attributes
     ----------
     data : dict<str, Event2CommandStoreMapping>
-    '''
+    """
 
     def __getitem__(self, key):
         try:
@@ -248,13 +248,13 @@ class Group2EventMapping(collections.UserDict):
 
 
 class Event2CommandStoreMapping(OrderedDict):
-    '''
+    """
     Stores for each event a :py:class:`.CommandStore`.
 
     Attributes
     ----------
     data : dict<str, CommandStore>
-    '''
+    """
 
     def __getitem__(self, key):
         try:
@@ -271,7 +271,7 @@ class Event2CommandStoreMapping(OrderedDict):
 class CommandStore(Resetable):
 
     def __init__(self, name):
-        '''
+        """
         Stores the commands for an event.
         All commands are considered to be executed in parallel.
 
@@ -280,7 +280,7 @@ class CommandStore(Resetable):
         name : str
         shell_command_args : OrderedSet<(str, str, str)>
         shell_commands : set<str>
-        '''
+        """
         self.name = name
         self.reset()
 
@@ -310,13 +310,13 @@ class CommandStore(Resetable):
         return out
 
     def get_one_shell_call_commands(self):
-        '''
+        """
         Shell commands as sh one-liner.
 
         Returns
         -------
         list<str>
-        '''
+        """
         commands = []
         MAX_ARG_STR_LEN = 131072
 
@@ -333,7 +333,7 @@ class CommandStore(Resetable):
         return commands
 
     def add_command(self, id, cmd, prefixes):
-        '''
+        """
         Add a command to the store and prevent duplicates!
 
         Parameters
@@ -341,7 +341,7 @@ class CommandStore(Resetable):
         id : str
         cmd : str
         prefixes : iterable<str>
-        '''
+        """
         prefixes = tuple(prefixes)
         # check for unique command
         if cmd not in self.__uniq_shell_commands:
@@ -350,7 +350,7 @@ class CommandStore(Resetable):
             self.shell_command_args.add(shell_command_arg)
 
     def run_commands(self, max_workers=None):
-        '''
+        """
 
         Parameters
         ----------
@@ -359,7 +359,7 @@ class CommandStore(Resetable):
         Returns
         -------
 
-        '''
+        """
         if max_workers is None:
             max_workers = ConcurrencyUtil.cpu_count()
 

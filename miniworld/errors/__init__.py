@@ -3,7 +3,7 @@ from miniworld.errors import WrapperException
 __author__ = 'Nils Schmidt'
 
 
-''' Base Exception '''
+""" Base Exception """
 
 
 class Base(WrapperException.WrapperException):

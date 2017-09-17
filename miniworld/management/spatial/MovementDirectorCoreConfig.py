@@ -4,7 +4,7 @@ from miniworld.model.spatial import CoreConfigNodes
 
 
 class MovementDirectorCoreConfig(MovementDirectorAbstract):
-    '''
+    """
     Attributes
     ----------
     scenario_changes : list<list<str, int>>
@@ -12,7 +12,7 @@ class MovementDirectorCoreConfig(MovementDirectorAbstract):
 
     node_count :                                int
     nodes :                                     ArmaNodes
-    '''
+    """
 
     def __init__(self, scenario_changes, *args, **kwargs):
         self.nodes = CoreConfigNodes.factory()(scenario_changes)
@@ -24,21 +24,21 @@ class MovementDirectorCoreConfig(MovementDirectorAbstract):
         return ""
 
     def get_geo_json_for_nodes(self):
-        '''
+        """
         Returns
         -------
         geo_json
                     for the current state of all nodes
-        '''
+        """
         return ""
 
     def get_geo_json_for_roads(self):
-        '''
+        """
         Returns
         -------
         geo_json
                     for the current state of all nodes
-        '''
+        """
         return ""
 
     def simulate_one_step(self):

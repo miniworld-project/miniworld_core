@@ -16,7 +16,7 @@ class Interface(TemplateContentProvider):
     node_class = 0
     node_class_name = "abstract"
 
-    '''
+    """
     Models an interface class like Access Point or Mesh.
 
     Attributes
@@ -31,7 +31,7 @@ class Interface(TemplateContentProvider):
     Raises
     ------
     ValueError
-    '''
+    """
 
     def __init__(self, nr_host_interface=1):
 
@@ -71,7 +71,7 @@ class Interface(TemplateContentProvider):
 
     # TODO: get IP from NetworkConfigurator!
     def get_ip(self, node_id):
-        '''
+        """
         Get the ip for the `node_id.
 
 
@@ -82,7 +82,7 @@ class Interface(TemplateContentProvider):
         Returns
         -------
         ipaddress._BaseAddress
-        '''
+        """
         return self.get_ip_network()[node_id]
 
     def get_last_ip(self):
@@ -92,7 +92,7 @@ class Interface(TemplateContentProvider):
         return subnet_for_type()[type(self)]
 
     def get_mac(self, node_id):
-        '''
+        """
         Get the mac address for the `node_id`.
 
         "02:01:00:00:01:00" -> Class: Mesh, Interface number 1, Node ID: 256 (0x100)
@@ -104,7 +104,7 @@ class Interface(TemplateContentProvider):
         Returns
         -------
         str
-        '''
+        """
         nc = '%02x' % self.node_class
         nr_iface = '%02x' % self.nr_host_interface
         node_id = '%08x' % node_id
@@ -112,11 +112,11 @@ class Interface(TemplateContentProvider):
         return '%s:%s:%s:%s:%s:%s' % (nc, nr_iface, node_id[0:2], node_id[2:4], node_id[4:6], node_id[6:8])
 
     def get_network(self):
-        ''' Get the network ip '''
+        """ Get the network ip """
         return self.get_ip_network()[-1]
 
     def get_netmask(self):
-        ''' Get the net mask '''
+        """ Get the net mask """
         return self.get_ip_network().netmask
 
     # TODO: interface?
@@ -238,13 +238,13 @@ static_lock = Lock()
 
 
 def subnet_for_type():
-    '''
+    """
 
     Returns
     -------
     subnets : dict<type, IPv4Network>
         For each interface type a subnet.
-    '''
+    """
 
     # there may be concurrent access
     with static_lock:

@@ -7,7 +7,7 @@ from miniworld.model.network.linkqualitymodels.LinkQualityConstants import LINK_
 
 
 class AbstractConnection(StartableObject.StartableSimulationStateObject, InterfaceDependentID):
-    '''
+    """
     Attributes
     ----------
     id : str
@@ -18,7 +18,7 @@ class AbstractConnection(StartableObject.StartableSimulationStateObject, Interfa
     interface_x : Interface
     interface_y : Interface
     connection_info : ConnectionInfo, optional (default is None)
-    '''
+    """
 
     def __init__(self, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info=None):
         StartableObject.StartableSimulationStateObject.__init__(self)
@@ -39,18 +39,18 @@ class AbstractConnection(StartableObject.StartableSimulationStateObject, Interfa
 
     # TODO: adjust doc: set the link up ...
     def start(self, start_activated=False):
-        '''
+        """
         Start the connection.
 
         Parameters
         ----------
         start_activated  : bool, optional (default is False)
             Start the connection in active mode, letting all packets pass through.
-        '''
+        """
         raise NotImplementedError
 
     def adjust_link_quality(self, link_quality_dict):
-        '''
+        """
 
         Parameters
         ----------
@@ -58,7 +58,7 @@ class AbstractConnection(StartableObject.StartableSimulationStateObject, Interfa
 
         Returns
         -------
-        '''
+        """
         # assumes only equal interfaces can be connected to each other
         bandwidth = link_quality_dict.get(LINK_QUALITY_KEY_BANDWIDTH)
         loss = link_quality_dict.get(LINK_QUALITY_KEY_LOSS)
@@ -74,14 +74,14 @@ class AbstractConnection(StartableObject.StartableSimulationStateObject, Interfa
     #####################################
 
     def get_central_node(self):
-        '''
+        """
         See :py:meth:`.SimulationManager`
-        '''
+        """
         return singletons.simulation_manager.get_central_node(self.emulation_node_x, self.emulation_node_y, self.interface_x, self.interface_y)
 
     # TODO: set correct doc ref
     def get_remote_node(self):
-        '''
+        """
         See :py:meth:`.SimulationManager`
-        '''
+        """
         return singletons.simulation_manager.get_remote_node(self.emulation_node_x, self.emulation_node_y, self.interface_x, self.interface_y)

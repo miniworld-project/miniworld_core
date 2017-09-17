@@ -1,6 +1,6 @@
 
 def szudzik_pairing_function(a, b):
-    '''
+    """
     a, b >= 0
 
 
@@ -15,7 +15,7 @@ def szudzik_pairing_function(a, b):
     Returns
     -------
 
-    '''
+    """
     if a >= b:
         return a * a + a + b
     return a + b * b

@@ -83,11 +83,11 @@ def escape(c):
 
 
 def assert_node_id_is_int(fun):
-    '''
+    """
     Raises
     ------
     ValueError
-    '''
+    """
 
     # TODO: use wraps in all decorators!
     # @wraps(fun)
@@ -103,11 +103,11 @@ def assert_node_id_is_int(fun):
 
 
 def node_id_2_int(fun):
-    '''
+    """
     Raises
     ------
     ValueError
-    '''
+    """
 
     # TODO: use wraps in all decorators!
     # @wraps(fun)
@@ -121,11 +121,11 @@ def node_id_2_int(fun):
 
 # TODO: DOC
 def assert_simulation_manager_started(fun):
-    '''
+    """
     Raises
     ------
     RuntimeError
-    '''
+    """
 
     def wrap(*args, **kwargs):
         _self = args[0]
@@ -141,14 +141,14 @@ def assert_simulation_manager_started(fun):
 # TODO: set response type to json in all method responses!
 # TODO: refactor!!
 class MiniWorldRPC:
-    '''
+    """
     Attributes
     ----------
     zmq_server : ZeroMQServer, default is None
         Only set in the distributed mode.
     lock
 
-    '''
+    """
 
     def __init__(self):
         self.lock = Lock()
@@ -278,7 +278,7 @@ class MiniWorldRPC:
         return singletons.simulation_manager.movement_director.get_geo_json_for_connections()
 
     def get_max_connected_distance(self):
-        ''' The maximum range in which nodes are still connected. '''
+        """ The maximum range in which nodes are still connected. """
         res = singletons.simulation_manager.link_quality_model.max_connected_distance
         if res is None:
             return 0
@@ -308,9 +308,9 @@ yappi_started = False
 
 
 def signal_profiling_handler(signum, *args, **kwargs):
-    '''
+    """
     Use SIGUSR2 to start profiling. Second signal dumps the stats to file.
-    '''
+    """
     import yappi
     global yappi_started
     logger().debug("SIGUSR2 error handler ...")
@@ -337,12 +337,12 @@ def signal_profiling_handler(signum, *args, **kwargs):
 
 
 class MiniWorldRPCClient(MiniWorldRPC):
-    '''
+    """
     Attributes
     ----------
     zeromq_client : ZeroMQClient
     zeromq_thread : Thread
-    '''
+    """
 
     def __init__(self, server_addr, tunnel_addr):
         super(MiniWorldRPCClient, self).__init__()
@@ -355,12 +355,12 @@ class MiniWorldRPCClient(MiniWorldRPC):
 
 
 class MiniWorldRPCServer(MiniWorldRPC):
-    '''
+    """
     Attributes
     ----------
     zeromq_thread : Thread
     zmq_server : ZeroMQServer
-    '''
+    """
 
     def __init__(self):
         super(MiniWorldRPCServer, self).__init__()

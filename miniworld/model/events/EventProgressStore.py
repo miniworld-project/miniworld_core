@@ -5,7 +5,7 @@ from miniworld.model.events.EventSystemStats import EventSystemStats
 
 
 class EventProgressStore(collections.UserDict, EventSystemStats):
-    '''
+    """
     Stores the progress for some events.
     Can be used like a normal dictionary. The default value for non-existing keys is 0.
     The order is insertion-based.
@@ -14,7 +14,7 @@ class EventProgressStore(collections.UserDict, EventSystemStats):
     -----------
     data : dict<str, float>
         Event, progress.
-    '''
+    """
 
     def __init__(self):
         self.data = OrderedDict()

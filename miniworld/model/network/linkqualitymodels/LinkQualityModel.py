@@ -19,7 +19,7 @@ class LinkQualityModel:
                  bandwidth=None,
                  loss=None,
                  **kwargs):
-        '''
+        """
         Parameters
         ----------
         bandwidth : int, optional (default is unlimited)
@@ -27,7 +27,7 @@ class LinkQualityModel:
         loss : int, optional (default is no loss)
         max_connected_distance : float
 
-        '''
+        """
         if loss is None:
             loss = LINK_QUALITY_VAL_LOSS_NONE
         if bandwidth is None:
@@ -54,7 +54,7 @@ class LinkQualityModel:
 
     @staticmethod
     def import_link_quality_model(pn):
-        '''
+        """
         Import a :py:class:`.LinkQualityModel` by package name.
 
         Parameters
@@ -69,7 +69,7 @@ class LinkQualityModel:
         Raises
         ------
         ValueError
-        '''
+        """
         mod = '.'.join(pn.split(".")[:-1])
         cls = pn.split(".")[-1]
         print(mod, cls)
@@ -112,11 +112,11 @@ class LinkQualityModel:
         return self._distance_2_link_quality(distance)
 
     def _distance_2_link_quality(self, distance):
-        '''
+        """
         Returns
         -------
         bool, dict
             If connected, the link quality described by certain attributes such as e.g. bandwidth, loss, ...
-        '''
+        """
 
         raise NotImplementedError

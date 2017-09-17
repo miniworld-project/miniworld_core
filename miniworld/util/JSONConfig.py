@@ -1,6 +1,6 @@
-'''
+"""
 Utility functions and class to use json as config file format.
-'''
+"""
 import json
 import re
 from collections import UserDict
@@ -28,7 +28,7 @@ def arg2float(fun):
 
 
 def customizable_attrs(*keys, **kwargs):
-    '''
+    """
     Decorator to read the value for the given keys.
     Prefers the node customized value.
 
@@ -57,7 +57,7 @@ def customizable_attrs(*keys, **kwargs):
         If the config is syntactically incorrect.
     ConfigOptionNotSupported
         If the option is not in the expected list.
-    '''
+    """
     not_null = kwargs.get('not_null', False)
 
     default = kwargs.get("default", nothing)
@@ -107,7 +107,7 @@ def customizable_attrs(*keys, **kwargs):
 
 
 def json2dict(func):
-    '''
+    """
     Converts json to dict. E.g {"1" : 2} => {1 : 2}.
     The function does not handle this recursive!
 
@@ -121,7 +121,7 @@ def json2dict(func):
         If value was not None
     None
         Else
-    '''
+    """
     @wraps(func)
     def func_wrapper(*args, **kwargs):
         res = func(*args, **kwargs)
@@ -140,7 +140,7 @@ def _pretty_format(keys):
 
 
 class JSONConfig(UserDict):
-    '''
+    """
     `JSONConfig` leverages JSON to form a config system.
     Access to the values in the config are provided by decorating functions.
     The decorators map the key(s) and therefore the structure of the config layout to the functions.
@@ -159,7 +159,7 @@ class JSONConfig(UserDict):
     1
     >>> print c.get_non_default()
     None
-    '''
+    """
 
     def __init__(self):
         self.data = {}
@@ -184,7 +184,7 @@ class JSONConfig(UserDict):
 
 
 def read_json_config(config=None, raw=False):
-    '''
+    """
     Read a json config file.
     Strips all lines beginning with `CONFIG_COMMENT`.
 
@@ -204,7 +204,7 @@ def read_json_config(config=None, raw=False):
     Raises
     ------
     ConfigError
-    '''
+    """
 
     try:
         if not raw:
@@ -219,7 +219,7 @@ def read_json_config(config=None, raw=False):
 
 
 def get_dict_nested_value(d, keys):
-    '''
+    """
     Get the nested dictionary value if present.
 
     Parameters
@@ -233,7 +233,7 @@ def get_dict_nested_value(d, keys):
         The value if found
     Nothing
 
-    '''
+    """
     cur_dict = d
 
     def dict_check(d):

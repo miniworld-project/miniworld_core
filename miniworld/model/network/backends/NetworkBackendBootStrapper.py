@@ -1,7 +1,7 @@
 
 class NetworkBackendBootStrapper(object):
 
-    '''
+    """
     Bundles the components a :py:class:`.NetworkBackend` needs to operate.
 
     Attributes
@@ -18,7 +18,7 @@ class NetworkBackendBootStrapper(object):
         Only use the management mode if the backend provides a class for it.
     virtual_node_network_backend_type : type
     tunnel_type : type
-    '''
+    """
 
     def __init__(self, network_backend_type,
                  emulation_node_network_backend_type, emulation_node_type,

@@ -110,11 +110,11 @@ def create_runner(tmpdir_factory, request, config_path):
             self.start_scenario(self.scenario)
 
         def start_scenario(self, scenario, force_snapshot_boot=False):
-            '''
+            """
             Parameters
             ----------
             scenario: dict
-            '''
+            """
             with open(self.scenario, 'w') as f:
                 scenario_json = json.dumps(scenario, indent=4, sort_keys=True)
                 f.write(scenario_json)
@@ -132,35 +132,35 @@ def create_runner(tmpdir_factory, request, config_path):
             self.run_mwcli_command(['step'])
 
         def get_connections(self):
-            '''
+            """
             Returns
             -------
             dict
-            '''
+            """
             return self.run_mwcli_command_json_result(['info', 'connections'])
 
         def get_links(self):
-            '''
+            """
             Returns
             -------
             dict
-            '''
+            """
             return self.run_mwcli_command_json_result(['info', 'links'])
 
         def get_distances(self):
-            '''
+            """
             Returns
             -------
             dict
-            '''
+            """
             return self.run_mwcli_command_json_result(['info', 'distances'])
 
         def get_addr(self):
-            '''
+            """
             Returns
             -------
             dict
-            '''
+            """
             return self.run_mwcli_command_json_result(['info', 'addr'])
 
         @staticmethod

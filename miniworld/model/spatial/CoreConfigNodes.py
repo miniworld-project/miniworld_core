@@ -25,7 +25,7 @@ def factory():
 
 
 class CoreConfigNodes(Resetable):
-    '''
+    """
     Parameter
     ---------
     scenario_changes : list<list<str, int>>
@@ -35,7 +35,7 @@ class CoreConfigNodes(Resetable):
     Attributes
     ----------
 
-    '''
+    """
 
     def __init__(self, scenario_changes):
         self.orig_scenario_changes = scenario_changes
@@ -51,15 +51,15 @@ class CoreConfigNodes(Resetable):
         logger().debug("scenario files: %s", self.scenario_changes)
 
     def get_list_of_nodes(self):
-        '''
+        """
         Stub-methode
-        '''
+        """
         return {}
 
     def get_node_for_node_id(self, node_id):
-        '''
+        """
         Stub-methode
-        '''
+        """
         return None
 
     # TODO: use distances from core config file
@@ -79,24 +79,24 @@ class CoreConfigNodes(Resetable):
         return distance_matrix
 
     def get_coordinates(self):
-        '''
+        """
         Stub-methode
-        '''
+        """
         return {}
 
     def get_geo_json(self):
-        '''
+        """
         Stub-methode
-        '''
+        """
         return ""
 
     def __get_next_scenario(self):
-        '''
+        """
 
         Returns
         -------
         str, int
-        '''
+        """
         if self.scenario_changes:
             return self.scenario_changes.pop()
         return []

@@ -33,13 +33,13 @@ CNT_ZMQ_THREADS = 1
 
 # TODO: if not all emulation servers are needed, these could be excluded from the current simulation, resulting in faster communication and less overhead
 class ZeroMQServer:
-    '''
+    """
     For an introduction to the zeromq services, see :py:class:`.ZeroMQClient`.
 
-    '''
+    """
 
     def __init__(self):
-        '''
+        """
         Parameters
         ----------
         context : zmq.sugar.context.Context
@@ -58,7 +58,7 @@ class ZeroMQServer:
         wait_for_nodes_started : threading.Event
 
         last_step_time : int
-        '''
+        """
 
         self.context = zmq.Context.instance(CNT_ZMQ_THREADS)
 
@@ -107,7 +107,7 @@ class ZeroMQServer:
         self.reset()
 
     def start(self, cnt_peers):
-        '''
+        """
         Start the server by expecting the clients to register in the first state.
         This method controls the whole communication expect the distribution of the distance matrix.
 
@@ -118,7 +118,7 @@ class ZeroMQServer:
         Returns
         -------
 
-        '''
+        """
         log.info("waiting for %d servers ...", cnt_peers)
         self.cnt_peers = cnt_peers
 
@@ -147,9 +147,9 @@ class ZeroMQServer:
     ####################################################################
 
     def handle_state_register(self):
-        '''
+        """
         Wait until all clients have been registered and sync them afterwards.
-        '''
+        """
 
         # show registered clients ...
         def register_fun(expecter, idx, cnt):
@@ -161,9 +161,9 @@ class ZeroMQServer:
         ResponderServerID(self.router_socket, self.protocol, expect_state)()
 
     def handle_state_information_exchange(self):
-        '''
+        """
         Let clients send their tunnel Ip addr and send each the scenario config.
-        '''
+        """
 
         log.info("state: %s", States.STATE_EXCHANGE)
 
@@ -194,18 +194,18 @@ class ZeroMQServer:
         responder.respond()
 
     def handle_state_start_nodes(self):
-        '''
+        """
         Start the nodes and sync them afterwards. Finally notify that :py:meth:`.handle_state_distance_matrix` can continue.
-        '''
+        """
         log.info("state: %s", States.STATE_START_NODES)
         expect_state = self.get_expecter_state(States.STATE_START_NODES, 1)
         ResponderArgument(self.router_socket, self.protocol, expect_state, '')()
         self.wait_for_nodes_started.set()
 
     def sync_subscribers(self):
-        '''
+        """
         Sync the subscribers and provide some debugging information about the sync progress (if debug mode)
-        '''
+        """
         log.info("syncing subscribers ...")
 
         def fun(expecter, idx, cnt):
@@ -233,21 +233,21 @@ class ZeroMQServer:
 
 class ZeroMQServerRouter(ZeroMQServer):
 
-    '''
+    """
     This class sends the distance matrix for each peer via the zeromq router socket.
     Each server gets only the local distance matrix which it needs.
-    '''
+    """
 
     # # TODO: check for each server if the distance matrix has been changed?
     # def enter_run_loop(self, block=True):
-    #     '''
+    #     """
     #     Send each server updates of the local distance matrix.
-    #     '''
+    #     """
     #
     #     super(ZeroMQServerRouter, self).enter_run_loop()
     #
     #     def fun(distance_matrix_per_server):
-    #         '''
+    #         """
     #
     #         Convert each distance matrix into a json encodable format and send it to the server directly.
     #
@@ -255,7 +255,7 @@ class ZeroMQServerRouter(ZeroMQServer):
     #         ----------
     #         distance_matrix_per_server : dict<int, dict<(int, int), int>>
     #             For each server the distance matrix.
-    #         '''
+    #         """
     #         # convert each distance matrix into a structure which is json encodable
     #         self.handle_state_distance_matrix(distance_matrix_per_server)
     #
@@ -268,14 +268,14 @@ class ZeroMQServerRouter(ZeroMQServer):
     #             self.drun_loop.join(0.1)
 
     def _handle_state_distance_matrix(self, distance_matrix_per_server):
-        '''
+        """
         Note: Called externally.
 
         Parameters
         ----------
         distance_matrix_per_server : dict<int, dict<(int, int), int>>
             For each server the distance matrix.
-        '''
+        """
 
         log.info("syncing nodes ...")
 
@@ -292,7 +292,7 @@ class ZeroMQServerRouter(ZeroMQServer):
 
 class ZeroMQCServerPubSub(ZeroMQServer):
 
-    '''
+    """
     This class enables the distribution of the distance matrix via a publish-subscribe pattern.
 
     Changes in the distance matrix (depending on the config) are sent efficiently to all subscribers.
@@ -309,7 +309,7 @@ class ZeroMQCServerPubSub(ZeroMQServer):
     last_distance_matrix_hash : str
         The last hash of the distance matrix.
         Used to send only the distance matrix if it changed (configurable via the config system)
-    '''
+    """
 
     last_distance_matrix_hash = ""
 
@@ -327,13 +327,13 @@ class ZeroMQCServerPubSub(ZeroMQServer):
         super(ZeroMQCServerPubSub, self).shutdown()
 
     def send_distance_matrix(self, distance_matrix):
-        '''
+        """
         Send the distance matrix via the publish socket.
 
         Parameters
         ----------
         distance_matrix : DistanceMatrix
-        '''
+        """
         data = self.serialize(DistanceMatrix.transform_distance_matrix(distance_matrix))
         log.info("sending %f kbytes ...", len(data) / 1024.0)
         self.pub_socket.send(data)
@@ -348,9 +348,9 @@ class ZeroMQCServerPubSub(ZeroMQServer):
         self.sync_subscribers()
 
     # def enter_run_loop(self, block=True):
-    #     '''
+    #     """
     #     Notify subscribers about changes in the distance matrix.
-    #     '''
+    #     """
     #
     #     super(ZeroMQCServerPubSub, self).enter_run_loop()
     #

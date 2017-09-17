@@ -4,7 +4,7 @@ from collections import defaultdict
 
 
 def transform_distance_matrix(distance_matrix):
-    '''
+    """
 
     Parameters
     ----------
@@ -13,7 +13,7 @@ def transform_distance_matrix(distance_matrix):
     Returns
     -------
     dict<int, list<(int, int)>
-    '''
+    """
     res = defaultdict(list)
     for (x, y), distance in distance_matrix.items():
         res[x].append((y, distance))
@@ -21,7 +21,7 @@ def transform_distance_matrix(distance_matrix):
 
 
 def detransform_distance_matrix(distance_matrix):
-    '''
+    """
 
     Parameters
     ----------
@@ -30,7 +30,7 @@ def detransform_distance_matrix(distance_matrix):
     Returns
     -------
     DistanceMatrix
-    '''
+    """
     res = {}
     for x, entries in distance_matrix.items():
         for (y, distance) in entries:
@@ -45,7 +45,7 @@ def factory():
 class DistanceMatrix:
 
     def __init__(self, data):
-        '''
+        """
         Each subclass has to provide a constructor which
         can be used to create a new instance of a :py:class:`.DistanceMatrix`
         by supplying the data as dict.
@@ -53,7 +53,7 @@ class DistanceMatrix:
         Parameters
         ----------
         data : dict<(int, int), int>
-        '''
+        """
         pass
 
     def filter_empty(self):
@@ -70,7 +70,7 @@ class DistanceMatrix:
         raise NotImplementedError
 
     def set_unlimited_distance(self, x, y):
-        '''
+        """
         If two nodes shall not be connected at all, we set no distance at all.
         Therefore we can save bytes in the matrix.
 
@@ -83,7 +83,7 @@ class DistanceMatrix:
         Returns
         -------
 
-        '''
+        """
         raise NotImplementedError
 
     def get_distance(self, x, y):

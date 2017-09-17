@@ -9,14 +9,14 @@ __author__ = 'Nils Schmidt'
 
 
 class RunLoop(ExceptionStopThread):
-    '''
+    """
 
     Attributes
     ----------
     __last_check : int
     simulation_manager : SimulationManager
     time_step : float
-    '''
+    """
 
     def __init__(self, simulation_manager):
         super(RunLoop, self).__init__(Exception)

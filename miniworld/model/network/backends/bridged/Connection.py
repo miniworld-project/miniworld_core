@@ -23,9 +23,9 @@ def get_superclass_dynamic():
 
 def ConnectionDummy():
     class ConnectionDummy(AbstractConnection):
-        '''
+        """
 
-        '''
+        """
 
         EVENT_ROOT = "connection"
         EVENT_CONN_STATE_CHANGE = "conn_state_change"
@@ -65,7 +65,7 @@ def ConnectionDummy():
 
         # TODO: implement adjustment with netem!
         def adjust_link_quality(self, link_quality_dict):
-            '''
+            """
 
             Parameters
             ----------
@@ -73,7 +73,7 @@ def ConnectionDummy():
 
             Returns
             -------
-            '''
+            """
 
             # assumes only equal interfaces can be connected to each other
             bandwidth = link_quality_dict.get(LINK_QUALITY_KEY_BANDWIDTH)
@@ -112,7 +112,7 @@ def ConnectionDummy():
                         self.shape_device(tap_y, connection_id, link_quality_dict)
 
         def shape_device(self, dev_name, connection_id, link_quality_dict):
-            '''
+            """
             Parameters
             ----------
             dev_name : str
@@ -122,7 +122,7 @@ def ConnectionDummy():
             tc qdisc add dev $DEV root handle 1:0 htb default 12
             tc class add dev $DEV parent 1:0 classid 1:1 htb rate 190kbit ceil 190kbit
             tc class add dev $DEV parent 1:1 classid 1:12 htb rate 100kbit ceil 190kbit prio 2
-            '''
+            """
 
             rate = link_quality_dict.get(LINK_QUALITY_KEY_BANDWIDTH)
             delay = link_quality_dict.get(LINK_QUALITY_KEY_DELAY)
@@ -198,7 +198,7 @@ def ConnectionDummy():
 
         # TODO: RENAME!
         def set_connection_state(self, up=True):
-            '''
+            """
 
             Parameters
             ----------
@@ -208,7 +208,7 @@ def ConnectionDummy():
             Returns
             -------
 
-            '''
+            """
             is_hubwifi = self.connection_info.is_central
 
             if is_hubwifi:

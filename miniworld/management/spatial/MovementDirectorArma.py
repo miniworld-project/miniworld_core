@@ -10,12 +10,12 @@ from miniworld.model.spatial.ArmaNodes import ArmaNodes
 
 
 class MovementDirectorArma(MovementDirectorAbstract):
-    '''
+    """
     Attributes
     ----------
     node_count :                                int
     nodes :                                     ArmaNodes
-    '''
+    """
 
     def __init__(self, node_count, file_path):
         self.node_count = node_count
@@ -25,21 +25,21 @@ class MovementDirectorArma(MovementDirectorAbstract):
         return self.nodes.get_distance_matrix()
 
     def get_geo_json_for_nodes(self):
-        '''
+        """
         Returns
         -------
         geo_json
                     for the current state of all nodes
-        '''
+        """
         return self.nodes.get_geo_json()
 
     def get_geo_json_for_roads(self):
-        '''
+        """
         Returns
         -------
         geo_json
                     for the current state of all nodes
-        '''
+        """
         return ""
 
     def simulate_one_step(self):

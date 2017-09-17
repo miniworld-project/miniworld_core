@@ -6,9 +6,9 @@ __author__ = 'Nils Schmidt'
 
 
 class VirtualNodeNetworkBackend(EmulationNodeNetworkBackend):
-    '''
+    """
 
-    '''
+    """
 
     def __init__(self, network_backend_bootstrapper, node_id,
                  # network

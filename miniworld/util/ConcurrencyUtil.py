@@ -10,7 +10,7 @@ __author__ = 'Nils Schmidt'
 
 
 def wait_until_fun_returns_true(check_fun, fun, *args, **kwargs):
-    '''
+    """
     Wait until fun(*args, **kwargs) returns something True.
 
     Parameters
@@ -21,7 +21,7 @@ def wait_until_fun_returns_true(check_fun, fun, *args, **kwargs):
     -------
     object
         The value of the function
-    '''
+    """
     sleep_time = kwargs.get("sleep_time", 0.1)
     if "sleep_time" in kwargs:
         del kwargs["sleep_time"]

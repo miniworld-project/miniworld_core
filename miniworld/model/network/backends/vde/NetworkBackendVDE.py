@@ -13,12 +13,12 @@ __author__ = 'Nils Schmidt'
 
 class NetworkBackendVDE(NetworkBackendDummy):
 
-    '''
+    """
     Attributes
     ----------
     switches: dict<Interface, AbstractSwitch>
         One AbstractSwitch for each interface.
-    '''
+    """
 
     def __init__(self, *args, **kwargs):
         super(NetworkBackendVDE, self).__init__(*args, **kwargs)
@@ -47,16 +47,16 @@ class NetworkBackendVDE(NetworkBackendDummy):
                                        network_backend, emulation_node_x, emulation_node_y, interface_x,
                                        interface_y, connection_info,
                                        **kwargs):
-        '''
+        """
         Adjust the link quality.
-        '''
+        """
         connection.adjust_link_quality(link_quality_dict)
 
     def get_interface_index(self, emulation_node, interface):
         return emulation_node.network_mixin.interfaces.index(interface)
 
     def create_n_connect_central_nodes(self, interfaces):
-        '''
+        """
 
         Parameters
         ----------
@@ -65,7 +65,7 @@ class NetworkBackendVDE(NetworkBackendDummy):
         Returns
         -------
         dict<int, CentralNode>
-        '''
+        """
         # create CentralNode s but only if there is a HubWiFi interface
         # TODO: REMOVE
         cnt = 0

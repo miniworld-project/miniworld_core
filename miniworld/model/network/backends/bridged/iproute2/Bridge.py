@@ -15,13 +15,13 @@ def BridgeIproute2():
     # TODO: extract iproute2 commands!
     class BridgeIproute2(Bridge):
 
-        '''
+        """
         Attributes
         ----------
         id : str
             Name of the bridge.
         bridge:
-        '''
+        """
 
         EVENT_ROOT = "bridge"
         EVENT_BRIDGE_ADD = "bridge_add"
@@ -39,7 +39,7 @@ def BridgeIproute2():
             singletons.network_backend.shell_command_executor.add_command(self.EVENT_ROOT, event, self.id, cmd, ["bridge"])
 
         def _start(self, bridge_dev_name=None, switch=False):
-            '''
+            """
             Create the bridge, add it to the bridge group and set the hub mode if appropriate.
 
             Parameters
@@ -50,7 +50,7 @@ def BridgeIproute2():
             Returns
             -------
 
-            '''
+            """
 
             self.bridge_dev_name = bridge_dev_name
             br_add_cmd = self._get_bridge_add_cmd()

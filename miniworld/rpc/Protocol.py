@@ -17,12 +17,12 @@ PORT_PUB_SERVICE = 5563
 
 
 class Protocol:
-    '''
+    """
     Abstract protocol which defines how data is represented on the wire.
-    '''
+    """
 
     def serialize(self, obj):
-        '''
+        """
 
         Parameters
         ----------
@@ -31,11 +31,11 @@ class Protocol:
         Returns
         -------
         obj
-        '''
+        """
         raise NotImplementedError
 
     def deserialize(self, obj):
-        '''
+        """
 
         Parameters
         ----------
@@ -44,7 +44,7 @@ class Protocol:
         Returns
         -------
         obj
-        '''
+        """
         raise NotImplementedError
 
     ############################################

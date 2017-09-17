@@ -16,7 +16,7 @@ class LocationArma(object):
         return self.y
 
     def get_distance_in_km(self, snd_location):
-        '''
+        """
         Parameters
         ----------
         snd_location : Location
@@ -24,11 +24,11 @@ class LocationArma(object):
         Returns
         -------
         int
-        '''
+        """
         return self.get_distance_in_m(snd_location) / 1000
 
     def get_distance_in_m(self, snd_location):
-        '''
+        """
         Parameters
         ----------
         snd_location : Location
@@ -36,5 +36,5 @@ class LocationArma(object):
         Returns
         -------
         int
-        '''
+        """
         return math.sqrt((self.x - snd_location.location.x) ** 2 + (self.y - snd_location.location.y) ** 2)

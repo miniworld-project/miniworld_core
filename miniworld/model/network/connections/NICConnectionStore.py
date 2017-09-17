@@ -8,14 +8,14 @@ from miniworld.model.network.connections.JSONEncoder import JSONStrMixin
 
 
 class NICConnectionStore(TupleUserDict, JSONStrMixin):
-    '''
+    """
     Models the connections between two interfaces.
     Default value is: dict
 
     Attributes
     ----------
     data : dict<(Interfaces, ConnectionDetails)
-    '''
+    """
 
     #########################################
     # Magic Methods
@@ -31,7 +31,7 @@ class NICConnectionStore(TupleUserDict, JSONStrMixin):
     # TODO: implement same behaviour via magic methods ...
     @staticmethod
     def _get_key(interface_x, interface_y):
-        '''
+        """
 
         Parameters
         ----------
@@ -41,7 +41,7 @@ class NICConnectionStore(TupleUserDict, JSONStrMixin):
         Returns
         -------
         Interfaces
-        '''
+        """
         import miniworld.model.network.interface.Interfaces
         # order on EmulationNode is sufficient for tuple sort
         return miniworld.model.network.interface.Interfaces.Interfaces([interface_x, interface_y])

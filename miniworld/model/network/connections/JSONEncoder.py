@@ -130,7 +130,7 @@ if __name__ == '__main__':
     #     ,cls = ConnectionEncoder
     # )
 
-    encoded_json = '''{
+    encoded_json = """{
         "(1, 5)": 9223372036854775807,
         "(1, 14)": 9223372036854775807,
         "(1, 7)": 9223372036854775807,
@@ -160,7 +160,7 @@ if __name__ == '__main__':
         "(1, 10)": 9223372036854775807,
         "(1, 13)": 9223372036854775807,
         "(2, 9)": 9223372036854775807
-    }'''
+    }"""
 
     print(encoded_json)
     decoded_json = json.loads(encoded_json, cls=ConnectionDecoder)

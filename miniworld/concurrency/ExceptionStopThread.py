@@ -12,7 +12,7 @@ __email__ = "schmidt89 at informatik.uni-marburg.de"
 
 
 class ExceptionStopThread(StopThread.StopThread):
-    ''' Adds a wrapper around the run() method and catches the supplied exceptions.
+    """ Adds a wrapper around the run() method and catches the supplied exceptions.
     If an exception occurrs, the thread is stopped and the exception is stored in a local variable
     together with its traceback.
 
@@ -31,10 +31,10 @@ class ExceptionStopThread(StopThread.StopThread):
     >>> t.start()
     >>> t.join()
     >>> raise t.raise_objects[0], t.raise_objects[1], t.raise_objects[2]
-    '''
+    """
 
     def __init__(self, exception_type, *args, **kwargs):
-        '''
+        """
         Parameters
         ----------
         exception_type : type
@@ -42,24 +42,24 @@ class ExceptionStopThread(StopThread.StopThread):
         raise_objects : BaseException, None, traceback
             Objects to be passed to raise(...)
 
-        '''
+        """
         super(ExceptionStopThread, self).__init__(*args, **kwargs)
         self.raise_objects = None
 
         self.exception_type = exception_type
 
     def _run(self):
-        ''' Implement in subclass '''
+        """ Implement in subclass """
         raise NotImplementedError
 
     def exception_handler(self, exception):
-        '''
+        """
         Called if a unhandled exception occurs.
 
         Parameters
         ----------
         exception
-        '''
+        """
         pass
 
     def run(self):
@@ -74,7 +74,7 @@ class ExceptionStopThread(StopThread.StopThread):
     # TODO: DOC
     @staticmethod
     def run_fun_threaded_n_log_exception(*args, **kwargs):
-        '''
+        """
 
         Parameters
         ----------
@@ -85,7 +85,7 @@ class ExceptionStopThread(StopThread.StopThread):
         Returns
         -------
         Thread
-        '''
+        """
 
         target = kwargs.get("target")
         targs = kwargs.get("targs")

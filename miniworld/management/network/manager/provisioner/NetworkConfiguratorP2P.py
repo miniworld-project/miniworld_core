@@ -7,7 +7,7 @@ from miniworld.util import DictUtil
 
 class NetworkConfiguratorP2P(NetworkConfiguratorConnectionBased):
 
-    '''
+    """
     Provisions IP address based on the current connections.
     For each connection, a link with an own subnet is created.
 
@@ -16,7 +16,7 @@ class NetworkConfiguratorP2P(NetworkConfiguratorConnectionBased):
     subnet_generator : generator<IPv4Network>
     used_subnets : dict<(EmulationNode, EmulationNode), ipaddress.IPv4Network>
         The subnet for each connection.
-    '''
+    """
 
     ################################################
     # NetworkConfigurator
@@ -39,7 +39,7 @@ class NetworkConfiguratorP2P(NetworkConfiguratorConnectionBased):
         return super(NetworkConfiguratorP2P, self).get_nic_configuration_commands(connections)
 
     def configure_connection(self, emulation_nodes, interfaces):
-        '''
+        """
         Assign connected nodes an ip address of the same subnet.
 
         Parameters
@@ -49,7 +49,7 @@ class NetworkConfiguratorP2P(NetworkConfiguratorConnectionBased):
 
         Returns
         -------
-        '''
+        """
         # dict<int, list<str>>
         commands_per_node = defaultdict(list)
         check_commands_per_node = defaultdict(list)

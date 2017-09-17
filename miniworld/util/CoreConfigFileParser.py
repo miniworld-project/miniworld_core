@@ -8,7 +8,7 @@ __author__ = "Nils Schmidt"
 
 
 def parse_core_config_file(file_path, include_interfaces=False):
-    '''
+    """
     Parse the core xml config file and return which nodes are connected with each other.
 
     Parameters
@@ -39,7 +39,7 @@ def parse_core_config_file(file_path, include_interfaces=False):
         </channel>
       </network>
       ...
-      '''
+      """
     # Open XML document using minidom parser
     DOMTree = xml.dom.minidom.parse(file_path)
     scenario = DOMTree.documentElement
@@ -84,7 +84,7 @@ def parse_core_config_file(file_path, include_interfaces=False):
 
 
 def parse_core_config_file_positions(file_path):
-    '''
+    """
     Parse the core xml config file and return the positions of the nodes.
 
     Parameters
@@ -113,7 +113,7 @@ def parse_core_config_file_positions(file_path):
         <point lat="47.550510742" lon="-122.106359809" type="gps"/>
       </host>
     ...
-    '''
+    """
     # Open XML document using minidom parser
     # TODO: #32: error handling!
     DOMTree = xml.dom.minidom.parse(file_path)

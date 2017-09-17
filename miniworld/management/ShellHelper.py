@@ -35,7 +35,7 @@ class BackgroundProcessError(ShellHelperError):
 
 
 def run_shell(cmd, *args, **kwargs):
-    '''
+    """
 
     Parameters
     ----------
@@ -46,7 +46,7 @@ def run_shell(cmd, *args, **kwargs):
     Returns
     -------
     str
-    '''
+    """
     bufsize = kwargs.get("buf_size", -1)
     cmd_as_list = shlex.split(cmd)
     # TODO: check if bufsize improves performance
@@ -62,7 +62,7 @@ def run_shell(cmd, *args, **kwargs):
 
 # TODO: DOC
 def run_shell_get_output(cmd, shell=False):
-    '''
+    """
     Use the system shell for pipes etc!.
     Parameters
     ----------
@@ -76,7 +76,7 @@ def run_shell_get_output(cmd, shell=False):
     Raises
     ------
     MyCalledProcessError
-    '''
+    """
     p, cmd = run_sub_process_popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=shell)
     stdout, stderr = p.communicate()
     if p.returncode != 0 and stderr:
@@ -115,7 +115,7 @@ def run_sub_process_popen(cmd, stdout=None, stderr=None, stdin=None, **kwargs):
 
 
 def run_shell_with_input(cmd, _input):
-    '''
+    """
     Run the shell command `cmd` and supply `_input` as stdin.
 
     Parameters
@@ -130,7 +130,7 @@ def run_shell_with_input(cmd, _input):
     Raises
     ------
     MyCalledProcessError
-    '''
+    """
     log.info("'%s <<<\"%s\"'", cmd, _input)
 
     cmd = shlex.split(cmd)
@@ -144,14 +144,14 @@ def run_shell_with_input(cmd, _input):
 
 
 def fmt_shell_cmd_log_file_prologue(cmd):
-    ''' Create the prologue for a log file which holds the result of the execution of `cmd` '''
+    """ Create the prologue for a log file which holds the result of the execution of `cmd` """
     return """$ %s
 %s
 """ % (cmd, "-" * 50)
 
 
 def fmt_cmd_template(cmd):
-    ''' Format the cmd template `cmd` so that in can be used e.g. for a os.system call '''
+    """ Format the cmd template `cmd` so that in can be used e.g. for a os.system call """
     return re.sub("\s+", " ", cmd)
 
 
@@ -159,7 +159,7 @@ def fmt_cmd_template(cmd):
 # TODO: use selectors instead of epoll!
 # TODO: DOC
 class LogWriter(Resetable):
-    '''
+    """
     Read from all log files (stdout + stderr) and write line-buffered into a log file.
 
     When resetting, data belonging to closed file descriptors is discarded.
@@ -173,10 +173,10 @@ class LogWriter(Resetable):
     fh_logfile : file
 
     writer_thread : ExceptionStopThread
-    '''
+    """
 
     def __init__(self, log_filename=None):
-        '''
+        """
 
         Parameters
         ----------
@@ -184,7 +184,7 @@ class LogWriter(Resetable):
 
         Returns
         -------
-        '''
+        """
         object.__init__(self)
 
         if log_filename is None:
@@ -271,7 +271,7 @@ FOREGROUND_SHELL_LOG_PATH = PathUtil.get_log_file_path("foreground_shell_command
 
 class ShellHelper(Resetable):
 
-    '''
+    """
     Provides help for starting shell process in fore- and background.
      For the background threads, the stdout/stderr file descriptors are read
      and further process by the :py:class:`.LogWriter` thread.
@@ -288,14 +288,14 @@ class ShellHelper(Resetable):
     lock
     subprocess : list<subprocess.Popen>
     bg_checker_thread : ExceptionStopThread
-    '''
+    """
 
     lock = Lock()
     subprocesses = []
     log_writer = None
 
     def __init__(self, garbage_collect=True):
-        '''
+        """
 
         Parameters
         ----------
@@ -307,7 +307,7 @@ class ShellHelper(Resetable):
         -------
         str
             Output of the shell command
-        '''
+        """
         self.garbage_collect = True
         self.bg_checker_thread = None
         self.start_bg_checker_thread()
@@ -388,7 +388,7 @@ class ShellHelper(Resetable):
 
     # TODO: Ticket #2
     def run_shell_async(self, node_name, cmd, prefixes=None, take_process_ownership=True, supervise_process=True):
-        '''
+        """
 
         Parameters
         ----------
@@ -401,7 +401,7 @@ class ShellHelper(Resetable):
         Returns
         -------
 
-        '''
+        """
 
         with self.lock:
             if not self.log_writer:

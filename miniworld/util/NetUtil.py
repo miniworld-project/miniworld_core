@@ -9,9 +9,9 @@ __author__ = 'Nils Schmidt'
 
 
 def get_mac(postfix_as_int, prefix="aa:aa:aa:aa"):
-    ''' Generate a mac address with suffix `prefix` and postfix `postfix_as_int`
+    """ Generate a mac address with suffix `prefix` and postfix `postfix_as_int`
     Supports 2^16 unique mac addresses
-    '''
+    """
 
     postfix = "%04x" % postfix_as_int
     postfix = '%s:%s' % (postfix[0:2], postfix[2:4])
@@ -28,7 +28,7 @@ def get_ip_addr_change_cmd(dev, ip, netmask, up=True):
 
 
 def get_slash_x(subnets, prefixlen):
-    '''
+    """
 
     Parameters
     ----------
@@ -46,7 +46,7 @@ def get_slash_x(subnets, prefixlen):
     Returns
     -------
     generator<IPv4Network>
-    '''
+    """
     for subnet in subnets:
         if subnet.prefixlen == prefixlen:
             yield subnet
@@ -61,7 +61,7 @@ def get_slash_x(subnets, prefixlen):
 ###########################################################
 
 def uds_reachable(uds_path, return_sock=False):
-    ''' Check if the unix domain socket at path `uds_path` is reachable.
+    """ Check if the unix domain socket at path `uds_path` is reachable.
 
     Parameters
     ----------
@@ -74,7 +74,7 @@ def uds_reachable(uds_path, return_sock=False):
     bool, socket
         If the socket is reachable, the socket if `return_sock` else None
         Remember to close the socket!
-    '''
+    """
     sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     try:
         sock.connect(uds_path)
@@ -89,12 +89,12 @@ def uds_reachable(uds_path, return_sock=False):
 
 
 def wait_until_uds_reachable(uds_path, return_sock=False):
-    ''' Wait until the unix domain socket at `uds_path` is reachable.
+    """ Wait until the unix domain socket at `uds_path` is reachable.
 
     Returns
     -------
     socket.socket
-    '''
+    """
 
     from miniworld.util import ConcurrencyUtil
     sock = ConcurrencyUtil.wait_until_fun_returns_true(lambda x: x[0] is True, uds_reachable, uds_path, return_sock=return_sock)[1]
@@ -113,7 +113,7 @@ class SocketExpect(object):
     # TODO: REMOVE expected_length
     # TODO: support timeout!
     def __init__(self, sock, check_fun, read_buf_size=1, timeout=None, send_data=None):
-        '''
+        """
         Read from the socket `sock` until the function
         `check_fun` return True.
 
@@ -125,7 +125,7 @@ class SocketExpect(object):
         read_buf_size : int, optional (default is 1)
             Reads bytewise from the socket.
         send_data: bytes
-        '''
+        """
 
         if timeout is not None and timeout < 0:
             raise ValueError("timeout must be > 0!")
@@ -145,7 +145,7 @@ class SocketExpect(object):
 
     # TODO: DOC
     def read(self):
-        '''
+        """
 
         Returns
         -------
@@ -157,7 +157,7 @@ class SocketExpect(object):
         ------
         Timeout
             If `timeout` is not None.
-        '''
+        """
         try:
             self.selector.register(self.sock, selectors.EVENT_READ)
             t_start = time.time()
@@ -206,11 +206,11 @@ def wait_for_socket_result(*args, **kwargs):
 
 
 def wait_for_boot(*args, **kwargs):
-    '''
+    """
     Raises
     ------
     Timeout
-    '''
+    """
     # enter shell after each select timeout
     kwargs['send_data'] = b'\n'
     buffered_socket_reader = SocketExpect(*args, **kwargs)
@@ -246,7 +246,7 @@ if __name__ == '__main__':
 
 
 def read_remaining_data(sock, buf_size=4096):
-    '''
+    """
     Get the remaining (unread) data from the socket.
 
     Parameters
@@ -258,7 +258,7 @@ def read_remaining_data(sock, buf_size=4096):
     -------
     str
         The data.
-    '''
+    """
     data = ""
     try:
         old_timeout = sock.gettimeout()

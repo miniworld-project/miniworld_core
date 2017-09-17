@@ -19,7 +19,7 @@ NETWORK_BACKENDS = {
 
 
 def get_network_backend_bootstrapper_for_string(network_backend_name):
-    '''
+    """
 
     Parameters
     ----------
@@ -28,7 +28,7 @@ def get_network_backend_bootstrapper_for_string(network_backend_name):
     Returns
     -------
     NetworkBackendBootstrapper
-    '''
+    """
 
     if network_backend_name == NETWORK_BACKENDS_VDE:
 
@@ -89,7 +89,7 @@ def get_network_backend_bootstrapper_for_string(network_backend_name):
 
 
 def _boot_strapper_backend_bridged_for_execution_mode(network_backend, connection, bridge, tunnel_type=None):
-    '''
+    """
 
     Parameters
     ----------
@@ -100,7 +100,7 @@ def _boot_strapper_backend_bridged_for_execution_mode(network_backend, connectio
     Returns
     -------
     NetworkBackendBootStrapper
-    '''
+    """
     from miniworld.model.network.backends.bridged import EmulationNodeBridged, CentralBridgeNode, ManagementNodeBridged, EmulationNodeNetworkBackendBridgedMultiDevice
     from miniworld.model.network.backends.EmulationNodeNetworkBackend import EmulationNodeNetworkBackend
     from miniworld.model.network.backends.bridged import QemuTap
@@ -124,12 +124,12 @@ def _boot_strapper_backend_bridged_for_execution_mode(network_backend, connectio
 
 
 def get_current_network_backend_bootstrapper():
-    '''
+    """
     Get a copy of the current :py:class:`.NetworkBackend`.
 
     Returns
     -------
     NetworkBackendBootstrapper
 
-    '''
+    """
     return get_network_backend_bootstrapper_for_string(scenario_config.get_network_backend())

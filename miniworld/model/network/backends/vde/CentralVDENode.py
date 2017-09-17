@@ -8,7 +8,7 @@ class CentralVDENode(CentralNode.CentralNode):
 
     # TODO: #54,#55
     def start(self, switch=False):
-        '''
+        """
         1. Start hub/switch
         2. Color interfaces (if switch wants so)
         3. Move interface to VLAN
@@ -20,7 +20,7 @@ class CentralVDENode(CentralNode.CentralNode):
         Raises
         ------
         NetworkManagementSwitchBridgeNotExisting
-        '''
+        """
         log.info("starting management node/switch ...")
         super(CentralVDENode, self)._start(switch=switch)
 

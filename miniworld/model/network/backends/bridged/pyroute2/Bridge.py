@@ -12,13 +12,13 @@ from miniworld.model.singletons.Singletons import singletons
 def BridgePyroute2():
     class BridgePyroute2(Bridge):
 
-        '''
+        """
         Attributes
         ----------
         id : str
             Name of the bridge.
         bridge: pyroute2.ipdb.interface.Interface
-        '''
+        """
 
         def _start(self, bridge_dev_name=None, switch=False):
             self.bridge_dev_name = bridge_dev_name
@@ -62,7 +62,7 @@ def BridgePyroute2():
                        pformat(singletons.network_backend._tap_id_mapping)), caused_by=e)
 
     #     def reset(self):
-    #         '''
+    #         """
     #         Raises
     #         ------
     #         NetworkBackendErrorReset
@@ -70,7 +70,7 @@ def BridgePyroute2():
     #         Returns
     #         -------
     #
-    #         '''
+    #         """
     #         try:
     #             if self.bridge_dev_name:
     #                 # use pyroute2 since otherwise the cache may not be in sync
@@ -89,13 +89,13 @@ def BridgePyroute2():
 def BridgePyroute2IPRoute():
     class BridgePyroute2IPRoute(Bridge):
 
-        '''
+        """
         Attributes
         ----------
         id : str
             Name of the bridge.
         bridge: pyroute2.ipdb.interface.Interface
-        '''
+        """
 
         def _start(self, bridge_dev_name=None, switch=False):
             self.bridge_dev_name = bridge_dev_name

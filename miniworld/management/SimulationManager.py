@@ -69,7 +69,7 @@ def factory():
 
 class SimulationManager(Resetable, object):
 
-    '''
+    """
     This class is responsible for managing the simulation.
     The simulation can run assisted or automatically (a :py:class:`RunLoop` triggers every time step the step() method).
     In the first case some external program has to call it.
@@ -101,7 +101,7 @@ class SimulationManager(Resetable, object):
 
     resets : int
         The number of times an experiment has been started/stopped
-    '''
+    """
 
     class Error(Base):
         pass
@@ -156,21 +156,21 @@ class SimulationManager(Resetable, object):
         return self.movement_director is not None or config.is_mode_distributed()
 
     def get_emulation_nodes(self):
-        '''
+        """
         Get all :py:class:`.EmulationNode` from the current simulation.
 
         Returns
         -------
         EmulationNodes
-        '''
+        """
         return EmulationNodes(OrderedSet(self.nodes_id_mapping.values())).filter_real_emulation_nodes()
 
     def get_emulation_node_ids(self):
-        '''
+        """
         Returns
         -------
         list<int>
-        '''
+        """
         # filter out virtual nodes!
         return list(filter(lambda x: isinstance(x, int), self.nodes_id_mapping.keys()))
 
@@ -180,14 +180,14 @@ class SimulationManager(Resetable, object):
 
     # TODO: adjust doc, remove comments
     def pre_calculate_hubwifi_distance_matrix(self, nodes):
-        '''
+        """
         Precalculate the distance matrix where each node with a :py:class:`.HubWiFi` interface is connected
         to the `CentralHub`.
 
         Returns
         -------
         dict( (int, int), int>
-        '''
+        """
         if self.distance_matrix_hubwifi:
             return self.distance_matrix_hubwifi
 
@@ -226,11 +226,11 @@ class SimulationManager(Resetable, object):
     ###############################################
 
     def start_run_loop(self):
-        '''
+        """
         Note
         ----
         Not thread-safe!
-        '''
+        """
         self.run_loop = RunLoop(self)
         self.run_loop.daemon = True
         self.run_loop.start()
@@ -239,14 +239,14 @@ class SimulationManager(Resetable, object):
         return self.run_loop
 
     def stop_run_loop(self):
-        '''
+        """
         Stop the run loop and wait until the thread terminated.
-        '''
+        """
         self.run_loop.terminate()
         self.run_loop.join()
 
     def raise_run_loop_exception(self):
-        '''
+        """
         Check if an exception occurred in the :py:class:`RunLoop`.
         If yes, raise the exception.
 
@@ -257,7 +257,7 @@ class SimulationManager(Resetable, object):
         Raises
         ------
         Exception
-        '''
+        """
 
         if hasattr(self.run_loop, 'raise_objects'):
             # no exception
@@ -285,7 +285,7 @@ class SimulationManager(Resetable, object):
         return hasher.hexdigest()
 
     def start(self, scenario_config_content, auto_stepping=False, blocking=True, force_snapshot_boot=False):
-        '''
+        """
         Parse the scenario config and run the simulation.
 
         Parameters
@@ -300,7 +300,7 @@ class SimulationManager(Resetable, object):
         Raises
         ------
         SimulationStateStartFailed
-        '''
+        """
         try:
 
             # store scenario file globally
@@ -377,7 +377,7 @@ class SimulationManager(Resetable, object):
             raise SimulationStateStartFailed("Failed to start the simulation! Check the rpc log for details!", caused_by=e)
 
     def exec_node_cmd(self, cmd, node_id=None, validation=True, timeout=None) -> Union[str, Dict[int, str]]:
-        '''
+        """
         Execute a command on a node or all nodes.
 
         Parameters
@@ -386,7 +386,7 @@ class SimulationManager(Resetable, object):
         cmd
         validation
         timeout
-        '''
+        """
         nodes = self.get_emulation_nodes()
 
         def get_fun(node):
@@ -429,7 +429,7 @@ class SimulationManager(Resetable, object):
                link_quality_model, network_backend_name,
                parallel=True, auto_stepping=False,
                node_ids=None):
-        '''
+        """
         Start the simulation (thread-safe)
 
         This includes the following steps:
@@ -448,7 +448,7 @@ class SimulationManager(Resetable, object):
         Returns
         -------
         list<EmulationNode>
-        '''
+        """
 
         with self.try_simulation(scenario_name):
 
@@ -574,7 +574,7 @@ class SimulationManager(Resetable, object):
     ###############################################
 
     def set_hubwifi_on_connection_info(self, interface, connection_info):
-        '''
+        """
 
         Parameters
         ----------
@@ -585,7 +585,7 @@ class SimulationManager(Resetable, object):
         -------
         bool
             Whether we have a HubWifi interface
-        '''
+        """
         # HubWiFi interface: do not change connections, but apply link quality
         is_hubwifi_iface = isinstance(interface, HubWiFi)
         connection_info.is_central = is_hubwifi_iface
@@ -595,7 +595,7 @@ class SimulationManager(Resetable, object):
     # TODO:
     @staticmethod
     def get_central_node(emulation_node_x, emulation_node_y, interface_x, interface_y):
-        '''
+        """
 
         Parameters
         ----------
@@ -606,12 +606,12 @@ class SimulationManager(Resetable, object):
         -------
         CentralNode, HubWifi, EmulationNode, Interface
             central_node, if_hubwifi, emu_node, if_emu_node
-        '''
+        """
         return (emulation_node_x, interface_x, emulation_node_y, interface_y) if is_central_node(
             emulation_node_x) else (emulation_node_y, interface_y, emulation_node_x, emulation_node_x)
 
     def get_distance_matrix_diff(self, new_distance_matrix):
-        '''
+        """
         This method is not idempotent.
 
         Parameters
@@ -621,7 +621,7 @@ class SimulationManager(Resetable, object):
         Returns
         -------
         DistanceMatrix
-        '''
+        """
 
         # TODO: #52: maybe numpy is faster for comparing matrices
         # new dict with entries present in the first set, but not in the second
@@ -638,7 +638,7 @@ class SimulationManager(Resetable, object):
     ###############################################
 
     def step(self, steps, distance_matrix=None):
-        '''
+        """
         This method is responsible for tracking the changes in the network topology
         which are signaled by the :py:class:`.MovementDirector` by a distance matrix.
         According to the distance, a :py:class:`.LinkQualityModel` determines the link quality.
@@ -667,7 +667,7 @@ class SimulationManager(Resetable, object):
         ------
         ValueError
             If the distance matrix is None
-        '''
+        """
 
         def _step(distance_matrix):
 
@@ -761,14 +761,14 @@ class SimulationManager(Resetable, object):
         return self.nodes_id_mapping[idx]
 
     def _step_inner(self, node_ids, distance):
-        '''
+        """
         Do a step but only if the node_ids are according to an upper triangular matrix.
 
         Parameters
         ----------
         node_ids: (int, int)
         distance: int
-        '''
+        """
         x, y = node_ids
 
         connection_info = ConnectionInfo()
@@ -816,7 +816,7 @@ class SimulationManager(Resetable, object):
         self._step_connection(link_quality_model_says_connected, link_quality_dict, node_x, node_y, connection_info)
 
     def _step_no_connection_yet(self, link_quality_model_says_connected, link_quality_dict, distance, emulation_node_x, emulation_node_y, connection_info):
-        '''
+        """
         Connect all interfaces according to the decision of the :py:class:`.LinkQualityModel`
           except the :py:class:`.Management` and :py:class:`.HubWiFi`.
         Afterwards adjust the link quality.
@@ -842,7 +842,7 @@ class SimulationManager(Resetable, object):
         node_id_y : int
         emulation_node_y: EmulationNode
         connection_info : ConnectionInfo
-        '''
+        """
 
         # TODO: put into connection_info
         is_exactly_one_central_node = len(list(filter(lambda x: x is True, (is_central_node(emulation_node_x), is_central_node(emulation_node_y))))) == 1
@@ -899,7 +899,7 @@ class SimulationManager(Resetable, object):
 
     # TODO: DOC link_quality_dict
     def _step_connection(self, link_quality_model_says_connected, link_quality_dict, emulation_node_x, emulation_node_y, connection_info):
-        '''
+        """
         Adjust the link quality for already connected nodes
         there a :py:class:`.AbstractConnection` already exists.
 
@@ -910,7 +910,7 @@ class SimulationManager(Resetable, object):
         emulation_node_x : EmulationNode
         emulation_node_y: EmulationNode
         connection_info : ConnectionInfo
-        '''
+        """
         key = emulation_node_x, emulation_node_y
 
         def call_link_quality_adjustment_notifications(connection, link_quality_dict, interface_x, interface_y):
@@ -967,7 +967,7 @@ class SimulationManager(Resetable, object):
 
 class DistributedModeSimulationManager(SimulationManager):
 
-    '''
+    """
 
     Attributes
     ----------
@@ -975,7 +975,7 @@ class DistributedModeSimulationManager(SimulationManager):
         Stores for each emulation server the list of nodes it maintains.
     all_nodes_id_mapping : dict<int, EmulationNode>
         All nodes that take part in the distributed simulation.
-    '''
+    """
 
     def reset(self):
         super(DistributedModeSimulationManager, self).reset()
@@ -1001,7 +1001,7 @@ class DistributedModeSimulationManager(SimulationManager):
 
     # TODO: REMOVE ?
     def map_distance_matrix_to_servers(self, distance_matrix):
-        '''
+        """
         We do not need the whole distance matrix for each server.
         Only entries, where a distance to a node which the server maintains is listed, is necessary.
         This function filters these entries for each server.
@@ -1014,7 +1014,7 @@ class DistributedModeSimulationManager(SimulationManager):
         -------
         dict< int, dict<(int, int>, int> >>
             Distance matrix for each server
-        '''
+        """
         res = defaultdict(dict)
 
         if not config.is_publish_individual_distance_matrices():
@@ -1039,13 +1039,13 @@ class SimulationManagerDistributedClient(DistributedModeSimulationManager):
         return emulation_node_id in self.get_local_node_ids()
 
     def is_connection_among_servers(self, emulation_node_x, emulation_node_y):
-        '''
+        """
         Check if we need a tunnel between the two nodes.
 
         Returns
         -------
         bool
-        '''
+        """
 
         # TODO: #90
         if not EmulationNodes((emulation_node_x, emulation_node_x)).filter_real_emulation_nodes():
@@ -1059,17 +1059,17 @@ class SimulationManagerDistributedClient(DistributedModeSimulationManager):
         return False
 
     def get_local_node_ids(self):
-        '''
+        """
         Get the node_ids for which this server is responsible (distributed mode)
 
         Returns
         -------
         list<int>
-        '''
+        """
         return list(self.nodes_id_mapping.keys())
 
     def get_local_distance_matrix_to_servers(self, whole_distance_matrix):
-        '''
+        """
         We do not need the whole distance matrix for each server.
         Only entries, where a distance to a node which the server maintains is listed, is necessary.
         This function filters these entries for each server.
@@ -1082,7 +1082,7 @@ class SimulationManagerDistributedClient(DistributedModeSimulationManager):
         -------
         dict<(int, int>, int>>
             Distance matrix for this erver
-        '''
+        """
         res = {}
         local_node_ids = self.get_local_node_ids()
         for (x, y), distance in whole_distance_matrix.items():
@@ -1093,7 +1093,7 @@ class SimulationManagerDistributedClient(DistributedModeSimulationManager):
         return DistanceMatrix.factory()(res)
 
     def get_remote_node(self, emulation_node_x, emulation_node_y, interface_x, interface_y):
-        '''
+        """
 
         Parameters
         ----------
@@ -1106,7 +1106,7 @@ class SimulationManagerDistributedClient(DistributedModeSimulationManager):
         -------
         EmulationNode, Interface, EmulationNode, Interface
             remote_node, if_remote_node, local_emu_node, if_local_emu_node
-        '''
+        """
         return (emulation_node_x, interface_x, emulation_node_y, interface_y) if not self.is_local_node(emulation_node_x.id) else (emulation_node_y, interface_y, emulation_node_x, interface_x)
 
 
@@ -1135,7 +1135,7 @@ class SimulationManagerDistributedCoordinator(DistributedModeSimulationManager):
 
     @staticmethod
     def create_scenario_configs(server_node_mapping):
-        '''
+        """
 
         Parameters
         ----------
@@ -1145,7 +1145,7 @@ class SimulationManagerDistributedCoordinator(DistributedModeSimulationManager):
         -------
         dict<int, dict>
             Dict of the scenario configs.
-        '''
+        """
         scenario_configs = {}
         for server in server_node_mapping:
             miniworld.Scenario.scenario_config.set_distributed_server_id(server)
@@ -1155,7 +1155,7 @@ class SimulationManagerDistributedCoordinator(DistributedModeSimulationManager):
 
     # TODO: DOC
     def transform_distance_matrix(self, distance_matrix):
-        '''
+        """
 
         Parameters
         ----------
@@ -1165,7 +1165,7 @@ class SimulationManagerDistributedCoordinator(DistributedModeSimulationManager):
         -------
         dict<(int, int), int> or dict<int, dict<(int, int), int>
             The first is the normal distance matrix. The latter for each node the local distance matrix.
-        '''
+        """
         if config.is_protocol_zeromq_mode_mcast():
             return distance_matrix
         else:
@@ -1173,7 +1173,7 @@ class SimulationManagerDistributedCoordinator(DistributedModeSimulationManager):
 
     # TODO: abstract more with super step?
     def step(self, steps, distance_matrix=None):
-        '''
+        """
         This method is responsible for tracking the changes in the network topology
         which are signaled by the :py:class:`.MovementDirector` by a distance matrix.
         According to the distance, a :py:class:`.LinkQualityModel` determines the link quality.
@@ -1202,7 +1202,7 @@ class SimulationManagerDistributedCoordinator(DistributedModeSimulationManager):
         Returns
         -------
         DistanceMatrix
-        '''
+        """
 
         # TODO:
         if steps > 1:
@@ -1232,9 +1232,9 @@ class SimulationManagerDistributedCoordinator(DistributedModeSimulationManager):
                 return distance_matrix
 
     def get_emulation_node_ids(self):
-        '''
+        """
         Returns
         -------
         list<int>
-        '''
+        """
         return scenario_config.get_all_emulation_node_ids()

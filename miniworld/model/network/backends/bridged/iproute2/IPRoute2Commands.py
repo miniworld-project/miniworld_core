@@ -5,7 +5,7 @@ from miniworld.util import PathUtil
 
 
 def find_empty_group(start=1, end=10000):
-    '''
+    """
     Returns the next free iproute2 group.
 
     Parameters
@@ -16,7 +16,7 @@ def find_empty_group(start=1, end=10000):
     Returns
     -------
     int
-    '''
+    """
     for idx in range(start, end + 1):
         # no links for this group
         if not run_shell("ip link list group {}".format(idx)):

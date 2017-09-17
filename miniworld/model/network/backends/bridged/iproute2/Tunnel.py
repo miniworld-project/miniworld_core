@@ -12,7 +12,7 @@ GRETAP_MTU = 1458
 
 
 class AbstractTunnel(StartableObject.StartableSimulationStateObject):
-    '''
+    """
     Attributes
     ----------
     emulation_node_x : EmulationNode
@@ -20,7 +20,7 @@ class AbstractTunnel(StartableObject.StartableSimulationStateObject):
     prefix : str
     remote_ip : str
         IP address of the remote peer.
-    '''
+    """
 
     def __init__(self, emulation_node_x, emulation_node_y, remote_ip):
 
@@ -60,11 +60,11 @@ class TunnelIPRoute(AbstractTunnel):
     EVENT_TUNNEL_ADD = "tunnel_add"
     EVENT_ORDER = OrderedSet([EVENT_TUNNEL_REMOVE, EVENT_TUNNEL_ADD])
 
-    '''
+    """
     Attributes
     ----------
     PREFIXES : list<str>
-    '''
+    """
 
     def __init__(self, *args, **kwargs):
         super(TunnelIPRoute, self).__init__(*args, **kwargs)
@@ -125,7 +125,7 @@ class VLANTunnel(TunnelIPRoute):
 
 
 class VXLanTunnel(TunnelIPRoute):
-    ''' ip link add name vxlan0 type vxlan id 42 dev eth0 group 239.0.0.1 dstport 4789 '''
+    """ ip link add name vxlan0 type vxlan id 42 dev eth0 group 239.0.0.1 dstport 4789 """
 
     def _start(self):
         self.add_command(self.EVENT_TUNNEL_ADD,

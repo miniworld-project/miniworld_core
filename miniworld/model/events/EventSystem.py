@@ -13,7 +13,7 @@ from miniworld.model.singletons import Resetable
 
 
 class EventSystem(collections.UserDict, EventSystemStats, Resetable.Resetable):
-    '''
+    """
     Thread-safe event system. The model is usable like a normal dict.
     The default value for non existing keys is: :py:class:`.NodeEventSystem`
 
@@ -24,7 +24,7 @@ class EventSystem(collections.UserDict, EventSystemStats, Resetable.Resetable):
     events : list<str>
     ready : threading.event
         Use to block progress generation until the system is ready.
-    '''
+    """
 
     EVENT_TOTAL_PROGRESS = "total_progress"
 
@@ -58,7 +58,7 @@ class EventSystem(collections.UserDict, EventSystemStats, Resetable.Resetable):
 
     @contextmanager
     def event_init(self, event_name, init_ids=None, finish_ids=None):
-        '''
+        """
         Provides a contextmanager for event updating.
 
         Parameters
@@ -92,7 +92,7 @@ class EventSystem(collections.UserDict, EventSystemStats, Resetable.Resetable):
         >>>     # but after the context manager exits
         >>>     print "finishing ..."
         >>> print es.get_progress(), es.items(
-        '''
+        """
         if init_ids is None:
             init_ids = list(self.keys())
 
@@ -106,15 +106,15 @@ class EventSystem(collections.UserDict, EventSystemStats, Resetable.Resetable):
         event.finish(finish_ids)
 
     def event_no_init_finish(self, event_name):
-        '''
+        """
         Same as :py:meth:`.event` but do no init and no finish.
-        '''
+        """
         return self.event_init(event_name, init_ids=[], finish_ids=[])
 
     def event_no_init(self, event_name, finish_ids=None):
-        '''
+        """
         Same as :py:meth:`.event` but do no init.
-        '''
+        """
         return self.event_init(event_name, init_ids=[], finish_ids=finish_ids)
 
     #########################################
@@ -122,21 +122,21 @@ class EventSystem(collections.UserDict, EventSystemStats, Resetable.Resetable):
     #########################################
 
     def get_average_complete_progress(self):
-        '''
+        """
         Get the average complete progress.
         Therefore, the progress of all events divided by the number of events.
 
         Returns
         -------
         float
-        '''
+        """
         cnt_events = len(self.get_events())
         if cnt_events > 0:
             return sum([self.get_average_progress(event) for event in self.get_events()]) * 1.0 / cnt_events
         return 0.0
 
     def get_average_progress(self, event=None):
-        '''
+        """
         Get the average progress for the `event`.
 
         Parameters
@@ -147,7 +147,7 @@ class EventSystem(collections.UserDict, EventSystemStats, Resetable.Resetable):
         Returns
         -------
         float
-        '''
+        """
         cnt_items = len(self)
         sum_progress = None
 
@@ -169,14 +169,14 @@ class EventSystem(collections.UserDict, EventSystemStats, Resetable.Resetable):
     #########################################
 
     def init_events(self, events):
-        '''
+        """
         Init the `events`. This might be necessary if one wants to enforce the order given by `events`.
         Otherwise the order is the order in which the events are updated the first time.
 
         Parameters
         ----------
         events: list<str>
-        '''
+        """
         for node_id in self.keys():
             for event in events:
                 self.update_event(event, 0.0, node_ids=[node_id])
@@ -192,14 +192,14 @@ class EventSystem(collections.UserDict, EventSystemStats, Resetable.Resetable):
     #########################################
 
     def get_progress(self, asc=True):
-        '''
+        """
         Get a list describing the progress of each event.
 
         Returns
         -------
         list<tuple<str, float>>
             Progress for each event.
-        '''
+        """
 
         # block until system is ready
         while not self.ready.isSet():
@@ -212,7 +212,7 @@ class EventSystem(collections.UserDict, EventSystemStats, Resetable.Resetable):
         return [(event, self.get_average_progress(event)) for event in events]
 
     def get_sum_progress_event(self, event):
-        '''
+        """
         Get the sum of the progress for the `key` for each node.
 
         Parameters
@@ -222,31 +222,31 @@ class EventSystem(collections.UserDict, EventSystemStats, Resetable.Resetable):
         Returns
         -------
         float
-        '''
+        """
         return sum(map(lambda node: node[event], self.values()))
 
     def get_all_events(self):
-        '''
+        """
         Get all registered events plus the event for the total progress.
         Assume each node has the same events.
 
         Returns
         -------
         OrderedSet<str>
-        '''
+        """
         s = OrderedSet([self.EVENT_TOTAL_PROGRESS])
         s.update(self.get_events())
         return s
 
     def get_events(self):
-        '''
+        """
         Get all registered events.
         Assume each node has the same events.
 
         Returns
         -------
         OrderedSet<str>
-        '''
+        """
         return self.events
 
     #########################################
@@ -254,7 +254,7 @@ class EventSystem(collections.UserDict, EventSystemStats, Resetable.Resetable):
     #########################################
 
     def update_event(self, event, progress, add=False, node_ids=None, all_nodes=False):
-        '''
+        """
         Update the `event` with `progress`. If `add`, add the value to the current progress.
 
         Either `node_id` or `all_nodes` must be supplied.
@@ -278,7 +278,7 @@ class EventSystem(collections.UserDict, EventSystemStats, Resetable.Resetable):
         Raises
         ------
         ValueError
-        '''
+        """
 
         updated_progress = []
 

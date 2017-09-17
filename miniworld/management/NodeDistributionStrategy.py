@@ -20,12 +20,12 @@ def factory():
 
 class NodeDistributionStrategy:
 
-    '''
+    """
     Attributes
     ----------
     server_score : dict
         Dict produced and readable by :py:class:`.ServerScore`
-    '''
+    """
 
     def __init__(self):
         self.server_score = None
@@ -36,7 +36,7 @@ class NodeDistributionStrategy:
     def apply_distribution_strategy(self, node_ids, cnt_servers, server_node_distribution,
                                     distribute_remaining_fair=True, distribute_remaining_server_ids=None
                                     ):
-        '''
+        """
 
         Parameters
         ----------
@@ -54,7 +54,7 @@ class NodeDistributionStrategy:
         dict<int, <list<int>>>
             The nodes distributed among the servers.
             e.g: {1 : [1,2], 2 : [3,4]}
-        '''
+        """
 
         res = defaultdict(list)
         if distribute_remaining_server_ids is None:
@@ -109,7 +109,7 @@ class NDSEqual(NodeDistributionStrategy):
 class NDSScore(NodeDistributionStrategy):
 
     def distribute_emulation_nodes(self, node_ids, cnt_servers):
-        '''
+        """
 
         Parameters
         ----------
@@ -119,7 +119,7 @@ class NDSScore(NodeDistributionStrategy):
         Returns
         -------
 
-        '''
+        """
         server_node_distribution = {}
         server_score_sorted_cpu_ranking_desc = list(OrderedDict(sorted(self.server_score.items(), key=lambda x: ServerScore.get_cpu_score(x[1]), reverse=True)).keys())
 

@@ -23,7 +23,7 @@ ifconfig {mgmt_iface} up
 
 
 class EmulationNodeNetworkBackend(NetworkMixin):
-    '''
+    """
     This class enables each :py:class:`.EmulationNode` to handle network backend stuff differently by encapsulating these methods into an extra class.
 
     For example the base :py:class:`.NetworkBackendEmulationNode`.
@@ -31,7 +31,7 @@ class EmulationNodeNetworkBackend(NetworkMixin):
     Attributes
     ----------
     network_backend_boot_strapper : NetworkBackendBootStrapper
-    '''
+    """
 
     def __init__(self, network_backend_bootstrapper, node_id,
                  # network

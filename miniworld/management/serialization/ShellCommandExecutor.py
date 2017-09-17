@@ -12,14 +12,14 @@ from miniworld.model.singletons.Singletons import singletons
 class ShellCommandSerializer(object, Resetable):
 
     def __init__(self, name):
-        '''
+        """
 
         Parameters
         ----------
         name : str
         shell_command_args : OrderedSet<(str, str, str)>
         shell_commands : set<str>
-        '''
+        """
         self.name = name
         self.reset()
 
@@ -46,7 +46,7 @@ class ShellCommandSerializer(object, Resetable):
 
 
 class ShellCommandExecutor(object, Resetable):
-    '''
+    """
     Examples
     --------
     >>> sce=ShellCommandExecutor()
@@ -56,17 +56,17 @@ class ShellCommandExecutor(object, Resetable):
     Runs 'brctl addbr' before 'brctl addif'
     >>> sce.run_commands()
 
-    '''
+    """
 
     def __init__(self):
-        '''
+        """
         Parameters
         ----------
 
         serializable_events_for_id : dict<str, list<str>>
         shellcommandserializer_for_event_order_id : EventOrder
         event_order_id_order : list<str>
-        '''
+        """
         self.reset()
 
     def __str__(self):
@@ -85,7 +85,7 @@ class ShellCommandExecutor(object, Resetable):
         self.event_order_id_order = []
 
     def get_serialized_commands_event(self, event_order_id, event):
-        '''
+        """
 
         Parameters
         ----------
@@ -95,7 +95,7 @@ class ShellCommandExecutor(object, Resetable):
         Returns
         -------
 
-        '''
+        """
         scs = self.shellcommandserializer_for_event_order_id[event_order_id][event]
         return scs.get_shell_commands()
 
@@ -106,13 +106,13 @@ class ShellCommandExecutor(object, Resetable):
         return res
 
     def get_serialized_commands_per_event_order(self):
-        '''
+        """
 
         Generator
         --------
         One list per `event_order_id`
             ((str, str), list<str>)
-        '''
+        """
 
         for event_order_id in self.event_order_id_order:
             serializable_event_order = self.serializable_events_for_id[event_order_id]
@@ -121,7 +121,7 @@ class ShellCommandExecutor(object, Resetable):
                 yield (event_order_id, serializable_event), self.get_serialized_commands_event(event_order_id, serializable_event)
 
     def run_commands(self, max_workers=None, events_order=None):
-        '''
+        """
 
         Parameters
         ----------
@@ -132,7 +132,7 @@ class ShellCommandExecutor(object, Resetable):
         Returns
         -------
 
-        '''
+        """
         if events_order is None:
             events_order = self.event_order_id_order
 
@@ -166,11 +166,11 @@ class ShellCommandExecutor(object, Resetable):
 
 
 class EventOrder(collections.UserDict):
-    '''
+    """
     Attributes
     -----------
     data : dict<str, ShellCommandSerializer>
-    '''
+    """
 
     def __getitem__(self, key):
         try:

@@ -16,7 +16,7 @@ class EmulationNodeNetworkBackendBridgedMultiDevice(EmulationNodeNetworkBackend)
         super(EmulationNodeNetworkBackendBridgedMultiDevice, self).__init__(network_backend_bootstrapper, node_id, interfaces=interfaces, management_switch=management_switch)
 
     def adjust_interfaces_to_number_of_links(self, node_id, interfaces):
-        '''
+        """
         For each connection, add an additional interface.
 
         Parameters
@@ -27,7 +27,7 @@ class EmulationNodeNetworkBackendBridgedMultiDevice(EmulationNodeNetworkBackend)
         Returns
         -------
         Interfaces
-        '''
+        """
 
         adjusted_interfaces = []
         for _if in interfaces:

@@ -33,7 +33,7 @@ KEY_DISTANCE = "distance"
 
 
 class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifications):
-    '''
+    """
     Keeps track of the network connections.
     For this purpose, it receives events from the :py:class:`.SimulationManager`,
     defined by the :py:class:`.NetworkBackendNotifications` interface.
@@ -52,15 +52,15 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
         Calculated for each change in the distance matrix.
         Fully qualified matrix.
     distance_matrix : dict<(int, int), int>
-    '''
+    """
 
     def __init__(self):
         self.reset()
 
     def init_for_next_scenario(self):
-        '''
+        """
         Call first if the scenario config is set.
-        '''
+        """
         self.reset()
         self.net_configurator = self.get_network_provisioner()
 
@@ -80,13 +80,13 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
             self.net_configurator = self.net_configurator(singletons.network_backend.get_interface_index)
 
     def get_network_provisioner(self):
-        '''
+        """
 
         Returns
         -------
         type
             Subclass of NetworkConfigurator
-        '''
+        """
 
         if singletons.network_backend.get_network_provisioner():
             return singletons.network_backend.get_network_provisioner()
@@ -180,18 +180,18 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
     #############################################################
 
     def before_simulation_step(self, simulation_manager, step_cnt, network_backend, emulation_nodes, **kwargs):
-        '''
+        """
         Remember the current step cnt.
         See :py:class:`NetworkBackendNotifications` for documentation on the arguments.
-        '''
+        """
         self.step_cnt = step_cnt
         return network_backend.before_simulation_step(simulation_manager, step_cnt, network_backend, emulation_nodes)
 
     def after_simulation_step(self, simulation_manager, step_cnt, network_backend, emulation_nodes, **kwargs):
-        '''
+        """
         For the new connections which have been created in this step, perform some network checks ( if enabled ).
         See :py:class:`NetworkBackendNotifications` for documentation on the arguments.
-        '''
+        """
 
         if scenario_config.is_network_links_auto_ipv4() and scenario_config.is_connectivity_check_enabled():
             new_connections = self.get_new_connections_with_interfaces_since_last_distance_matrix_change()
@@ -208,10 +208,10 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
 
     def before_distance_matrix_changed(self, simulation_manager, network_backend, changed_distance_matrix,
                                        full_distance_matrix, **kwargs):
-        '''
+        """
         Remember the active interfaces per node. This is needed for the :py:meth:`.get_new_connections`.
         See :py:class:`NetworkBackendNotifications` for documentation on the arguments.
-        '''
+        """
         self.distance_matrix = full_distance_matrix
 
         es = singletons.event_system
@@ -255,12 +255,12 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
         return res
 
     def get_new_connections_with_interfaces_since_last_distance_matrix_change(self):
-        ''' Get only new connections since distance matrix changed.
+        """ Get only new connections since distance matrix changed.
 
         Returns
         -------
         OrderedDict<EmulationNodes, tuple<Interfaces>>>
-        '''
+        """
         active_connections = singletons.network_manager.connection_store.get_active_interfaces_per_connection()
 
         # first step -> return all connections
@@ -360,7 +360,7 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
     # TODO: DOC
     # TODO: REMOVE
     def to_id_matrix(self, d):
-        '''
+        """
 
         Parameters
         ----------
@@ -369,14 +369,14 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
         Returns
         -------
         d: dict<str, object>
-        '''
+        """
         return {(emu_node_x.id, emu_node_y.id): item for (emu_node_x, emu_node_y), item in d.items()}
 
     # TODO: #15: cleanup
     # TODO: REMOVE
     @staticmethod
     def transform_distance_matrix(distance_matrix, ids):
-        '''
+        """
 
         Parameters
         ----------
@@ -386,7 +386,7 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
         Returns
         -------
 
-        '''
+        """
 
         from collections import defaultdict
 
@@ -403,7 +403,7 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
 
     # TODO:
     def create_vde_switch_topology(self, include_management_node=False, include_nodes=True):
-        '''
+        """
 
         Parameters
         ----------
@@ -415,7 +415,7 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
         Returns
         -------
 
-        '''
+        """
 
         group_node = 1
         group_interface = 2

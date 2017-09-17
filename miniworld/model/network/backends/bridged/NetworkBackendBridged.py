@@ -22,7 +22,7 @@ __author__ = 'Nils Schmidt'
 
 
 class EventMonitor(Resetable):
-    '''
+    """
     Monitors new bridge events.
 
     Cleared per simulation step
@@ -31,7 +31,7 @@ class EventMonitor(Resetable):
     Attributes
     ----------
     new_bridges : OrderedSet<str>
-    '''
+    """
 
     def __init__(self):
         self.reset()
@@ -71,7 +71,7 @@ PATH_SHELL_COMMANDS = PathUtil.get_log_file_path("network_backend_%s.txt" % "she
 def NetworkBackendBridgedDummy():
     class NetworkBackendBridgedDummy(NetworkBackend.NetworkBackend()):
 
-        '''
+        """
         Implementation of a network backend which uses Linux Ethernet Bridiging.
 
         The backend supports 3 execution modes:
@@ -91,27 +91,27 @@ def NetworkBackendBridgedDummy():
         all_connections : dict<int, list<int>>
             All connections the nodes can have at any time in one of the scenarios.
         shell_command_executor : ShellCommandSerializer
-        '''
+        """
 
         def _start(self, *args, **kwargs):
             self.reset()
 
         # TODO: add interface for ShellCommandExecutor stuff and mention in commment
         def init_shell_command_executor(self):
-            '''
+            """
             Init the :py:class:`.ShellCommandExecutor` and set the command orders.
             Necessary to parallelize the tc command execution.
             By default only the :py:class:`.AbstractConnection` subclass is expected to have ShellCommandExecutor stuff.
-            '''
+            """
             self.shell_command_executor = ShellCommandSerializer()
 
         def setup_shell_command_executor(self, shell_command_executor):
-            '''
+            """
 
             Parameters
             ----------
             shell_command_executor : ShellCommandSerializer
-            '''
+            """
             conn_type = self.network_backend_bootstrapper.connection_type
             EVENT_ORDER = [conn_type.EVENT_ROOT]
             shell_command_executor.set_group_order(EVENT_ORDER)
@@ -153,7 +153,7 @@ def NetworkBackendBridgedDummy():
         ###########################################################
 
         def get_br_name(self, node_id, interface):
-            '''
+            """
             Get the bridge name for the `node_id` and `interface`.
 
             Parameters
@@ -164,7 +164,7 @@ def NetworkBackendBridgedDummy():
             Returns
             -------
             str
-            '''
+            """
             return 'br_%s_{id_fmt}'.format(id_fmt=NODE_ID_FMT) % (node_id, self.get_id_br_postfix(node_id, interface))
 
         def get_id_br_postfix(self, node_id, interface):
@@ -177,7 +177,7 @@ def NetworkBackendBridgedDummy():
             return short_id
 
         def get_tap_name(self, node_id, interface):
-            '''
+            """
             Get the tap name for the `node_id` and `interface`.
 
             Parameters
@@ -188,7 +188,7 @@ def NetworkBackendBridgedDummy():
             Returns
             -------
             str
-            '''
+            """
             node_id = int(node_id)
             return 'tap_{id_fmt}_%x'.format(id_fmt=NODE_ID_FMT) % (node_id, self.get_id_tap_postfix(node_id, interface))
 
@@ -218,9 +218,9 @@ def NetworkBackendBridgedDummy():
         # TODO: create abstract event system
         # TODO: add event system to every networkbackend
         def after_simulation_step(self, simulation_manager, step_cnt, network_backend, emulation_nodes, **kwargs):
-            '''
+            """
             Notify about events, if registered for events.
-            '''
+            """
             # notify script about new events
             event_hook_script_path = scenario_config.get_network_backend_event_hook_script()
             if event_hook_script_path and os.path.exists(event_hook_script_path):
@@ -230,9 +230,9 @@ def NetworkBackendBridgedDummy():
             self.reset_simulation_step()
 
         def after_distance_matrix_changed(self, simulation_manager, network_backend, changed_distance_matrix, full_distance_matrix, **kwargs):
-            '''
+            """
             Do the actual network topology change.
-            '''
+            """
 
             # configure network
             super(NetworkBackendBridgedDummy, self).after_distance_matrix_changed(simulation_manager, network_backend, changed_distance_matrix, full_distance_matrix, **kwargs)
@@ -248,9 +248,9 @@ def NetworkBackendBridgedDummy():
         def before_link_quality_adjustment(self, connection, link_quality_still_connected, link_quality_dict,
                                            network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info,
                                            **kwargs):
-            '''
+            """
             Adjust the link quality.
-            '''
+            """
             if connection:
                 connection.adjust_link_quality(link_quality_dict)
 
@@ -284,9 +284,9 @@ def NetworkBackendBridgedDummy():
             raise NotImplementedError
 
         def do_queueing_discipline(self):
-            '''
+            """
             Execute the linux qdisc commands for traffic shaping etc.
-            '''
+            """
 
             # for the other modes the class :py:class:`.ShellCommandSerializer` takes over
             if scenario_config.is_network_backend_bridged_execution_mode_batch():
@@ -308,7 +308,7 @@ def NetworkBackendBridgedDummy():
         #############################################################
 
         def create_n_store_switch(self, emulation_node_x, emulation_node_y, interface_x):
-            '''
+            """
             Create a switch and store a reference locally in `event_monitor`.
             There are at maximum 10^5 bridges supported!
             This is a limitation of the nic device length on linux and our naming schema!
@@ -322,7 +322,7 @@ def NetworkBackendBridgedDummy():
             Returns
             -------
             Bridge
-            '''
+            """
 
             max_id = 10**5
             if emulation_node_x.id > max_id or emulation_node_y.id > max_id:
@@ -339,7 +339,7 @@ def NetworkBackendBridgedDummy():
 
         # TODO: #54, #55: MERGE WITH ...
         def create_n_connect_central_nodes(self, interfaces):
-            '''
+            """
 
             Parameters
             ----------
@@ -348,7 +348,7 @@ def NetworkBackendBridgedDummy():
             Returns
             -------
             dict<int, CentralNode>
-            '''
+            """
             from miniworld.model.singletons.Singletons import singletons
 
             # create CentralNode s but only if there is a HubWiFi interface
@@ -392,12 +392,12 @@ def NetworkBackendBridgedDummy():
 
 
 def NetworkBackendBridged():
-    '''
+    """
     NOTE: We need to create the class dynamically, otherwise after a reset and change of the network backend (new scenario) the backend stays the same!
     Returns
     -------
     NetworkBackendBridged
-    '''
+    """
     class NetworkBackendBridged(get_superclass_dynamic()):
         pass
 

@@ -18,7 +18,7 @@ class QemuMonitorSnapshotLoadError(Base):
 
 
 class QemuMonitorRepl(REPLable):
-    '''
+    """
 
     Qemu Monitor connection.
 
@@ -45,7 +45,7 @@ class QemuMonitorRepl(REPLable):
     nlog
         Extra node logger.
     id : int
-    '''
+    """
 
     def __init__(self, qemu):
 
@@ -74,7 +74,7 @@ class QemuMonitorRepl(REPLable):
         self.run_commands_eager_check_ret_val(StringIO("savevm %s" % name))
 
     def loadvm(self, name):
-        '''
+        """
         Load a snapshot.
 
         Parameters
@@ -84,7 +84,7 @@ class QemuMonitorRepl(REPLable):
         Raises
         ------
         QemuMonitorSnapshotLoadError
-        '''
+        """
         try:
             if name is None:
                 name = self.qemu.get_snapshot_id()
@@ -115,11 +115,11 @@ class QemuMonitorRepl(REPLable):
                                        )
 
     def run_commands(self, flo, *args, **kwargs):
-        '''
+        """
         Returns
         -------
         dict
-        '''
+        """
         kwargs["timeout"] = config.get_repl_timeout()
 
         name = self.get_verbose_logger_path()

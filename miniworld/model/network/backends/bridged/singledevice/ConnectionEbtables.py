@@ -13,7 +13,7 @@ from miniworld.model.network.linkqualitymodels.LinkQualityConstants import *
 
 def ConnectionEbtables():
     class ConnectionEbtables(ConnectionDummy()):
-        '''
+        """
         Ebtables setup example
         ----------------------
         # flush rules
@@ -42,7 +42,7 @@ def ConnectionEbtables():
         --------------
         ebtables -D FORWARD -i tap_00002_2 -o tap_00003_2 -j ACCEPT
 
-        '''
+        """
 
         policy_accept = "ACCEPT"
         policy_drop = "DROP"

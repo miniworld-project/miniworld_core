@@ -5,10 +5,10 @@ from miniworld.model.network.backends.bridged.iproute2.NetworkBackendBridged imp
 
 def NetworkBackendBridgedBrctl():
     class NetworkBackendBridgedBrctl(NetworkBackendBridgedIproute2()):
-        '''
+        """
         1. Use brctl to setup and config bridges
         2. Use iproute2 for the remaining stuff
-        '''
+        """
 
         def do_network_topology_change(self):
 

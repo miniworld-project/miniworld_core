@@ -52,12 +52,12 @@ class ArmaNodes:
         self.next_step = (next_time, list_of_coordinates)
 
     def get_geo_json(self):
-        '''
+        """
         Returns
         -------
         geo_json
                     for the current state of all nodes
-        '''
+        """
         feature_coll_nodes = geojson.FeatureCollection([self.__get_single_node(n) for n in range(self.node_cnt)])
         return geojson.dumps(feature_coll_nodes)
 

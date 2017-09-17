@@ -22,11 +22,11 @@ class EmulationNodeNetworkBackendVDE(EmulationNodeNetworkBackend, SwitchMixin):
         self.start_switches()
 
     def after_pre_shell_commands(self, emulation_node):
-        '''
+        """
         1. Set switch size
         2. Color interfaces
         3. Move interfaces to specific VLAN
-        '''
+        """
 
         # NOTE: uds socket has to be reachable!
 
@@ -38,9 +38,9 @@ class EmulationNodeNetworkBackendVDE(EmulationNodeNetworkBackend, SwitchMixin):
 
     # TODO: MOVE TO VDESWITCH
     def color_interfaces(self):
-        '''
+        """
         Color all interfaces, therefore simulate a hop-2-hop network.
-        '''
+        """
         self.nlog.info("coloring qemu vde_switch port ...")
 
         for _if, vde_switch in self.switches.items():
@@ -53,6 +53,6 @@ class EmulationNodeNetworkBackendVDE(EmulationNodeNetworkBackend, SwitchMixin):
             vde_switch.move_interface_to_vlan(port=miniworld.model.network.backends.vde.VDEConstants.PORT_QEMU, interface=_if)
 
     def set_switch_sizes(self):
-        ''' Set the size of the switch '''
+        """ Set the size of the switch """
         for vde_switch in self.switches.values():
             vde_switch.set_port_size(scenario_config.get_network_backend_vde_num_ports())

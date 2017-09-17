@@ -7,14 +7,14 @@ from miniworld.management.events.CLIEventDisplay import CLIEventDisplay
 class MyCLIEventDisplay(CLIEventDisplay):
 
     def __init__(self, event_system, *args, **kwargs):
-        '''
+        """
         Automated version :py:class:`.CLIEventDisplay`.
         Updated the progress in a while-loop.
 
         Parameters
         ----------
         event_system
-        '''
+        """
         super(MyCLIEventDisplay, self).__init__(*args, **kwargs)
         self.event_system = event_system
         self.progress_thread = None

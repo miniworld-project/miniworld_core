@@ -99,9 +99,9 @@ class LinkQualityModelWiFiExponential(LinkQualityModelWiFiLinear):
 
     # TODO: Abstract!
     def _distance_2_link_quality(self, distance):
-        '''
+        """
 
-        '''
+        """
 
         distance = distance * 1.0
 

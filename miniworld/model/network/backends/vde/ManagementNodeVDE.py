@@ -15,7 +15,7 @@ class ManagementNodeVDE(ManagementNode):
         super(ManagementNode, self).__init__(id, network_backend, interfaces)
 
     def _start(self, switch=True, bridge_dev_name=None):
-        '''
+        """
         1. Start hub/switch
         2. Color interfaces (if switch wants so)
         3. Move interface to VLAN
@@ -27,7 +27,7 @@ class ManagementNodeVDE(ManagementNode):
         Raises
         ------
         NetworkManagementSwitchBridgeNotExisting
-        '''
+        """
 
         if bridge_dev_name is None:
             bridge_dev_name = config.get_bridge_tap_name()

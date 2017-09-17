@@ -10,7 +10,7 @@ from miniworld.model.network.interface import Interface
 
 
 def get_cmd_template_qemu_nic():
-    '''
+    """
 
     Returns
     -------
@@ -18,7 +18,7 @@ def get_cmd_template_qemu_nic():
     See Also
     --------
     http://www.linux-kvm.org/page/10G_NIC_performance:_VFIO_vs_virtio
-    '''
+    """
     # # TODO: #54,#55: check what vlan means for qemu
     CMD_TEMPLATE_QEMU_NIC = """
     -device {nic_model},netdev=net{vlan},mac={mac_addr}

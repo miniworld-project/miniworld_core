@@ -9,18 +9,18 @@ log = get_logger(__name__)
 
 
 class TemplateEngine:
-    '''
+    """
     A template engine for writing template shell scripts.
     Keywords are optionally! If unusued, an empty string is used instead and a warning is logged.
-    '''
+    """
 
     def __init__(self, script_str):
-        '''
+        """
         Parameters
         ----------
         script_str
             The script as string.
-        '''
+        """
         self.script_str = script_str
 
     def render(self, **kwargs):
@@ -29,11 +29,11 @@ class TemplateEngine:
 
 
 def render_script_from_flo(flo, **kwargs):
-    '''
+    """
     Parameters
     ----------
     flo : file-like-object
-    '''
+    """
     flo.seek(0)
     te = TemplateEngine(flo.read())
     return te.render(**kwargs)

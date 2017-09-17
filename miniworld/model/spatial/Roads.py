@@ -13,7 +13,7 @@ from .Road import Road
 
 
 class Roads:
-    '''
+    """
     Attributes
     ----------
     list_of_roads :                                                 list
@@ -21,7 +21,7 @@ class Roads:
     geo_json :                                                      geojson
     list_of_roads_with_quality_more_or_equal_than_one_for_car :     list
     list_of_roads_with_quality_more_or_equal_than_one_for_bike :    list
-    '''
+    """
 
     def __init__(self):
 
@@ -34,16 +34,16 @@ class Roads:
         self.list_of_roads_with_quality_more_or_equal_than_one_for_bike = [road for road in self.list_of_roads if road.has_more_or_equal_qualitaty_for_bike_then(1)]
 
     def get_geo_json(self):
-        '''
+        """
         Returns
         -------
         geo_json
                     of all existing roads
-        '''
+        """
         return self.geo_json
 
     def get_list_of_roads_with_quality_more_or_equal_than_x_for_car(self, quality):
-        '''
+        """
         Parameters
         ----------
         quality : int
@@ -51,11 +51,11 @@ class Roads:
         Returns
         -------
         list
-        '''
+        """
         return [road for road in self.list_of_roads if road.has_more_or_equal_qualitaty_for_car_then(quality)]
 
     def get_list_of_roads_with_quality_more_or_equal_than_x_for_bike(self, quality):
-        '''
+        """
         Parameters
         ----------
         quality : int
@@ -63,11 +63,11 @@ class Roads:
         Returns
         -------
         list
-        '''
+        """
         return [road for road in self.list_of_roads if road.has_more_or_equal_qualitaty_for_bike_then(quality)]
 
     def get_list_of_next_roads_with_quality_restriction_for_cars(self, end_point, quality):
-        '''
+        """
         Parameters
         ----------
         quality : int
@@ -75,11 +75,11 @@ class Roads:
         Returns
         -------
         list
-        '''
+        """
         return [road for road in self.list_of_roads if road.is_road_direct_rechable_from_given_point_with_quality_restrictions_for_cars(end_point, quality)]
 
     def get_list_of_next_roads_with_quality_restriction_for_bike(self, end_point, quality):
-        '''
+        """
         Parameters
         ----------
         end_point : MapNode
@@ -87,7 +87,7 @@ class Roads:
         Returns
         -------
         list
-        '''
+        """
         return [road for road in self.list_of_roads if road.is_road_direct_rechable_from_given_point_with_quality_restrictions_for_bike(end_point, quality)]
 
     def __convert_sql_line_to_road(self, line):

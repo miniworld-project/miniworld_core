@@ -40,12 +40,12 @@ class ServerScore(object):
 
     @staticmethod
     def get_bogomips():
-        '''
+        """
 
         Returns
         -------
         float
-        '''
+        """
         with open("/proc/cpuinfo") as f:
             output = f.read()
             return float(re.search("bogomips\s+:\s+(.*)", output).group(1))

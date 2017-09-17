@@ -25,7 +25,7 @@ REPL_MODES = REPL_MODE_QEMU, REPL_MODE_VDE, REPL_MODE_WIREFILTER
 
 
 class REPL:
-    '''
+    """
     Models a read-eval-print-loop for all given qemu nodes.
 
     A command can be executed on all qemu nodes either concurrently or sequentially.
@@ -40,16 +40,16 @@ class REPL:
         Run commands concurrently
     mode : string, see `REPL_MODE_*` constants
         The active REPL mode.
-    '''
+    """
 
     def __init__(self, number_of_nodes, async=False):
-        '''
+        """
         Parameters
         ----------
         number_of_nodes: int
         async: bool, optional (default is False)
             Run commands concurrently
-        '''
+        """
         # TODO: refactor to list<REPLable> ?
 
         # NOTE: give each node an own copy of the NetworkBackend and an own copy of the interfaces
@@ -61,10 +61,10 @@ class REPL:
         self.mode = None
 
     def start(self):
-        '''
+        """
         Start the read-eval-print-loop.
         CTRL-D and CTLR-C are forwarded to the qemu instances.
-        '''
+        """
 
         log.info("starting interactive shell, streamlines commands to all qemu instances!")
         log.info("be sure to disconnect every instance connected to a qemu socket, otherwise this operations blocks!")
@@ -119,7 +119,7 @@ class REPL:
                 log.info("sending CTRL-C instances [done]")
 
     def run_command(self, args):
-        '''
+        """
         Runs the command on uds sockets.
         Before running the instance via a unix domain socket,
         the corresponding socket object is returned via a generator.
@@ -129,7 +129,7 @@ class REPL:
         Parameters
         ----------
         cmd : str
-        '''
+        """
         node, cmd = args
 
         # get unix domain socket before executing the commands
@@ -164,7 +164,7 @@ class REPL:
                     pass
 
     def _run_command_threaded(self, cmd):
-        '''
+        """
         Runs the command `cmd` threaded. If `self.async` execute all concurrently, otherwise use a single thread.
         The single thread is needed so that the repl is not blocking.
 
@@ -172,16 +172,16 @@ class REPL:
         ---------
         cmd : str
             The command to execute in the qemu instance
-        '''
+        """
         # one thread per node for async, else 1
         pool = ThreadPool(processes=len(self.nodes) if self.async else 1)
         pool.map_async(self.run_command, zip(self.nodes, repeat(cmd)))
 
     def _run_command_interrupt(self, cmd):
-        '''
+        """
         Simulate an interrupt. Close the active unix domain socket connections, so that `cmd` can be executed.
         Usefor for sending CTRL-D or CTRL-C to the qemu intances.
-        '''
+        """
         to_remove = []
 
         # remember sockets
@@ -212,9 +212,9 @@ class REPL:
         self._run_command_threaded(cmd)
 
     def fmt_help(self):
-        '''
+        """
         Fmt a help string.
-        '''
+        """
         return """Commands:
         %s        Print this help.
         %s <mode> Switch to a different mode, where mode in (%s).

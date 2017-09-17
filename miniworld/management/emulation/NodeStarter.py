@@ -22,7 +22,7 @@ TIME_NODE_STATUS_REFRESH = 5
 
 
 class NodeStarter:
-    '''
+    """
     Starts the emulation nodes together with all its subcomponents: qemu, vde_switch
 
     Attributes
@@ -36,7 +36,7 @@ class NodeStarter:
     network_backend_name : str
     event_nodes_started : Event
     lock : Lock
-    '''
+    """
 
     def __init__(self, node_ids, network_backend_name):
 
@@ -57,7 +57,7 @@ class NodeStarter:
     #################################################
 
     def print_overall_node_status(self):
-        ''' Print the nodes not ready yet '''
+        """ Print the nodes not ready yet """
 
         while not self.event_nodes_started.is_set():
             nodes_not_ready = self.nodes_not_ready()
@@ -76,7 +76,7 @@ class NodeStarter:
                     # start options
                     parallel=False,
                     ):
-        '''
+        """
         Start the nodes (a)synchronously.
 
         Parameters
@@ -93,7 +93,7 @@ class NodeStarter:
         Returns
         -------
         list<EmulationNode>, ManagementNode
-        '''
+        """
 
         if not self.node_ids:
             log.info("there are no nodes to start!")
@@ -165,14 +165,14 @@ class NodeStarter:
 
     # TODO: #82: DOC, maybe singleton ref?
     def start_management_node(self):
-        '''
+        """
         Start the management switch and connect all other nodes to it.
         Also store a reference in the :py:class:`.NetworkManager`.
 
         Returns
         -------
         ManagementNode
-        '''
+        """
 
         network_backend_bootstrapper = NetworkBackends.get_current_network_backend_bootstrapper()
         if config.is_management_switch_enabled():
@@ -192,13 +192,13 @@ class NodeStarter:
             return management_node
 
     def _start_node(self, *args):
-        '''
+        """
         Start a node.
 
         Returns
         -------
         EmulationNode
-        '''
+        """
         args = args[0]
 
         # TODO: #54,#55
@@ -212,14 +212,14 @@ class NodeStarter:
         return node
 
     def nodes_not_ready(self):
-        '''
+        """
         Get all all nodes which have not started yet.
         Remembers the last started node id.
 
         Returns
         -------
         set<Node>
-        '''
+        """
         all_node_ids = set(self.node_ids)
 
         nodes_remaining = all_node_ids.difference(set(map(lambda node: node.id, self.nodes_running)))

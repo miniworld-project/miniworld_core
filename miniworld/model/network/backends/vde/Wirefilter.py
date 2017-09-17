@@ -47,7 +47,7 @@ def ensure_successful(fun, *args, **kwargs):
 
 
 class Wirefilter(AbstractConnection, ShellCmdWrapper, REPLable):
-    '''
+    """
     Handles the starting of a Wirefilter instance between two nodes.
 
     Attributes
@@ -59,7 +59,7 @@ class Wirefilter(AbstractConnection, ShellCmdWrapper, REPLable):
     node_b: EmulationNode
     interface_a : Interface
     interface_b : Interface
-    '''
+    """
 
     def __init__(self, emulation_node_x, emulation_node_y, interface_x, interface_y):
         AbstractConnection.__init__(self, emulation_node_x, emulation_node_y, interface_x, interface_y)
@@ -81,7 +81,7 @@ class Wirefilter(AbstractConnection, ShellCmdWrapper, REPLable):
 
     # TODO: #54,#55, adjust doc
     def start(self, start_activated=False):
-        '''
+        """
         Start the wirefilter and put the plug on `port_a` on the first node,
          on `port_b` on the second.
 
@@ -89,7 +89,7 @@ class Wirefilter(AbstractConnection, ShellCmdWrapper, REPLable):
         ----------
         start_activated  : bool, optional (default is False)
             Start the wirefilter active mode, letting all packets pass through.
-        '''
+        """
         # TODO: #54,#55
         vde_switch_x = self.emulation_node_x.network_mixin.switches[self.interface_x]
         vde_switch_y = self.emulation_node_y.network_mixin.switches[self.interface_y]
@@ -145,7 +145,7 @@ class Wirefilter(AbstractConnection, ShellCmdWrapper, REPLable):
         return True
 
     def adjust_link_quality(self, link_quality_dict):
-        '''
+        """
 
         Parameters
         ----------
@@ -153,7 +153,7 @@ class Wirefilter(AbstractConnection, ShellCmdWrapper, REPLable):
 
         Returns
         -------
-        '''
+        """
         # assumes only equal interfaces can be connected to each other
         bandwidth = link_quality_dict.get(LINK_QUALITY_KEY_BANDWIDTH)
         loss = link_quality_dict.get(LINK_QUALITY_KEY_LOSS)

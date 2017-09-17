@@ -36,14 +36,14 @@ class TerminalWriter:
         self.idx = idx
 
     def write(self, string):
-        '''
+        """
         Write a `string` to the terminal.
          Use `blessings` if available, otherwise print to stdout.
 
         Parameters
         ----------
         string : string
-        '''
+        """
         msg = string
         if curses_ok:
             # clear line

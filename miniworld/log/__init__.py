@@ -39,10 +39,10 @@ def set_log_level(level):
 
 @memoize_pos_args
 def get_logger(name, formatter=None, handlers=None, log_level=None, **kwargs):
-    '''
+    """
     Get a logger with `name` and the specified `log_level`.
     A formatter from `logging.Formatter` has to be supplied too!
-    '''
+    """
 
     if log_level is None:
         log_level = get_log_level()
@@ -95,9 +95,9 @@ add_logger(log)
 
 @memoize_pos_args
 def get_node_logger(node_id, log_level=None):
-    ''' Get a colored logger for a node with id `node_id`.
+    """ Get a colored logger for a node with id `node_id`.
     A file handler will be created which logs to the standard log directory.
-    '''
+    """
 
     from colorlog import ColoredFormatter
 

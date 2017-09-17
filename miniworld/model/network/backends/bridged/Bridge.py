@@ -16,7 +16,7 @@ __author__ = "Nils Schmidt"
 
 class Bridge(AbstractSwitch.AbstractSwitch, Resetable.Resetable):
 
-    '''
+    """
     Attributes
     ----------
     id : str
@@ -27,7 +27,7 @@ class Bridge(AbstractSwitch.AbstractSwitch, Resetable.Resetable):
     --------
     http://baturin.org/docs/iproute2/#Create%20a%20bridge%20interface
     http://lists.openwall.net/netdev/2015/06/16/44
-    '''
+    """
 
     def run(self, cmd):
         return singletons.shell_helper.run_shell(self.id, cmd, prefixes=["bridge"])
@@ -49,7 +49,7 @@ class Bridge(AbstractSwitch.AbstractSwitch, Resetable.Resetable):
     # TODO: #54,#55: arguments needed for abstract start() ??
     # TODO: only allow starting once!
     def _start(self, bridge_dev_name=None, switch=False):
-        '''
+        """
 
         Parameters
         ----------
@@ -62,13 +62,13 @@ class Bridge(AbstractSwitch.AbstractSwitch, Resetable.Resetable):
         Raises
         ------
         NetworkBackendStartError
-        '''
+        """
         self.bridge_dev_name = bridge_dev_name
 
     # TODO: #54,#55: exceptions around all networkbackends!
     # TODO: #54,#55: recognize or delete if_up
     def add_if(self, _if_name, if_up=True):
-        '''
+        """
 
         Parameters
         ----------
@@ -79,11 +79,11 @@ class Bridge(AbstractSwitch.AbstractSwitch, Resetable.Resetable):
         Raises
         ------
         NetworkBackendBridgedBridgeError
-        '''
+        """
         pass
 
     def reset(self):
-        '''
+        """
         Raises
         ------
         NetworkBackendErrorReset
@@ -91,7 +91,7 @@ class Bridge(AbstractSwitch.AbstractSwitch, Resetable.Resetable):
         Returns
         -------
 
-        '''
+        """
         try:
             if self.started and self.bridge_dev_name:
                 self.run(IPRoute2Commands.get_link_del_cmd(self.bridge_dev_name))

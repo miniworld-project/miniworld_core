@@ -10,7 +10,7 @@ from miniworld.model.network.linkqualitymodels.LinkQualityConstants import *
 from miniworld.util import JSONConfig, ConcurrencyUtil
 from miniworld.util.JSONConfig import customizable_attrs, json2dict
 
-'''
+"""
 Provides access to the current scenario.
 
 Examples
@@ -26,7 +26,7 @@ All functions decorated with @attrs can prefer the node customized value by supp
 >>> {'foo': {'bar': '0'}, 'node_details': {'1': {'foo': {'bar': '2'}}}}
 >>> get_bar(node_id = "1")
 2
-'''
+"""
 
 # keeps the scenario config as dict
 # scenario_config = {}
@@ -74,11 +74,11 @@ class ScenarioConfig(JSONConfig.JSONConfig):
             return range(1, self.get_number_of_nodes() + 1)
 
     def get_all_emulation_node_ids(self):
-        '''
+        """
         Returns
         -------
         list<int>
-        '''
+        """
         return range(1, self.get_number_of_nodes() + 1)
 
     @customizable_attrs("qemu", "qemu_user_addition")
@@ -133,7 +133,7 @@ class ScenarioConfig(JSONConfig.JSONConfig):
 
     @customizable_attrs("network", "links", "bandwidth", default=LINK_QUALITY_VAL_BANDWIDTH_UNLIMITED)
     def get_link_bandwidth(self):
-        ''' default is unlimited bandwidth '''
+        """ default is unlimited bandwidth """
         pass
 
     #################################################
@@ -282,11 +282,11 @@ class ScenarioConfig(JSONConfig.JSONConfig):
         return scenario_config.get_network_backend_bridged_connection_mode() is not None
 
     def is_network_backend_bridged_connection_mode_multi(self):
-        '''
+        """
         Raises
         ------
         ValueError
-        '''
+        """
         if not scenario_config.get_core_scenarios():
             # TODO: use abstract variable for network backend name
             raise ValueError("""Network backend '%s' is only usable with a previously known network topology.
@@ -305,13 +305,13 @@ class ScenarioConfig(JSONConfig.JSONConfig):
         pass
 
     def set_network_backend_bridged_tunnel_endpoints(self, tunnel_endpoints):
-        '''
+        """
 
         Returns
         -------
         tunnel_endpoints : dict<int, str>
             For each server the tunnel ip address.
-        '''
+        """
 
         # TODO: this is a quickfixi
         self.init_keys(["network", "backend", "tunnel_endpoints"])
@@ -328,7 +328,7 @@ class ScenarioConfig(JSONConfig.JSONConfig):
     KEY_NETWORK_BACKEND_BRIDGED_DISTRIBUTED_MODE_GRETAP = "gretap"
     KEY_NETWORK_BACKEND_BRIDGED_DISTRIBUTED_MODE_VXLAN = "vxlan"
 
-    ''' distributed mode '''
+    """ distributed mode """
 
     @customizable_attrs("network", "backend", "distributed_mode",
                         expected=[KEY_NETWORK_BACKEND_BRIDGED_DISTRIBUTED_MODE_VLAN,
@@ -381,28 +381,28 @@ class ScenarioConfig(JSONConfig.JSONConfig):
     #################################################
 
     def get_all_shell_commands_pre_network_start(self, node_id=None):
-        '''
+        """
         See :py:meth:`._get_all_shell_commands`
-        '''
+        """
         return self._get_all_shell_commands(self._get_shell_commands_path_pre_network_start(node_id=node_id),
                                             self._get_shell_commands_pre_network_start(node_id=node_id))
 
     def get_all_shell_commands_post_network_start(self, node_id=None):
-        '''
+        """
         See :py:meth:`._get_all_shell_commands`
-        '''
+        """
         return self._get_all_shell_commands(self._get_shell_commands_path_post_network_start(node_id=node_id),
                                             self._get_shell_commands_post_network_start(node_id=node_id))
 
     # def get_all_shell_commands_before_snapshot(self, node_id = None):
-    #     '''
+    #     """
     #     See :py:meth:`._get_all_shell_commands`
-    #     '''
+    #     """
     #     return self._get_all_shell_commands(self._get_shell_commands_path_before_snapshot(node_id = node_id),
     #                                         self._get_shell_commands_before_snapshot(node_id = node_id))
 
     def _get_all_shell_commands(self, shell_commands_path, shell_commands_list):
-        '''
+        """
         Get the shell commands.
         Concatenates the commands from the shell script to the direct commands.
         (shell_cmds_path + shell_cmds)
@@ -420,7 +420,7 @@ class ScenarioConfig(JSONConfig.JSONConfig):
         -------
         str
             The commands as string
-        '''
+        """
 
         shell_commands_from_path = ""
         shell_commands_from_config = ''
@@ -480,12 +480,12 @@ class ScenarioConfig(JSONConfig.JSONConfig):
         return list(self.get_distributed_server_node_mapping().keys())
 
     def set_distributed_server_node_mapping(self, server_node_mapping):
-        '''
+        """
         Parameters
         ----------
         server_node_mapping : dict
 
-        '''
+        """
         self.create_distributed_section()
 
         self.data["distributed"]["server_node_mapping"] = server_node_mapping
@@ -511,13 +511,13 @@ scenario_config = ScenarioConfig()
 
 
 def set_scenario_config(*args, **kwargs):
-    ''' Set the scenario config.
+    """ Set the scenario config.
 
     Returns
     -------
     dict
         The config as JSON.
-    '''
+    """
 
     _config = JSONConfig.read_json_config(*args, **kwargs)
     log.info("setting scenario config file '%s'", *args)

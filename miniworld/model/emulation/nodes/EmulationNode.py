@@ -29,7 +29,7 @@ from miniworld.model.ShellCmdWrapper import ShellCmdWrapper
 # TODO: #54,#55: adjust doc
 @total_ordering
 class EmulationNode(StartableObject.StartableSimulationStateObject, ShellCmdWrapper):
-    ''' Models a node in a mesh network.
+    """ Models a node in a mesh network.
 
     A node consists of a QEMU instance running e.g. an OpenWRT image.
     The nodes are connected via a VDE Switch, which are plugged together using a cable, a wirefilter.
@@ -45,7 +45,7 @@ class EmulationNode(StartableObject.StartableSimulationStateObject, ShellCmdWrap
     network_mixin : EmulationNodeNetworkBackend
     network_backend_bootstrapper : NetworkBackendBootStrapper
     network_mixin : NetworkMixin, optional (default is taken :py:class:`.NetworkBackendBootStrapper`
-    '''
+    """
 
     #############################################################
     # Factory stuff
@@ -121,7 +121,7 @@ class EmulationNode(StartableObject.StartableSimulationStateObject, ShellCmdWrap
 
     # TODO: adjust DOC
     def _start(self, *args, **kwargs):
-        '''
+        """
         Starting a node involves the following steps:
 
         1. Start the :py:class:`.EmulationNodeNetworkBackend.
@@ -133,7 +133,7 @@ class EmulationNode(StartableObject.StartableSimulationStateObject, ShellCmdWrap
         ----------
         flo_post_boot_script: file-like-object, optional (default is None)
             Run commands from `flo_post_boot_script` on the shell after successful boot.
-        '''
+        """
 
         flo_post_boot_script = kwargs.get("flo_post_boot_script")
         if flo_post_boot_script is not None:
@@ -168,7 +168,7 @@ class EmulationNode(StartableObject.StartableSimulationStateObject, ShellCmdWrap
 
     # TODO: #54,#55: adjust doc
     def run_pre_network_shell_commands(self, flo_post_boot_script, *args, **kwargs):
-        '''
+        """
         Run user commands
 
         Parameters
@@ -179,7 +179,7 @@ class EmulationNode(StartableObject.StartableSimulationStateObject, ShellCmdWrap
 
         Returns
         -------
-        '''
+        """
 
         # run post boot script in instance
         if flo_post_boot_script is not None:
@@ -189,10 +189,10 @@ class EmulationNode(StartableObject.StartableSimulationStateObject, ShellCmdWrap
 
     # TODO: #54,#55: adjust doc
     def run_post_network_shell_commands(self, *args, **kwargs):
-        '''
+        """
         Run user commands. This method is called from the :py:class:`.SimulationManager`
          after the network has been set up.
-        '''
+        """
         # TODO: use node_id everywhere possible for scenario_config.*()
         # # notify EventSystem even if there are no commands
         es = singletons.event_system

@@ -1,6 +1,6 @@
 from miniworld import log
 
-'''
+"""
 The classes in this module helps to implement a state machine used for
 group communication based on ZeroMQ.
 
@@ -18,12 +18,12 @@ There are different responders for different responder patterns:
 - :py:class:`ResponderServerID` responds each client with its allocated ID
 - :py:class:`ResponderPerServerID` responds each client with a different argument.
     The arguments are passed as dictionary where each entry contains the server id.
-'''
+"""
 
 
 class Expecter:
 
-    '''
+    """
     Expects a multi part messages from each client with a specific number of message parts.
 
     Protocol for multipart messages:
@@ -55,18 +55,18 @@ class Expecter:
         address, message part 1, ..., message part n
     cnt_message_parts : int
         How much parts the messages is expected to have
-    '''
+    """
 
     def __init__(self, socket, cnt_peers, protocol, state,
                  cnt_message_parts=1,
                  after_response_fun=None
                  ):
-        '''
+        """
         Parameters
         ----------
         cnt_message_parts : int, optional (default is 1)
             Expect at least one argument.
-        '''
+        """
         self.socket = socket
         self.cnt_peers = cnt_peers
         self.state = state
@@ -81,7 +81,7 @@ class Expecter:
         self.cnt_minimal_args_per_message = 3
 
     def expect_for_all(self):
-        '''
+        """
         Call :py:func:`expect` for each client and before the first client.
         Therefore, the method first returns, if each client responded in the current state
         with the correct number of parts in the message.
@@ -90,7 +90,7 @@ class Expecter:
         -------
         expect_storage : list<obj>
             address, message part 1, ..., message part n
-        '''
+        """
 
         if self.after_response_fun:
             self.after_response_fun(self, 0, self.cnt_peers)
@@ -106,7 +106,7 @@ class Expecter:
                 self.after_response_fun(self, idx, self.cnt_peers)
 
     def expect(self):
-        '''
+        """
         Receives a multipart message and checks if the multi part message contains the correct number of parts.
         Moreover, deserialize all message parts.
 
@@ -114,7 +114,7 @@ class Expecter:
         -------
         list<obj>
             The received objects if no error occurred!
-        '''
+        """
         msgs = self.socket.recv_multipart()
         expected_msg_parts = self.cnt_minimal_args_per_message + self.cnt_message_parts
         if len(msgs) == expected_msg_parts:
@@ -138,23 +138,23 @@ class Expecter:
         return self.get_message_parts(_from=1)
 
     def get_message_parts(self, _from=2):
-        '''
+        """
         Get all message parts by cutting off the addr and node_id from the stored arguments.
-        '''
+        """
         return [arg_list[_from:] for arg_list in self.expect_storage]
 
     def get_message_parts_per_node_id(self):
-        '''
+        """
         cut off addr and node_id from stored arguments
 
         Returns
         -------
         dict<int, list<obj>>
-        '''
+        """
         return {arg_list[1]: arg_list[2:] for arg_list in self.expect_storage}
 
     def get_message_part_per_node_id(self, arg_nr=1):
-        '''
+        """
         Assume there is only one part in the message.
         Return them per node id.
 
@@ -165,42 +165,42 @@ class Expecter:
         Returns
         -------
         dict<int, obj>
-        '''
+        """
         return {arg_list[1]: arg_list[2 + arg_nr - 1] for arg_list in self.expect_storage}
 
     def get_server_ids(self):
-        '''
+        """
         Get the server ids as list.
 
         Returns
         -------
         list<str>
-        '''
+        """
         return [arg_list[1] for arg_list in self.expect_storage]
 
     def get_addresses(self):
-        '''
+        """
         Get the addresses from each client.
 
         Returns
         -------
         list<obj>
-        '''
+        """
         return [item[0] for item in self.expect_storage]
 
     def get_server_id_addr_mapping(self):
-        '''
+        """
         Get for each server the address.
 
         Returns
         -------
         dict<str, obj>
-        '''
+        """
         return {item[1]: item[0] for item in self.expect_storage}
 
 
 class Responder(object):
-    '''
+    """
     This is the base class used to implement different responder patterns.
     It has access to the :py:class:`.Expecter` because we need the addresses of the clients.
     Each responder implements its own :py:func:`.respond` method to provide different responder patterns.
@@ -213,7 +213,7 @@ class Responder(object):
     protocol : Protocol
         The protocol for serialization/deserialization
     expecter : Expecter
-    '''
+    """
 
     def __init__(self, socket, protocol, expecter):
         self.socket = socket
@@ -221,9 +221,9 @@ class Responder(object):
         self.expecter = expecter
 
     def __call__(self, *args, **kwargs):
-        '''
+        """
         Use this method if data received with the expecter can be simply passed to the responder.
-        '''
+        """
         self.expecter.expect_for_all()
         self.respond()
 
@@ -232,22 +232,22 @@ class Responder(object):
 
 
 class ResponderArgument(Responder):
-    '''
+    """
     Send each client the same response/argument.
 
     Attributes
     ----------
     response : obj
-    '''
+    """
 
     def __init__(self, socket, protocol, expecter, response):
         super(ResponderArgument, self).__init__(socket, protocol, expecter)
         self.response = response
 
     def respond(self):
-        '''
+        """
         Run over addresses and send the response.
-        '''
+        """
         for addr in self.expecter.get_addresses():
             self.socket.send_multipart([
                 addr,
@@ -257,22 +257,22 @@ class ResponderArgument(Responder):
 
 
 class ResponderServerID(Responder):
-    '''
+    """
     Send each client it's id.
     This is allocated in a first-come-first-served manner.
     Therefore the order in which the clients registered (hold by the expecter class).
-    '''
+    """
 
     def __init__(self, socket, protocol, expecter):
         super(ResponderServerID, self).__init__(socket, protocol, expecter)
 
     def respond(self):
-        '''
+        """
 
         Returns
         -------
         dict<int, obj>
-        '''
+        """
 
         server_id_addr_mapping = {}
 
@@ -289,21 +289,21 @@ class ResponderServerID(Responder):
 
 
 class ResponderPerServerID(Responder):
-    '''
+    """
     Respond individually for each server.
 
     Attributes
     ----------
     responses : dict<int, obj>
         For each server the object to send.
-    '''
+    """
 
     def __init__(self, socket, protocol, expecter, responses):
         super(ResponderPerServerID, self).__init__(socket, protocol, expecter)
         self.responses = responses
 
     def respond(self):
-        '''
+        """
 
         Parameters
         ----------
@@ -311,7 +311,7 @@ class ResponderPerServerID(Responder):
         Returns
         -------
 
-        '''
+        """
         for server_id, addr in self.expecter.get_server_id_addr_mapping().items():
             self.socket.send_multipart([
                 addr,

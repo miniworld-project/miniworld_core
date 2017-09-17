@@ -18,7 +18,7 @@ __author__ = 'Nils Schmidt'
 
 
 def init(config_path: str=None, do_init_singletons=True):
-    ''' Init the module by installing signal handlers and creating the temp files '''
+    """ Init the module by installing signal handlers and creating the temp files """
 
     if not os.path.exists(PATH_GLOBAL_CONFIG):
         # TODO: render config.json from config sleeve
@@ -61,12 +61,12 @@ def try_umount_ramdisk():
 
 
 def create_n_check_tmp_files(delete_first=False, create_ramdisk=False):
-    ''' Create tmp dirs if not existing yet.
+    """ Create tmp dirs if not existing yet.
 
     Raises
     ------
     AlreadyRunning
-    '''
+    """
     if os.path.exists(PATH_TMP):
         if delete_first:
             try:
@@ -95,13 +95,13 @@ def create_n_check_tmp_files(delete_first=False, create_ramdisk=False):
 
 
 def create_log_files_dir():
-    ''' Create log dirs if not existing yet '''
+    """ Create log dirs if not existing yet """
     log.warn("(re)creating log directory: '%s' !", PATH_LOGS)
     os.makedirs(PATH_LOGS)
 
 
 def install_signal_handlers():
-    ''' Install the signal handlers '''
+    """ Install the signal handlers """
 
     atexit.register(error_handler, "exit")
     signal.signal(signal.SIGINT, error_handler_sys_exit)
@@ -111,7 +111,7 @@ def install_signal_handlers():
 
 
 def uninstall_signal_handlers():
-    ''' Uninstall the signal handlers '''
+    """ Uninstall the signal handlers """
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     signal.signal(signal.SIGTERM, signal.SIG_DFL)
 

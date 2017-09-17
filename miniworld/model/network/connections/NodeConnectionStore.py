@@ -5,7 +5,7 @@ from miniworld.model.network.connections.JSONEncoder import ConnectionEncoder, J
 
 
 class NodeConnectionStore(JSONStrMixin, TupleUserDict):
-    '''
+    """
     Default value for non-existent keys is: NICConnectionStore.
 
     Attributes
@@ -18,7 +18,7 @@ class NodeConnectionStore(JSONStrMixin, TupleUserDict):
     >>> ci = NodeConnectionStore()
     >>> # Get connection information between the two hosts
     >>> ci[(emu_node1, emu_node2)]
-    '''
+    """
 
     #########################################
     # Magic Methods
@@ -34,7 +34,7 @@ class NodeConnectionStore(JSONStrMixin, TupleUserDict):
     # TODO: implement same behaviour via magic methods ...
     @staticmethod
     def _get_key(emu_node_x, emu_node_y):
-        '''
+        """
         Get the key to access the dict via slicing.
 
         Assume we have bidirectional links.
@@ -50,7 +50,7 @@ class NodeConnectionStore(JSONStrMixin, TupleUserDict):
         Returns
         -------
         EmulationNodes
-        '''
+        """
         return EmulationNodes((emu_node_x, emu_node_y)).sorted()
 
 

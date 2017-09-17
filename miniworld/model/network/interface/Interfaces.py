@@ -8,25 +8,25 @@ __author__ = 'Nils Schmidt'
 
 
 class Interfaces(Objects):
-    '''
+    """
     Collection for the interfaces the OS has.
     Can be used like a list in python.
 
     Includes a factory method for the creation of multiple interfaces.
-    '''
+    """
 
     def __init__(self, interfaces):
-        '''
+        """
         Parameters
         ----------
         node_classes : list<Interface>
-        '''
+        """
         self.interfaces = self.data = interfaces
         super(Interfaces, self).__init__(interfaces)
 
     @staticmethod
     def interface_name_to_type(interface_class_name):
-        ''' Get the interface type for `interface_class_name`.
+        """ Get the interface type for `interface_class_name`.
 
         Parameters
         ----------
@@ -39,7 +39,7 @@ class Interfaces(Objects):
         Raises
         ------
         InterfaceUnknown
-        '''
+        """
         interface_class_name = interface_class_name.lower()
         type = INTERFACE_NAME_TYPE_MAPPING.get(interface_class_name)
         if type is None:
@@ -48,7 +48,7 @@ class Interfaces(Objects):
 
     @staticmethod
     def factory_from_interface_names(interface_names):
-        ''' See py:meth:`.factory`
+        """ See py:meth:`.factory`
 
         Examples
         --------
@@ -58,7 +58,7 @@ class Interfaces(Objects):
         Raises
         ------
         InterfaceUnknown
-        '''
+        """
         if not interface_names:
             return Interfaces([])
         else:
@@ -66,7 +66,7 @@ class Interfaces(Objects):
 
     @staticmethod
     def factory(interface_types):
-        '''
+        """
         Factory method to create the network interfaces.
         The factory takes care of counting interfaces of the same kind.
         This count+1 is passed to the `Interface` class (needed to differentiate between e.g. two `AP` objects)
@@ -79,7 +79,7 @@ class Interfaces(Objects):
         Returns
         -------
         Interfaces
-        '''
+        """
         # count created instances
         counter = defaultdict(lambda: 1)
         interfaces = []

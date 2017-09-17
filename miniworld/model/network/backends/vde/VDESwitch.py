@@ -42,7 +42,7 @@ port/setcolour {port} {color}
 
 
 def get_num_tap_devices():
-    ''' Get the number of tap devices associated with this switch '''
+    """ Get the number of tap devices associated with this switch """
     return len(re.findall("-t", CMD_TEMPLATE_VDE_SWITCH))
 
 
@@ -58,7 +58,7 @@ def fix_vdeswitch_hiccup(fun, *args, **kwargs):
 
 
 def fix_hiccup(fun, *args, **kwargs):
-    ''' Fix a bug of the VDESwitch where it responds with "Function not implemented"
+    """ Fix a bug of the VDESwitch where it responds with "Function not implemented"
     instead of the expected result.
     Trying it n times seems to be a workaround for now (Ticket #29)
 
@@ -75,7 +75,7 @@ def fix_hiccup(fun, *args, **kwargs):
     Raises
     ------
     VDESWitchHiccup
-    '''
+    """
 
     hiccup_funs = kwargs.get('hiccup_funs', [lambda output: "Function not implemented" in output])
     name = kwargs.get('name', "?")
@@ -111,19 +111,19 @@ def fix_hiccup(fun, *args, **kwargs):
 # TODO: #54,#55: REMOVE
 class TapSwitch(AbstractSwitch):
     def __init__(self, id, interface):
-        '''
+        """
         Parameters
         ----------
         id : int
         interface : Interface
         colorful : bool
             If the interface shall be colored on the switch.
-        '''
+        """
         super(VDESwitch, self).__init__(id, interface)
 
 
 class VDESwitch(AbstractSwitch, ShellCmdWrapper, REPLable):
-    ''' Model around the `vde_switch` command.
+    """ Model around the `vde_switch` command.
 
      Attributes
      ----------
@@ -131,17 +131,17 @@ class VDESwitch(AbstractSwitch, ShellCmdWrapper, REPLable):
      interface : Interface
      mgmt_dev_created : bool
      bridge_dev_name : bool
-     '''
+     """
 
     def __init__(self, id, interface):
-        '''
+        """
         Parameters
         ----------
         id : int
         interface : Interface
         colorful : bool
             If the interface shall be colored on the switch.
-        '''
+        """
         super(VDESwitch, self).__init__(id, interface)
 
         # TODO: DOC
@@ -177,7 +177,7 @@ class VDESwitch(AbstractSwitch, ShellCmdWrapper, REPLable):
 
     # TODO: #54,#55: check arguments. Should be wrong :/
     def _start(self, bridge_dev_name=None, switch=False):
-        '''
+        """
 
         Parameters
         ----------
@@ -193,7 +193,7 @@ class VDESwitch(AbstractSwitch, ShellCmdWrapper, REPLable):
         Raises
         ------
         NetworkBridgeNotExisting
-        '''
+        """
         # TODO: do not allow command-line injection!
         # NOTE: create device before superclass checks for existence!
         self.bridge_dev_name = bridge_dev_name
@@ -229,14 +229,14 @@ class VDESwitch(AbstractSwitch, ShellCmdWrapper, REPLable):
 
     # TODO: MOVE TO VDESWITCH
     def move_interface_to_vlan(self, interface, port=None):
-        '''
+        """
         Move the port from the switch to a specific VLAN
 
         Parameters
         ----------
         port : int, optional (default is None)
         interface : Interface
-        '''
+        """
         self.nlog.info("moving port %s to vlan %s", port, interface.node_class)
         fix_vdeswitch_hiccup(
             self.run_commands_eager,
@@ -245,9 +245,9 @@ class VDESwitch(AbstractSwitch, ShellCmdWrapper, REPLable):
         )
 
     def color_interface(self, port, color):
-        '''
+        """
         Color the interface.
-        '''
+        """
 
         if self.colorful:
             self.nlog.info("coloring qemu vde_switch port ...")
@@ -258,19 +258,19 @@ class VDESwitch(AbstractSwitch, ShellCmdWrapper, REPLable):
             )
 
     def get_used_ports(self):
-        '''
+        """
         Get the used ports of the switch (there a cable is plugged into)
 
         Returns
         -------
         list<int>
-        '''
+        """
 
         output = fix_vdeswitch_hiccup(self.run_commands_eager, StringIO("port/print"))
         return [int(port) for port in re.findall('Port\s+(\d+)', output)]
 
     def get_num_ports(self):
-        ''' Get the number of ports the switch has '''
+        """ Get the number of ports the switch has """
 
         output = fix_vdeswitch_hiccup(self.run_commands_eager, StringIO("port/showinfo"),
                                       hiccup_funs=[lambda output: "Function not implemented" in output,
@@ -279,7 +279,7 @@ class VDESwitch(AbstractSwitch, ShellCmdWrapper, REPLable):
         return int(re.search("Numports=(\d+)", output).groups()[0])
 
     def get_free_port(self):
-        ''' Get a free port '''
+        """ Get a free port """
         possible_ports = set(range(PORT_QEMU, self.get_num_ports() + 1))
         used_ports = set(self.get_used_ports())
         # remove used ports
@@ -291,15 +291,15 @@ class VDESwitch(AbstractSwitch, ShellCmdWrapper, REPLable):
         return random_port
 
     def set_port_size(self, size):
-        '''
+        """
         Set the number of ports for the switch.
-        '''
+        """
         fix_vdeswitch_hiccup(self.run_commands_eager,
                              StringIO(CMD_TEMPLATE_VDE_SWITCH_NUM_PORTS.format(size)))
 
     @staticmethod
     def get_vde_switch_mgmt_sock_path(id):
-        ''' Get the VDESwitch management unix domain socket path.
+        """ Get the VDESwitch management unix domain socket path.
 
         Parameters
         ----------
@@ -310,12 +310,12 @@ class VDESwitch(AbstractSwitch, ShellCmdWrapper, REPLable):
         Returns
         -------
         str
-        '''
+        """
         return PathUtil.get_temp_file_path("vde_switch_mgmt_%s" % id)
 
     @staticmethod
     def get_vde_switch_sock_path(id):
-        ''' Get the VDESwitch control unix domain socket path.
+        """ Get the VDESwitch control unix domain socket path.
 
         Parameters
         ----------
@@ -326,7 +326,7 @@ class VDESwitch(AbstractSwitch, ShellCmdWrapper, REPLable):
         Returns
         -------
         str
-        '''
+        """
         return PathUtil.get_temp_file_path("vde_switch_%s" % id)
 
     ###############################################
@@ -346,13 +346,13 @@ class VDESwitch(AbstractSwitch, ShellCmdWrapper, REPLable):
         return REPLable.run_commands(self, *args, **kwargs)
 
     def render_script_from_flo(self, flo, **kwargs):
-        '''
+        """
         Render the script from the file-like-object and inject some variables like ip addr and node id.
 
         Returns
         -------
         str
-        '''
+        """
 
         return render_script_from_flo(flo,
                                       # TODO: fill dictionary for custom template (if needed at a later time
@@ -368,7 +368,7 @@ class VDESwitch(AbstractSwitch, ShellCmdWrapper, REPLable):
 # def start_wirefilters(mode, interface_a, interface_b = None,
 #                       node_ids = None,
 #                       **kwargs):
-#     '''
+#     """
 #     Start `Wirefilter`s between the `node_ids` with the given `mode`.
 #
 #     Parameters
@@ -384,7 +384,7 @@ class VDESwitch(AbstractSwitch, ShellCmdWrapper, REPLable):
 #     -------
 #     dict<(int, int), (WireFilter, Interface, Interface>
 #         Remembers which node ids are connected with a wirefilter.
-#     '''
+#     """
 #     if interface_b is None:
 #         interface_b = interface_a
 #
@@ -419,7 +419,7 @@ MODES = set([
 
 
 def create_node_indexes(mode, node_ids):
-    '''
+    """
     Generate a list of pairs which shall be connected to each other.
     The `mode` influences the pair calculation.
 
@@ -433,7 +433,7 @@ def create_node_indexes(mode, node_ids):
     Returns
     -------
     list<tuple<int, int>>
-    '''
+    """
 
     def rand():
         return node_ids[random.randint(0, len(node_ids) - 1)]
@@ -456,7 +456,7 @@ def create_node_indexes(mode, node_ids):
 
 # TODO: UNUSED!
 # def setup_network_from_dict(connections_dict):
-#     '''
+#     """
 #     Setup the network topology by reading which nodes are connected to each other from the core config file.
 #     Assume the nodes are connected on the Mesh VLAN.
 #
@@ -469,7 +469,7 @@ def create_node_indexes(mode, node_ids):
 #     -------
 #     list<Wirefilter>, dict<int, list<int>
 #         Wirefilters, Which nodes are connected to each other.
-#     '''
+#     """
 #     connections = []
 #
 #     log.info("connecting nodes: %s", pformat(connections_dict))

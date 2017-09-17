@@ -14,62 +14,62 @@ from miniworld.model.spatial.Roads import Roads
 
 
 class MovementDirector(MovementDirectorAbstract):
-    '''
+    """
     Attributes
     ----------
     dict_of_movements_with_number_of_nodes :    dict<str, int>
         Name of the movement pattern, count of nodes
     roads :                                     Roads
     nodes :                                     Nodes
-    '''
+    """
 
     def __init__(self, dict_of_movements_with_number_of_nodes):
         self.roads = singletons.spatial_singleton.get_roads()
         self.nodes = Nodes(dict_of_movements_with_number_of_nodes)
 
     def get_distances_from_nodes(self):
-        '''
+        """
         Returns
         -------
         dict<(int, int), float>
             The distance (meters) matrix for each connection.
-        '''
+        """
         return self.nodes.get_distance_matrix()
 
     def get_geo_json_for_roads(self):
-        '''
+        """
         Returns
         -------
         geo_json
             for the existing streets
-        '''
+        """
         return self.roads.get_geo_json()
 
     def get_geo_json_for_nodes(self):
-        '''
+        """
         Returns
         -------
         geo_json
             for the current state of all nodes
-        '''
+        """
         return self.nodes.get_geo_json()
 
     def get_coordinates_for_nodes(self):
-        '''
+        """
         Returns
         -------
         dict<int, (float, float)>
             with current coordinates of all nodes and id as key
-        '''
+        """
         return self.nodes.get_coordinates()
 
     def get_geo_json_for_connections(self):
-        '''
+        """
         Returns
         -------
         geojson
             with connection status for all nodes
-        '''
+        """
         list_of_geo_json_objects = []
 
         for emulation_node, connected_emulation_nodes in singletons.network_manager.connection_store.get_connections_per_node().items():
@@ -101,9 +101,9 @@ class MovementDirector(MovementDirectorAbstract):
         singletons.spatial_singletonset_file_path(path)
 
     def simulate_one_step(self):
-        '''
+        """
         simulates the next step for all nodes
-        '''
+        """
         for node in self.nodes.get_list_of_nodes().items():
             node[1].step()
 
