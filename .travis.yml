@@ -23,9 +23,11 @@ install:
 script:
     - uname -a
     # run tests
-    - MW_CONFIG=tests/config.json BRANCH=$TRAVIS_BRANCH docker-compose up -d
-    - docker-compose exec core flake8
-    - eval $TEST_COMMAND
+    - BRANCH=$TRAVIS_BRANCH docker-compose run --entrypoint flake8 core  # flake8
+    - MW_CONFIG=tests/config.json BRANCH=$TRAVIS_BRANCH docker-compose up -d  # start docker environment
+    - sleep 10
+    - MW_CONFIG=tests/config.json BRANCH=$TRAVIS_BRANCH docker-compose logs
+    - docker-compose exec core pytest -x -v -m "not examples" tests  # actual tests
 after_script:
     - docker-compose logs > docker-compose.txt
 after_success:
@@ -35,6 +37,6 @@ after_success:
     - docker push $REPO:$TRAVIS_BRANCH
 addons:
   artifacts:
-    s3_region: "eu-central-1"
+    s3_region: "eu-west-1"
     paths:
     - docker-compose.txt
