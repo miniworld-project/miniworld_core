@@ -24,6 +24,7 @@ script:
     - uname -a
     # run tests
     - MW_CONFIG=tests/config.json BRANCH=$TRAVIS_BRANCH docker-compose up -d
+    - docker-compose exec core pep8
     - eval $TEST_COMMAND
 after_script:
     - docker-compose logs > docker-compose.txt
