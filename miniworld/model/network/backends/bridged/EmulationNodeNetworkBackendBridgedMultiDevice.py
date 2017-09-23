@@ -1,8 +1,7 @@
-from miniworld.log import get_node_logger, log
+from miniworld.log import log
 from miniworld.model.network.backends.EmulationNodeNetworkBackend import EmulationNodeNetworkBackend
 from miniworld.model.singletons.Singletons import singletons
-from miniworld.model.network.interface import Interfaces
-from miniworld.model.network.interface.Interface import *
+from miniworld.model.network.interface import Interfaces, Interface
 
 __author__ = 'Nils Schmidt'
 
@@ -31,7 +30,7 @@ class EmulationNodeNetworkBackendBridgedMultiDevice(EmulationNodeNetworkBackend)
 
         adjusted_interfaces = []
         for _if in interfaces:
-            if not isinstance(_if, HubWiFi) and not isinstance(_if, Management):
+            if not isinstance(_if, Interface.HubWiFi) and not isinstance(_if, Interface.Management):
                 log.debug("connections for '%s':'%s'", node_id, singletons.network_backend.get_all_connections().get(node_id))
                 adjusted_interfaces.extend(type(_if) for _ in singletons.network_backend.get_all_connections()[node_id])
             else:

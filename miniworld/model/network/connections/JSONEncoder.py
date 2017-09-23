@@ -95,13 +95,6 @@ class ConnectionDecoder(json.JSONDecoder):
             return res
         elif isinstance(obj, tuple):
             return list(map(lambda x: self.my_decode(x, escape_keys=True), obj))
-        elif isinstance(obj, (str, unicode)):
-            if escape_keys:
-                # e.g.  u'(10, 15)' => ('10', '15')
-                res = self.regex_str_tuple.search(obj).groups()
-                # ('10', '15') => (10, 15)
-                res = list(map(int, res))
-                return tuple(res)
 
         return obj
 

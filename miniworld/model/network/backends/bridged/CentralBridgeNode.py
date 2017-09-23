@@ -1,10 +1,8 @@
 from miniworld.model.singletons.Singletons import singletons
 from miniworld.model.emulation.nodes.virtual import CentralNode
-from miniworld.model.network.backends.bridged import Bridge
 
 
 class CentralBridgeNode(CentralNode.CentralNode):
-
     """
     Attributes
     ----------

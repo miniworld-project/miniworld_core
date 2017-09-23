@@ -1,7 +1,6 @@
 from miniworld import log
 from miniworld.Scenario import scenario_config
-from miniworld.model.network.linkqualitymodels import LinkQualityModel
-from miniworld.model.network.linkqualitymodels.LinkQualityConstants import *
+from miniworld.model.network.linkqualitymodels import LinkQualityModel, LinkQualityConstants
 
 __author__ = 'Nils Schmidt'
 
@@ -16,7 +15,7 @@ class LinkQualityModelRange(LinkQualityModel.LinkQualityModel):
         default_link_quality = {}
         if 0 <= distance < 30:
             default_link_quality.update({
-                LINK_QUALITY_KEY_LOSS: 0
+                LinkQualityConstants.LINK_QUALITY_KEY_LOSS: 0
             })
             return True, default_link_quality
 
@@ -72,7 +71,7 @@ class LinkQualityModelWiFiLinear(LinkQualityModelNetEm):
             if distance >= 0:
 
                 bandwidth = 1.0 * max_bandwidth / distance if distance > 1 else max_bandwidth
-                default_link_quality[LINK_QUALITY_KEY_BANDWIDTH] = bandwidth
+                default_link_quality[LinkQualityConstants.LINK_QUALITY_KEY_BANDWIDTH] = bandwidth
 
                 delay_const = (distance - 1) * 2 if distance > 1 else 0
                 delay_const_str = '%.2f' % delay_const
@@ -122,7 +121,7 @@ class LinkQualityModelWiFiExponential(LinkQualityModelWiFiLinear):
             bandwidth_divisor = 2 ** int(distance / 4.0)
 
             bandwidth = 1.0 * max_bandwidth / bandwidth_divisor if distance >= 1 else max_bandwidth
-            default_link_quality[LINK_QUALITY_KEY_BANDWIDTH] = bandwidth
+            default_link_quality[LinkQualityConstants.LINK_QUALITY_KEY_BANDWIDTH] = bandwidth
 
             delay_const = bandwidth_divisor
             delay_const_str = '%.2f' % delay_const

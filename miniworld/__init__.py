@@ -9,7 +9,6 @@ from miniworld.Config import set_global_config, PATH_GLOBAL_CONFIG, config
 from miniworld.Constants import PATH_TMP, PATH_LOGS, PROJECT_NAME, PATH_CLEANUP_SCRIPT
 from miniworld.errors import AlreadyRunning
 from miniworld.log import log, set_log_level
-from miniworld.management import ShellHelper
 from miniworld.management.ShellHelper import run_shell
 from miniworld.model.singletons.Singletons import singletons
 from miniworld.util import PathUtil

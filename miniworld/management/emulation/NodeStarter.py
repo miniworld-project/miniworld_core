@@ -5,9 +5,7 @@ from miniworld.Config import config
 from miniworld.concurrency.ExceptionStopThread import ExceptionStopThread
 from miniworld.errors import Unsupported
 from miniworld.log import log
-from miniworld.model.emulation.nodes.EmulationNode import EmulationNode
 from miniworld.model.emulation.nodes.virtual.CentralNode import is_central_node_interface
-from miniworld.model.emulation.nodes.virtual.ManagementNode import ManagementNode
 from miniworld.model.network.backends import NetworkBackends
 from miniworld.model.network.interface.Interface import HubWiFi
 from miniworld.model.singletons.Singletons import singletons

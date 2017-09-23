@@ -1,5 +1,4 @@
 from miniworld.model.collections.TupleUserDict import TupleUserDict
-from miniworld.model.emulation.nodes.EmulationNode import EmulationNode
 from miniworld.model.emulation.nodes.EmulationNodes import EmulationNodes
 from miniworld.model.network.connections.JSONEncoder import ConnectionEncoder, JSONStrMixin
 

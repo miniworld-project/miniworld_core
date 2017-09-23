@@ -1,7 +1,6 @@
 from miniworld import log
 from miniworld.Config import config
 from miniworld.model.emulation.nodes.EmulationNode import EmulationNode
-from miniworld.model.network.backends.NetworkBackendNotifications import ConnectionInfo
 from miniworld.model.singletons.Singletons import singletons
 
 
@@ -32,7 +31,8 @@ class VirtualNode(EmulationNode):
         # TODO: #82: network_backend is of type NetworkBackendEmulationNode
         # this call inits the interfaces of the :py:class:`.NetworkBackend`
 
-        network_mixin = network_backend_bootstrapper.virtual_node_network_backend_type(network_backend_bootstrapper, node_id, interfaces=interfaces,
+        network_mixin = network_backend_bootstrapper.virtual_node_network_backend_type(network_backend_bootstrapper,
+                                                                                       node_id, interfaces=interfaces,
                                                                                        management_switch=config.is_management_switch_enabled())
         super(VirtualNode, self).__init__(node_id, network_backend_bootstrapper, interfaces=interfaces,
                                           network_mixin=network_mixin)
@@ -89,7 +89,9 @@ class VirtualNode(EmulationNode):
         # NetworkBackendNotifications
         connected, switch, connection = singletons.network_manager.before_link_initial_start(network_backend, self,
                                                                                              emulation_node, interface,
-                                                                                             emu_node_if, connection_info, start_activated=True)
+                                                                                             emu_node_if,
+                                                                                             connection_info,
+                                                                                             start_activated=True)
         singletons.network_manager.after_link_initial_start(connected, switch, connection, network_backend, self,
                                                             emulation_node, interface, emu_node_if, connection_info,
                                                             start_activated=True)

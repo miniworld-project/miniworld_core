@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
 import argparse
 import json
-import random
-import sys
-import uuid
 from pprint import pformat
 
 import netifaces
-from uuid import uuid5
 
 import zmq
 
@@ -251,7 +247,7 @@ class ZeroMQClientReq(ZeroMQClient):
 
     def start(self, tunnel_ip):
         # do steps 1-3
-        scenario_config = super(ZeroMQClientReq, self).start(tunnel_ip)
+        super(ZeroMQClientReq, self).start(tunnel_ip)
 
         #########################################################
         # State: Distance Matrix
@@ -309,7 +305,7 @@ class ZeroMQClientSub(ZeroMQClient, Resetable):
         log.info("connecting to: %s ...", addr)
 
     def start(self, tunnel_ip):
-        scenario_config = super(ZeroMQClientSub, self).start(tunnel_ip)
+        super(ZeroMQClientSub, self).start(tunnel_ip)
 
         #########################################################
         # State: Distance Matrix

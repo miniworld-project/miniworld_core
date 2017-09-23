@@ -1,5 +1,4 @@
 from miniworld.management.spatial.MovementDirectorAbstract import MovementDirectorAbstract
-from miniworld.model.singletons.Singletons import singletons
 from miniworld.model.spatial import CoreConfigNodes
 
 

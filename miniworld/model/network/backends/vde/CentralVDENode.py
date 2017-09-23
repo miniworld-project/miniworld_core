@@ -1,7 +1,6 @@
 import miniworld.model.network.backends.vde.VDEConstants
 from miniworld import log
 from miniworld.model.emulation.nodes.virtual import CentralNode
-from miniworld.model.network.backends.vde import VDESwitch
 
 
 class CentralVDENode(CentralNode.CentralNode):

@@ -27,7 +27,6 @@ from miniworld.management.RunLoop import RunLoop
 from miniworld.management.emulation import NodeStarter
 from miniworld.management.spatial import MovementDirectorFactory
 from miniworld.model.collections import DistanceMatrix
-from miniworld.model.emulation.nodes.EmulationNode import EmulationNode
 from miniworld.model.emulation.nodes.EmulationNodes import EmulationNodes
 from miniworld.model.emulation.nodes.virtual.CentralNode import is_central_node
 from miniworld.model.events.MyEventSystem import MyEventSystem
@@ -329,8 +328,6 @@ class SimulationManager(Resetable, object):
             scenario_name = scenario_config.get_scenario_name()
             path_qemu_image = scenario_config.get_path_image()
             post_boot_script_string_io = StringIO(scenario_config.get_all_shell_commands_pre_network_start())
-            core_scenarios = scenario_config.get_core_scenarios()
-            walk_model_name = scenario_config.get_walk_model_name()
             network_backend_name = scenario_config.get_network_backend()
             parallel = scenario_config.is_parallel_node_starting()
             node_ids = scenario_config.get_local_node_ids()
@@ -344,8 +341,6 @@ class SimulationManager(Resetable, object):
 
             # load LinkQualityModel
             link_quality_model = LinkQualityModel.LinkQualityModel.import_link_quality_model(scenario_config.get_link_quality_model())(**kwargs)
-
-            topology_mode_kwargs = {}
 
             singletons.network_manager.cnt_nodes = cnt_nodes
 

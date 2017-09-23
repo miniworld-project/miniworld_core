@@ -273,7 +273,6 @@ class MiniWorldRPC:
     #########################################
 
     def get_is_arma(self):
-        return IS_ARMA
         return scenario_config.get_walk_model_name() == MovementDirectorFactory.TOPOLOGY_MODE_ARMA
 
     def get_geo_json_connections(self):

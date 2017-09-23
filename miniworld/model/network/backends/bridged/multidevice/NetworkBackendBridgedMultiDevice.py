@@ -75,7 +75,7 @@ def NetworkBackendBridgedMultiDevice():
 
             is_one_tap_mode = is_hubwifi or is_mgmt_node
 
-            bridge, connection = None, None
+            bridge = None
 
             # we have only one tap here
             if is_one_tap_mode:

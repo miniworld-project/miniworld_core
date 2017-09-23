@@ -1,9 +1,7 @@
 import curses
 import json
 from itertools import imap, repeat
-
-from progressbar import *
-
+import progressbar
 from miniworld.management.events.TerminalWriter import TerminalWriter
 from miniworld.model.events.MyEventSystem import MyEventSystem
 
@@ -16,7 +14,7 @@ event_length = 25
 
 curses_ok = False
 try:
-    from blessings import Terminal
+    from blessings import Terminal  # noqa
     curses_ok = True
 except curses.error:
     pass
@@ -59,14 +57,14 @@ class CLIEventDisplay:
 
             def get_shared_widgets(event_name):
                 event_name = event_name.ljust(event_length)[:event_length]
-                return [event_name, ': ', Percentage(), ' ']
+                return [event_name, ': ', progressbar.Percentage(), ' ']
 
-            widgets = get_shared_widgets(event) + [Bar(marker=RotatingMarker()), ' ', ETA()]
+            widgets = get_shared_widgets(event) + [progressbar.Bar(marker=progressbar.RotatingMarker()), ' ', progressbar.ETA()]
 
             if event == MyEventSystem.EVENT_TOTAL_PROGRESS:
-                widgets = get_shared_widgets(EVENT_OVERALL_PROGRESS) + [Bar('>'), ReverseBar('<'), ' ', ETA()]
+                widgets = get_shared_widgets(EVENT_OVERALL_PROGRESS) + [progressbar.Bar('>'), progressbar.ReverseBar('<'), ' ', progressbar.ETA()]
 
-            pbar = ProgressBar(fd=TerminalWriter(0, idx=self.get_progressbar_idx()), widgets=widgets, maxval=1.0).start()
+            pbar = progressbar.ProgressBar(fd=TerminalWriter(0, idx=self.get_progressbar_idx()), widgets=widgets, maxval=1.0).start()
             self.pbars[event] = pbar
 
             return True, pbar

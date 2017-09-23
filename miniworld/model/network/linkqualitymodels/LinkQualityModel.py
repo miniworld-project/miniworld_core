@@ -2,7 +2,7 @@ import importlib
 import sys
 
 from miniworld import log
-from miniworld.model.network.linkqualitymodels.LinkQualityConstants import *
+from miniworld.model.network.linkqualitymodels import LinkQualityConstants
 
 VAL_DISTANCE_ZERO = 0
 VAL_DISTANCE_UNLIMITED = sys.maxsize
@@ -29,9 +29,9 @@ class LinkQualityModel:
 
         """
         if loss is None:
-            loss = LINK_QUALITY_VAL_LOSS_NONE
+            loss = LinkQualityConstants.LINK_QUALITY_VAL_LOSS_NONE
         if bandwidth is None:
-            bandwidth = LINK_QUALITY_VAL_BANDWIDTH_UNLIMITED
+            bandwidth = LinkQualityConstants.LINK_QUALITY_VAL_BANDWIDTH_UNLIMITED
 
         self.loss = loss
         self.bandwidth = bandwidth
@@ -99,8 +99,8 @@ class LinkQualityModel:
     # TODO: REMOVE 1st ARG?
     def get_initial_link_quality(self):
         return False, {
-            LINK_QUALITY_KEY_BANDWIDTH: self.bandwidth,
-            LINK_QUALITY_KEY_LOSS: self.loss
+            LinkQualityConstants.LINK_QUALITY_KEY_BANDWIDTH: self.bandwidth,
+            LinkQualityConstants.LINK_QUALITY_KEY_LOSS: self.loss
         }
 
     # TODO: DOC: idempotent!

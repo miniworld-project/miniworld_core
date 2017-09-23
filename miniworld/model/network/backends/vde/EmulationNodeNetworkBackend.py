@@ -1,20 +1,17 @@
-from collections import OrderedDict
-
 import miniworld.model.network.backends.vde.VDEConstants
 from miniworld.Scenario import scenario_config
-from miniworld.model import StartableObject
 from miniworld.model.network.backends.SwitchMixin import SwitchMixin
-from miniworld.model.network.backends.vde import VDESwitch
 from miniworld.model.network.backends.EmulationNodeNetworkBackend import EmulationNodeNetworkBackend
+
 __author__ = 'Nils Schmidt'
 
 
 class EmulationNodeNetworkBackendVDE(EmulationNodeNetworkBackend, SwitchMixin):
-
     def __init__(self, network_backend_bootstrapper, node_id,
                  # network
                  interfaces=None, management_switch=False):
-        super(EmulationNodeNetworkBackendVDE, self).__init__(network_backend_bootstrapper, node_id, interfaces=interfaces, management_switch=management_switch)
+        super(EmulationNodeNetworkBackendVDE, self).__init__(network_backend_bootstrapper, node_id,
+                                                             interfaces=interfaces, management_switch=management_switch)
 
         self.create_switches()
 
@@ -45,12 +42,14 @@ class EmulationNodeNetworkBackendVDE(EmulationNodeNetworkBackend, SwitchMixin):
 
         for _if, vde_switch in self.switches.items():
             self.nlog.debug("coloring %s, %s", _if, vde_switch)
-            vde_switch.color_interface(port=miniworld.model.network.backends.vde.VDEConstants.PORT_QEMU, color=_if.node_class)
+            vde_switch.color_interface(port=miniworld.model.network.backends.vde.VDEConstants.PORT_QEMU,
+                                       color=_if.node_class)
 
     def move_interfaces_to_vlan(self):
         # move the interfaces to their corresponding vlan
         for _if, vde_switch in self.switches.items():
-            vde_switch.move_interface_to_vlan(port=miniworld.model.network.backends.vde.VDEConstants.PORT_QEMU, interface=_if)
+            vde_switch.move_interface_to_vlan(port=miniworld.model.network.backends.vde.VDEConstants.PORT_QEMU,
+                                              interface=_if)
 
     def set_switch_sizes(self):
         """ Set the size of the switch """

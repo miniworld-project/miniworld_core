@@ -1,5 +1,4 @@
 
-from miniworld.Config import config
 from miniworld.model.network.backends.EmulationNodeNetworkBackend import EmulationNodeNetworkBackend
 
 __author__ = 'Nils Schmidt'

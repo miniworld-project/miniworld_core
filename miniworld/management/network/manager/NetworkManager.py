@@ -2,19 +2,17 @@ from collections import defaultdict, OrderedDict
 from pprint import pformat
 
 from dictdiffer import DictDiffer
+from miniworld.model.network.linkqualitymodels import LinkQualityConstants
 
 from miniworld import singletons
 from miniworld.Scenario import scenario_config
 from miniworld.log import log
 from miniworld.management.network.manager.provisioner.NetworkConfiguratorP2P import NetworkConfiguratorP2P
 from miniworld.management.network.manager.provisioner.NetworkConfiguratorSameSubnet import NetworkConfiguratorSameSubnet
-from miniworld.model.emulation.nodes.EmulationNodes import EmulationNodes
 from miniworld.model.emulation.nodes.virtual.ManagementNode import ManagementNode
 from miniworld.model.events.MyEventSystem import MyEventSystem
 from miniworld.model.network.backends import NetworkBackendNotifications
 from miniworld.model.network.connections.ConnectionStore import ConnectionStore
-from miniworld.model.network.interface.Interface import Management
-from miniworld.model.network.linkqualitymodels.LinkQualityConstants import *
 from miniworld.model.singletons.Resetable import Resetable
 from miniworld.util import PathUtil
 
@@ -26,6 +24,7 @@ NETWORK_CONFIGURATOR_NAME_P2P = 'p2p'
 __author__ = 'Nils Schmidt'
 
 KEY_DISTANCE = "distance"
+
 
 # TODO: MOVE CONNECTIONS HERE ...
 # TODO: STORE EMUNODES OR NODE IDS?
@@ -105,7 +104,6 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
             with open(PathUtil.get_log_file_path("%s.txt" % self.__class__.__name__), "a") as f:
 
                 if self.net_configurator.needs_reconfiguration(singletons.simulation_manager.current_step):
-
                     # only connection setup and check for new connections
                     log.info("%s: configuring network ...", self.net_configurator.__class__.__name__)
                     commands_per_node = self.net_configurator.get_nic_configuration_commands(new_connections)
@@ -141,7 +139,7 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
     @property
     def bandwidth(self):
         return self.connection_store.get_active_node_connection_store().get_link_quality_matrix(
-            include_interfaces=False, key=LINK_QUALITY_KEY_BANDWIDTH)
+            include_interfaces=False, key=LinkQualityConstants.LINK_QUALITY_KEY_BANDWIDTH)
 
     def bandwidth_matrix(self):
         return self._to_matrix(self.bandwidth)
@@ -164,14 +162,11 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
     @property
     def loss(self):
         return self.connection_store.get_link_quality_matrix(
-            include_interfaces=False, key=LINK_QUALITY_KEY_LOSS)
+            include_interfaces=False, key=LinkQualityConstants.LINK_QUALITY_KEY_LOSS)
 
     # TODO: use decorator to offer loss_matrix and to_matrix method
     def loss_matrix(self):
         return self._to_matrix(self.loss)
-
-    def _to_matrix(self, matrix, fill_in="-"):
-        return PlotUtil.fill_quadratic_matrix(matrix, size=self.cnt_nodes, fill_in=fill_in)
 
     #############################################################
     # NetworkBackendNotifications
@@ -217,7 +212,7 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
         es = singletons.event_system
 
         # clear progress for network backend setup
-        with es.event_init(es.EVENT_NETWORK_BACKEND_SETUP, finish_ids=[]) as ev:
+        with es.event_init(es.EVENT_NETWORK_BACKEND_SETUP, finish_ids=[]):
             pass
 
         # fully qualified matrix
@@ -275,13 +270,16 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
             return OrderedDict([(k, active_connections[k]) for k in dd.added()])
 
     # TODO: {before,after}_link_stop ?
-    def before_link_initial_start(self, network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info,
+    def before_link_initial_start(self, network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y,
+                                  connection_info,
                                   start_activated=False, **kwargs):
         return network_backend.before_link_initial_start(network_backend, emulation_node_x, emulation_node_y,
-                                                         interface_x, interface_y, connection_info, start_activated=start_activated)
+                                                         interface_x, interface_y, connection_info,
+                                                         start_activated=start_activated)
 
     def after_link_initial_start(self, network_backend_connected, switch, connection, network_backend, emulation_node_x,
-                                 emulation_node_y, interface_x, interface_y, connection_info, start_activated=False, **kwargs):
+                                 emulation_node_y, interface_x, interface_y, connection_info, start_activated=False,
+                                 **kwargs):
         # try:
         #     type_check(network_backend_connected, bool)
         #     type_check(switch, AbstractSwitch.AbstractSwitch)
@@ -289,10 +287,9 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
         # except ValueError:
         #     print "foo"
 
-        es = singletons.event_system
-
         if network_backend_connected:
-            self.connection_store.add_connection(emulation_node_x, emulation_node_y, interface_x, interface_y, connection,
+            self.connection_store.add_connection(emulation_node_x, emulation_node_y, interface_x, interface_y,
+                                                 connection,
                                                  network_backend_connected)
 
             # TODO: enable again!
@@ -308,29 +305,35 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
             #         ev.update([emulation_node_y.id], 1.0 / ( len(self.new_conns_per_node[emulation_node_y.id]) * cnt_normal_ifaces_y), add=True)
 
         return network_backend.after_link_initial_start(network_backend_connected, switch, connection, network_backend,
-                                                        emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info,
+                                                        emulation_node_x, emulation_node_y, interface_x, interface_y,
+                                                        connection_info,
                                                         start_activated=start_activated)
 
     def before_link_quality_adjustment(self, connection, link_quality_still_connected, link_quality_dict,
-                                       network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info,
+                                       network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y,
+                                       connection_info,
                                        **kwargs):
         return network_backend.before_link_quality_adjustment(
-            connection, link_quality_still_connected, link_quality_dict, network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info)
+            connection, link_quality_still_connected, link_quality_dict, network_backend, emulation_node_x,
+            emulation_node_y, interface_x, interface_y, connection_info)
 
     def after_link_quality_adjustment(self, connection, link_quality_still_connected, link_quality_dict,
-                                      network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info,
+                                      network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y,
+                                      connection_info,
                                       **kwargs):
 
         self.connection_store.update_link_quality(emulation_node_x, emulation_node_y, interface_x, interface_y,
                                                   connection, link_quality_still_connected, link_quality_dict)
         return network_backend.after_link_quality_adjustment(
-            connection, link_quality_still_connected, link_quality_dict, network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info)
+            connection, link_quality_still_connected, link_quality_dict, network_backend, emulation_node_x,
+            emulation_node_y, interface_x, interface_y, connection_info)
 
     def link_up(self, connection, link_quality_dict,
                 network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info,
                 **kwargs):
         # flag as active/inactive connection
-        self.connection_store.change_connection_state(emulation_node_x, emulation_node_y, interface_x, interface_y, now_active=True)
+        self.connection_store.change_connection_state(emulation_node_x, emulation_node_y, interface_x, interface_y,
+                                                      now_active=True)
         res = network_backend.link_up(
             connection, link_quality_dict,
             network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info,
@@ -341,7 +344,8 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
                   network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info,
                   **kwargs):
         # flag as active/inactive connection
-        self.connection_store.change_connection_state(emulation_node_x, emulation_node_y, interface_x, interface_y, now_active=False)
+        self.connection_store.change_connection_state(emulation_node_x, emulation_node_y, interface_x, interface_y,
+                                                      now_active=False)
         res = network_backend.link_down(
             connection, link_quality_dict,
             network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info,
@@ -350,7 +354,8 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
 
     def connection_across_servers(self, network_backend, emulation_node_x, emulation_node_y, remote_ip):
 
-        tunnel = network_backend.connection_across_servers(network_backend, emulation_node_x, emulation_node_y, remote_ip)
+        tunnel = network_backend.connection_across_servers(network_backend, emulation_node_x, emulation_node_y,
+                                                           remote_ip)
         return tunnel
 
     #########################################
@@ -435,14 +440,14 @@ class NetworkManager(Resetable, NetworkBackendNotifications.NetworkBackendNotifi
         G = nx.Graph()
 
         # TODO: #54,#55
-        for (emu_node_x, emu_node_y), nic_connection_store in self.connection_store.get_active_node_connection_store().items():
+        for (emu_node_x,
+             emu_node_y), nic_connection_store in self.connection_store.get_active_node_connection_store().items():
             emu_node_x_str = get_node_name(emu_node_x)
             emu_node_y_str = get_node_name(emu_node_y)
             connections = nic_connection_store.keys()
 
             # add nodes
-            if not include_management_node and (
-                    isinstance(emu_node_x, ManagementNode) or isinstance(emu_node_y, ManagementNode)):
+            if not include_management_node and (isinstance(emu_node_x, ManagementNode) or isinstance(emu_node_y, ManagementNode)):
                 continue
 
             if include_nodes:

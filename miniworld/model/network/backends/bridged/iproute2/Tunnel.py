@@ -23,17 +23,11 @@ class AbstractTunnel(StartableObject.StartableSimulationStateObject):
     """
 
     def __init__(self, emulation_node_x, emulation_node_y, remote_ip):
-
         super(AbstractTunnel, self).__init__()
 
         self.emulation_node_x = emulation_node_x
         self.emulation_node_y = emulation_node_y
         self.remote_ip = remote_ip
-
-    def _start(self, *args, **kwargs):
-        tunnel_set_group_cmd = IPRoute2Commands.get_add_interface_to_group_cmd(self.get_tunnel_name(),
-                                                                               IPRoute2Commands.GROUP_TUNNELS)
-        # run_shell(tunnel_set_group_cmd)
 
     def run_shell(self, cmd):
         singletons.shell_helper.run_shell(0, cmd, prefixes=["tunnel"])
@@ -50,11 +44,11 @@ class AbstractTunnel(StartableObject.StartableSimulationStateObject):
         raise NotImplementedError
 
     def get_local_emulation_node(self):
-        return self.emulation_node_x if singletons.simulation_manager.is_local_node(self.emulation_node_x.id) else self.emulation_node_y
+        return self.emulation_node_x if singletons.simulation_manager.is_local_node(
+            self.emulation_node_x.id) else self.emulation_node_y
 
 
 class TunnelIPRoute(AbstractTunnel):
-
     EVENT_ROOT = "tunnel"
     EVENT_TUNNEL_REMOVE = "tunnel_remove"
     EVENT_TUNNEL_ADD = "tunnel_add"
@@ -82,15 +76,15 @@ class TunnelIPRoute(AbstractTunnel):
         tunnel_cmd = IPRoute2Commands.get_link_del_cmd(self.get_tunnel_name())
         self.add_command(self.EVENT_TUNNEL_REMOVE, tunnel_cmd)
 
+
 # TODO: set tunnel group
 
 
 class GreTapTunnel(TunnelIPRoute):
-
     def _start(self):
-
         # TODO: use ShellCommandSerializer
-        tunnel_cmd = IPRoute2Commands.get_gretap_tunnel_cmd(self.get_tunnel_name(), self.remote_ip, self.get_tunnel_id())
+        tunnel_cmd = IPRoute2Commands.get_gretap_tunnel_cmd(self.get_tunnel_name(), self.remote_ip,
+                                                            self.get_tunnel_id())
 
         log.info("creating gretap tunnel for %s<->%s" % (self.emulation_node_x.id, self.emulation_node_y.id))
 
@@ -101,6 +95,7 @@ class GreTapTunnel(TunnelIPRoute):
 
         # set tunnel dev group
         super(GreTapTunnel, self)._start()
+
 
 # TODO:
 
@@ -120,6 +115,7 @@ class VLANTunnel(TunnelIPRoute):
                          )
         # set tunnel dev group
         super(VLANTunnel, self)._start()
+
 
 # TODO:
 

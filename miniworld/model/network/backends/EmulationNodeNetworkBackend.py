@@ -4,9 +4,9 @@ from miniworld import config
 from miniworld.Scenario import scenario_config
 from miniworld.log import get_node_logger
 from miniworld.model.network.backends.NetworkMixin import NetworkMixin
-from miniworld.model.network.interface import Interfaces
-from miniworld.model.network.interface.Interface import *
+from miniworld.model.network.interface import Interfaces, Interface
 from miniworld.util import NetUtil
+
 __author__ = 'Nils Schmidt'
 
 
@@ -43,12 +43,12 @@ class EmulationNodeNetworkBackend(NetworkMixin):
         self.nlog = get_node_logger(self.node_id)
 
         if interfaces is None:
-            self.interfaces = Interfaces.Interfaces.factory([Mesh])
+            self.interfaces = Interfaces.Interfaces.factory([Interface.Mesh])
         else:
             self.interfaces = interfaces
 
         if management_switch:
-            self.interfaces.append(Interfaces.Interfaces.factory([Management])[0])
+            self.interfaces.append(Interfaces.Interfaces.factory([Interface.Management])[0])
 
         # let the management interface be the last one
         self.interfaces.sort()
@@ -87,8 +87,9 @@ class EmulationNodeNetworkBackend(NetworkMixin):
             ip = _if.get_ip(emulation_node.id)
             netmask = _if.get_netmask()
 
-            cmd_ip_change = NetUtil.get_ip_addr_change_cmd("%s%s" % (scenario_config.get_network_links_nic_prefix(), idx),
-                                                           ip, netmask)
+            cmd_ip_change = NetUtil.get_ip_addr_change_cmd(
+                "%s%s" % (scenario_config.get_network_links_nic_prefix(), idx),
+                ip, netmask)
             emulation_node.virtualization_layer.run_commands_eager(StringIO(cmd_ip_change))
 
     def _nic_mgmt_ipv4_config(self, emulation_node):

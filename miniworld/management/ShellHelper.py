@@ -29,6 +29,7 @@ class MyCalledProcessError(CalledProcessError):
 class BackgroundProcessError(ShellHelperError):
     pass
 
+
 # TODO: DOC
 
 
@@ -88,7 +89,6 @@ devnull = open(os.devnull, "r")
 def run_sub_process_popen(cmd, stdout=None, stderr=None, stdin=None, **kwargs):
     cmd = fmt_cmd_template(cmd)
     symbol_devnull = "devnull"
-    dev_null_used = False
 
     cmd_as_list = shlex.split(cmd)
     # note: do not use subprocess.PIPE! May cause deadlock!
@@ -97,15 +97,10 @@ def run_sub_process_popen(cmd, stdout=None, stderr=None, stdin=None, **kwargs):
         stdin = devnull
 
     if stdout is symbol_devnull:
-        dev_null_used = True
         stdout = devnull
 
     if stderr is symbol_devnull:
-        dev_null_used = True
         stderr = devnull
-
-    # if dev_null_used:
-    #     devnull.close()
 
     p = subprocess.Popen(cmd_as_list, close_fds=True, stdout=stdout, stderr=stderr, stdin=stdin, **kwargs)
     log.debug("started %s", ' '.join(p.args) + (" (PID = %s)" % p.pid))
@@ -221,7 +216,8 @@ class LogWriter(Resetable):
         log.info("starting log writer (file: '%s')", self.log_filename)
         if self.fh_logfile is None:
             self.fh_logfile = open(PathUtil.get_log_file_path(self.log_filename), "w")
-        self.writer_thread = ExceptionStopThread.run_fun_threaded_n_log_exception(target=self.check, tkwargs=dict(name="LogWriter"))
+        self.writer_thread = ExceptionStopThread.run_fun_threaded_n_log_exception(target=self.check,
+                                                                                  tkwargs=dict(name="LogWriter"))
         self.writer_thread.daemon = True
         self.writer_thread.start()
 
@@ -268,7 +264,6 @@ FOREGROUND_SHELL_LOG_PATH = PathUtil.get_log_file_path("foreground_shell_command
 
 
 class ShellHelper(Resetable):
-
     """
     Provides help for starting shell process in fore- and background.
      For the background threads, the stdout/stderr file descriptors are read
@@ -316,7 +311,8 @@ class ShellHelper(Resetable):
 
     def check_error_codes(self):
 
-            # check processes every x seconds for return codes
+        # check processes every x seconds for return codes
+        subproc_error = None
         while True:
             if self.bg_checker_thread.shall_terminate():
                 return
@@ -324,11 +320,6 @@ class ShellHelper(Resetable):
 
             with self.lock:
 
-                # delete subprocess with error, error is already logged
-                if subproc_error:
-                    del self.subprocesses[subproc_error]
-
-                subproc_error = None
                 log.debug("checking bg processes return codes ...")
                 for subproc in self.subprocesses:
                     log.debug("%s => %s", subproc, subproc.returncode)
@@ -337,12 +328,15 @@ class ShellHelper(Resetable):
                             "The subprocess '%s' exited with error code '%s'. See the log file for the output!" % (
                                 subproc, subproc.returncode))
                         self.bg_checker_thread.exception_handler(exception)
-                    subproc_error = subproc
+                    # delete subprocess with error, error is already logged
+                    del self.subprocesses[subproc_error]
 
     # TODO: REMOVE?
     def start_bg_checker_thread(self):
         return
-        self.bg_checker_thread = ExceptionStopThread.run_fun_threaded_n_log_exception(target=self.check_error_codes, tkwargs=dict(name="BG Process Checker"))
+        self.bg_checker_thread = ExceptionStopThread.run_fun_threaded_n_log_exception(target=self.check_error_codes,
+                                                                                      tkwargs=dict(
+                                                                                          name="BG Process Checker"))
         self.bg_checker_thread.start()
         log.info("starting bg process checker thread ...")
 

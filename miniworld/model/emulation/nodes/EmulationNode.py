@@ -154,7 +154,7 @@ class EmulationNode(StartableObject.StartableSimulationStateObject, ShellCmdWrap
         self.nlog.info("node running ...")
 
         # notify EventSystem even if there are no commands
-        with es.event_no_init(es.EVENT_VM_SHELL_PRE_NETWORK_COMMANDS, finish_ids=[self.id]) as ev:
+        with es.event_no_init(es.EVENT_VM_SHELL_PRE_NETWORK_COMMANDS, finish_ids=[self.id]):
             # do this immediately after the node has been started
             self.run_pre_network_shell_commands(flo_post_boot_script)
 
@@ -198,7 +198,7 @@ class EmulationNode(StartableObject.StartableSimulationStateObject, ShellCmdWrap
         # TODO: use node_id everywhere possible for scenario_config.*()
         # # notify EventSystem even if there are no commands
         es = singletons.event_system
-        with es.event_no_init(es.EVENT_VM_SHELL_POST_NETWORK_COMMANDS, finish_ids=[self.id]) as ev:
+        with es.event_no_init(es.EVENT_VM_SHELL_POST_NETWORK_COMMANDS, finish_ids=[self.id]):
             commands = scenario_config.get_all_shell_commands_post_network_start(node_id=self.id)
             if commands:
                 self.virtualization_layer.run_commands_eager(StringIO(commands))

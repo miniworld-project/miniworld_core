@@ -32,7 +32,6 @@ class MyCLIEventDisplay(CLIEventDisplay):
 
 
 if __name__ == '__main__':
-    from miniworld.management.events.MyCLIEventDisplay import MyCLIEventDisplay
     from miniworld.model.events.MyEventSystem import MyEventSystem
     import time
 

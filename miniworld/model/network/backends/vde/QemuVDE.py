@@ -1,4 +1,3 @@
-from miniworld.Config import config
 from miniworld.Scenario import scenario_config
 from miniworld.model.emulation import Qemu
 from miniworld.model.network.backends.vde.VDESwitch import VDESwitch

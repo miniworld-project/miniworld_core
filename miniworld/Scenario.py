@@ -1,12 +1,13 @@
 import os
 from copy import deepcopy
 
+from miniworld.model.network.linkqualitymodels import LinkQualityConstants
+
 import miniworld.ScenarioConstants
 import miniworld.model.network.backends.vde.VDEConstants
 import miniworld.model.network.interface.Interface
 from miniworld import log
 from miniworld.errors import ConfigMalformed
-from miniworld.model.network.linkqualitymodels.LinkQualityConstants import *
 from miniworld.util import JSONConfig, ConcurrencyUtil
 from miniworld.util.JSONConfig import customizable_attrs, json2dict
 
@@ -131,7 +132,7 @@ class ScenarioConfig(JSONConfig.JSONConfig):
     def get_link_quality_model(self):
         pass
 
-    @customizable_attrs("network", "links", "bandwidth", default=LINK_QUALITY_VAL_BANDWIDTH_UNLIMITED)
+    @customizable_attrs("network", "links", "bandwidth", default=LinkQualityConstants.LINK_QUALITY_VAL_BANDWIDTH_UNLIMITED)
     def get_link_bandwidth(self):
         """ default is unlimited bandwidth """
         pass

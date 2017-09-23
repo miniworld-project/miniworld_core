@@ -1,11 +1,9 @@
 # encoding: utf-8
 from miniworld.management.spatial.MovementDirectorAbstract import MovementDirectorAbstract
 from miniworld.model.spatial.Nodes import Nodes
-from miniworld.Scenario import scenario_config
 import geojson
 from collections import OrderedDict
 from miniworld.model.singletons.Singletons import singletons
-from miniworld.model.spatial.Roads import Roads
 
 __author__ = "Patrick Lampe"
 __email__ = "uni at lampep.de"

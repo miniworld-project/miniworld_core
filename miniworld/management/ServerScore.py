@@ -1,7 +1,6 @@
 import re
 
 import psutil
-from multiprocessing import cpu_count
 
 from miniworld.util import ConcurrencyUtil
 
@@ -9,11 +8,11 @@ from miniworld.util import ConcurrencyUtil
 def factory():
     return ServerScore
 
+
 # TODO: add kvm capability
 
 
 class ServerScore(object):
-
     SCORE_CPU = "cpu"
     SCORE_FREE_MEM = "free_mem"
 

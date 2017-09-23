@@ -314,7 +314,6 @@ class EventSystem(collections.UserDict, EventSystemStats, Resetable.Resetable):
 
 
 if __name__ == '__main__':
-    from miniworld.model.events.EventSystem import EventSystem
     from miniworld.model.events.MyEventSystem import MyEventSystem
     import time
     from pprint import pprint, pformat

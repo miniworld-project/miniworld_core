@@ -6,7 +6,10 @@ import time
 from collections import UserDict
 from io import StringIO
 
+from miniworld.script import TemplateEngine
+
 import miniworld.model.network.interface.Interface
+from miniworld import log
 from miniworld.Config import config
 from miniworld.Scenario import scenario_config
 from miniworld.management.ShellHelper import run_shell
@@ -20,7 +23,6 @@ from miniworld.errors import QemuBootWaitTimeout
 from miniworld.util import PathUtil, NetUtil
 from miniworld.model.singletons.Singletons import singletons
 
-from miniworld.script.TemplateEngine import *
 from miniworld.repl.REPLable import REPLable
 from miniworld.model.ShellCmdWrapper import ShellCmdWrapper
 
@@ -513,7 +515,7 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
         """
 
         kwargs.update(self.get_repl_variables(kwargs))
-        return render_script_from_flo(flo, **kwargs)
+        return TemplateEngine.render_script_from_flo(flo, **kwargs)
 
     # TODO: ABSTRACT AND MOVE TO REPL?
     @staticmethod
@@ -522,7 +524,7 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
             vars = {}
 
         # set node id
-        vars[KEYWORD_NODE_ID] = id
+        vars[TemplateEngine.KEYWORD_NODE_ID] = id
         # get key/value pairs from each node class
         for node_class_type in miniworld.model.network.interface.Interface.INTERFACE_ALL_CLASSES_TYPES:
             vars.update(node_class_type().get_template_dict(id))

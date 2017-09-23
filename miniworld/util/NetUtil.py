@@ -15,7 +15,8 @@ def get_mac(postfix_as_int, prefix="aa:aa:aa:aa"):
 
     postfix = "%04x" % postfix_as_int
     postfix = '%s:%s' % (postfix[0:2], postfix[2:4])
-    return'%s:%s' % (prefix, postfix)
+    return '%s:%s' % (prefix, postfix)
+
 
 ###########################################################
 # Network Configuration
@@ -97,19 +98,20 @@ def wait_until_uds_reachable(uds_path, return_sock=False):
     """
 
     from miniworld.util import ConcurrencyUtil
-    sock = ConcurrencyUtil.wait_until_fun_returns_true(lambda x: x[0] is True, uds_reachable, uds_path, return_sock=return_sock)[1]
+    sock = ConcurrencyUtil.wait_until_fun_returns_true(lambda x: x[0] is True, uds_reachable, uds_path,
+                                                       return_sock=return_sock)[1]
     return sock
 
 
 class Timeout(Base):
     pass
 
+
 # # TODO: DOC
 # TODO: use for multiple sockets in parallel!
 
 
 class SocketExpect(object):
-
     # TODO: REMOVE expected_length
     # TODO: support timeout!
     def __init__(self, sock, check_fun, read_buf_size=1, timeout=None, send_data=None):
@@ -218,8 +220,6 @@ def wait_for_boot(*args, **kwargs):
 
 
 if __name__ == '__main__':
-    import selectors
-    import socket
 
     def foo():
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

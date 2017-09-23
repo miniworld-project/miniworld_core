@@ -1,7 +1,6 @@
 import gzip
 import json
 import os
-import shutil
 import signal
 import subprocess
 import sys
@@ -12,8 +11,6 @@ from typing import List, Dict
 
 import pytest
 import requests
-
-from miniworld.util import JSONConfig
 
 devnull = open(os.devnull, "w")
 
@@ -72,13 +69,15 @@ def create_runner(tmpdir_factory, request, config_path):
 
         @staticmethod
         def run_mwcli_command(custom_args: List[str], *args, **kwargs) -> bytes:
-            return subprocess.check_output(['mwcli', '--addr', os.environ.get('MW_SERVER_ADRR', '127.0.0.1')] + custom_args,
-                                           *args, **kwargs)
+            return subprocess.check_output(
+                ['mwcli', '--addr', os.environ.get('MW_SERVER_ADRR', '127.0.0.1')] + custom_args,
+                *args, **kwargs)
 
         @staticmethod
         def run_mwcli_command_silently(custom_args: List[str], *args, **kwargs) -> bytes:
-            return subprocess.check_call(['mwcli', '--addr', os.environ.get('MW_SERVER_ADRR', '127.0.0.1')] + custom_args,
-                                         *args, stdout=devnull, stderr=devnull, **kwargs)
+            return subprocess.check_call(
+                ['mwcli', '--addr', os.environ.get('MW_SERVER_ADRR', '127.0.0.1')] + custom_args,
+                *args, stdout=devnull, stderr=devnull, **kwargs)
 
         @staticmethod
         def run_mwcli_command_json_result(custom_args: List[str]) -> Dict:

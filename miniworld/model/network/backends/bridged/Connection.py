@@ -1,12 +1,12 @@
 import subprocess
 from collections import defaultdict
 
+from miniworld.model.network.linkqualitymodels import LinkQualityConstants
 from ordered_set import OrderedSet
 
 from miniworld import log
 from miniworld.Scenario import scenario_config
 from miniworld.model.network.backends.AbstractConnection import AbstractConnection
-from miniworld.model.network.linkqualitymodels.LinkQualityConstants import *
 from miniworld.model.network.linkqualitymodels.LinkQualityModelRange import LinkQualityModelNetEm
 from miniworld.model.singletons.Singletons import singletons
 
@@ -79,7 +79,7 @@ def ConnectionDummy():
             """
 
             # assumes only equal interfaces can be connected to each other
-            bandwidth = link_quality_dict.get(LINK_QUALITY_KEY_BANDWIDTH)
+            bandwidth = link_quality_dict.get(LinkQualityConstants.LINK_QUALITY_KEY_BANDWIDTH)
 
             self.nlog.info("adjusting link quality ...")
 
@@ -127,8 +127,7 @@ def ConnectionDummy():
             tc class add dev $DEV parent 1:1 classid 1:12 htb rate 100kbit ceil 190kbit prio 2
             """
 
-            rate = link_quality_dict.get(LINK_QUALITY_KEY_BANDWIDTH)
-            delay = link_quality_dict.get(LINK_QUALITY_KEY_DELAY)
+            rate = link_quality_dict.get(LinkQualityConstants.LINK_QUALITY_KEY_BANDWIDTH)
 
             if rate is not None:
 

@@ -1,7 +1,6 @@
 from pprint import pformat
 import netifaces
 
-from miniworld import log
 from miniworld.errors import NetworkBackendErrorReset
 from miniworld.model.singletons.Singletons import singletons
 from miniworld.model.network.backends import AbstractSwitch

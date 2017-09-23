@@ -2,13 +2,13 @@ import logging
 import re
 from io import StringIO
 
+from miniworld.model.network.linkqualitymodels import LinkQualityConstants
+
 from miniworld.log import get_logger
 from miniworld.model.ShellCmdWrapper import ShellCmdWrapper
 from miniworld.model.emulation.InterfaceDependentID import InterfaceDependentID
-from miniworld.model.emulation.nodes.EmulationNode import EmulationNode
 from miniworld.model.network.backends.AbstractConnection import AbstractConnection
 from miniworld.model.network.backends.vde import VDESwitch
-from miniworld.model.network.linkqualitymodels.LinkQualityConstants import *
 from miniworld.model.singletons.Singletons import singletons
 from miniworld.repl.REPLable import REPLable
 from miniworld.util import PathUtil
@@ -155,8 +155,8 @@ class Wirefilter(AbstractConnection, ShellCmdWrapper, REPLable):
         -------
         """
         # assumes only equal interfaces can be connected to each other
-        bandwidth = link_quality_dict.get(LINK_QUALITY_KEY_BANDWIDTH)
-        loss = link_quality_dict.get(LINK_QUALITY_KEY_LOSS)
+        bandwidth = link_quality_dict.get(LinkQualityConstants.LINK_QUALITY_KEY_BANDWIDTH)
+        loss = link_quality_dict.get(LinkQualityConstants.LINK_QUALITY_KEY_LOSS)
 
         commands = []
         if bandwidth is not None:
@@ -167,7 +167,7 @@ class Wirefilter(AbstractConnection, ShellCmdWrapper, REPLable):
 
         # TODO: # 15: REMOVE CONNECTIONS OR JUST SET INFINITE LOSS?
         # TODO:
-        if loss == LINK_QUALITY_VAL_LOSS_ALL:
+        if loss == LinkQualityConstants.LINK_QUALITY_VAL_LOSS_ALL:
             # TODO: REMOVE CONNECTIONS ...
             pass
         # TODO: CHECK FOR SUCCESS
@@ -181,7 +181,6 @@ class Wirefilter(AbstractConnection, ShellCmdWrapper, REPLable):
     ###############################################
 
     def run_commands(self, *args, **kwargs):
-        name = "%s_%s" % (self.id, self.__class__.__name__)
 
         kwargs.update({
             'brief_logger': self.nlog,

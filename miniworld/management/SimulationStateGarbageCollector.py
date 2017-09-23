@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from miniworld import log, singletons
+from miniworld import log
 
 KEY_SINGLETON = "singleton"
 KEY_OBJECT = "object"

@@ -78,7 +78,7 @@ class REPL:
                 if self.mode:
                     prompt = '%s %s' % (self.mode, prompt)
 
-                cmd = raw_input(prompt)
+                cmd = input(prompt)
                 uq_cmd = cmd.lower().strip()
 
                 # always let print help and exit

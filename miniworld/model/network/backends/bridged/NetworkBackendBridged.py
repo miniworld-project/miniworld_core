@@ -410,11 +410,3 @@ def NetworkBackendBridged():
         pass
 
     return NetworkBackendBridged
-
-
-if __name__ == '__main__':
-    from collections import defaultdict
-    from pprint import pformat
-
-    connections = {1: [2], 2: [3, 1], 3: [2]}
-    print(pformat(configure_network(connections)))

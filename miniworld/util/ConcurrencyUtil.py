@@ -4,8 +4,6 @@ from time import sleep
 import multiprocessing
 from concurrent import futures
 
-from miniworld import config
-
 __author__ = 'Nils Schmidt'
 
 
@@ -32,6 +30,7 @@ def wait_until_fun_returns_true(check_fun, fun, *args, **kwargs):
             return res
         sleep(sleep_time)
 
+
 # TODO: DOC
 # TODO: introduce more context managers!
 
@@ -51,6 +50,7 @@ def node_start_parallel():
     cnt_minions = cpu_count() if parallel else 1
     with tpe(cnt_minions) as executor:
         yield executor
+
 
 # @contextlib.contextmanager
 # def network_backend_parallel():

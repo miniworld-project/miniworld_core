@@ -121,8 +121,6 @@ class QemuMonitorRepl(REPLable):
         """
         kwargs["timeout"] = config.get_repl_timeout()
 
-        name = self.get_verbose_logger_path()
-
         kwargs.update({
             'brief_logger': self.nlog,
             'verbose_logger': self.verbose_logger,

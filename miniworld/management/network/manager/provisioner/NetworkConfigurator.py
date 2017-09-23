@@ -6,7 +6,6 @@ from miniworld import singletons
 from miniworld.Scenario import scenario_config
 from miniworld.errors import Base
 from miniworld.log import log
-from miniworld.model.emulation.nodes.EmulationNodes import EmulationNodes
 from miniworld.util import DictUtil, NetUtil, ConcurrencyUtil
 
 

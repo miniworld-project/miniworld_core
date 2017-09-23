@@ -1,9 +1,4 @@
-from collections import defaultdict
-
 from miniworld.model.collections.TupleUserDict import TupleUserDict
-
-
-# (AbstractConnection, bool, dict)
 from miniworld.model.network.connections.JSONEncoder import JSONStrMixin
 
 

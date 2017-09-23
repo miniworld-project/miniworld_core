@@ -2,7 +2,6 @@ import os
 import subprocess
 
 import pytest
-from typing import Dict
 
 from miniworld.util import JSONConfig
 
