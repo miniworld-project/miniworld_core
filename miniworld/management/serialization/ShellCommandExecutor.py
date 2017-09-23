@@ -192,7 +192,7 @@ if __name__ == '__main__':
     sce.add_command("connection", "connection_mod", "e.g 1", "ifconfig eth0 up", ["connection"])
     # Runs 'brctl addbr' before 'brctl addif'
 
-    #sce.set_event_order_id_order(["bridge", "connection"])
+    # sce.set_event_order_id_order(["bridge", "connection"])
     sce.set_event_super_order(["connection", "bridge"])
     # sce.run_commands()
     print(list(sce.get_serialized_commands_per_event_order()))

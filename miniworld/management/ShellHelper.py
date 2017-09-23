@@ -12,8 +12,6 @@ from miniworld.log import get_node_logger, log
 from miniworld.model.singletons.Resetable import Resetable
 from miniworld.util import PathUtil
 
-# TODO:
-#BUF_SIZE = 16184
 SELECT_TIMEOUT = 0.5
 
 __author__ = 'Nils Schmidt'

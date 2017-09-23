@@ -14,8 +14,6 @@ from miniworld.model.emulation.QemuMonitorRepl import QemuMonitorRepl, QemuMonit
 from miniworld.model.emulation.VirtualizationLayer import VirtualizationLayer
 from miniworld.util.NetUtil import Timeout
 
-__author__ = 'Nils Schmidt'
-
 from os.path import basename, abspath
 from os.path import splitext
 from miniworld.errors import QemuBootWaitTimeout
@@ -25,6 +23,8 @@ from miniworld.model.singletons.Singletons import singletons
 from miniworld.script.TemplateEngine import *
 from miniworld.repl.REPLable import REPLable
 from miniworld.model.ShellCmdWrapper import ShellCmdWrapper
+
+__author__ = 'Nils Schmidt'
 
 ###############################################
 # Command templates
@@ -36,6 +36,7 @@ qemu-img create
     -f qcow2
     "{overlay_image_path}"
 """
+
 
 # TODO: check for kvm!
 # Ticket: #8
@@ -61,6 +62,7 @@ def log_kvm_usable():
         log.info("Using kvm for virtualization ...")
     else:
         log.info("Kvm already in use or not supported! Falling back to emulation ...")
+
 
 # TODO: CHANGE RAM
 # Ticket: #10
@@ -102,6 +104,7 @@ def get_nic_models():
     output = run_shell("kvm -device ?")
     output = output.split("Network devices:")[1:]
     return re.findall('name\s+"([^"]+)', output, re.MULTILINE)
+
 
 ###############################################
 # Other constants
@@ -148,7 +151,7 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
 
         # unix domain socket paths
         self.path_uds_socket = self.get_qemu_sock_path(self.id)
-        #self.uds_socket = None
+        # self.uds_socket = None
 
     def reset(self):
         # try:
@@ -182,7 +185,8 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
 
         for image_path in scenario_config.get_overlay_images():
             overlay_image_path = self.create_qemu_overlay_image(abspath(image_path))
-            overlay_image_cmd += "%s %s" % (overlay_image_cmd, CMD_TEMPLATE_QEMU_MOUNT_DISK.format(image_path=overlay_image_path, index=index))
+            overlay_image_cmd += "%s %s" % (
+                overlay_image_cmd, CMD_TEMPLATE_QEMU_MOUNT_DISK.format(image_path=overlay_image_path, index=index))
             index += 1
 
         return overlay_image_cmd
@@ -399,10 +403,12 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
         # get the temp file for the final overlay image
         overlay_image_path = PathUtil.get_temp_file_path(overlay_image_name)
         # create it
-        cmd_qemu_create_overlay_image = CMD_TEMPLATE_QEMU_CREATE_OVERLAY_IMAGE.format(base_image_path=base_image_path, overlay_image_path=overlay_image_path)
+        cmd_qemu_create_overlay_image = CMD_TEMPLATE_QEMU_CREATE_OVERLAY_IMAGE.format(base_image_path=base_image_path,
+                                                                                      overlay_image_path=overlay_image_path)
 
         # TODO: #2 : error handling
-        singletons.shell_helper.run_shell(self.id, cmd_qemu_create_overlay_image, [self.shell_prefix, "create_overlay", basename(base_image_path)])
+        singletons.shell_helper.run_shell(self.id, cmd_qemu_create_overlay_image,
+                                          [self.shell_prefix, "create_overlay", basename(base_image_path)])
 
         return overlay_image_path
 
@@ -447,7 +453,9 @@ class Qemu(VirtualizationLayer, ShellCmdWrapper, REPLable):
             try:
                 func(sock, check_fun, read_buf_size=READ_BUF_SIZE, timeout=timeout)
             except Timeout as e:
-                raise QemuBootWaitTimeout("Timeout occurred while waiting for boot completed signal ('%s') of QEMU instance: %s" % (booted_signal, self), caused_by=e)
+                raise QemuBootWaitTimeout(
+                    "Timeout occurred while waiting for boot completed signal ('%s') of QEMU instance: %s" % (
+                        booted_signal, self), caused_by=e)
 
             self.nlog.info("qemu boot completed ...")
 

@@ -8,7 +8,6 @@ from miniworld.model.network.backends.bridged import NetworkBackendBridged
 
 lock = threading.Lock()
 
-
 logger = None
 
 
@@ -39,7 +38,6 @@ ip.get_links()
 
 
 def NetworkBackendBridgedPyroute2():
-
     class NetworkBackendBridgedPyroute2(NetworkBackendBridged.NetworkBackendBridged()):
 
         """
@@ -59,13 +57,13 @@ def NetworkBackendBridgedPyroute2():
                 import pyroute2.netlink.rtnl as rtnl
                 GROUPS = rtnl.RTNLGRP_LINK | rtnl.RTNLGRP_NEIGH | rtnl.RTNLGRP_IPV4_IFADDR | rtnl.RTNLGRP_IPV6_IFADDR | rtnl.RTNLGRP_IPV4_ROUTE | rtnl.RTNLGRP_IPV6_ROUTE | rtnl.RTNLGRP_IPV4_MROUTE
                 GROUPS = \
-                    rtnl.RTNLGRP_LINK |\
-                    rtnl.RTNLGRP_NEIGH |\
-                    rtnl.RTNLGRP_IPV4_IFADDR |\
-                    rtnl.RTNLGRP_IPV4_ROUTE |\
-                    rtnl.RTNLGRP_IPV4_MROUTE |\
-                    rtnl.RTNLGRP_IPV6_IFADDR |\
-                    rtnl.RTNLGRP_IPV6_ROUTE |\
+                    rtnl.RTNLGRP_LINK | \
+                    rtnl.RTNLGRP_NEIGH | \
+                    rtnl.RTNLGRP_IPV4_IFADDR | \
+                    rtnl.RTNLGRP_IPV4_ROUTE | \
+                    rtnl.RTNLGRP_IPV4_MROUTE | \
+                    rtnl.RTNLGRP_IPV6_IFADDR | \
+                    rtnl.RTNLGRP_IPV6_ROUTE | \
                     rtnl.RTNLGRP_MPLS_ROUTE
 
                 # rtnl.RTNLGRP_NONE |\
@@ -83,10 +81,10 @@ def NetworkBackendBridgedPyroute2():
                 # rtnl.RTNLGRP_NOP4 |\
                 # rtnl.RTNLGRP_TC |\
 
-#.*_ROUTE
-# AttributeError: 'IPDB' object has no attribute 'routes'
-#.*_IFADDR
-# AttributeError: 'IPDB' object has no attribute 'by_name'
+                # .*_ROUTE
+                # AttributeError: 'IPDB' object has no attribute 'routes'
+                # .*_IFADDR
+                # AttributeError: 'IPDB' object has no attribute 'by_name'
                 self.ipdb = IPDB(nl_async="process", nl_bind_groups=GROUPS)
                 # import pyroute2
                 # ipr = pyroute2.IPRoute()
@@ -94,7 +92,7 @@ def NetworkBackendBridgedPyroute2():
                 # ipb.link("add", index=550, kind="dummy", ifname="test2")
                 # ipr.sendto(ipb.batch, (0, 0))
                 # ipdb = IPDB(nl_async="process")
-                #run_shell("renice -n {} {}".format(-20, self.ipdb.mnl.async_cache.pid))
+                # run_shell("renice -n {} {}".format(-20, self.ipdb.mnl.async_cache.pid))
                 run_shell("chrt -f -p {} {}".format(1, self.ipdb.mnl.async_cache.pid))
 
             return self.ipdb
@@ -155,7 +153,6 @@ def NetworkBackendBridgedPyroute2():
 
 
 def NetworkBackendBridgedPyroute2IPRoute():
-
     import pyroute2
 
     class NetworkBackendBridgedPyroute2IPRoute(NetworkBackendBridged.NetworkBackendBridged()):
@@ -185,7 +182,8 @@ def NetworkBackendBridgedPyroute2IPRoute():
 
         def before_simulation_step(self, simulation_manager, step_cnt, network_backend, emulation_nodes, **kwargs):
             self.step_cnt = step_cnt
-            super(NetworkBackendBridgedPyroute2IPRoute, self).before_simulation_step(simulation_manager, step_cnt, network_backend, emulation_nodes)
+            super(NetworkBackendBridgedPyroute2IPRoute, self).before_simulation_step(simulation_manager, step_cnt,
+                                                                                     network_backend, emulation_nodes)
             self.reset_step_state()
 
         def build_cache(self):

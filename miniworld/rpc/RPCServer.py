@@ -15,8 +15,7 @@ from xmlrpc.server import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
 import netifaces
 
 # set PYTHONPATH
-sys.path.append(os.getcwd())
-
+sys.path.append(os.getcwd())  # noqa
 
 from miniworld.management.spatial import MovementDirectorFactory
 from miniworld.model.emulation.Qemu import Qemu
@@ -42,6 +41,7 @@ _logger = None
 def to_json(fun):
     def wrap(*args, **kwargs):
         return json.dumps(fun(*args, **kwargs), indent=4)
+
     return wrap
 
 
@@ -78,6 +78,7 @@ def escape(c):
         return c
     else:
         return ''
+
 
 # TODO: DOC
 
@@ -196,7 +197,8 @@ class MiniWorldRPC:
         if node_id is not None:
             node_id = int(node_id)
 
-        return json.dumps(singletons.simulation_manager.exec_node_cmd(cmd, node_id=node_id, validation=validation, timeout=timeout))
+        return json.dumps(
+            singletons.simulation_manager.exec_node_cmd(cmd, node_id=node_id, validation=validation, timeout=timeout))
 
     @dec_requires_simulation_running
     def get_distributed_node_mapping(self):
@@ -397,7 +399,8 @@ class MiniWorldRPCServer(MiniWorldRPC):
         else:
             log.info("starting in local mode ...")
 
-        singletons.simulation_manager.start(scenario_config_content, auto_stepping=auto_stepping, blocking=blocking, force_snapshot_boot=force_snapshot_boot)
+        singletons.simulation_manager.start(scenario_config_content, auto_stepping=auto_stepping, blocking=blocking,
+                                            force_snapshot_boot=force_snapshot_boot)
 
     def simulation_pause(self):
         singletons.simulation_manager.pause()
@@ -464,13 +467,13 @@ def mode_coordinator(args):
 
 
 def main():
-
     root_parser = argparse.ArgumentParser(description='MiniWorld network emulator')
     root_parser.add_argument('-c', '--config', default=os.environ.get('MW_CONFIG'), help="The config file")
 
     mode_group = root_parser.add_argument_group('mode')
     mode_group.add_argument('--distributed', action='store_true', help='Run in the distributed mode')
-    mode_group.add_argument('--server', action='store_true', help='Run as server. By default run as the coordinator in the distributed mode. Only works with --distributed')
+    mode_group.add_argument('--server', action='store_true',
+                            help='Run as server. By default run as the coordinator in the distributed mode. Only works with --distributed')
 
     server_group = root_parser.add_argument_group('server')
     address_group = server_group.add_mutually_exclusive_group()

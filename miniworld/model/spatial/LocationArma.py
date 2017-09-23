@@ -1,10 +1,9 @@
-__author__ = 'lampep'
-
 import math
+
+__author__ = 'lampep'
 
 
 class LocationArma(object):
-
     def __init__(self, x, y):
         self.x = x
         self.y = y

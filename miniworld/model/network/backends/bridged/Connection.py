@@ -9,6 +9,7 @@ from miniworld.model.network.backends.AbstractConnection import AbstractConnecti
 from miniworld.model.network.linkqualitymodels.LinkQualityConstants import *
 from miniworld.model.network.linkqualitymodels.LinkQualityModelRange import LinkQualityModelNetEm
 from miniworld.model.singletons.Singletons import singletons
+
 __author__ = 'Nils Schmidt'
 
 
@@ -32,7 +33,8 @@ def ConnectionDummy():
         EVENT_LINK_SHAPE_ADD_CLASS = "link_shape_add_class"
         EVENT_LINK_SHAPE_ADD_QDISC = "link_shape_add_child"
         EVENT_LINK_SHAPE_ADD_FILTER = "link_shape_add_filter"
-        EVENT_ORDER = OrderedSet([EVENT_CONN_STATE_CHANGE, EVENT_LINK_SHAPE_ADD_QDISC, EVENT_LINK_SHAPE_ADD_CLASS, EVENT_LINK_SHAPE_ADD_FILTER])
+        EVENT_ORDER = OrderedSet([EVENT_CONN_STATE_CHANGE, EVENT_LINK_SHAPE_ADD_QDISC, EVENT_LINK_SHAPE_ADD_CLASS,
+                                  EVENT_LINK_SHAPE_ADD_FILTER])
 
         PREFIXES = ["connection"]
 
@@ -42,7 +44,8 @@ def ConnectionDummy():
         # TODO: INTERFACE FOR ShellCommandSerializer STUFF?
         # COMMON VARIABLES AND THIS METHOD
         def add_shell_command(self, event, cmd):
-            singletons.network_backend.shell_command_executor.add_command(self.EVENT_ROOT, event, self.id, cmd, self.PREFIXES)
+            singletons.network_backend.shell_command_executor.add_command(self.EVENT_ROOT, event, self.id, cmd,
+                                                                          self.PREFIXES)
 
         def run(self, cmd):
             return singletons.shell_helper.run_shell(self.id, cmd, prefixes=["tc"])
@@ -106,7 +109,7 @@ def ConnectionDummy():
                         connection_id = self.get_connection_id(tap_local, tunnel_dev)
                         self.shape_device(tap_local, connection_id, link_quality_dict)
                         # NOTE: this happens at the other server!
-                        #self.shape_device(tap_remote, connection_id, link_quality_dict)
+                        # self.shape_device(tap_remote, connection_id, link_quality_dict)
                     else:
                         self.shape_device(tap_x, connection_id, link_quality_dict)
                         self.shape_device(tap_y, connection_id, link_quality_dict)
@@ -221,7 +224,8 @@ def ConnectionDummy():
                 remote_node, if_remote_node, local_emu_node, if_local_emu_node = self.get_remote_node()
 
                 # always produce the same dev name => sort nodes by id
-                node_id_1, node_id_2 = (remote_node.id, local_emu_node.id) if remote_node.id < local_emu_node.id else (local_emu_node.id, remote_node.id)
+                node_id_1, node_id_2 = (remote_node.id, local_emu_node.id) if remote_node.id < local_emu_node.id else (
+                    local_emu_node.id, remote_node.id)
                 tunnel_dev_name = singletons.network_backend.get_tunnel_name(node_id_1, node_id_2)
                 tap_local = singletons.network_backend.get_tap_name(local_emu_node.id, if_local_emu_node)
 
@@ -269,9 +273,7 @@ def ConnectionDummy():
 
 
 def Connection():
-    class Connection(
-        # choose connection for connection mode
-            get_superclass_dynamic()):
+    class Connection(get_superclass_dynamic()):  # choose connection for connection mode
         pass
 
     return Connection

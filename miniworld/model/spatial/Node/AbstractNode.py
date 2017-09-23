@@ -1,13 +1,13 @@
-
 # encoding: utf-8
+
+
+import random
 
 __author__ = "Patrick Lampe"
 __email__ = "uni at lampep.de"
 
-import random
 
-
-class AbstractNode():
+class AbstractNode:
     """
     Parameter
     ---------
@@ -22,7 +22,9 @@ class AbstractNode():
         self.dict_of_movement_pattern = {}
         self.node_id = node_id
 
-        def r(): return random.randint(0, 255)
+        def r():
+            return random.randint(0, 255)
+
         self.color = '#%02X%02X%02X' % (r(), r(), r())
 
     def get_name_of_movement_patter(self, movement_pattern):

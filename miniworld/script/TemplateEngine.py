@@ -1,8 +1,6 @@
-
-__author__ = 'Nils Schmidt'
-
 from miniworld.log import get_logger
 
+__author__ = 'Nils Schmidt'
 KEYWORD_NODE_ID = "node_id"
 
 log = get_logger(__name__)
@@ -24,7 +22,6 @@ class TemplateEngine:
         self.script_str = script_str
 
     def render(self, **kwargs):
-
         return self.script_str.format(**kwargs)
 
 
@@ -40,9 +37,8 @@ def render_script_from_flo(flo, **kwargs):
 
 
 if __name__ == '__main__':
-
-    #from miniworld.model.emulation.nodeclass import NodeClass
-    #nc = NodeClass()
+    # from miniworld.model.emulation.nodeclass import NodeClass
+    # nc = NodeClass()
     # nc.
 
     print(render_script_from_flo("../../templates/std_network.sh"))

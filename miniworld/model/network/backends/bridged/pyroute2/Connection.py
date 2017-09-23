@@ -21,15 +21,15 @@ def ConnectionPyroute2():
 
             dev = self.lookup_device(tap_x)
 
-            #get_ipdb_logger().info("%s = get_ipdb_singleton().interfaces['%s']" % (tap_x, tap_x))
+            # get_ipdb_logger().info("%s = get_ipdb_singleton().interfaces['%s']" % (tap_x, tap_x))
 
             if not singletons.network_backend.connection_book_keeper.interface_states[tap_x]:
                 if up:
-                    #get_ipdb_logger().info("%s.up()" % dev['ifname'])
+                    # get_ipdb_logger().info("%s.up()" % dev['ifname'])
                     dev.up()
             else:
                 if not up:
-                    #get_ipdb_logger().info("%s.down()" % dev['ifname'])
+                    # get_ipdb_logger().info("%s.down()" % dev['ifname'])
                     dev.down()
 
             # remember that the device is up (or down)

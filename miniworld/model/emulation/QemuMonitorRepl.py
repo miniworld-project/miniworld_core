@@ -6,11 +6,11 @@ from miniworld.errors import Base
 from miniworld.repl.errors import REPLUnexpectedResult
 from miniworld.util import PathUtil
 
-__author__ = 'Nils Schmidt'
-
 from miniworld.log import get_node_logger
 
 from miniworld.repl.REPLable import REPLable
+
+__author__ = 'Nils Schmidt'
 
 
 class QemuMonitorSnapshotLoadError(Base):
@@ -102,7 +102,6 @@ class QemuMonitorRepl(REPLable):
 
     def run_commands_eager_check_ret_val(self, flo, *args, **kwargs):
         def _return_value_checker(cmd, res):
-
             # TODO: this is only working for snapshot loading, is there a more generic approach?
             # QMP does not have to seem the needed features right now :/
             if re.search("Device '.*' does not have the requested snapshot '.*'", res):
@@ -134,8 +133,8 @@ class QemuMonitorRepl(REPLable):
         # keep generator
         return res
 
-#    def run_commands_eager(self, *args, **kwargs):
-#        return [json.loads(sub_res) for sub_res in REPLable.run_commands_eager(self, *args, **kwargs)]
+    #    def run_commands_eager(self, *args, **kwargs):
+    #        return [json.loads(sub_res) for sub_res in REPLable.run_commands_eager(self, *args, **kwargs)]
 
     def render_script_from_flo(self, flo):
         # overwrite default behaviour

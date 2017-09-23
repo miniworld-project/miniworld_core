@@ -1,10 +1,10 @@
-
 # encoding: utf-8
+
+
+from LatLon23 import LatLon, Latitude, Longitude
 
 __author__ = "Patrick Lampe"
 __email__ = "uni at lampep.de"
-
-from LatLon23 import LatLon, Latitude, Longitude
 
 
 class Location:

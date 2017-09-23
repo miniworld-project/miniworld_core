@@ -26,8 +26,8 @@ setup(
     extras_require={
         'server': ['ordered-set', 'argparse', 'ipaddress', 'colorlog', 'geojson', 'futures',
                    'netifaces', 'networkx', 'blessings', 'py-dictdiffer', 'pyroute2', 'psutil', 'LatLon23',
-                   'requests', 'msgpack-python', 'zmq'],
-        'develop': ['pytest', 'sphinx'],
+                   'requests', 'msgpack-python', 'zmq', 'injector'],
+        'develop': ['pytest', 'sphinx', 'pep8', 'flake8'],
     },
     scripts=['mwcli'],
     entry_points={

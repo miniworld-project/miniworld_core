@@ -15,6 +15,7 @@ CONFIG_COMMENT = "//"
 
 CONFIG_KEY_NODE_DETAILS = "node_details"
 
+
 ###############################################
 # Decorators
 ###############################################
@@ -24,6 +25,7 @@ def arg2float(fun):
     def inner(*args, **kwargs):
         res = fun(*args, **kwargs)
         return float(res)
+
     return inner
 
 
@@ -81,12 +83,13 @@ def customizable_attrs(*keys, **kwargs):
             if res in (None, nothing):
                 res = get_dict_nested_value(self.data, keys)
 
-            #log.debug("%s : %s", _pretty_format(keys), res)
+            # log.debug("%s : %s", _pretty_format(keys), res)
 
             # not null check
             if res in (None, nothing):
                 if not_null:
-                    raise ConfigMalformed("A value for '%s' is required! Customizable: '%s'" % (_pretty_format(keys), customizable_key))
+                    raise ConfigMalformed(
+                        "A value for '%s' is required! Customizable: '%s'" % (_pretty_format(keys), customizable_key))
                 if default is not nothing:
                     res = default
 
@@ -99,10 +102,13 @@ def customizable_attrs(*keys, **kwargs):
                 # allow None
                 expected.append(None)
                 if res not in expected:
-                    raise ConfigOptionNotSupported("The value for key '%s' is not supported! Is: '%s'. Supported values are: '%s'" % (_pretty_format(keys), res, ', '.join(map(str, expected))))
+                    raise ConfigOptionNotSupported(
+                        "The value for key '%s' is not supported! Is: '%s'. Supported values are: '%s'" % (
+                            _pretty_format(keys), res, ', '.join(map(str, expected))))
             return res
 
         return wrap2
+
     return wrap
 
 
@@ -122,17 +128,20 @@ def json2dict(func):
     None
         Else
     """
+
     @wraps(func)
     def func_wrapper(*args, **kwargs):
         res = func(*args, **kwargs)
         if res is None:
             return res
         return {int(x): y for x, y in res.items()}
+
     return func_wrapper
 
 
 def _pretty_format(keys):
     return '->'.join(keys)
+
 
 ###############################################
 # Subclassable Config object
@@ -178,6 +187,8 @@ class JSONConfig(UserDict):
     @customizable_attrs("non_default")
     def get_non_default(self):
         pass
+
+
 ###############################################
 # Helper methods
 ###############################################
@@ -253,6 +264,7 @@ def get_dict_nested_value(d, keys):
             return nothing
 
     return cur_dict
+
 
 # TODO: #40: DOC
 

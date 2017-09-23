@@ -5,12 +5,13 @@ from miniworld.Config import config
 from miniworld.Scenario import scenario_config
 from miniworld.model import StartableObject
 
-
-__author__ = 'Nils Schmidt'
 from io import StringIO
 
 from miniworld.log import get_node_logger
 from miniworld.model.ShellCmdWrapper import ShellCmdWrapper
+
+__author__ = 'Nils Schmidt'
+
 
 # TODO: REMOVE
 # CMD_TEMPLATE_DISABLE_IPTABLES = """
@@ -75,7 +76,8 @@ class EmulationNode(StartableObject.StartableSimulationStateObject, ShellCmdWrap
 
         if network_mixin is None:
             network_mixin_type = network_backend_bootstrapper.emulation_node_network_backend_type
-            self.network_mixin = network_mixin_type(network_backend_bootstrapper, node_id, interfaces=interfaces, management_switch=config.is_management_switch_enabled())
+            self.network_mixin = network_mixin_type(network_backend_bootstrapper, node_id, interfaces=interfaces,
+                                                    management_switch=config.is_management_switch_enabled())
         else:
             self.network_mixin = network_mixin
 

@@ -1,14 +1,14 @@
 # encoding: utf-8
 from miniworld.model.singletons.Resetable import Resetable
 
-__author__ = "Patrick Lampe"
-__email__ = "uni at lampep.de"
-
 import sqlite3
 import os
 from random import randint
 from miniworld.model.spatial.Point import Point
 from miniworld.model.spatial.Location import Location
+
+__author__ = "Patrick Lampe"
+__email__ = "uni at lampep.de"
 
 
 # TODO: also singleton for other backend stuff? move to other place?

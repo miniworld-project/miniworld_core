@@ -1,4 +1,3 @@
-
 from miniworld import log
 from miniworld.management.network.manager.provisioner.NetworkConfiguratorSameSubnet import NetworkConfiguratorSameSubnet
 from miniworld.model.emulation.nodes.virtual.CentralNode import is_central_node_interface
@@ -12,7 +11,6 @@ __author__ = 'Nils Schmidt'
 
 
 class NetworkBackendVDE(NetworkBackendDummy):
-
     """
     Attributes
     ----------
@@ -80,7 +78,7 @@ class NetworkBackendVDE(NetworkBackendDummy):
             network_backend_bootstrapper = NetworkBackends.get_current_network_backend_bootstrapper()
             for _ in range(0, count_central_nodes):
                 # create an own network backend for each node
-                #new_emulation_node_network_backend = network_backend_bootstrapper.emulation_node_network_backend_type(network_backend_bootstrapper)
+                # new_emulation_node_network_backend = network_backend_bootstrapper.emulation_node_network_backend_type(network_backend_bootstrapper)
 
                 central_node = network_backend_bootstrapper.central_node_type(network_backend_bootstrapper)
                 # TODO: #54 make configurable!

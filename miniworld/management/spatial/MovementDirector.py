@@ -1,16 +1,14 @@
-
 # encoding: utf-8
 from miniworld.management.spatial.MovementDirectorAbstract import MovementDirectorAbstract
-
-__author__ = "Patrick Lampe"
-__email__ = "uni at lampep.de"
-
 from miniworld.model.spatial.Nodes import Nodes
 from miniworld.Scenario import scenario_config
 import geojson
 from collections import OrderedDict
 from miniworld.model.singletons.Singletons import singletons
 from miniworld.model.spatial.Roads import Roads
+
+__author__ = "Patrick Lampe"
+__email__ = "uni at lampep.de"
 
 
 class MovementDirector(MovementDirectorAbstract):
@@ -74,7 +72,8 @@ class MovementDirector(MovementDirectorAbstract):
 
         for emulation_node, connected_emulation_nodes in singletons.network_manager.connection_store.get_connections_per_node().items():
             for connected_emulation_node in connected_emulation_nodes:
-                list_of_geo_json_objects.append(self.__get_geo_json_object_for_connection(emulation_node.id - 1, connected_emulation_node.id - 1))
+                list_of_geo_json_objects.append(
+                    self.__get_geo_json_object_for_connection(emulation_node.id - 1, connected_emulation_node.id - 1))
 
         feature_coll_roads = geojson.FeatureCollection(list_of_geo_json_objects)
         return geojson.dumps(feature_coll_roads)
@@ -87,7 +86,8 @@ class MovementDirector(MovementDirectorAbstract):
             type="Feature",
             geometry=OrderedDict(
                 type="LineString",
-                coordinates=[[float(source.get_lon()), float(source.get_lat())], [float(target.get_lon()), float(target.get_lat())]]
+                coordinates=[[float(source.get_lon()), float(source.get_lat())],
+                             [float(target.get_lon()), float(target.get_lat())]]
             ),
             properties=OrderedDict(
                 color=source.color,
@@ -107,7 +107,7 @@ class MovementDirector(MovementDirectorAbstract):
         for node in self.nodes.get_list_of_nodes().items():
             node[1].step()
 
-        #current_simulation_step = SimulationStep()
-        # current_simulation_step.set_dict_of_coordinates(self.get_coordinates_for_nodes())
-        # current_simulation_step.set_dict_of_distances(self.get_distances_from_nodes())
-        # singletons.add_next_simulated_step(current_simulation_step)
+            # current_simulation_step = SimulationStep()
+            # current_simulation_step.set_dict_of_coordinates(self.get_coordinates_for_nodes())
+            # current_simulation_step.set_dict_of_distances(self.get_distances_from_nodes())
+            # singletons.add_next_simulated_step(current_simulation_step)

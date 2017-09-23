@@ -38,6 +38,7 @@ port/setcolourful 1
 port/setcolour {port} {color}
 """
 
+
 # TODO: REMOVE
 
 
@@ -48,6 +49,7 @@ def get_num_tap_devices():
 
 class VDESWitchHiccup(Base):
     pass
+
 
 # TODO: USE CONTEXTMANAGER? COULD BE MORE INTUITIVE!
 
@@ -82,7 +84,8 @@ def fix_hiccup(fun, *args, **kwargs):
     remove_kwargs = ['hiccup_funs', 'name', 'negate']
     negate = kwargs.get("negate", False)
 
-    def negate_fun(x): return not x if negate else x
+    def negate_fun(x):
+        return not x if negate else x
 
     for rm_kwarg in remove_kwargs:
         if rm_kwarg in kwargs:
@@ -104,7 +107,8 @@ def fix_hiccup(fun, *args, **kwargs):
             return output
 
         if i == TRIES:
-            raise VDESWitchHiccup("%s responded with: '%s'! This is not the expected result (tried: %s times)!" % (name, output, i))
+            raise VDESWitchHiccup(
+                "%s responded with: '%s'! This is not the expected result (tried: %s times)!" % (name, output, i))
         i += 1
 
 
@@ -214,7 +218,8 @@ class VDESwitch(AbstractSwitch, ShellCmdWrapper, REPLable):
         # start commands as subprocess
         # TODO: gitlab #2
         # TODO:
-        self.process = singletons.shell_helper.run_shell_async(self.id, vde_switch_command, prefixes=[self.shell_prefix])
+        self.process = singletons.shell_helper.run_shell_async(self.id, vde_switch_command,
+                                                               prefixes=[self.shell_prefix])
 
         # TODO:
         self.wait_until_uds_reachable()

@@ -1,4 +1,5 @@
-
+import msgpack
+import json
 
 # TODO: ABC class
 from miniworld.Config import config
@@ -59,13 +60,10 @@ class Protocol:
         return register_msg[REGISTER_MSG_KEY_TUNNEL_ADDR]
 
 
-import json
-
 # TODO: move (en/de)coders here ...
 
 
 class JSONProtocol(Protocol):
-
     def serialize(self, obj):
         return json.dumps(obj).encode()
 
@@ -73,11 +71,7 @@ class JSONProtocol(Protocol):
         return json.loads(obj.decode())
 
 
-import msgpack
-
-
 class MsgPackProtocol(Protocol):
-
     def serialize(self, obj):
         return msgpack.packb(obj)
 

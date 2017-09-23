@@ -44,7 +44,6 @@ class ZeroMQException(BaseException):
 
 
 class ZeroMQClient:
-
     """
     This is a client for the :py:class:`.ZeroMQService` which uses a request socket.
     The socket is intended for synchronous communication in a blocking request-reply pattern.
@@ -131,7 +130,7 @@ class ZeroMQClient:
         log.info('%s: %s', self.server_id, str)
 
     #####################################################################
-    ### Sending and receiving
+    # Sending and receiving
     #####################################################################
 
     def send_server_id(self, state, *args):
@@ -245,7 +244,6 @@ class ZeroMQClient:
 
 
 class ZeroMQClientReq(ZeroMQClient):
-
     """
     This subclass implements step 4 by receiving the local distance matrix via the request socket.
     NOTE: the client does not see the whole distance matrix!
@@ -289,7 +287,6 @@ class ZeroMQClientReq(ZeroMQClient):
 
 
 class ZeroMQClientSub(ZeroMQClient, Resetable):
-
     """
     This client receives the whole distance matrix from a publish-subscribe socket.
     Therefore, the client is responsible for cutting out the necessary part of the distance matrix.
@@ -350,7 +347,8 @@ class ZeroMQClientSub(ZeroMQClient, Resetable):
         if config.is_debug():
             log.info("server id: %d", scenario_config.get_distributed_server_id())
 
-        local_distance_matrix = singletons.simulation_manager.get_local_distance_matrix_to_servers(whole_distance_matrix)
+        local_distance_matrix = singletons.simulation_manager.get_local_distance_matrix_to_servers(
+            whole_distance_matrix)
 
         return DistanceMatrix.factory()(local_distance_matrix)
 
@@ -358,7 +356,7 @@ class ZeroMQClientSub(ZeroMQClient, Resetable):
     def reset(self):
         log.info("got reset message ...")
         singletons.simulation_manager.abort()
-        #super(ZeroMQClientSub, self).reset()
+        # super(ZeroMQClientSub, self).reset()
         self.start(self.tunnel_ip)
 
     # TODO: adjust doc for reset ...
@@ -410,7 +408,7 @@ class ZeroMQClientSub(ZeroMQClient, Resetable):
                         self.send_sync()
                         # wait for sync reply or error
                         rlist, _, xlist = zmq.select([self.reset_socket, self.svc], [], [])
-                        #rlist, _, xlist = zmq.select([self.svc], [], [])
+                        # rlist, _, xlist = zmq.select([self.svc], [], [])
 
                         if handle_select(rlist, xlist):
                             return True
@@ -429,8 +427,8 @@ class ZeroMQClientSub(ZeroMQClient, Resetable):
 
             if step():
                 return
-            # exec_time = timeit(step, number=1)
-            # log.info("took %0.2f seconds (sync + step)", exec_time)
+                # exec_time = timeit(step, number=1)
+                # log.info("took %0.2f seconds (sync + step)", exec_time)
 
 
 if __name__ == '__main__':

@@ -1,11 +1,11 @@
-
 # encoding: utf-8
 
-__author__ = "Patrick Lampe"
-__email__ = "uni at lampep.de"
 
 from miniworld.model.spatial.MovementPattern.RandomWalk import RandomWalk
 from .AbstractNode import AbstractNode
+
+__author__ = "Patrick Lampe"
+__email__ = "uni at lampep.de"
 
 
 class DefaultNode(AbstractNode):

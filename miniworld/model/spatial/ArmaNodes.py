@@ -1,9 +1,5 @@
-
 # encoding: utf-8
 from miniworld.model.singletons.Singletons import singletons
-
-__author__ = "Patrick Lampe"
-__email__ = "uni at lampep.de"
 
 from time import strptime
 from collections import OrderedDict
@@ -11,6 +7,9 @@ from collections import OrderedDict
 import geojson
 
 from miniworld.model.spatial.Node.ArmaNode import ArmaNode
+
+__author__ = "Patrick Lampe"
+__email__ = "uni at lampep.de"
 
 
 class ArmaNodes:
@@ -40,13 +39,13 @@ class ArmaNodes:
         self.get_next_step_from_file()
 
     def get_next_step_from_file(self):
-        while("POSITIONLIST_BEGIN" not in self.file.readline()):
+        while ("POSITIONLIST_BEGIN" not in self.file.readline()):
             pass
 
         self.crnt_line = self.file.readline()
         next_time = self.__extract_time_from_line(self.crnt_line)
         list_of_coordinates = []
-        while("POSITIONLIST_END" not in self.crnt_line):
+        while ("POSITIONLIST_END" not in self.crnt_line):
             list_of_coordinates.append(self.__extract_coordinates_from_line(self.crnt_line))
             self.crnt_line = self.file.readline()
         self.next_step = (next_time, list_of_coordinates)

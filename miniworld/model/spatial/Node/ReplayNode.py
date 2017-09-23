@@ -1,11 +1,10 @@
-
 # encoding: utf-8
 from miniworld.model.singletons.Singletons import singletons
 
+from miniworld.model.spatial.MovementPattern.ReplayMovementPattern import ReplayMovementPattern
+
 __author__ = "Patrick Lampe"
 __email__ = "uni at lampep.de"
-
-from miniworld.model.spatial.MovementPattern.ReplayMovementPattern import ReplayMovementPattern
 
 
 class ReplayNode():

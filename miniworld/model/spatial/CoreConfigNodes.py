@@ -1,4 +1,3 @@
-
 # encoding: utf-8
 from pprint import pformat
 
@@ -9,10 +8,10 @@ from miniworld.model.singletons.Singletons import singletons
 from miniworld.model.spatial import logger
 from miniworld.model.spatial.Location import Location
 
+from miniworld.util.CoreConfigFileParser import parse_core_config_file, parse_core_config_file_positions
+
 __author__ = "Patrick Lampe"
 __email__ = "uni at lampep.de"
-
-from miniworld.util.CoreConfigFileParser import parse_core_config_file, parse_core_config_file_positions
 
 
 def factory():
@@ -130,7 +129,6 @@ class CoreConfigNodes(Resetable):
 
 
 class CoreConfigNodesLan(CoreConfigNodes):
-
     def __init__(self, *args, **kwargs):
         super(CoreConfigNodesLan, self).__init__(*args, **kwargs)
         self.crnt_connections = None
@@ -169,7 +167,6 @@ class CoreConfigNodesWiFi(CoreConfigNodes):
         for n in singletons.simulation_manager.get_emulation_node_ids():
             for i in range(n + 1, singletons.simulation_manager.get_emulation_node_ids()[-1] + 1):
                 if n != i:
-
                     distance = Location(*self.crnt_distances[n]).get_distance_in_m(Location(*self.crnt_distances[i]))
                     distance_matrix.set_distance(n, i, distance)
 

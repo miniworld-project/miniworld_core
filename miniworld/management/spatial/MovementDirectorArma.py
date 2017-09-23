@@ -1,12 +1,11 @@
-
 # encoding: utf-8
 from miniworld.management.spatial.MovementDirectorAbstract import MovementDirectorAbstract
 from miniworld.model.singletons.Singletons import singletons
 
+from miniworld.model.spatial.ArmaNodes import ArmaNodes
+
 __author__ = "Patrick Lampe"
 __email__ = "uni at lampep.de"
-
-from miniworld.model.spatial.ArmaNodes import ArmaNodes
 
 
 class MovementDirectorArma(MovementDirectorAbstract):

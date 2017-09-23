@@ -321,7 +321,7 @@ if __name__ == '__main__':
 
     es = EventSystem([MyEventSystem.EVENT_VM_BOOT])
     # instead of constructor: es.events.add(es.EVENT_VM_BOOT)
-    #cli_display = MyCLIEventDisplay(es)
+    # cli_display = MyCLIEventDisplay(es)
     # cli_display.start_progress_thread()
 
     es.ready.set()

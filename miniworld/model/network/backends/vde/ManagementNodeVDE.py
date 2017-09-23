@@ -1,4 +1,3 @@
-
 from miniworld import log
 from miniworld.model.emulation.nodes.virtual.ManagementNode import ManagementNode
 from miniworld.model.network.backends.vde.VDEConstants import PORT_MANAGEMENT
@@ -8,7 +7,6 @@ from miniworld.model.network.interface.Interface import Management
 
 
 class ManagementNodeVDE(ManagementNode):
-
     def __init__(self, network_backend):
         interfaces = Interfaces.Interfaces.factory([Management])
         id = config.get_bridge_tap_name()
@@ -36,7 +34,7 @@ class ManagementNodeVDE(ManagementNode):
         super(ManagementNodeVDE, self)._start(switch=switch, bridge_dev_name=bridge_dev_name)
 
         # start and wait for switches
-        #self.switch.start(bridge_dev_name = self.bridge_name, switch = switch)
+        # self.switch.start(bridge_dev_name = self.bridge_name, switch = switch)
 
         # color tap/management device
         self.switch.color_interface(PORT_MANAGEMENT, self.interface.node_class)

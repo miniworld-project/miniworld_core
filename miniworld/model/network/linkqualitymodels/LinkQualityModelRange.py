@@ -7,14 +7,12 @@ __author__ = 'Nils Schmidt'
 
 
 class LinkQualityModelRange(LinkQualityModel.LinkQualityModel):
-
     #####################################################
     # Implement these methods in a subclass
     #####################################################
 
     # TODO:
     def _distance_2_link_quality(self, distance):
-
         default_link_quality = {}
         if 0 <= distance < 30:
             default_link_quality.update({
@@ -27,7 +25,6 @@ class LinkQualityModelRange(LinkQualityModel.LinkQualityModel):
 
 # TODO: extract
 class LinkQualityModelNetEm(LinkQualityModel.LinkQualityModel):
-
     # TODO:
     NETEM_KEY_LOSS = "loss"
     NETEM_KEY_LIMIT = "limit"
@@ -38,11 +35,12 @@ class LinkQualityModelNetEm(LinkQualityModel.LinkQualityModel):
     NETEM_KEY_RATE = "rate"
 
     # order of options that netem needs
-    NETEM_KEYS = (NETEM_KEY_LIMIT, NETEM_KEY_DELAY, NETEM_KEY_LOSS, NETEM_KEY_CORRUPT, NETEM_KEY_DUPLICATE, NETEM_KEY_REORDER, NETEM_KEY_RATE)
+    NETEM_KEYS = (
+        NETEM_KEY_LIMIT, NETEM_KEY_DELAY, NETEM_KEY_LOSS, NETEM_KEY_CORRUPT, NETEM_KEY_DUPLICATE, NETEM_KEY_REORDER,
+        NETEM_KEY_RATE)
 
 
 class LinkQualityModelWiFiLinear(LinkQualityModelNetEm):
-
     MAX_BANDWIDTH = 54000
     log.info("max_bandwidth: %s" % MAX_BANDWIDTH)
 
@@ -80,8 +78,9 @@ class LinkQualityModelWiFiLinear(LinkQualityModelNetEm):
                 delay_const_str = '%.2f' % delay_const
                 delay_variation = delay_const / 10.0
                 delay_variation_str = '%.2f' % delay_variation
-                delay_cmd = "{delay_const}ms {delay_var}ms 25%".format(delay_const=delay_const_str, delay_var=delay_variation_str)
-                #delay_cmd = "{delay_const} {delay_var} distribution normal".format(delay_const=delay_const, delay_var=delay_variation)
+                delay_cmd = "{delay_const}ms {delay_var}ms 25%".format(delay_const=delay_const_str,
+                                                                       delay_var=delay_variation_str)
+                # delay_cmd = "{delay_const} {delay_var} distribution normal".format(delay_const=delay_const, delay_var=delay_variation)
                 default_link_quality[self.NETEM_KEY_DELAY] = delay_cmd
                 # return bandwidth, delay_const, delay_variation
 
@@ -92,7 +91,6 @@ class LinkQualityModelWiFiLinear(LinkQualityModelNetEm):
 
 
 class LinkQualityModelWiFiExponential(LinkQualityModelWiFiLinear):
-
     #####################################################
     # Implement these methods in a subclass
     #####################################################
@@ -130,8 +128,9 @@ class LinkQualityModelWiFiExponential(LinkQualityModelWiFiLinear):
             delay_const_str = '%.2f' % delay_const
             delay_variation = delay_const / 10.0
             delay_variation_str = '%.2f' % delay_variation
-            delay_cmd = "{delay_const}ms {delay_var}ms 25%".format(delay_const=delay_const_str, delay_var=delay_variation_str)
-            #delay_cmd = "{delay_const} {delay_var} distribution normal".format(delay_const=delay_const, delay_var=delay_variation)
+            delay_cmd = "{delay_const}ms {delay_var}ms 25%".format(delay_const=delay_const_str,
+                                                                   delay_var=delay_variation_str)
+            # delay_cmd = "{delay_const} {delay_var} distribution normal".format(delay_const=delay_const, delay_var=delay_variation)
             default_link_quality[self.NETEM_KEY_DELAY] = delay_cmd
 
             # return bandwidth, delay_const, delay_variation
@@ -158,4 +157,5 @@ if __name__ == '__main__':
         values.append([x] + list(vals1) + list(vals2))
 
     print('\n'.join(
-        [("\\trowgray\n" if val[0] % 2 == 0 else "") + "\\hline\n%s & %.00f & %s & %s & %.00f & %s & %s \\\\" % tuple(val) for val in values]))
+        [("\\trowgray\n" if val[0] % 2 == 0 else "") + "\\hline\n%s & %.00f & %s & %s & %.00f & %s & %s \\\\" % tuple(
+            val) for val in values]))

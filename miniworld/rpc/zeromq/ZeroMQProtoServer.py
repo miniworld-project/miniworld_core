@@ -84,7 +84,7 @@ class ZeroMQServer:
 
         self.wait_for_scenario_config = threading.Event()
         self.wait_for_nodes_started = threading.Event()
-        #self.reset_required = threading.Event()
+        # self.reset_required = threading.Event()
 
         self.reset()
 
@@ -182,7 +182,8 @@ class ZeroMQServer:
         node_ids = miniworld.Scenario.scenario_config.get_local_node_ids()
 
         # distribute nodes among emulation server
-        server_node_mapping = singletons.node_distribution_strategy.distribute_emulation_nodes(list(node_ids), self.cnt_peers)
+        server_node_mapping = singletons.node_distribution_strategy.distribute_emulation_nodes(list(node_ids),
+                                                                                               self.cnt_peers)
         log.info("nodes mapping: %s", pformat(server_node_mapping))
         log.info("nodes per server: %s", pformat({k: len(v) for k, v in server_node_mapping.items()}))
 
@@ -220,7 +221,6 @@ class ZeroMQServer:
         log.info("syncing subscribers [done]")
 
     def handle_state_distance_matrix(self, distance_matrix):
-
         if self.last_step_time is not None:
             et = time.time() - self.last_step_time
             log.info("took %0.2f seconds (previous distribution + sync)", et)
@@ -232,7 +232,6 @@ class ZeroMQServer:
 
 
 class ZeroMQServerRouter(ZeroMQServer):
-
     """
     This class sends the distance matrix for each peer via the zeromq router socket.
     Each server gets only the local distance matrix which it needs.
@@ -291,7 +290,6 @@ class ZeroMQServerRouter(ZeroMQServer):
 
 
 class ZeroMQCServerPubSub(ZeroMQServer):
-
     """
     This class enables the distribution of the distance matrix via a publish-subscribe pattern.
 
@@ -347,42 +345,42 @@ class ZeroMQCServerPubSub(ZeroMQServer):
         self.send_distance_matrix(distance_matrix)
         self.sync_subscribers()
 
-    # def enter_run_loop(self, block=True):
-    #     """
-    #     Notify subscribers about changes in the distance matrix.
-    #     """
-    #
-    #     super(ZeroMQCServerPubSub, self).enter_run_loop()
-    #
-    #     ZeroMQCServerPubSub.last_distance_matrix_hash = ""
-    #
-    #     def fun(whole_distance_matrix):
-    #
-    #         new_distance_matrix = True
-    #         if config.is_publish_only_new_distance_matrices():
-    #             new_distance_matrix_hash = hash(frozenset(whole_distance_matrix.items()))
-    #
-    #             if new_distance_matrix_hash != ZeroMQCServerPubSub.last_distance_matrix_hash:
-    #                 new_distance_matrix = False
-    #
-    #         if new_distance_matrix:
-    #             log.info("change in distance matrix ...")
-    #
-    #             self.handle_state_distance_matrix(whole_distance_matrix)
-    #
-    #             if config.is_publish_only_new_distance_matrices():
-    #                 ZeroMQCServerPubSub.last_distance_matrix_hash = new_distance_matrix_hash
-    #
-    #             if config.is_debug():
-    #                 log.debug("publishing distance matrix: %s", pformat(whole_distance_matrix))
-    #         else:
-    #             log.info("no change in distance matrix ... not publishing!")
-    #
-    #     self.drun_loop = singletons.simulation_manager.start_distributed_runloop(fun, split_distance_matrix=False)
-    #     if block:
-    #         # enable CTRL-C
-    #         while 1:
-    #             self.drun_loop.join(0.1)
+        # def enter_run_loop(self, block=True):
+        #     """
+        #     Notify subscribers about changes in the distance matrix.
+        #     """
+        #
+        #     super(ZeroMQCServerPubSub, self).enter_run_loop()
+        #
+        #     ZeroMQCServerPubSub.last_distance_matrix_hash = ""
+        #
+        #     def fun(whole_distance_matrix):
+        #
+        #         new_distance_matrix = True
+        #         if config.is_publish_only_new_distance_matrices():
+        #             new_distance_matrix_hash = hash(frozenset(whole_distance_matrix.items()))
+        #
+        #             if new_distance_matrix_hash != ZeroMQCServerPubSub.last_distance_matrix_hash:
+        #                 new_distance_matrix = False
+        #
+        #         if new_distance_matrix:
+        #             log.info("change in distance matrix ...")
+        #
+        #             self.handle_state_distance_matrix(whole_distance_matrix)
+        #
+        #             if config.is_publish_only_new_distance_matrices():
+        #                 ZeroMQCServerPubSub.last_distance_matrix_hash = new_distance_matrix_hash
+        #
+        #             if config.is_debug():
+        #                 log.debug("publishing distance matrix: %s", pformat(whole_distance_matrix))
+        #         else:
+        #             log.info("no change in distance matrix ... not publishing!")
+        #
+        #     self.drun_loop = singletons.simulation_manager.start_distributed_runloop(fun, split_distance_matrix=False)
+        #     if block:
+        #         # enable CTRL-C
+        #         while 1:
+        #             self.drun_loop.join(0.1)
 
 
 def main(cnt_peers):

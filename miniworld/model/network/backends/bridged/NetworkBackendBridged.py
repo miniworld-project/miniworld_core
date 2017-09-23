@@ -42,6 +42,7 @@ class EventMonitor(Resetable):
     def add_new_bridge(self, br):
         self.new_bridges.add(br)
 
+
 #############################################################
 # Execution Modes
 #############################################################
@@ -194,7 +195,8 @@ def NetworkBackendBridgedDummy():
 
         def get_id_tap_postfix(self, node_id, interface):
             # log.debug("get_id_tap_postfix interface: '%s'", repr(interface))
-            long_id = '%s_{id_fmt}_{id_fmt}'.format(id_fmt=NODE_ID_FMT) % (node_id, interface.node_class, interface.nr_host_interface)
+            long_id = '%s_{id_fmt}_{id_fmt}'.format(id_fmt=NODE_ID_FMT) % (
+                node_id, interface.node_class, interface.nr_host_interface)
             short_id = self._current_tap_dev_nr[node_id]
             if long_id in self._tap_id_mapping:
                 return self._tap_id_mapping[long_id]
@@ -225,17 +227,21 @@ def NetworkBackendBridgedDummy():
             event_hook_script_path = scenario_config.get_network_backend_event_hook_script()
             if event_hook_script_path and os.path.exists(event_hook_script_path):
                 bridge_list = ' '.join(self.event_monitor.new_bridges)
-                log.info("notified event_hook_script: %s" % check_output([event_hook_script_path, bridge_list], cwd=dirname(event_hook_script_path)))
+                log.info("notified event_hook_script: %s" % check_output([event_hook_script_path, bridge_list],
+                                                                         cwd=dirname(event_hook_script_path)))
 
             self.reset_simulation_step()
 
-        def after_distance_matrix_changed(self, simulation_manager, network_backend, changed_distance_matrix, full_distance_matrix, **kwargs):
+        def after_distance_matrix_changed(self, simulation_manager, network_backend, changed_distance_matrix,
+                                          full_distance_matrix, **kwargs):
             """
             Do the actual network topology change.
             """
 
             # configure network
-            super(NetworkBackendBridgedDummy, self).after_distance_matrix_changed(simulation_manager, network_backend, changed_distance_matrix, full_distance_matrix, **kwargs)
+            super(NetworkBackendBridgedDummy, self).after_distance_matrix_changed(simulation_manager, network_backend,
+                                                                                  changed_distance_matrix,
+                                                                                  full_distance_matrix, **kwargs)
 
             # NOTE: we can configure the network first after the link quality has been adjusted
             # and therefore the links have been marked as active/inactive
@@ -246,7 +252,8 @@ def NetworkBackendBridgedDummy():
 
         # TODO: let NetworkBackend call before_link_quality_adjustment, link_down, and link_up by default
         def before_link_quality_adjustment(self, connection, link_quality_still_connected, link_quality_dict,
-                                           network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info,
+                                           network_backend, emulation_node_x, emulation_node_y, interface_x,
+                                           interface_y, connection_info,
                                            **kwargs):
             """
             Adjust the link quality.
@@ -324,7 +331,7 @@ def NetworkBackendBridgedDummy():
             Bridge
             """
 
-            max_id = 10**5
+            max_id = 10 ** 5
             if emulation_node_x.id > max_id or emulation_node_y.id > max_id:
                 raise ValueError("Only %d nodes supported!" % max_id)
 
@@ -365,8 +372,9 @@ def NetworkBackendBridgedDummy():
                 # TODO: #54: make amount of nodes configurable
                 count_central_nodes = 1
                 for i in range(0, count_central_nodes):
-                    central_node = self.network_backend_bootstrapper.central_node_type(self.network_backend_bootstrapper, id=i + 1)
-                    #central_node.id = self.get_br_name(central_node.id, central_node.interface)
+                    central_node = self.network_backend_bootstrapper.central_node_type(
+                        self.network_backend_bootstrapper, id=i + 1)
+                    # central_node.id = self.get_br_name(central_node.id, central_node.interface)
                     # TODO: #54 make configurable!
                     log.debug("creating CentralNode with id: %s", central_node.id)
                     central_node.start(switch=False, bridge_dev_name=central_node.id)
@@ -380,7 +388,6 @@ def NetworkBackendBridgedDummy():
             # connect via server boundaries (overlay)
             node_ids = singletons.simulation_manager.get_emulation_node_ids()
             for x, y in zip(node_ids, node_ids[1:]):
-
                 emulation_node_x = singletons.simulation_manager.get_emulation_node_for_idx(x)
                 emulation_node_y = singletons.simulation_manager.get_emulation_node_for_idx(y)
                 log.info("connecting %s<->%s", emulation_node_x, emulation_node_y)
@@ -398,6 +405,7 @@ def NetworkBackendBridged():
     -------
     NetworkBackendBridged
     """
+
     class NetworkBackendBridged(get_superclass_dynamic()):
         pass
 

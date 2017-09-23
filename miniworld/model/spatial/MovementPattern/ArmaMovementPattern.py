@@ -1,9 +1,10 @@
 # encoding: utf-8
 
-__author__ = "Patrick Lampe"
-__email__ = "uni at lampep.de"
 
 from time import strptime
+
+__author__ = "Patrick Lampe"
+__email__ = "uni at lampep.de"
 
 
 class ArmaMovementPattern:
@@ -14,13 +15,13 @@ class ArmaMovementPattern:
         self.next_step = self.get_next_step_from_file()
 
     def __get_next_step_from_file(self):
-        while("POSITIONLIST_BEGIN" not in self.file.readline()):
+        while ("POSITIONLIST_BEGIN" not in self.file.readline()):
             pass
 
         self.crnt_line = self.file.readline()
         next_time = self.__extract_time_from_line(self.crnt_line)
         list_of_coordinates = []
-        while("POSITIONLIST_END" not in self.crnt_line):
+        while ("POSITIONLIST_END" not in self.crnt_line):
             list_of_coordinates.append(self.__extract_coordinates_from_line(self.crnt_line))
             self.crnt_line = self.file.readline()
         self.next_step = (next_time, list_of_coordinates)

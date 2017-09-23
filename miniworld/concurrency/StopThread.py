@@ -1,11 +1,10 @@
+from threading import Event
+import threading
 
 # encoding: utf-8
 
 __author__ = "Nils Tobias Schmidt"
 __email__ = "schmidt89 at informatik.uni-marburg.de"
-
-from threading import Event
-import threading
 
 
 class StopThread(threading.Thread):
