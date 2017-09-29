@@ -2,8 +2,9 @@ from collections import defaultdict
 
 # TODO: RENAME
 
+
 def to_fully_staffed_matrix_3(d):
-    '''
+    """
 
     Parameters
     ----------
@@ -12,14 +13,15 @@ def to_fully_staffed_matrix_3(d):
     Returns
     -------
     dict<object, object>
-    '''
+    """
     for key, val in d.items():
         d[val] = key
 
     return d
 
+
 def to_fully_staffed_matrix(d):
-    '''
+    """
 
     Parameters
     ----------
@@ -28,7 +30,7 @@ def to_fully_staffed_matrix(d):
     Returns
     -------
     dict<object, set<object>>
-    '''
+    """
     fully_staffed = defaultdict(set)
 
     # copy entries
@@ -43,8 +45,10 @@ def to_fully_staffed_matrix(d):
     return fully_staffed
 
 # TODO: RENAME, MOVE TO NETWORKMANAGER!
+
+
 def to_fully_staffed_matrix_2(d):
-    '''
+    """
     Note: The key object must support the creation of the same object via its constructor.
 
     Parameters
@@ -54,7 +58,7 @@ def to_fully_staffed_matrix_2(d):
     Returns
     -------
     d : dict<reversed<object, object>>, list<reversed<object>>>
-    '''
+    """
     fully_staffed = {}
 
     for k, vals in d.items():
@@ -69,7 +73,7 @@ def to_fully_staffed_matrix_2(d):
 
 # TODO: DOC
 def list_merge_values(d, d2, in_place=True):
-    '''
+    """
 
     Parameters
     ----------
@@ -86,17 +90,18 @@ def list_merge_values(d, d2, in_place=True):
     Returns
     -------
 
-    '''
+    """
     d3 = d.copy() if not in_place else d
     for key, val in d2.items():
-        if not key in d3:
+        if key not in d3:
             d3[key] = val
         else:
             d3[key].extend(val)
     return d3
 
+
 def merge_recursive_in_place(d, d2):
-    '''
+    """
 
     Parameters
     ----------
@@ -105,7 +110,7 @@ def merge_recursive_in_place(d, d2):
 
     Returns
     -------
-    '''
+    """
 
     if d2 is None:
         return d
@@ -119,9 +124,10 @@ def merge_recursive_in_place(d, d2):
         # prefer keys from d2
         return d2
 
+
 if __name__ == '__main__':
     d = {'foo': {'bar': 1, 'rest': 'foO'}}
-    d2 =  {'foo': {'bar': 2}}
+    d2 = {'foo': {'bar': 2}}
 
     print(merge_recursive_in_place(d, d2))
     print(merge_recursive_in_place({}, d2))

@@ -17,25 +17,26 @@ def factory():
     else:
         raise ValueError("Value unknown!")
 
+
 class NodeDistributionStrategy:
 
-    '''
+    """
     Attributes
     ----------
     server_score : dict
         Dict produced and readable by :py:class:`.ServerScore`
-    '''
+    """
+
     def __init__(self):
         self.server_score = None
 
     def distribute_emulation_nodes(node_ids, cnt_servers):
         raise NotImplementedError
 
-
     def apply_distribution_strategy(self, node_ids, cnt_servers, server_node_distribution,
                                     distribute_remaining_fair=True, distribute_remaining_server_ids=None
                                     ):
-        '''
+        """
 
         Parameters
         ----------
@@ -53,7 +54,7 @@ class NodeDistributionStrategy:
         dict<int, <list<int>>>
             The nodes distributed among the servers.
             e.g: {1 : [1,2], 2 : [3,4]}
-        '''
+        """
 
         res = defaultdict(list)
         if distribute_remaining_server_ids is None:
@@ -72,7 +73,7 @@ class NodeDistributionStrategy:
 
         for server_id in range(1, cnt_servers + 1):
 
-            if not server_id in server_node_distribution:
+            if server_id not in server_node_distribution:
                 break
             cur_pos += server_node_distribution[server_id]
             if check():
@@ -85,7 +86,7 @@ class NodeDistributionStrategy:
         if distribute_remaining_fair:
             # distribute remaining nodes
             # can happen if len(node_ids) / cnt_servers is no integer
-            while 1:
+            while True:
                 for server_id in distribute_remaining_server_ids:
 
                     if check():
@@ -96,18 +97,19 @@ class NodeDistributionStrategy:
 
         return res
 
+
 class NDSEqual(NodeDistributionStrategy):
 
     # TODO: for core mode, we can minimize the number of tunnels!
     def distribute_emulation_nodes(self, node_ids, cnt_servers):
-        server_node_distribution = {node_id : max(1, len(node_ids) // cnt_servers) for node_id in node_ids}
+        server_node_distribution = {node_id: max(1, len(node_ids) // cnt_servers) for node_id in node_ids}
         return self.apply_distribution_strategy(node_ids, cnt_servers, server_node_distribution)
 
 
 class NDSScore(NodeDistributionStrategy):
 
     def distribute_emulation_nodes(self, node_ids, cnt_servers):
-        '''
+        """
 
         Parameters
         ----------
@@ -117,7 +119,7 @@ class NDSScore(NodeDistributionStrategy):
         Returns
         -------
 
-        '''
+        """
         server_node_distribution = {}
         server_score_sorted_cpu_ranking_desc = list(OrderedDict(sorted(self.server_score.items(), key=lambda x: ServerScore.get_cpu_score(x[1]), reverse=True)).keys())
 
@@ -129,14 +131,14 @@ class NDSScore(NodeDistributionStrategy):
         # distribute nodes according to their bogomips and check if the ram size limit is still not full
         for server_id in server_score_sorted_cpu_ranking_desc:
             bogomips = ServerScore.get_cpu_score(self.server_score[server_id])
-            bogomips_perc = bogomips * 1.0/ sum_bogomips
+            bogomips_perc = bogomips * 1.0 / sum_bogomips
 
             # ceal the cnt because we have a list of servers sorted by feature CPU
             cnt_assigned_nodes = int(math.ceil(bogomips_perc * len(node_ids)))
 
             # decrease cnt until RAM fits
             free_memory = ServerScore.get_free_mem_score(self.server_score[server_id])
-            while 1:
+            while True:
                 # assume each VM has the same amount of RAM
                 assigned_memory = cnt_assigned_nodes * vm_size
                 ram_limit_reached = assigned_memory > free_memory
@@ -163,7 +165,7 @@ if __name__ == '__main__':
 
     nds = NDSScore()
     print(nds.__class__.__name__)
-    Scenario.set_scenario_config(json.dumps({"qemu" : {"ram" : "128M"}}), raw=True)
+    Scenario.set_scenario_config(json.dumps({"qemu": {"ram": "128M"}}), raw=True)
 
     nds.server_score = {1: {"cpu": 1000, "free_mem": 128}, 2: {"cpu": 2000, "free_mem": 255},
                         3: {"cpu": 1050.1, "free_mem": 255}}

@@ -1,16 +1,17 @@
 import os
 from copy import deepcopy
 
+from miniworld.model.network.linkqualitymodels import LinkQualityConstants
+
 import miniworld.ScenarioConstants
 import miniworld.model.network.backends.vde.VDEConstants
 import miniworld.model.network.interface.Interface
 from miniworld import log
 from miniworld.errors import ConfigMalformed
-from miniworld.model.network.linkqualitymodels.LinkQualityConstants import *
 from miniworld.util import JSONConfig, ConcurrencyUtil
 from miniworld.util.JSONConfig import customizable_attrs, json2dict
 
-'''
+"""
 Provides access to the current scenario.
 
 Examples
@@ -26,10 +27,11 @@ All functions decorated with @attrs can prefer the node customized value by supp
 >>> {'foo': {'bar': '0'}, 'node_details': {'1': {'foo': {'bar': '2'}}}}
 >>> get_bar(node_id = "1")
 2
-'''
+"""
 
 # keeps the scenario config as dict
 # scenario_config = {}
+
 
 def not_null(fun):
     def wrap(*args, **kwargs):
@@ -50,6 +52,8 @@ CONNECTION_MODE_SINGLE = "single"
 CONNECTION_MODE_MULTI = "multi"
 
 # TODO: is marshmallow sufficient for schema checking?
+
+
 class ScenarioConfig(JSONConfig.JSONConfig):
 
     @customizable_attrs("foo", "bar")
@@ -57,7 +61,7 @@ class ScenarioConfig(JSONConfig.JSONConfig):
         pass
 
     # TODO: #40: ADD CAST FUNCTIONS
-    @customizable_attrs("cnt_nodes", default = 0)
+    @customizable_attrs("cnt_nodes", default=0)
     def get_number_of_nodes(self):
         pass
 
@@ -70,15 +74,13 @@ class ScenarioConfig(JSONConfig.JSONConfig):
         else:
             return range(1, self.get_number_of_nodes() + 1)
 
-
     def get_all_emulation_node_ids(self):
-        '''
+        """
         Returns
         -------
         list<int>
-        '''
+        """
         return range(1, self.get_number_of_nodes() + 1)
-
 
     @customizable_attrs("qemu", "qemu_user_addition")
     def get_qemu_user_addition(self):
@@ -89,15 +91,14 @@ class ScenarioConfig(JSONConfig.JSONConfig):
         pass
 
     #################################################
-    ### Provisioning
+    # Provisioning
     #################################################
 
-    @customizable_attrs("provisioning", "parallel", default = True)
+    @customizable_attrs("provisioning", "parallel", default=True)
     def is_parallel_node_starting(self):
         pass
 
-
-    @customizable_attrs("provisioning", "overlay_images", default = [])
+    @customizable_attrs("provisioning", "overlay_images", default=[])
     def get_overlay_images(self):
         pass
 
@@ -115,29 +116,29 @@ class ScenarioConfig(JSONConfig.JSONConfig):
         return self.get_provisioning_boot_mode() == self.PROVISIONING_BOOT_MODE_PEXPECT
 
     @customizable_attrs("provisioning", "regex_shell_prompt")
-    def get_shell_prompt(self, not_null = True):
+    def get_shell_prompt(self, not_null=True):
         pass
 
     @customizable_attrs("provisioning", "regex_boot_completed")
     def get_signal_boot_completed(self):
         pass
 
-    @customizable_attrs("provisioning", "image", not_null = True)
+    @customizable_attrs("provisioning", "image", not_null=True)
     def get_path_image(self):
         pass
 
     # TODO: default val
-    @customizable_attrs("network", "links", "model", default = "miniworld.model.network.linkqualitymodels.LinkQualityModelRange.LinkQualityModelRange")
+    @customizable_attrs("network", "links", "model", default="miniworld.model.network.linkqualitymodels.LinkQualityModelRange.LinkQualityModelRange")
     def get_link_quality_model(self):
         pass
 
-    @customizable_attrs("network", "links", "bandwidth", default = LINK_QUALITY_VAL_BANDWIDTH_UNLIMITED)
+    @customizable_attrs("network", "links", "bandwidth", default=LinkQualityConstants.LINK_QUALITY_VAL_BANDWIDTH_UNLIMITED)
     def get_link_bandwidth(self):
-        ''' default is unlimited bandwidth '''
+        """ default is unlimited bandwidth """
         pass
 
     #################################################
-    ### Walk Model
+    # Walk Model
     #################################################
 
     WALK_MODEL_NAME_ARMA = 'arma'
@@ -159,25 +160,23 @@ class ScenarioConfig(JSONConfig.JSONConfig):
         pass
 
     #################################################
-    ### Qemu
+    # Qemu
     #################################################
 
-
-    @customizable_attrs("qemu", "ram", default = "32M")
+    @customizable_attrs("qemu", "ram", default="32M")
     def get_qemu_memory(self):
         pass
 
     def get_qemu_memory_mb(self):
         return int(self.get_qemu_memory().split("M")[0])
 
-
-    @customizable_attrs("qemu", "nic", "model", default = "virtio-net-pci",
+    @customizable_attrs("qemu", "nic", "model", default="virtio-net-pci",
                         expected=miniworld.ScenarioConstants.get_nic_models())
     def get_qemu_nic(self):
         pass
 
     #################################################
-    ### Network Link Configuration Connectivity Check
+    # Network Link Configuration Connectivity Check
     #################################################
 
     @customizable_attrs("network", "links", "configuration", "connectivity_check", "enabled", default=True)
@@ -193,15 +192,14 @@ class ScenarioConfig(JSONConfig.JSONConfig):
         pass
 
     #################################################
-    ### Network Link Configuration
+    # Network Link Configuration
     #################################################
-
 
     @customizable_attrs("network", "links", "configuration", "ip_provisioner", "name", expected=["p2p", "same_subnet"], default=None)
     def get_network_provisioner_name(self):
         pass
 
-    @customizable_attrs("network", "links", "configuration", "auto_ipv4", default = True)
+    @customizable_attrs("network", "links", "configuration", "auto_ipv4", default=True)
     def is_network_links_auto_ipv4(self):
         pass
 
@@ -218,12 +216,13 @@ class ScenarioConfig(JSONConfig.JSONConfig):
         pass
 
     #################################################
-    ### Network Backend
+    # Network Backend
     #################################################
 
     NETWORK_BACKEND_BRIDGED = "bridged"
     NETWORK_BACKEND_VDE = "vde"
     # TODO: check for backend names!
+
     @customizable_attrs("network", "backend", "name",
                         expected=[NETWORK_BACKEND_BRIDGED, NETWORK_BACKEND_VDE],
                         default=NETWORK_BACKEND_BRIDGED)
@@ -250,7 +249,7 @@ class ScenarioConfig(JSONConfig.JSONConfig):
         pass
 
     #################################################
-    ### Network Backend Bridged Specific
+    # Network Backend Bridged Specific
     #################################################
 
     @customizable_attrs("network", "backend", "connection_mode", default="single",
@@ -284,11 +283,11 @@ class ScenarioConfig(JSONConfig.JSONConfig):
         return scenario_config.get_network_backend_bridged_connection_mode() is not None
 
     def is_network_backend_bridged_connection_mode_multi(self):
-        '''
+        """
         Raises
         ------
         ValueError
-        '''
+        """
         if not scenario_config.get_core_scenarios():
             # TODO: use abstract variable for network backend name
             raise ValueError("""Network backend '%s' is only usable with a previously known network topology.
@@ -307,13 +306,13 @@ class ScenarioConfig(JSONConfig.JSONConfig):
         pass
 
     def set_network_backend_bridged_tunnel_endpoints(self, tunnel_endpoints):
-        '''
+        """
 
         Returns
         -------
         tunnel_endpoints : dict<int, str>
             For each server the tunnel ip address.
-        '''
+        """
 
         # TODO: this is a quickfixi
         self.init_keys(["network", "backend", "tunnel_endpoints"])
@@ -330,11 +329,11 @@ class ScenarioConfig(JSONConfig.JSONConfig):
     KEY_NETWORK_BACKEND_BRIDGED_DISTRIBUTED_MODE_GRETAP = "gretap"
     KEY_NETWORK_BACKEND_BRIDGED_DISTRIBUTED_MODE_VXLAN = "vxlan"
 
-    ''' distributed mode '''
+    """ distributed mode """
 
     @customizable_attrs("network", "backend", "distributed_mode",
                         expected=[KEY_NETWORK_BACKEND_BRIDGED_DISTRIBUTED_MODE_VLAN,
-                                    KEY_NETWORK_BACKEND_BRIDGED_DISTRIBUTED_MODE_GRETAP,
+                                  KEY_NETWORK_BACKEND_BRIDGED_DISTRIBUTED_MODE_GRETAP,
                                   KEY_NETWORK_BACKEND_BRIDGED_DISTRIBUTED_MODE_VXLAN],
                         default=KEY_NETWORK_BACKEND_BRIDGED_DISTRIBUTED_MODE_GRETAP)
     def get_network_backend_bridged_distributed_mode(self):
@@ -350,10 +349,10 @@ class ScenarioConfig(JSONConfig.JSONConfig):
         return self.get_network_backend_bridged_distributed_mode() == self.KEY_NETWORK_BACKEND_BRIDGED_DISTRIBUTED_MODE_VXLAN
 
     #################################################
-    ### Network
+    # Network
     #################################################
 
-    @customizable_attrs("network", "links", "interfaces", default = [miniworld.model.network.interface.Interface.Mesh.node_class_name])
+    @customizable_attrs("network", "links", "interfaces", default=[miniworld.model.network.interface.Interface.Mesh.node_class_name])
     def get_interfaces(self):
         pass
 
@@ -379,32 +378,32 @@ class ScenarioConfig(JSONConfig.JSONConfig):
         pass
 
     #################################################
-    ### Shell
+    # Shell
     #################################################
 
-    def get_all_shell_commands_pre_network_start(self, node_id = None):
-        '''
+    def get_all_shell_commands_pre_network_start(self, node_id=None):
+        """
         See :py:meth:`._get_all_shell_commands`
-        '''
-        return self._get_all_shell_commands(self._get_shell_commands_path_pre_network_start(node_id = node_id),
-                                            self._get_shell_commands_pre_network_start(node_id = node_id))
+        """
+        return self._get_all_shell_commands(self._get_shell_commands_path_pre_network_start(node_id=node_id),
+                                            self._get_shell_commands_pre_network_start(node_id=node_id))
 
-    def get_all_shell_commands_post_network_start(self, node_id = None):
-        '''
+    def get_all_shell_commands_post_network_start(self, node_id=None):
+        """
         See :py:meth:`._get_all_shell_commands`
-        '''
-        return self._get_all_shell_commands(self._get_shell_commands_path_post_network_start(node_id = node_id),
-                                            self._get_shell_commands_post_network_start(node_id = node_id))
+        """
+        return self._get_all_shell_commands(self._get_shell_commands_path_post_network_start(node_id=node_id),
+                                            self._get_shell_commands_post_network_start(node_id=node_id))
 
     # def get_all_shell_commands_before_snapshot(self, node_id = None):
-    #     '''
+    #     """
     #     See :py:meth:`._get_all_shell_commands`
-    #     '''
+    #     """
     #     return self._get_all_shell_commands(self._get_shell_commands_path_before_snapshot(node_id = node_id),
     #                                         self._get_shell_commands_before_snapshot(node_id = node_id))
 
     def _get_all_shell_commands(self, shell_commands_path, shell_commands_list):
-        '''
+        """
         Get the shell commands.
         Concatenates the commands from the shell script to the direct commands.
         (shell_cmds_path + shell_cmds)
@@ -422,7 +421,7 @@ class ScenarioConfig(JSONConfig.JSONConfig):
         -------
         str
             The commands as string
-        '''
+        """
 
         shell_commands_from_path = ""
         shell_commands_from_config = ''
@@ -439,7 +438,6 @@ class ScenarioConfig(JSONConfig.JSONConfig):
                 raise ConfigMalformed("The path ('%s') to the shell script does not exist!" % shell_commands_path)
         return ('%s\n\n%s' % (shell_commands_from_path, shell_commands_from_config)).strip()
 
-
     @customizable_attrs("provisioning", "shell", "pre_network_start", "shell_cmds")
     def _get_shell_commands_pre_network_start(self):
         pass
@@ -448,11 +446,9 @@ class ScenarioConfig(JSONConfig.JSONConfig):
     def _get_shell_commands_path_pre_network_start(self):
         pass
 
-
     @customizable_attrs("provisioning", "shell", "post_network_start", "shell_cmds")
     def _get_shell_commands_post_network_start(self):
         pass
-
 
     @customizable_attrs("provisioning", "shell", "post_network_start", "shell_cmd_file_path")
     def _get_shell_commands_path_post_network_start(self):
@@ -469,11 +465,11 @@ class ScenarioConfig(JSONConfig.JSONConfig):
     #
 
 #################################################
-### Distributed Settings
+# Distributed Settings
 #################################################
 
     def create_distributed_section(self):
-        if not "distributed" in self.data:
+        if "distributed" not in self.data:
             self.data["distributed"] = {}
 
     @json2dict
@@ -485,12 +481,12 @@ class ScenarioConfig(JSONConfig.JSONConfig):
         return list(self.get_distributed_server_node_mapping().keys())
 
     def set_distributed_server_node_mapping(self, server_node_mapping):
-        '''
+        """
         Parameters
         ----------
         server_node_mapping : dict
 
-        '''
+        """
         self.create_distributed_section()
 
         self.data["distributed"]["server_node_mapping"] = server_node_mapping
@@ -511,17 +507,18 @@ class ScenarioConfig(JSONConfig.JSONConfig):
 scenario_config = ScenarioConfig()
 
 ###############################################
-### Scenario config file setter
+# Scenario config file setter
 ###############################################
 
+
 def set_scenario_config(*args, **kwargs):
-    ''' Set the scenario config.
+    """ Set the scenario config.
 
     Returns
     -------
     dict
         The config as JSON.
-    '''
+    """
 
     _config = JSONConfig.read_json_config(*args, **kwargs)
     log.info("setting scenario config file '%s'", *args)
@@ -529,7 +526,7 @@ def set_scenario_config(*args, **kwargs):
     return _config
 
 ###############################################
-### Scenario access API
+# Scenario access API
 ###############################################
 
 
@@ -540,15 +537,14 @@ if __name__ == '__main__':
     # print sc.get_foo(node_id = 1)
     # print sc.get_qemu_user_addition()
 
-
     sc = ScenarioConfig()
     sc.config = {
-        "network" : {
-          "core_scenarios" : {
-            "10" : "MiniWorld_Images/serval_paper/chain3.xml",
-            "15" : "MiniWorld_Images/serval_paper/chain3.xml",
-            "20" : "MiniWorld_Images/serval_paper/chain3.xml"
-          }
+        "network": {
+            "core_scenarios": {
+                "10": "MiniWorld_Images/serval_paper/chain3.xml",
+                "15": "MiniWorld_Images/serval_paper/chain3.xml",
+                "20": "MiniWorld_Images/serval_paper/chain3.xml"
+            }
         }
     }
     print(sc.get_core_scenarios())

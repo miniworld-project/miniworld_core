@@ -1,4 +1,3 @@
-from collections import defaultdict
 from functools import partial
 
 import os
@@ -82,20 +81,22 @@ def _create_scenarios(connection_mode):
 
 @pytest.mark.parametrize('scenario_fun',
                          **dict(zip(['argvalues', 'ids'], zip(*_create_scenarios(Scenario.CONNECTION_MODE_SINGLE)))))
-def test_network_switching_bridged_backends_single(scenario_fun, snapshot_runner, image_path, request, core_topologies_dir):
+def test_network_switching_bridged_backends_single(scenario_fun, snapshot_runner, image_path, request,
+                                                   core_topologies_dir):
     _test_network_switch_bridged_backends(core_topologies_dir, image_path, request, snapshot_runner, scenario_fun)
 
 
 @pytest.mark.parametrize('scenario_fun',
                          **dict(zip(['argvalues', 'ids'], zip(*_create_scenarios(Scenario.CONNECTION_MODE_MULTI)))))
-def test_network_switching_bridged_backends_multi(scenario_fun, snapshot_runner, image_path, request, core_topologies_dir):
+def test_network_switching_bridged_backends_multi(scenario_fun, snapshot_runner, image_path, request,
+                                                  core_topologies_dir):
     _test_network_switch_bridged_backends(core_topologies_dir, image_path, request, snapshot_runner, scenario_fun)
 
 
 def _test_network_switch_bridged_backends(core_topologies_dir, image_path, request, runner, scenario_fun):
     scenario = scenario_fun(image_path, request, core_topologies_dir)
     connection_mode = scenario['network']['backend']['connection_mode']
-    if not connection_mode in runner.connection_modes:
+    if connection_mode not in runner.connection_modes:
         force_snapshot_boot = False
         runner.connection_modes.add(connection_mode)
     else:

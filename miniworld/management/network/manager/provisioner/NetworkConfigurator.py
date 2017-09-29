@@ -6,16 +6,16 @@ from miniworld import singletons
 from miniworld.Scenario import scenario_config
 from miniworld.errors import Base
 from miniworld.log import log
-from miniworld.model.emulation.nodes.EmulationNodes import EmulationNodes
 from miniworld.util import DictUtil, NetUtil, ConcurrencyUtil
 
 
 class NetworkConfiguratorError(Base):
     pass
 
+
 class NetworkConfigurator:
 
-    '''
+    """
     Base class for network configuraters.
 
     Moreover, the network can be checked for connectivity and whether the NIC configuration succeeded.
@@ -26,13 +26,14 @@ class NetworkConfigurator:
     nic_prefix : str, optional (default is taken from the scenario config)
         E.g. 'eth'
     nic_check_commands : nic_check_commands
-    '''
+    """
+
     def __init__(self, get_interface_index_fun, nic_prefix=None,
                  # connectivity checking stuff
                  connectivity_checker_fun=None, is_connectivity_checks_enabled=None, network_timeout=None,
                  base_network_cidr=None, prefixlen=None,
                  **kwargs):
-        '''
+        """
 
         Parameters
         ----------
@@ -53,7 +54,7 @@ class NetworkConfigurator:
         prefixlen : str, optional (default is the value from the scenario config)
             Assigns for each node a /x network. 30 is the smallest subnet size for broadcast included.
 
-        '''
+        """
         if nic_prefix is None:
             nic_prefix = miniworld.Scenario.scenario_config.get_network_links_nic_prefix()
         if network_timeout is None:
@@ -92,12 +93,12 @@ class NetworkConfigurator:
         return step_cnt < 1
 
     def get_nic_check_commands(self, connections):
-        '''
+        """
         Parameters
         ----------
         connections : dict<(EmulationNode,EmulationNode), iterable<(Interface, Interface)]>>
             Must be fully staffed if you want bidirectional links!
-        '''
+        """
         return self.nic_check_commands
 
     def get_active_connections(self):
@@ -153,9 +154,8 @@ class NetworkConfigurator:
             with es.event_init(es.EVENT_NETWORK_CHECK) as ev:
                 ev.finish()
 
-
     def configure_connection(self, emulation_nodes, interfaces):
-        '''
+        """
         Configure a single connection.
 
         Parameters
@@ -166,12 +166,12 @@ class NetworkConfigurator:
         Returns
         -------
         dict<EmulationNode, list<str>>, dict<EmulationNode, list<str>>
-        '''
+        """
         raise NotImplementedError
 
     @staticmethod
     # TODO: MOVE TO NETWORK UTIL!
-    def get_ip_addr_change_cmd(dev, ip, netmask, up = True):
+    def get_ip_addr_change_cmd(dev, ip, netmask, up=True):
         return 'ifconfig {dev} {ip} netmask {netmask} {state}'.format(dev=dev, ip=ip, netmask=netmask,
                                                                       state='up' if up else '')
 
@@ -182,12 +182,12 @@ class NetworkConfigurator:
         raise NotImplementedError
 
     #########################################
-    ### Connectivity Checkers
+    # Connectivity Checkers
     #########################################
 
     # TODO: add interface? => check that the ip is reachable from the correct interface
     def get_scenario_config_checker(self, ip, timeout):
-        '''
+        """
         ICMP network connectivity checker.
 
         Parameters
@@ -197,7 +197,7 @@ class NetworkConfigurator:
 
         Returns
         -------
-        '''
+        """
         cmd = scenario_config.get_connectivity_check_cmd()
         return cmd.format(ip=ip, timeout=timeout)
 

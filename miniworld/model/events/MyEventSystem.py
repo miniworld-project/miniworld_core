@@ -1,11 +1,12 @@
 from miniworld.model.StartableObject import StartableSimulationStateObject
 from miniworld.model.events.EventSystem import EventSystem
 
+
 class MyEventSystem(EventSystem, StartableSimulationStateObject):
-    '''
+    """
     Concrete implementation of the MiniWorld Event-System.
     Contains all events used in the project.
-    '''
+    """
 
     EVENT_VM_BOOT = "vm_boot"
     EVENT_VM_SHELL_READY = "vm_shell_ready"

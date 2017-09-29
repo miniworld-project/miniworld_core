@@ -13,9 +13,9 @@ from miniworld.Config import config
 __author__ = "Nils Schmidt"
 
 
-'''
+"""
 This is a base `ArgumentParser` which reads and expects a scenario config file.
-'''
+"""
 # TODO: REMOVE
 scenario_config_parser = argparse.ArgumentParser(add_help=False)
 scenario_config_parser.add_argument('scenario_config', help='The scenario description (Path to *.json)')
@@ -23,6 +23,8 @@ scenario_config_parser.add_argument('--customize-scenario', "-cs", default='{}',
 
 # TODO: use
 rpc_parser = argparse.ArgumentParser(add_help=False)
+
+
 def get_default_rpc_addr():
     try:
         if not config.config:
@@ -30,10 +32,13 @@ def get_default_rpc_addr():
         return Config.config.get_server_addr()
     except Exception:
         return "127.0.0.1"
+
+
 rpc_parser.add_argument("--addr", default=get_default_rpc_addr(), help="The address of the rpc server, default is: '%(default)s'")
 
-def parse_scenario_config(scenario_config = None, customize_scenario = None):
-    '''
+
+def parse_scenario_config(scenario_config=None, customize_scenario=None):
+    """
 
     Parameters
     ----------
@@ -43,7 +48,7 @@ def parse_scenario_config(scenario_config = None, customize_scenario = None):
     Returns
     -------
     str, str, str
-    '''
+    """
     def parse_args():
         return scenario_config_parser.parse_known_args()[0]
 
@@ -58,7 +63,7 @@ def parse_scenario_config(scenario_config = None, customize_scenario = None):
 
     if customize_scenario:
         try:
-            custom_scenario = JSONConfig.read_json_config(customize_scenario, raw = True)
+            custom_scenario = JSONConfig.read_json_config(customize_scenario, raw=True)
             # TODO: #61
             DictUtil.merge_recursive_in_place(scenario_config, custom_scenario)
         except ValueError as e:
@@ -66,12 +71,15 @@ def parse_scenario_config(scenario_config = None, customize_scenario = None):
             raise ConfigMalformed("The supplied custom json scenario is invalid!")
 
     scenario_config_json = json.dumps(scenario_config)
-    Scenario.set_scenario_config(scenario_config_json, raw = True)
+    Scenario.set_scenario_config(scenario_config_json, raw=True)
     return scenario_config, custom_scenario, scenario_config_json
 
+
 CLI_REFRESH_RATE = 0.25
+
+
 def start_scenario(scenario_config, autostepping=None, blocking=True, connection=None):
-    '''
+    """
 
     Parameters
     ----------
@@ -80,7 +88,7 @@ def start_scenario(scenario_config, autostepping=None, blocking=True, connection
 
     Returns
     -------
-    '''
+    """
 
     from miniworld.management.events.CLIEventDisplay import CLIEventDisplay
 
@@ -93,7 +101,7 @@ def start_scenario(scenario_config, autostepping=None, blocking=True, connection
     cli_display = CLIEventDisplay()
 
     def show_progress():
-        while 1:
+        while True:
             progress_dict = OrderedDict(con_progress.get_progress(False))
             if progress_dict is not None:
 
@@ -118,7 +126,7 @@ def start_scenario(scenario_config, autostepping=None, blocking=True, connection
         t.start()
 
     if not blocking:
-        while 1:
+        while True:
             t.join(0.5)
             if not t.isAlive():
                 return

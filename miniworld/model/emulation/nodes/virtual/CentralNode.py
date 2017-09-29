@@ -7,35 +7,35 @@ from miniworld.model.network.interface.Interface import HubWiFi
 
 
 class CentralNode(VirtualNode.VirtualNode):
-    '''
+    """
     A VirtualNode whose links are quality adjusted by distance matrix.
-    '''
+    """
 
     cnt_instances = 0
 
-    def __init__(self, network_backend_bootstrapper, id = None):
-        '''
+    def __init__(self, network_backend_bootstrapper, id=None):
+        """
 
         Parameters
         ----------
         network_backend_bootstrapper : NetworkBackendBootStrapper
         id : int, optional (default is generated)
         bridge_name : str
-        '''
+        """
         interfaces = Interfaces.Interfaces.factory([HubWiFi])
         if id is None:
             id = self.gen_bridge_node_id()
 
-        super(CentralNode, self).__init__(id, network_backend_bootstrapper, interfaces = interfaces)
+        super(CentralNode, self).__init__(id, network_backend_bootstrapper, interfaces=interfaces)
         CentralNode.cnt_instances += 1
 
     def init_connection_info(self):
-        '''
+        """
 
         Returns
         -------
         ConnectionInfo
-        '''
+        """
         return ConnectionInfo(is_central=True)
 
     # TODO: REMOVE ?
@@ -50,7 +50,8 @@ class CentralNode(VirtualNode.VirtualNode):
 
 
 def is_central_node_interface(interface):
-    return type(interface) == HubWiFi
+    return isinstance(interface, HubWiFi)
+
 
 def is_central_node(node):
     return isinstance(node, CentralNode)

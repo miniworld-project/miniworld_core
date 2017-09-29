@@ -1,9 +1,5 @@
-
 # encoding: utf-8
 from miniworld.model.singletons.Singletons import singletons
-
-__author__ = "Patrick Lampe"
-__email__ = "uni at lampep.de"
 
 from time import strptime
 from collections import OrderedDict
@@ -11,6 +7,9 @@ from collections import OrderedDict
 import geojson
 
 from miniworld.model.spatial.Node.ArmaNode import ArmaNode
+
+__author__ = "Patrick Lampe"
+__email__ = "uni at lampep.de"
 
 
 class ArmaNodes:
@@ -27,7 +26,7 @@ class ArmaNodes:
         for n in range(0, self.node_cnt - 1):
             for i in range(n + 1, self.node_cnt):
                 if n != i:
-                    output[(n+1, i+1)] = self.list_of_nodes[n].get_distance_in_m(self.list_of_nodes[i])
+                    output[(n + 1, i + 1)] = self.list_of_nodes[n].get_distance_in_m(self.list_of_nodes[i])
         return output
 
     def walk(self):
@@ -40,31 +39,30 @@ class ArmaNodes:
         self.get_next_step_from_file()
 
     def get_next_step_from_file(self):
-        while("POSITIONLIST_BEGIN" not in self.file.readline()):
+        while ("POSITIONLIST_BEGIN" not in self.file.readline()):
             pass
 
         self.crnt_line = self.file.readline()
         next_time = self.__extract_time_from_line(self.crnt_line)
         list_of_coordinates = []
-        while("POSITIONLIST_END" not in self.crnt_line):
+        while ("POSITIONLIST_END" not in self.crnt_line):
             list_of_coordinates.append(self.__extract_coordinates_from_line(self.crnt_line))
             self.crnt_line = self.file.readline()
         self.next_step = (next_time, list_of_coordinates)
 
-
     def get_geo_json(self):
-        '''
+        """
         Returns
         -------
         geo_json
                     for the current state of all nodes
-        '''
+        """
         feature_coll_nodes = geojson.FeatureCollection([self.__get_single_node(n) for n in range(self.node_cnt)])
-        return  geojson.dumps(feature_coll_nodes)
+        return geojson.dumps(feature_coll_nodes)
 
     def __extract_coordinates_from_line(self, line):
         first_index = line.find("\"[") + 2
-        second_index =line.find("]\"")
+        second_index = line.find("]\"")
         coordinates = line[first_index:second_index]
         list_of_cords = coordinates.split(",")
         return (float(list_of_cords[0]), float(list_of_cords[1]))
@@ -76,15 +74,15 @@ class ArmaNodes:
         node = self.list_of_nodes[n]
 
         return OrderedDict(
-            type = "Feature",
-            geometry = OrderedDict(
-                type = "Point",
-                coordinates = [float(node.get_lon()) , float(node.get_lat())]
+            type="Feature",
+            geometry=OrderedDict(
+                type="Point",
+                coordinates=[float(node.get_lon()), float(node.get_lat())]
             ),
-            properties = OrderedDict(
-                color = node.color,
-                name = "Node " + str(n),
-                type = "Arma" + str(n),
-                popupContent = "Node " + str(n)
+            properties=OrderedDict(
+                color=node.color,
+                name="Node " + str(n),
+                type="Arma" + str(n),
+                popupContent="Node " + str(n)
             ),
         )

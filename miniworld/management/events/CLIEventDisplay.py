@@ -1,9 +1,7 @@
 import curses
 import json
 from itertools import imap, repeat
-
-from progressbar import *
-
+import progressbar
 from miniworld.management.events.TerminalWriter import TerminalWriter
 from miniworld.model.events.MyEventSystem import MyEventSystem
 
@@ -16,31 +14,33 @@ event_length = 25
 
 curses_ok = False
 try:
-    from blessings import Terminal
+    from blessings import Terminal  # noqa
     curses_ok = True
 except curses.error:
     pass
 
+
 class CLIEventDisplay:
 
-    '''
+    """
     CLI-based view for the :py:class:`.EventSystem`.
     Used a progressbar to display the progress of each event as well as the overall progress.
     For terminals that don't support it, the progress is prettyprinted as json to the terminal.
-    '''
+    """
+
     def __init__(self):
-        '''
+        """
         Parameters
         ----------
         pbars: dict<str, ProgressBar>
             Contains for each event a progressbar.
-        '''
+        """
         self.pbars = {}
         self.info_writer = None
         self.progress_gen = self.progress_gen()
 
     def create_progress_bar(self, event):
-        '''
+        """
         Create a :py:class:`.ProgressBar` for the `event` if none exists yet.
         Otherwise return the bar.
 
@@ -52,19 +52,19 @@ class CLIEventDisplay:
         -------
         bool, ProgressBar.
             If the progressbar is newly created, the progressbar object.
-        '''
-        if not event in self.pbars:
+        """
+        if event not in self.pbars:
 
             def get_shared_widgets(event_name):
                 event_name = event_name.ljust(event_length)[:event_length]
-                return [event_name, ': ', Percentage(), ' ']
+                return [event_name, ': ', progressbar.Percentage(), ' ']
 
-            widgets = get_shared_widgets(event) + [Bar(marker=RotatingMarker()), ' ', ETA()]
+            widgets = get_shared_widgets(event) + [progressbar.Bar(marker=progressbar.RotatingMarker()), ' ', progressbar.ETA()]
 
             if event == MyEventSystem.EVENT_TOTAL_PROGRESS:
-                widgets = get_shared_widgets(EVENT_OVERALL_PROGRESS) + [Bar('>'), ReverseBar('<'), ' ', ETA()]
+                widgets = get_shared_widgets(EVENT_OVERALL_PROGRESS) + [progressbar.Bar('>'), progressbar.ReverseBar('<'), ' ', progressbar.ETA()]
 
-            pbar = ProgressBar(fd=TerminalWriter(0, idx=self.get_progressbar_idx()), widgets=widgets, maxval=1.0).start()
+            pbar = progressbar.ProgressBar(fd=TerminalWriter(0, idx=self.get_progressbar_idx()), widgets=widgets, maxval=1.0).start()
             self.pbars[event] = pbar
 
             return True, pbar
@@ -76,7 +76,7 @@ class CLIEventDisplay:
 
     @staticmethod
     def is_finished(progess_dict):
-        '''
+        """
         Check if all events of the `progess_dict` are finished (value: 1).
 
         Parameters
@@ -86,7 +86,7 @@ class CLIEventDisplay:
         Returns
         -------
         bool
-        '''
+        """
         return all(imap(lambda x: x == 1, progess_dict.values()))
 
     def progress_gen(self):
@@ -95,13 +95,13 @@ class CLIEventDisplay:
                 yield c
 
     def print_progress(self, progress_dict):
-        '''
+        """
         Print the progress for each event of `progess_dict`.
 
         Parameters
         ----------
         progress_dict: dict<str, float>
-        '''
+        """
 
         if curses_ok:
             # iterate over events and progress
@@ -126,7 +126,7 @@ class CLIEventDisplay:
                     pbar.update(progress)
 
             if self.info_writer is None:
-                self.info_writer = TerminalWriter(0, idx = self.get_progressbar_idx() + INFOBAR_PADDING_VERTICAL)
+                self.info_writer = TerminalWriter(0, idx=self.get_progressbar_idx() + INFOBAR_PADDING_VERTICAL)
             msg = 'Scenario starting: %s' % next(self.progress_gen)
             self.info_writer.write(msg)
         else:

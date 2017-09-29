@@ -1,15 +1,17 @@
 import subprocess
 from collections import defaultdict
 
+from miniworld.model.network.linkqualitymodels import LinkQualityConstants
 from ordered_set import OrderedSet
 
 from miniworld import log
 from miniworld.Scenario import scenario_config
 from miniworld.model.network.backends.AbstractConnection import AbstractConnection
-from miniworld.model.network.linkqualitymodels.LinkQualityConstants import *
 from miniworld.model.network.linkqualitymodels.LinkQualityModelRange import LinkQualityModelNetEm
 from miniworld.model.singletons.Singletons import singletons
+
 __author__ = 'Nils Schmidt'
+
 
 def get_superclass_dynamic():
     assert scenario_config.is_network_backend_bridged_connection_mode_set()
@@ -19,18 +21,20 @@ def get_superclass_dynamic():
 
     return miniworld.model.network.backends.bridged.singledevice.ConnectionEbtables.ConnectionEbtables() if scenario_config.is_network_backend_bridged_connection_mode_single() else miniworld.model.network.backends.bridged.multidevice.ConnectionMultiBridges.ConnectionMultiBridges()
 
+
 def ConnectionDummy():
     class ConnectionDummy(AbstractConnection):
-        '''
+        """
 
-        '''
+        """
 
         EVENT_ROOT = "connection"
         EVENT_CONN_STATE_CHANGE = "conn_state_change"
         EVENT_LINK_SHAPE_ADD_CLASS = "link_shape_add_class"
         EVENT_LINK_SHAPE_ADD_QDISC = "link_shape_add_child"
         EVENT_LINK_SHAPE_ADD_FILTER = "link_shape_add_filter"
-        EVENT_ORDER = OrderedSet([EVENT_CONN_STATE_CHANGE, EVENT_LINK_SHAPE_ADD_QDISC, EVENT_LINK_SHAPE_ADD_CLASS, EVENT_LINK_SHAPE_ADD_FILTER])
+        EVENT_ORDER = OrderedSet([EVENT_CONN_STATE_CHANGE, EVENT_LINK_SHAPE_ADD_QDISC, EVENT_LINK_SHAPE_ADD_CLASS,
+                                  EVENT_LINK_SHAPE_ADD_FILTER])
 
         PREFIXES = ["connection"]
 
@@ -40,7 +44,8 @@ def ConnectionDummy():
         # TODO: INTERFACE FOR ShellCommandSerializer STUFF?
         # COMMON VARIABLES AND THIS METHOD
         def add_shell_command(self, event, cmd):
-            singletons.network_backend.shell_command_executor.add_command(self.EVENT_ROOT, event, self.id, cmd, self.PREFIXES)
+            singletons.network_backend.shell_command_executor.add_command(self.EVENT_ROOT, event, self.id, cmd,
+                                                                          self.PREFIXES)
 
         def run(self, cmd):
             return singletons.shell_helper.run_shell(self.id, cmd, prefixes=["tc"])
@@ -49,21 +54,21 @@ def ConnectionDummy():
             return self.interface
 
         ###############################################
-        ### Subclassed methods of AbstractConnection
+        # Subclassed methods of AbstractConnection
         ###############################################
 
         # TODO: #54,#55, adjust doc
         # TODO: #54, #55: refactor!
-        def start(self, start_activated = False):
+        def start(self, start_activated=False):
             pass
 
         ###############################################
-        ### Link Quality
+        # Link Quality
         ###############################################
 
         # TODO: implement adjustment with netem!
         def adjust_link_quality(self, link_quality_dict):
-            '''
+            """
 
             Parameters
             ----------
@@ -71,10 +76,10 @@ def ConnectionDummy():
 
             Returns
             -------
-            '''
+            """
 
             # assumes only equal interfaces can be connected to each other
-            bandwidth = link_quality_dict.get(LINK_QUALITY_KEY_BANDWIDTH)
+            bandwidth = link_quality_dict.get(LinkQualityConstants.LINK_QUALITY_KEY_BANDWIDTH)
 
             self.nlog.info("adjusting link quality ...")
 
@@ -104,13 +109,13 @@ def ConnectionDummy():
                         connection_id = self.get_connection_id(tap_local, tunnel_dev)
                         self.shape_device(tap_local, connection_id, link_quality_dict)
                         # NOTE: this happens at the other server!
-                        #self.shape_device(tap_remote, connection_id, link_quality_dict)
+                        # self.shape_device(tap_remote, connection_id, link_quality_dict)
                     else:
                         self.shape_device(tap_x, connection_id, link_quality_dict)
                         self.shape_device(tap_y, connection_id, link_quality_dict)
 
         def shape_device(self, dev_name, connection_id, link_quality_dict):
-            '''
+            """
             Parameters
             ----------
             dev_name : str
@@ -120,10 +125,9 @@ def ConnectionDummy():
             tc qdisc add dev $DEV root handle 1:0 htb default 12
             tc class add dev $DEV parent 1:0 classid 1:1 htb rate 190kbit ceil 190kbit
             tc class add dev $DEV parent 1:1 classid 1:12 htb rate 100kbit ceil 190kbit prio 2
-            '''
+            """
 
-            rate = link_quality_dict.get(LINK_QUALITY_KEY_BANDWIDTH)
-            delay = link_quality_dict.get(LINK_QUALITY_KEY_DELAY)
+            rate = link_quality_dict.get(LinkQualityConstants.LINK_QUALITY_KEY_BANDWIDTH)
 
             if rate is not None:
 
@@ -195,8 +199,8 @@ def ConnectionDummy():
         ###############################################
 
         # TODO: RENAME!
-        def set_connection_state(self,up=True):
-            '''
+        def set_connection_state(self, up=True):
+            """
 
             Parameters
             ----------
@@ -206,7 +210,7 @@ def ConnectionDummy():
             Returns
             -------
 
-            '''
+            """
             is_hubwifi = self.connection_info.is_central
 
             if is_hubwifi:
@@ -219,7 +223,8 @@ def ConnectionDummy():
                 remote_node, if_remote_node, local_emu_node, if_local_emu_node = self.get_remote_node()
 
                 # always produce the same dev name => sort nodes by id
-                node_id_1, node_id_2 = (remote_node.id, local_emu_node.id) if remote_node.id < local_emu_node.id else (local_emu_node.id, remote_node.id)
+                node_id_1, node_id_2 = (remote_node.id, local_emu_node.id) if remote_node.id < local_emu_node.id else (
+                    local_emu_node.id, remote_node.id)
                 tunnel_dev_name = singletons.network_backend.get_tunnel_name(node_id_1, node_id_2)
                 tap_local = singletons.network_backend.get_tap_name(local_emu_node.id, if_local_emu_node)
 
@@ -249,8 +254,8 @@ def ConnectionDummy():
             self.cleanup_commands.add('tc qdisc del dev {dev_name} root'.format(dev_name=dev_name))
 
         ###############################################
-        ### Subclass for custom execution mode
-        ### like iproute2 vs. pyroute2. vs brctl
+        # Subclass for custom execution mode
+        # like iproute2 vs. pyroute2. vs brctl
         ###############################################
 
         # # TODO: #84 move to NetworkBackendBridgedMultiDevice
@@ -263,13 +268,11 @@ def ConnectionDummy():
         def tap_link_up_remote(self, tap_x, tap_y, up=True):
             raise NotImplementedError
 
-
     return ConnectionDummy
 
+
 def Connection():
-    class Connection(
-        # choose connection for connection mode
-        get_superclass_dynamic()):
+    class Connection(get_superclass_dynamic()):  # choose connection for connection mode
         pass
 
     return Connection

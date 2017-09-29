@@ -1,11 +1,12 @@
 from miniworld import singletons
 from miniworld.model.network.backends.bridged.Connection import ConnectionDummy
 
+
 def ConnectionMultiBridges():
     class ConnectionMultiBridges(ConnectionDummy()):
 
         #########################################
-        ### Superclass stuff
+        # Superclass stuff
         #########################################
 
         def tap_link_up(self, tap_x, tap_y, up=True):

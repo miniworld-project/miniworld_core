@@ -1,19 +1,15 @@
 from collections import defaultdict
 
-from ordered_set import OrderedSet
-
 from miniworld import log
 from miniworld.Scenario import scenario_config
-from miniworld.model.network.linkqualitymodels.LinkQualityModelRange import LinkQualityModelNetEm
 from miniworld.model.singletons.Singletons import singletons
 from miniworld.model.network.backends.bridged.Connection import ConnectionDummy
 from miniworld.util import PathUtil
-from miniworld.model.network.linkqualitymodels.LinkQualityConstants import *
 
 
 def ConnectionEbtables():
     class ConnectionEbtables(ConnectionDummy()):
-        '''
+        """
         Ebtables setup example
         ----------------------
         # flush rules
@@ -42,8 +38,7 @@ def ConnectionEbtables():
         --------------
         ebtables -D FORWARD -i tap_00002_2 -o tap_00003_2 -j ACCEPT
 
-        '''
-
+        """
 
         policy_accept = "ACCEPT"
         policy_drop = "DROP"
@@ -59,7 +54,7 @@ def ConnectionEbtables():
                                                                                   atomic_file=atomic_file_str)
 
         ebtable_cmd_atomic_commit = "{ebtables} {atomic_file} --atomic-commit".format(ebtables=ebtables_cmd,
-                                                                                  atomic_file=atomic_file_str)
+                                                                                      atomic_file=atomic_file_str)
 
         path_connection_log = PathUtil.get_log_file_path("ebtable_connections.txt")
 
@@ -79,10 +74,10 @@ def ConnectionEbtables():
         # TODO: we should use hosts rather than interfaces here!
         # dict<(str, str>, int>
         # for each connection a connection identifier
-        connections = defaultdict(lambda : ConnectionEbtables.inc_counter())
+        connections = defaultdict(lambda: ConnectionEbtables.inc_counter())
 
         #########################################
-        ### Overwrite connection handling methods
+        # Overwrite connection handling methods
         #########################################
 
         # TODO: #84:
@@ -114,7 +109,6 @@ def ConnectionEbtables():
         def run_shell(cmd):
             return singletons.shell_helper.run_shell(ConnectionEbtables.__class__.__name__, cmd, prefixes=["ebtables"])
 
-
         @staticmethod
         def set_ebtables_forward_policy_accept():
             ConnectionEbtables.set_ebtables_forward_policy(ConnectionEbtables.policy_accept)
@@ -132,7 +126,6 @@ def ConnectionEbtables():
             ))
 
         def _get_ebtables_cmd(self, chain, tap_x, tap_y, up):
-
             # insert or delete?
             up_str = "-I" if up else "-D"
             # use ebtables atomic mode only in batch mode
@@ -145,18 +138,19 @@ def ConnectionEbtables():
             with open(self.path_connection_log, "a") as f:
                 f.write("%s,%s: %d\n" % (tap_x, tap_y, connection_id))
 
-            return "{ebtables} {atomic_prefix} {up_str} {chain} -i {tap_x} -o {tap_y} -j {policy}".format(ebtables=self.ebtables_cmd,
-                                                                                                          atomic_prefix=self.get_ebtables_atomix_prefix(),
-                                                                                                          up_str=up_str,
-                                                                                                          chain=chain,
-                                                                                                          tap_x=tap_x,
-                                                                                                          tap_y=tap_y,
-                                                                                                          policy=mark_str
-                                                                                                          )
+            return "{ebtables} {atomic_prefix} {up_str} {chain} -i {tap_x} -o {tap_y} -j {policy}".format(
+                ebtables=self.ebtables_cmd,
+                atomic_prefix=self.get_ebtables_atomix_prefix(),
+                up_str=up_str,
+                chain=chain,
+                tap_x=tap_x,
+                tap_y=tap_y,
+                policy=mark_str
+            )
 
         @staticmethod
         def get_ebtables_atomix_prefix():
-            return  "--atomic-file %s" % ConnectionEbtables.atomic_file if scenario_config.is_network_backend_bridged_execution_mode_batch() else ""
+            return "--atomic-file %s" % ConnectionEbtables.atomic_file if scenario_config.is_network_backend_bridged_execution_mode_batch() else ""
 
         @staticmethod
         def get_ebtables_chain_cmd(name, policy):
@@ -167,9 +161,10 @@ def ConnectionEbtables():
 
         @staticmethod
         def get_ebtables_redirect_cmd(br_name):
-            return "{ebtables} {atomic_prefix} -A FORWARD --logical-in {br_name} -j {br_name}".format(ebtables=ConnectionEbtables.ebtables_cmd,
-                                                                                                      atomic_prefix=ConnectionEbtables.get_ebtables_atomix_prefix(),
-                                                                                                      br_name=br_name)
+            return "{ebtables} {atomic_prefix} -A FORWARD --logical-in {br_name} -j {br_name}".format(
+                ebtables=ConnectionEbtables.ebtables_cmd,
+                atomic_prefix=ConnectionEbtables.get_ebtables_atomix_prefix(),
+                br_name=br_name)
 
         @staticmethod
         def get_ebtables_clear_cmd():
@@ -189,6 +184,5 @@ def ConnectionEbtables():
         def _get_default_class(self):
             # use filter instead
             return ""
-
 
     return ConnectionEbtables

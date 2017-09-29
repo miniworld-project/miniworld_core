@@ -1,21 +1,21 @@
-from miniworld.log import get_node_logger, log
+from miniworld.log import log
 from miniworld.model.network.backends.EmulationNodeNetworkBackend import EmulationNodeNetworkBackend
 from miniworld.model.singletons.Singletons import singletons
-from miniworld.model.network.interface import Interfaces
-from miniworld.model.network.interface.Interface import *
+from miniworld.model.network.interface import Interfaces, Interface
 
 __author__ = 'Nils Schmidt'
+
 
 class EmulationNodeNetworkBackendBridgedMultiDevice(EmulationNodeNetworkBackend):
 
     def __init__(self, network_backend_bootstrapper, node_id,
-              # network
-              interfaces = None, management_switch = False):
+                 # network
+                 interfaces=None, management_switch=False):
         interfaces = self.adjust_interfaces_to_number_of_links(node_id, interfaces)
         super(EmulationNodeNetworkBackendBridgedMultiDevice, self).__init__(network_backend_bootstrapper, node_id, interfaces=interfaces, management_switch=management_switch)
 
     def adjust_interfaces_to_number_of_links(self, node_id, interfaces):
-        '''
+        """
         For each connection, add an additional interface.
 
         Parameters
@@ -26,15 +26,15 @@ class EmulationNodeNetworkBackendBridgedMultiDevice(EmulationNodeNetworkBackend)
         Returns
         -------
         Interfaces
-        '''
+        """
 
         adjusted_interfaces = []
         for _if in interfaces:
-            if type(_if) != HubWiFi and type(_if) != Management:
+            if not isinstance(_if, Interface.HubWiFi) and not isinstance(_if, Interface.Management):
                 log.debug("connections for '%s':'%s'", node_id, singletons.network_backend.get_all_connections().get(node_id))
-                adjusted_interfaces.extend( type(_if) for _ in singletons.network_backend.get_all_connections()[node_id] )
+                adjusted_interfaces.extend(type(_if) for _ in singletons.network_backend.get_all_connections()[node_id])
             else:
-                adjusted_interfaces.append( type(_if) )
+                adjusted_interfaces.append(type(_if))
 
         return Interfaces.Interfaces.factory(adjusted_interfaces)
 

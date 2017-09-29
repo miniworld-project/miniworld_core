@@ -1,5 +1,5 @@
 def assert_topologies_equal(t1, t2):
-    ''' Compare topologies but ignore order inside value list '''
+    """ Compare topologies but ignore order inside value list """
     assert t1.keys() == t2.keys()
 
     t1s, t2s = {}, {}

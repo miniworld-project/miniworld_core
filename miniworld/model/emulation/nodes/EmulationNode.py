@@ -5,12 +5,13 @@ from miniworld.Config import config
 from miniworld.Scenario import scenario_config
 from miniworld.model import StartableObject
 
-
-__author__ = 'Nils Schmidt'
 from io import StringIO
 
 from miniworld.log import get_node_logger
 from miniworld.model.ShellCmdWrapper import ShellCmdWrapper
+
+__author__ = 'Nils Schmidt'
+
 
 # TODO: REMOVE
 # CMD_TEMPLATE_DISABLE_IPTABLES = """
@@ -29,7 +30,7 @@ from miniworld.model.ShellCmdWrapper import ShellCmdWrapper
 # TODO: #54,#55: adjust doc
 @total_ordering
 class EmulationNode(StartableObject.StartableSimulationStateObject, ShellCmdWrapper):
-    ''' Models a node in a mesh network.
+    """ Models a node in a mesh network.
 
     A node consists of a QEMU instance running e.g. an OpenWRT image.
     The nodes are connected via a VDE Switch, which are plugged together using a cable, a wirefilter.
@@ -45,11 +46,10 @@ class EmulationNode(StartableObject.StartableSimulationStateObject, ShellCmdWrap
     network_mixin : EmulationNodeNetworkBackend
     network_backend_bootstrapper : NetworkBackendBootStrapper
     network_mixin : NetworkMixin, optional (default is taken :py:class:`.NetworkBackendBootStrapper`
-    '''
-
+    """
 
     #############################################################
-    ### Factory stuff
+    # Factory stuff
     #############################################################
 
     @staticmethod
@@ -66,7 +66,7 @@ class EmulationNode(StartableObject.StartableSimulationStateObject, ShellCmdWrap
         return EmulationNode(id, network_backend_bootstrapper, interfaces)
 
     #############################################################
-    ### Magic and private methods
+    # Magic and private methods
     #############################################################
 
     def __init__(self, node_id, network_backend_bootstrapper, interfaces, network_mixin=None):
@@ -76,7 +76,8 @@ class EmulationNode(StartableObject.StartableSimulationStateObject, ShellCmdWrap
 
         if network_mixin is None:
             network_mixin_type = network_backend_bootstrapper.emulation_node_network_backend_type
-            self.network_mixin = network_mixin_type(network_backend_bootstrapper, node_id, interfaces=interfaces, management_switch=config.is_management_switch_enabled())
+            self.network_mixin = network_mixin_type(network_backend_bootstrapper, node_id, interfaces=interfaces,
+                                                    management_switch=config.is_management_switch_enabled())
         else:
             self.network_mixin = network_mixin
 
@@ -115,14 +116,14 @@ class EmulationNode(StartableObject.StartableSimulationStateObject, ShellCmdWrap
 
     def __repr__(self):
         return str(self)
-        #return '%s(%s, %s)' % (self.__class__.__name__, self.id, self.network_mixin)
+        # return '%s(%s, %s)' % (self.__class__.__name__, self.id, self.network_mixin)
 
     def __hash__(self):
         return hash(self.name)
 
     # TODO: adjust DOC
     def _start(self, *args, **kwargs):
-        '''
+        """
         Starting a node involves the following steps:
 
         1. Start the :py:class:`.EmulationNodeNetworkBackend.
@@ -134,7 +135,7 @@ class EmulationNode(StartableObject.StartableSimulationStateObject, ShellCmdWrap
         ----------
         flo_post_boot_script: file-like-object, optional (default is None)
             Run commands from `flo_post_boot_script` on the shell after successful boot.
-        '''
+        """
 
         flo_post_boot_script = kwargs.get("flo_post_boot_script")
         if flo_post_boot_script is not None:
@@ -153,7 +154,7 @@ class EmulationNode(StartableObject.StartableSimulationStateObject, ShellCmdWrap
         self.nlog.info("node running ...")
 
         # notify EventSystem even if there are no commands
-        with es.event_no_init(es.EVENT_VM_SHELL_PRE_NETWORK_COMMANDS, finish_ids=[self.id]) as ev:
+        with es.event_no_init(es.EVENT_VM_SHELL_PRE_NETWORK_COMMANDS, finish_ids=[self.id]):
             # do this immediately after the node has been started
             self.run_pre_network_shell_commands(flo_post_boot_script)
 
@@ -164,12 +165,12 @@ class EmulationNode(StartableObject.StartableSimulationStateObject, ShellCmdWrap
         pass
 
     #############################################################
-    ### Shell-command execution
+    # Shell-command execution
     #############################################################
 
     # TODO: #54,#55: adjust doc
     def run_pre_network_shell_commands(self, flo_post_boot_script, *args, **kwargs):
-        '''
+        """
         Run user commands
 
         Parameters
@@ -180,7 +181,7 @@ class EmulationNode(StartableObject.StartableSimulationStateObject, ShellCmdWrap
 
         Returns
         -------
-        '''
+        """
 
         # run post boot script in instance
         if flo_post_boot_script is not None:
@@ -190,22 +191,22 @@ class EmulationNode(StartableObject.StartableSimulationStateObject, ShellCmdWrap
 
     # TODO: #54,#55: adjust doc
     def run_post_network_shell_commands(self, *args, **kwargs):
-        '''
+        """
         Run user commands. This method is called from the :py:class:`.SimulationManager`
          after the network has been set up.
-        '''
+        """
         # TODO: use node_id everywhere possible for scenario_config.*()
         # # notify EventSystem even if there are no commands
         es = singletons.event_system
-        with es.event_no_init(es.EVENT_VM_SHELL_POST_NETWORK_COMMANDS, finish_ids=[self.id]) as ev:
-            commands = scenario_config.get_all_shell_commands_post_network_start(node_id = self.id)
+        with es.event_no_init(es.EVENT_VM_SHELL_POST_NETWORK_COMMANDS, finish_ids=[self.id]):
+            commands = scenario_config.get_all_shell_commands_post_network_start(node_id=self.id)
             if commands:
                 self.virtualization_layer.run_commands_eager(StringIO(commands))
 
             self.nlog.info("post_network_shell_commands done")
 
     #############################################################
-    ### Notify NetworkBackend
+    # Notify NetworkBackend
     #############################################################
 
     # TODO: create interface
@@ -214,4 +215,3 @@ class EmulationNode(StartableObject.StartableSimulationStateObject, ShellCmdWrap
 
     def do_network_config_after_pre_shell_commands(self):
         self.network_mixin.do_network_config_after_pre_shell_commands(self)
-

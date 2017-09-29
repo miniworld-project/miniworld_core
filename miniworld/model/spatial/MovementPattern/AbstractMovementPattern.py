@@ -1,10 +1,11 @@
-
 # encoding: utf-8
+
+
+from miniworld.model.singletons.Singletons import singletons
 
 __author__ = "Patrick Lampe"
 __email__ = "uni at lampep.de"
 
-from miniworld.model.singletons.Singletons import singletons
 
 class AbstractMovementPattern:
     def __init__(self):
@@ -29,7 +30,6 @@ class AbstractMovementPattern:
         Point
         """
         return singletons.spatial_singleton.get_random_point()
-
 
     def get_name(self):
         """
@@ -67,17 +67,17 @@ class AbstractMovementPattern:
         return self.location.lat_lon_to_string()[1]
 
     def __walk_m(self, distance_in_m):
-        if(self.next_map_node is not None and distance_in_m < self.distance_to_next_map_node_in_m):
+        if (self.next_map_node is not None and distance_in_m < self.distance_to_next_map_node_in_m):
             self.location = self.location.offset_in_m(self.heading, float(distance_in_m))
             self.distance_to_next_map_node_in_m = self.distance_to_next_map_node_in_m - distance_in_m
         else:
-            if(self.next_map_node is not None and self.distance_to_next_map_node_in_m is not None):
+            if (self.next_map_node is not None and self.distance_to_next_map_node_in_m is not None):
                 distance_to_go = distance_in_m - self.distance_to_next_map_node_in_m
                 last_map_node = self.current_map_node
                 self.current_map_node = self.next_map_node
                 self.location = self.current_map_node.location
                 self.next_map_node = self.get_next_map_node(self.current_map_node, last_map_node)
-                if(self.next_map_node is not None):
+                if (self.next_map_node is not None):
                     self.distance_to_next_map_node_in_m = self.current_map_node.get_distance_in_m(self.next_map_node)
                     self.heading = self.current_map_node.get_heading(self.next_map_node)
                     self.__walk_m(distance_to_go)

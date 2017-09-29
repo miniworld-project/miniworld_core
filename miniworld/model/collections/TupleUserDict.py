@@ -4,7 +4,7 @@ from collections import UserDict
 class TupleUserDict(UserDict):
 
     #########################################
-    ### Implement these in a subclass
+    # Implement these in a subclass
     #########################################
 
     # TODO: implement same behaviour via magic methods ...
@@ -13,15 +13,15 @@ class TupleUserDict(UserDict):
         raise NotImplementedError
 
     #########################################
-    ### Magic Methods
+    # Magic Methods
     #########################################
 
     def __getitem__(self, item):
-        '''
+        """
         Parameters
         ----------
         item : (Interface, Interface)
-        '''
+        """
         item = self._get_key(*item)
 
         # old-style class, no super
@@ -30,33 +30,33 @@ class TupleUserDict(UserDict):
         return res
 
     def __setitem__(self, key, item):
-        '''
+        """
         Parameters
         ----------
         key: (Interface, Interface)
         item : object
-        '''
+        """
         key = self._get_key(*key)
         # old-style class, no super
         return UserDict.__setitem__(self, key, item)
 
     def __delitem__(self, key):
-        '''
+        """
         Parameters
         ----------
         item : (Interface, Interface)
-        '''
+        """
         key = self._get_key(*key)
         # old-style class, no super
         return UserDict.__delitem__(self, key)
 
     # NOTE: important for get() to work properly!
     def __contains__(self, key):
-        '''
+        """
         Parameters
         ----------
         key : (Interface, Interface)
-        '''
+        """
         key = self._get_key(*key)
         # old-style class, no super
         return UserDict.__contains__(self, key)

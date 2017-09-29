@@ -6,8 +6,9 @@ from miniworld.log import log
 
 __author__ = "Nils Schmidt"
 
+
 def parse_core_config_file(file_path, include_interfaces=False):
-    '''
+    """
     Parse the core xml config file and return which nodes are connected with each other.
 
     Parameters
@@ -38,7 +39,7 @@ def parse_core_config_file(file_path, include_interfaces=False):
         </channel>
       </network>
       ...
-      '''
+      """
     # Open XML document using minidom parser
     DOMTree = xml.dom.minidom.parse(file_path)
     scenario = DOMTree.documentElement
@@ -81,8 +82,9 @@ def parse_core_config_file(file_path, include_interfaces=False):
                                 connections[node_id].add(cur_node_id)
     return connections
 
+
 def parse_core_config_file_positions(file_path):
-    '''
+    """
     Parse the core xml config file and return the positions of the nodes.
 
     Parameters
@@ -111,7 +113,7 @@ def parse_core_config_file_positions(file_path):
         <point lat="47.550510742" lon="-122.106359809" type="gps"/>
       </host>
     ...
-    '''
+    """
     # Open XML document using minidom parser
     # TODO: #32: error handling!
     DOMTree = xml.dom.minidom.parse(file_path)
@@ -135,16 +137,17 @@ def parse_core_config_file_positions(file_path):
 
             positions[host_id] = (lat, lon)
 
-
     return positions
+
 
 def check_version(version):
     if float(version) < 1.0:
         raise ValueError("Unsupported config file version! Should be 1.0 or greater!")
 
+
 if __name__ == '__main__':
 
-    #pprint(parse_core_config_file_positions('MiniWorld_Scenarios/serval_paper/core_scenarios/random_100_1.xml'))
-    #pprint(parse_core_config_file("/Users/nils/Dropbox/uni/Master/my_nicer/playground/core-serval/docker/chain3.xml"))
+    # pprint(parse_core_config_file_positions('MiniWorld_Scenarios/serval_paper/core_scenarios/random_100_1.xml'))
+    # pprint(parse_core_config_file("/Users/nils/Dropbox/uni/Master/my_nicer/playground/core-serval/docker/chain3.xml"))
 
     pprint(parse_core_config_file('MiniWorld_Scenarios/experiments/distributed/chain_512.xml'))

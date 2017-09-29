@@ -5,9 +5,7 @@ from miniworld.Config import config
 from miniworld.concurrency.ExceptionStopThread import ExceptionStopThread
 from miniworld.errors import Unsupported
 from miniworld.log import log
-from miniworld.model.emulation.nodes.EmulationNode import EmulationNode
 from miniworld.model.emulation.nodes.virtual.CentralNode import is_central_node_interface
-from miniworld.model.emulation.nodes.virtual.ManagementNode import ManagementNode
 from miniworld.model.network.backends import NetworkBackends
 from miniworld.model.network.interface.Interface import HubWiFi
 from miniworld.model.singletons.Singletons import singletons
@@ -19,8 +17,10 @@ TIME_NODE_STATUS_REFRESH = 5
 
 # TODO: RENAME TO NODES?
 # TODO: REFACTOR!
+
+
 class NodeStarter:
-    '''
+    """
     Starts the emulation nodes together with all its subcomponents: qemu, vde_switch
 
     Attributes
@@ -34,7 +34,8 @@ class NodeStarter:
     network_backend_name : str
     event_nodes_started : Event
     lock : Lock
-    '''
+    """
+
     def __init__(self, node_ids, network_backend_name):
 
         self.node_ids = node_ids
@@ -50,11 +51,11 @@ class NodeStarter:
         self.thread_check_nodes_started = None
 
     #################################################
-    ### Thread methods
+    # Thread methods
     #################################################
 
     def print_overall_node_status(self):
-        ''' Print the nodes not ready yet '''
+        """ Print the nodes not ready yet """
 
         while not self.event_nodes_started.is_set():
             nodes_not_ready = self.nodes_not_ready()
@@ -69,11 +70,11 @@ class NodeStarter:
     def start_nodes(self,
                     network_backend,
                     # node options
-                    path_qemu_base_image, stringio_post_boot_script, interfaces = None,
+                    path_qemu_base_image, stringio_post_boot_script, interfaces=None,
                     # start options
-                    parallel = False,
+                    parallel=False,
                     ):
-        '''
+        """
         Start the nodes (a)synchronously.
 
         Parameters
@@ -90,7 +91,7 @@ class NodeStarter:
         Returns
         -------
         list<EmulationNode>, ManagementNode
-        '''
+        """
 
         if not self.node_ids:
             log.info("there are no nodes to start!")
@@ -99,7 +100,7 @@ class NodeStarter:
         self.assert_only_one_wifibridge_interface(interfaces)
 
         # keep track of started nodes and print the missing ones each time unit ...
-        self.thread_check_nodes_started = ExceptionStopThread.run_fun_threaded_n_log_exception(target = self.print_overall_node_status, tkwargs=dict(name="Nodes Start Progress"))
+        self.thread_check_nodes_started = ExceptionStopThread.run_fun_threaded_n_log_exception(target=self.print_overall_node_status, tkwargs=dict(name="Nodes Start Progress"))
         self.thread_check_nodes_started.daemon = True
         self.thread_check_nodes_started.start()
 
@@ -116,8 +117,8 @@ class NodeStarter:
                 args.append((i,
                              path_qemu_base_image,
                              deepcopy(stringio_post_boot_script)
-                    )
-                )
+                             )
+                            )
                 # init events for first display
                 singletons.event_system.init_events_for_node(i)
 
@@ -155,7 +156,6 @@ class NodeStarter:
             self.event_nodes_started.set()
             self.thread_check_nodes_started.join()
 
-
     @staticmethod
     def assert_only_one_wifibridge_interface(interfaces):
         if len(list(filter(lambda x: is_central_node_interface(x), interfaces))) > 1:
@@ -163,14 +163,14 @@ class NodeStarter:
 
     # TODO: #82: DOC, maybe singleton ref?
     def start_management_node(self):
-        '''
+        """
         Start the management switch and connect all other nodes to it.
         Also store a reference in the :py:class:`.NetworkManager`.
 
         Returns
         -------
         ManagementNode
-        '''
+        """
 
         network_backend_bootstrapper = NetworkBackends.get_current_network_backend_bootstrapper()
         if config.is_management_switch_enabled():
@@ -182,7 +182,7 @@ class NodeStarter:
                 return None
 
             management_node = network_backend_bootstrapper.management_node_type(network_backend_bootstrapper)
-            management_node.start(switch = True, bridge_dev_name=config.get_bridge_tap_name())
+            management_node.start(switch=True, bridge_dev_name=config.get_bridge_tap_name())
             for node in self.nodes:
                 management_node.connect_to_emu_node(singletons.network_backend, node)
             NetworkManager.management_node = management_node
@@ -190,13 +190,13 @@ class NodeStarter:
             return management_node
 
     def _start_node(self, *args):
-        '''
+        """
         Start a node.
 
         Returns
         -------
         EmulationNode
-        '''
+        """
         args = args[0]
 
         # TODO: #54,#55
@@ -210,14 +210,14 @@ class NodeStarter:
         return node
 
     def nodes_not_ready(self):
-        '''
+        """
         Get all all nodes which have not started yet.
         Remembers the last started node id.
 
         Returns
         -------
         set<Node>
-        '''
+        """
         all_node_ids = set(self.node_ids)
 
         nodes_remaining = all_node_ids.difference(set(map(lambda node: node.id, self.nodes_running)))

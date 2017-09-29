@@ -1,9 +1,11 @@
 # encoding: utf-8
 
+
+from miniworld.model.spatial.Location import Location
+
 __author__ = "Patrick Lampe"
 __email__ = "uni at lampep.de"
 
-from miniworld.model.spatial.Location import Location
 
 class ReplayMovementPattern:
     def __init__(self, file_path, node_id):

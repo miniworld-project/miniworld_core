@@ -1,7 +1,6 @@
 import gzip
 import json
 import os
-import shutil
 import signal
 import subprocess
 import sys
@@ -12,8 +11,6 @@ from typing import List, Dict
 
 import pytest
 import requests
-
-from miniworld.util import JSONConfig
 
 devnull = open(os.devnull, "w")
 
@@ -72,12 +69,16 @@ def create_runner(tmpdir_factory, request, config_path):
 
         @staticmethod
         def run_mwcli_command(custom_args: List[str], *args, **kwargs) -> bytes:
-            return subprocess.check_output(['mwcli', '--addr', os.environ.get('MW_SERVER_ADRR', '127.0.0.1')] + custom_args,
-                                           *args, **kwargs)
+            return subprocess.check_output(
+                ['mwcli', '--addr', os.environ.get('MW_SERVER_ADRR', '127.0.0.1')] + custom_args,
+                *args, **kwargs)
+
         @staticmethod
         def run_mwcli_command_silently(custom_args: List[str], *args, **kwargs) -> bytes:
-            return subprocess.check_call(['mwcli', '--addr', os.environ.get('MW_SERVER_ADRR', '127.0.0.1')] + custom_args,
-                                           *args, stdout=devnull, stderr=devnull, **kwargs)
+            return subprocess.check_call(
+                ['mwcli', '--addr', os.environ.get('MW_SERVER_ADRR', '127.0.0.1')] + custom_args,
+                *args, stdout=devnull, stderr=devnull, **kwargs)
+
         @staticmethod
         def run_mwcli_command_json_result(custom_args: List[str]) -> Dict:
             return json.loads(strip_output(Runner.run_mwcli_command(custom_args).decode()))
@@ -108,11 +109,11 @@ def create_runner(tmpdir_factory, request, config_path):
             self.start_scenario(self.scenario)
 
         def start_scenario(self, scenario, force_snapshot_boot=False):
-            '''
+            """
             Parameters
             ----------
             scenario: dict
-            '''
+            """
             with open(self.scenario, 'w') as f:
                 scenario_json = json.dumps(scenario, indent=4, sort_keys=True)
                 f.write(scenario_json)
@@ -130,41 +131,41 @@ def create_runner(tmpdir_factory, request, config_path):
             self.run_mwcli_command(['step'])
 
         def get_connections(self):
-            '''
+            """
             Returns
             -------
             dict
-            '''
+            """
             return self.run_mwcli_command_json_result(['info', 'connections'])
 
         def get_links(self):
-            '''
+            """
             Returns
             -------
             dict
-            '''
+            """
             return self.run_mwcli_command_json_result(['info', 'links'])
 
         def get_distances(self):
-            '''
+            """
             Returns
             -------
             dict
-            '''
+            """
             return self.run_mwcli_command_json_result(['info', 'distances'])
 
         def get_addr(self):
-            '''
+            """
             Returns
             -------
             dict
-            '''
+            """
             return self.run_mwcli_command_json_result(['info', 'addr'])
 
         @staticmethod
         def connect_to_server():
             print('connecting to server')
-            while 1:
+            while True:
                 try:
                     Runner.run_mwcli_command_silently(['ping'])
                     sys.stderr.write('.')

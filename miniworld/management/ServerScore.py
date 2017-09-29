@@ -1,7 +1,6 @@
 import re
 
 import psutil
-from multiprocessing import cpu_count
 
 from miniworld.util import ConcurrencyUtil
 
@@ -9,9 +8,11 @@ from miniworld.util import ConcurrencyUtil
 def factory():
     return ServerScore
 
-# TODO: add kvm capability
-class ServerScore(object):
 
+# TODO: add kvm capability
+
+
+class ServerScore(object):
     SCORE_CPU = "cpu"
     SCORE_FREE_MEM = "free_mem"
 
@@ -24,8 +25,8 @@ class ServerScore(object):
         # network_speed =
         return \
             {
-                self.SCORE_CPU : total_bogomips,
-                self.SCORE_FREE_MEM : free_mem
+                self.SCORE_CPU: total_bogomips,
+                self.SCORE_FREE_MEM: free_mem
             }
 
     @staticmethod
@@ -38,12 +39,12 @@ class ServerScore(object):
 
     @staticmethod
     def get_bogomips():
-        '''
+        """
 
         Returns
         -------
         float
-        '''
+        """
         with open("/proc/cpuinfo") as f:
             output = f.read()
             return float(re.search("bogomips\s+:\s+(.*)", output).group(1))

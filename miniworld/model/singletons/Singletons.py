@@ -3,7 +3,7 @@ __author__ = 'Nils Schmidt'
 
 # TODO: #54,#55: adjust doc
 class Singletons:
-    '''
+    """
     Stores all singletons.
     The module `SingletonInit` shall be used to initialize them. Therefore, we prevent cyclic imports.
     Singletons which have state that shall be resetted when a new simulation is started, needs to
@@ -13,7 +13,7 @@ class Singletons:
     Attributes
     ----------
     event_system : EventSystem
-    '''
+    """
 
     def __init__(self):
         super(Singletons, self).__init__()
@@ -34,8 +34,9 @@ class Singletons:
 
 # TODO: #54,#55: EXTRACT CLASS
 #################################################
-### Singleton reference
+# Singleton reference
 #################################################
+
 
 singletons = Singletons()
 

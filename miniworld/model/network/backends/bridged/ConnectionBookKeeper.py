@@ -6,19 +6,19 @@ from miniworld.model.singletons.Resetable import Resetable
 
 
 class InterfaceStates(collections.UserDict):
-    '''
+    """
     No reset needed. Reset is done by :py:class:`.ConnectionBookKeeper`
-    '''
+    """
 
     def __init__(self, *args, **kwargs):
         collections.UserDict.__init__(self, *args, **kwargs)
 
     def __getitem__(self, item):
-        '''
+        """
         Parameters
         ----------
         item : str
-        '''
+        """
         try:
             # old-style class, no super
             res = collections.UserDict.__getitem__(self, item)
@@ -35,7 +35,7 @@ class InterfaceStates(collections.UserDict):
 
 
 class ConnectionBookKeeper(Resetable):
-    '''
+    """
     Keeps track of connections between hosts and the used tap devices.
 
     Attributes
@@ -43,7 +43,7 @@ class ConnectionBookKeeper(Resetable):
     connections : dict<(EmulationNode, EmulationNode), bool>
     interface_states : dict<str, bool>
         Remember for each the device whether it is up (True) or down
-    '''
+    """
 
     def __init__(self):
         object.__init__(self)
@@ -56,7 +56,7 @@ class ConnectionBookKeeper(Resetable):
 
     # TODO: check for bottleneck! better way?! use core file for tap dev mapping?
     def should_create_new_connection(self, emulation_node_x, emulation_node_y, interface_x, interface_y):
-        '''
+        """
         Check if the two tap devices used for the interfaces are already used.
         Moreover, check if there exists a connection between the two nodes yet.
 
@@ -66,7 +66,7 @@ class ConnectionBookKeeper(Resetable):
 
         Checking on demand if a connection shall be created might enable us to make this backend
         dynamic by hotplugging new tap devices into the nodes.
-        '''
+        """
 
         tap_x = singletons.network_backend.get_tap_name(emulation_node_x.id, interface_x)
         tap_y = singletons.network_backend.get_tap_name(emulation_node_y.id, interface_y)
@@ -80,7 +80,7 @@ class ConnectionBookKeeper(Resetable):
         return no_connection_between_hosts and no_tap_device_used_yet
 
     def remember_bidirectional_connection(self, emulation_node_x, emulation_node_y, interface_x, interface_y):
-        '''
+        """
         Remember which nodes are connected and which tap devices are already in use.
         This is because a tap device can only be connected to exactly one bridge.
 
@@ -93,7 +93,7 @@ class ConnectionBookKeeper(Resetable):
 
         Returns
         -------
-        '''
+        """
         tap_x = singletons.network_backend.get_tap_name(emulation_node_x.id, interface_x)
         tap_y = singletons.network_backend.get_tap_name(emulation_node_y.id, interface_y)
 

@@ -6,17 +6,19 @@ from miniworld.errors import Base
 from miniworld.repl.errors import REPLUnexpectedResult
 from miniworld.util import PathUtil
 
-__author__ = 'Nils Schmidt'
-
 from miniworld.log import get_node_logger
 
 from miniworld.repl.REPLable import REPLable
 
+__author__ = 'Nils Schmidt'
+
+
 class QemuMonitorSnapshotLoadError(Base):
     pass
 
+
 class QemuMonitorRepl(REPLable):
-    '''
+    """
 
     Qemu Monitor connection.
 
@@ -43,10 +45,9 @@ class QemuMonitorRepl(REPLable):
     nlog
         Extra node logger.
     id : int
-    '''
+    """
 
     def __init__(self, qemu):
-
 
         self.qemu = qemu
 
@@ -64,7 +65,7 @@ class QemuMonitorRepl(REPLable):
         self.path_uds_socket = self.get_qemu_sock_path(self.id)
 
     ###############################################
-    ### Monitor Commands
+    # Monitor Commands
     ###############################################
 
     def make_snapshot(self, name=None):
@@ -73,7 +74,7 @@ class QemuMonitorRepl(REPLable):
         self.run_commands_eager_check_ret_val(StringIO("savevm %s" % name))
 
     def loadvm(self, name):
-        '''
+        """
         Load a snapshot.
 
         Parameters
@@ -83,7 +84,7 @@ class QemuMonitorRepl(REPLable):
         Raises
         ------
         QemuMonitorSnapshotLoadError
-        '''
+        """
         try:
             if name is None:
                 name = self.qemu.get_snapshot_id()
@@ -92,7 +93,7 @@ class QemuMonitorRepl(REPLable):
             raise QemuMonitorSnapshotLoadError("Could not load '%s'" % name, caused_by=e)
 
     ###############################################
-    ### REPLable
+    # REPLable
     ###############################################
 
     @staticmethod
@@ -101,7 +102,6 @@ class QemuMonitorRepl(REPLable):
 
     def run_commands_eager_check_ret_val(self, flo, *args, **kwargs):
         def _return_value_checker(cmd, res):
-
             # TODO: this is only working for snapshot loading, is there a more generic approach?
             # QMP does not have to seem the needed features right now :/
             if re.search("Device '.*' does not have the requested snapshot '.*'", res):
@@ -114,27 +114,25 @@ class QemuMonitorRepl(REPLable):
                                        )
 
     def run_commands(self, flo, *args, **kwargs):
-        '''
+        """
         Returns
         -------
         dict
-        '''
+        """
         kwargs["timeout"] = config.get_repl_timeout()
-
-        name = self.get_verbose_logger_path()
 
         kwargs.update({
             'brief_logger': self.nlog,
             'verbose_logger': self.verbose_logger,
-            'shell_prompt' : '\\(qemu\\)',
-            'enter_shell_send_newline' : False
+            'shell_prompt': '\\(qemu\\)',
+            'enter_shell_send_newline': False
         })
         res = REPLable.run_commands(self, flo, *args, **kwargs)
         # keep generator
         return res
 
-#    def run_commands_eager(self, *args, **kwargs):
-#        return [json.loads(sub_res) for sub_res in REPLable.run_commands_eager(self, *args, **kwargs)]
+    #    def run_commands_eager(self, *args, **kwargs):
+    #        return [json.loads(sub_res) for sub_res in REPLable.run_commands_eager(self, *args, **kwargs)]
 
     def render_script_from_flo(self, flo):
         # overwrite default behaviour

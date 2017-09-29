@@ -15,9 +15,9 @@ from miniworld.model.network.backends.bridged.iproute2 import Constants
 
 def NetworkBackendBridgedIproute2():
     class NetworkBackendBridgedIproute2(NetworkBackendBridged.NetworkBackendBridged()):
-        '''
+        """
         Use iproute2 to setup the network.
-        '''
+        """
 
         def __init__(self, network_backend_boot_strapper):
             super(NetworkBackendBridgedIproute2, self).__init__(network_backend_boot_strapper)
@@ -31,10 +31,10 @@ def NetworkBackendBridgedIproute2():
             super(NetworkBackendBridgedIproute2, self).reset()
 
         def setup_shell_command_executor(self, shell_command_executor):
-            '''
+            """
             Init the :py:class:`.ShellCommandExecutor` and set the command orders.
             Necessary to parallelize the command execution.
-            '''
+            """
             super(NetworkBackendBridgedIproute2, self).setup_shell_command_executor(shell_command_executor)
 
             bridge_type = self.network_backend_bootstrapper.switch_type
@@ -71,7 +71,7 @@ def NetworkBackendBridgedIproute2():
                     try:
                         cmd = "ip -d -batch -"
                         log.info("changing network topology with '%s'. See '%s' for the commands." % (
-                        cmd, PATH_SHELL_COMMANDS))
+                            cmd, PATH_SHELL_COMMANDS))
                         ShellHelper.run_shell_with_input(cmd, ip_commands)
 
                     except subprocess.CalledProcessError as e:
@@ -89,9 +89,9 @@ def NetworkBackendBridgedIproute2():
                 self.shell_command_executor.run_commands()
 
         def after_distance_matrix_changed(self, *args, **kwargs):
-            '''
+            """
             Log shell commands used to setup the network topology.
-            '''
+            """
 
             with open(PATH_SHELL_COMMANDS, "a") as f:
                 f.write(self.shell_command_executor.get_verbose_info())
@@ -107,7 +107,7 @@ def NetworkBackendBridgedIproute2():
             tunnel_name = self.get_tunnel_name(emulation_node_x.id, emulation_node_y.id)
             # TODO:
             # new = False
-            if not tunnel_name in self.tunnels:
+            if tunnel_name not in self.tunnels:
                 # new = True
                 t = self.network_backend_bootstrapper.tunnel_type(emulation_node_x, emulation_node_y, remote_ip)
                 # with open(PathUtil.get_log_file_path("d_debug.txt"), "aw") as f:
@@ -125,7 +125,7 @@ def NetworkBackendBridgedIproute2():
             return self.tunnels[tunnel_name]
 
         def get_tunnel_name(self, emulation_node_x_id, emulation_node_y_id):
-            '''
+            """
             Order of arguments does not matter!
 
             Parameters
@@ -136,7 +136,7 @@ def NetworkBackendBridgedIproute2():
             Returns
             -------
             str
-            '''
+            """
             node_id_1, node_id_2 = sorted((emulation_node_x_id, emulation_node_y_id))
 
             def get_tunnel_name(prefix):

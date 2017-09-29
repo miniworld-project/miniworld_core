@@ -16,7 +16,7 @@ def NetworkBackendBridgedMultiDevice():
             return NetworkConfiguratorP2P
 
         #############################################################
-        ### NetworkBackendNotifications
+        # NetworkBackendNotifications
         #############################################################
 
         def do_network_topology_change(self):
@@ -25,10 +25,10 @@ def NetworkBackendBridgedMultiDevice():
         # TODO: put in NetworkBackend whether we have a central node or not ...
         def before_link_initial_start(self, network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info,
                                       start_activated=False, **kwargs):
-            '''
+            """
             Check if a connection shall be created between the nodes and the interfaces.
             Create for ach new connection a bridge.
-            '''
+            """
 
             connection = None
             # let the NetworkBackend decide whether the links really shall be connected
@@ -45,12 +45,12 @@ def NetworkBackendBridgedMultiDevice():
             return connected, bridge, connection
 
         #############################################################
-        ### Bridge/Connection handling
+        # Bridge/Connection handling
         #############################################################
 
         # TODO: move connection_book_keeper here ...
         def create_connection(self, emulation_node_x, emulation_node_y, interface_x, interface_y):
-            ''' Create a connection between the nodes for the given interfaces, but let the backend device whether a connection
+            """ Create a connection between the nodes for the given interfaces, but let the backend device whether a connection
             is needed/shall be created.
 
             Steps:
@@ -63,7 +63,7 @@ def NetworkBackendBridgedMultiDevice():
             -------
             bool, Bridge
                 First argument described whether a connection has been created and established.
-            '''
+            """
             connected = False
             connections = Connections([(emulation_node_x, interface_x), (emulation_node_y, interface_y)])
 
@@ -75,7 +75,7 @@ def NetworkBackendBridgedMultiDevice():
 
             is_one_tap_mode = is_hubwifi or is_mgmt_node
 
-            bridge, connection = None, None
+            bridge = None
 
             # we have only one tap here
             if is_one_tap_mode:

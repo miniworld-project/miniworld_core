@@ -15,8 +15,7 @@ from xmlrpc.server import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
 import netifaces
 
 # set PYTHONPATH
-sys.path.append(os.getcwd())
-
+sys.path.append(os.getcwd())  # noqa
 
 from miniworld.management.spatial import MovementDirectorFactory
 from miniworld.model.emulation.Qemu import Qemu
@@ -38,10 +37,13 @@ RPC_LOG_FILE_PATH = "rpc_server"
 # TODO: REMOVE
 _logger = None
 
+
 def to_json(fun):
     def wrap(*args, **kwargs):
         return json.dumps(fun(*args, **kwargs), indent=4)
+
     return wrap
+
 
 def logger():
     global _logger
@@ -77,13 +79,16 @@ def escape(c):
     else:
         return ''
 
+
 # TODO: DOC
+
+
 def assert_node_id_is_int(fun):
-    '''
+    """
     Raises
     ------
     ValueError
-    '''
+    """
 
     # TODO: use wraps in all decorators!
     # @wraps(fun)
@@ -99,11 +104,11 @@ def assert_node_id_is_int(fun):
 
 
 def node_id_2_int(fun):
-    '''
+    """
     Raises
     ------
     ValueError
-    '''
+    """
 
     # TODO: use wraps in all decorators!
     # @wraps(fun)
@@ -117,11 +122,11 @@ def node_id_2_int(fun):
 
 # TODO: DOC
 def assert_simulation_manager_started(fun):
-    '''
+    """
     Raises
     ------
     RuntimeError
-    '''
+    """
 
     def wrap(*args, **kwargs):
         _self = args[0]
@@ -137,14 +142,14 @@ def assert_simulation_manager_started(fun):
 # TODO: set response type to json in all method responses!
 # TODO: refactor!!
 class MiniWorldRPC:
-    '''
+    """
     Attributes
     ----------
     zmq_server : ZeroMQServer, default is None
         Only set in the distributed mode.
     lock
 
-    '''
+    """
 
     def __init__(self):
         self.lock = Lock()
@@ -192,7 +197,8 @@ class MiniWorldRPC:
         if node_id is not None:
             node_id = int(node_id)
 
-        return json.dumps(singletons.simulation_manager.exec_node_cmd(cmd, node_id=node_id, validation=validation, timeout=timeout))
+        return json.dumps(
+            singletons.simulation_manager.exec_node_cmd(cmd, node_id=node_id, validation=validation, timeout=timeout))
 
     @dec_requires_simulation_running
     def get_distributed_node_mapping(self):
@@ -220,7 +226,7 @@ class MiniWorldRPC:
         singletons.simulation_manager.raise_run_loop_exception()
 
     #########################################
-    ### Logs
+    # Logs
     #########################################
 
     @dec_requires_simulation_running
@@ -263,25 +269,24 @@ class MiniWorldRPC:
         return singletons.simulation_manager.movement_director.get_geo_json_for_nodes()
 
     #########################################
-    ### js stuff
+    # js stuff
     #########################################
 
     def get_is_arma(self):
-        return IS_ARMA
         return scenario_config.get_walk_model_name() == MovementDirectorFactory.TOPOLOGY_MODE_ARMA
 
     def get_geo_json_connections(self):
         return singletons.simulation_manager.movement_director.get_geo_json_for_connections()
 
     def get_max_connected_distance(self):
-        ''' The maximum range in which nodes are still connected. '''
+        """ The maximum range in which nodes are still connected. """
         res = singletons.simulation_manager.link_quality_model.max_connected_distance
         if res is None:
             return 0
         return res
 
     #########################################
-    ### Topology
+    # Topology
     #########################################
 
     # TODO: JSON DECORATOR
@@ -289,7 +294,7 @@ class MiniWorldRPC:
         return json.dumps(singletons.network_manager.create_vde_switch_topology(*args, **kwargs))
 
     #########################################
-    ### Progress Stats
+    # Progress Stats
     #########################################
 
     def get_progress(self, *args):
@@ -304,9 +309,9 @@ yappi_started = False
 
 
 def signal_profiling_handler(signum, *args, **kwargs):
-    '''
+    """
     Use SIGUSR2 to start profiling. Second signal dumps the stats to file.
-    '''
+    """
     import yappi
     global yappi_started
     logger().debug("SIGUSR2 error handler ...")
@@ -333,12 +338,12 @@ def signal_profiling_handler(signum, *args, **kwargs):
 
 
 class MiniWorldRPCClient(MiniWorldRPC):
-    '''
+    """
     Attributes
     ----------
     zeromq_client : ZeroMQClient
     zeromq_thread : Thread
-    '''
+    """
 
     def __init__(self, server_addr, tunnel_addr):
         super(MiniWorldRPCClient, self).__init__()
@@ -351,12 +356,12 @@ class MiniWorldRPCClient(MiniWorldRPC):
 
 
 class MiniWorldRPCServer(MiniWorldRPC):
-    '''
+    """
     Attributes
     ----------
     zeromq_thread : Thread
     zmq_server : ZeroMQServer
-    '''
+    """
 
     def __init__(self):
         super(MiniWorldRPCServer, self).__init__()
@@ -393,7 +398,8 @@ class MiniWorldRPCServer(MiniWorldRPC):
         else:
             log.info("starting in local mode ...")
 
-        singletons.simulation_manager.start(scenario_config_content, auto_stepping=auto_stepping, blocking=blocking, force_snapshot_boot=force_snapshot_boot)
+        singletons.simulation_manager.start(scenario_config_content, auto_stepping=auto_stepping, blocking=blocking,
+                                            force_snapshot_boot=force_snapshot_boot)
 
     def simulation_pause(self):
         singletons.simulation_manager.pause()
@@ -458,14 +464,15 @@ def mode_coordinator(args):
 
     return MiniWorldRPCServer, [], {}
 
-def main():
 
+def main():
     root_parser = argparse.ArgumentParser(description='MiniWorld network emulator')
     root_parser.add_argument('-c', '--config', default=os.environ.get('MW_CONFIG'), help="The config file")
 
     mode_group = root_parser.add_argument_group('mode')
     mode_group.add_argument('--distributed', action='store_true', help='Run in the distributed mode')
-    mode_group.add_argument('--server', action='store_true', help='Run as server. By default run as the coordinator in the distributed mode. Only works with --distributed')
+    mode_group.add_argument('--server', action='store_true',
+                            help='Run as server. By default run as the coordinator in the distributed mode. Only works with --distributed')
 
     server_group = root_parser.add_argument_group('server')
     address_group = server_group.add_mutually_exclusive_group()
@@ -490,7 +497,6 @@ def main():
     # the singletons rely on the mode set in the argparser func
     miniworld.init_singletons()
     rpc_instance = rpc_type(*rpc_args, **rpc_kwargs)
-
 
     ip, port = "0.0.0.0", RPCUtil.get_rpc_port()
     log.info('running server at {}:{}'.format(ip, port))
@@ -518,6 +524,7 @@ def main():
     logger().info("rpc server running")
     log.debug("registered functions: %s", pprint.pformat(server.system_listMethods()))
     server.serve_forever()
+
 
 if __name__ == '__main__':
     main()

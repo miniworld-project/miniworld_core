@@ -12,12 +12,13 @@ from miniworld.model.network.connections.NodeDictMixin import NodeDict
 class UnknownConnection(Base):
     pass
 
+
 class ConnectionStore(UserDict, JSONStrMixin):
 
     KEY_CONN_ACTIVE = 'active'
     KEY_CONN_NOT_ACTIVE = 'not_active'
 
-    '''
+    """
     Manages the network connections between :py:class:`.EmulationNode`s.
     The connections are separated into `active` and `inactive` connections.
 
@@ -121,15 +122,16 @@ class ConnectionStore(UserDict, JSONStrMixin):
             5
         ]
     }
-    '''
-    def __init__(self, data = None):
-        '''
+    """
+
+    def __init__(self, data=None):
+        """
 
         Parameters
         ----------
         data: optional (default is `dict<str, NodeConnectionStore>`)
 
-        '''
+        """
         if data is None:
             self.data = {}
             self[self.KEY_CONN_ACTIVE] = NodeConnectionStore()
@@ -138,16 +140,16 @@ class ConnectionStore(UserDict, JSONStrMixin):
             self.data = data
 
     #########################################
-    ### Iterators
+    # Iterators
     #########################################
 
     def iter_connections(self):
-        '''
+        """
 
         Generator
         ---------
         EmulationNodes, Interfaces
-        '''
+        """
         node_connection_store = self.get_active_node_connection_store()
         for emu_nodes, nic_connections in node_connection_store.items():
 
@@ -155,14 +157,14 @@ class ConnectionStore(UserDict, JSONStrMixin):
                 yield emu_nodes, ifaces
 
     def get_active_interfaces_per_connection(self):
-        '''
+        """
         Examples
         --------
 
         Returns
         -------
         dict<EmulationNodes, tuple<Interfaces>>
-        '''
+        """
         active_connections = self.get_active_node_connection_store()
 
         res = {}
@@ -173,25 +175,25 @@ class ConnectionStore(UserDict, JSONStrMixin):
         return res
 
     def get_connections_per_node(self, active=True):
-        '''
+        """
 
         Returns
         -------
         dict<EmulationNode, set<EmulationNode>>
-        '''
+        """
         network_topo = defaultdict(set)
         for emulation_node_x, emulation_node_y in self.get_connections_explicit(active=active).keys():
             network_topo[emulation_node_x].add(emulation_node_y)
         return network_topo
 
     #########################################
-    ### Connection Management
+    # Connection Management
     #########################################
 
     # TODO: #54,#55
     def add_connection(self, emu_node_x, emu_node_y, interface_x, interface_y,
-                       connection, active = True, link_quality_dict = None):
-        '''
+                       connection, active=True, link_quality_dict=None):
+        """
 
         Parameters
         ----------
@@ -204,7 +206,7 @@ class ConnectionStore(UserDict, JSONStrMixin):
             Add the connection to the active connections.
         link_quality_dict: optional (default is None)
             May not be present at this time.
-        '''
+        """
 
         conns = self.get_connections_explicit(active).get((emu_node_x, emu_node_y))
         if not conns:
@@ -215,23 +217,23 @@ class ConnectionStore(UserDict, JSONStrMixin):
         conns[key] = ConnectionDetails(connection, link_quality_dict)
 
     def get_active_node_connection_store(self):
-        '''
+        """
         Returns
         -------
         NodeConnectionStore
-        '''
+        """
         return self[self.KEY_CONN_ACTIVE]
 
     def get_inactive_node_connection_store(self):
-        '''
+        """
         Returns
         -------
         NodeConnectionStore
-        '''
+        """
         return self[self.KEY_CONN_NOT_ACTIVE]
 
-    def get_connections_explicit(self, active = True):
-        '''
+    def get_connections_explicit(self, active=True):
+        """
         Get a connection.
 
         Parameters
@@ -243,14 +245,14 @@ class ConnectionStore(UserDict, JSONStrMixin):
         Returns
         -------
         ConnectionInfos
-        '''
+        """
         if active:
             return self.get_active_node_connection_store()
         else:
             return self.get_inactive_node_connection_store()
 
     def get_connections_for_nodes_implicit(self, emu_node_x, emu_node_y, interface_x, interface_y):
-        '''
+        """
         Get the connection implicit from the `active` or `inactive` connections.
         NOTE: there is exactly one connection!
 
@@ -266,7 +268,7 @@ class ConnectionStore(UserDict, JSONStrMixin):
         str, NICConnectionStore
             The dict key, the connections dict.
         None, None
-        '''
+        """
         key = emu_node_x, emu_node_y
         nic_connection_store = self.get_active_node_connection_store().get(key)
         if nic_connection_store and (interface_x, interface_y) in nic_connection_store:
@@ -278,8 +280,8 @@ class ConnectionStore(UserDict, JSONStrMixin):
 
         return None, None
 
-    def change_connection_state(self, emu_node_x, emu_node_y, interface_x, interface_y, now_active = True):
-        '''
+    def change_connection_state(self, emu_node_x, emu_node_y, interface_x, interface_y, now_active=True):
+        """
         Change the connection state. Therefore, move (if state changed) e.g. from active to inactive connection.
 
         Parameters
@@ -300,7 +302,7 @@ class ConnectionStore(UserDict, JSONStrMixin):
         ------
         UnknownConnection
             If the connection is unknown
-        '''
+        """
         node_key = emu_node_x, emu_node_y
         iface_key = interface_x, interface_y
         key = node_key + iface_key
@@ -323,7 +325,7 @@ class ConnectionStore(UserDict, JSONStrMixin):
                     del self[self.KEY_CONN_NOT_ACTIVE][node_key][iface_key]
                     # delete dict for nodes if no active iface any more
                     if len(self[self.KEY_CONN_NOT_ACTIVE][node_key]) == 0:
-                        del self[self.KEY_CONN_NOT_ACTIVE   ][node_key]
+                        del self[self.KEY_CONN_NOT_ACTIVE][node_key]
                     # move to active connections
                     self[self.KEY_CONN_ACTIVE][node_key][iface_key] = connection_details
 
@@ -346,11 +348,11 @@ class ConnectionStore(UserDict, JSONStrMixin):
         return False
 
     #########################################
-    ### Link Quality
+    # Link Quality
     #########################################
 
     def get_link_quality_matrix(self, include_interfaces=True, key=None):
-        '''
+        """
 
         Parameters
         ----------
@@ -370,7 +372,7 @@ class ConnectionStore(UserDict, JSONStrMixin):
                 NodeDict<EmulationNodes, object>
         NodeDict<EmulationNodes, (Interfaces, object)>
             If `include_interfaces` and `key`.
-        '''
+        """
 
         def get_key(emu_nodes, ifaces):
             return emu_nodes
@@ -387,9 +389,8 @@ class ConnectionStore(UserDict, JSONStrMixin):
 
         return NodeDict({get_key(emu_nodes, ifaces): get_val(emu_nodes, ifaces) for emu_nodes, ifaces in self.iter_connections()})
 
-
     def get_link_quality(self, emu_node_x, emu_node_y, interface_x, interface_y):
-        '''
+        """
 
         Parameters
         ----------
@@ -401,13 +402,13 @@ class ConnectionStore(UserDict, JSONStrMixin):
         Returns
         -------
         bool, dict
-        '''
+        """
         key = emu_node_x, emu_node_y, interface_x, interface_y
         interface_key = interface_x, interface_y
         return self.get_connections_for_nodes_implicit(*key)[1][interface_key]
 
     def update_link_quality(self, emu_node_x, emu_node_y, interface_x, interface_y, connection, connected, link_quality_dict):
-        '''
+        """
         Moves (if connection change) the connection from active to inactive connections depending on `connected`
         Afterwards the link quality gets updated.
 
@@ -428,7 +429,7 @@ class ConnectionStore(UserDict, JSONStrMixin):
         Raises
         ------
         UnknownConnection
-        '''
+        """
         # get connections for nodes
         key = emu_node_x, emu_node_y, interface_x, interface_y
         dict_key, conns = self.get_connections_for_nodes_implicit(*key)
@@ -441,6 +442,7 @@ class ConnectionStore(UserDict, JSONStrMixin):
         conns[iface_key].update_link_quality(link_quality_dict)
 
         return dict_key
+
 
 if __name__ == "__main__":
     import doctest

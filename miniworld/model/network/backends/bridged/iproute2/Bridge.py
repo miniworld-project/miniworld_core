@@ -10,36 +10,36 @@ from miniworld.model.singletons.Singletons import singletons
 
 # TODO: use group mgmt functions!
 
+
 def BridgeIproute2():
     # TODO: extract iproute2 commands!
     class BridgeIproute2(Bridge):
 
-        '''
+        """
         Attributes
         ----------
         id : str
             Name of the bridge.
         bridge:
-        '''
+        """
 
         EVENT_ROOT = "bridge"
         EVENT_BRIDGE_ADD = "bridge_add"
 
         _BRIDGE_PAR = "bridge_parallel"
-        EVENT_BRIDGE_UP = _BRIDGE_PAR # "bridge_up"
-        EVENT_BRIDGE_ADD_IF = _BRIDGE_PAR # "bridge_add_if"
-        EVENT_BRIDGE_SET_HUB = _BRIDGE_PAR # "bridge_set_hub"
-        EVENT_BRIDGE_UP_IF = _BRIDGE_PAR # "bridge_up_if"
+        EVENT_BRIDGE_UP = _BRIDGE_PAR  # "bridge_up"
+        EVENT_BRIDGE_ADD_IF = _BRIDGE_PAR  # "bridge_add_if"
+        EVENT_BRIDGE_SET_HUB = _BRIDGE_PAR  # "bridge_set_hub"
+        EVENT_BRIDGE_UP_IF = _BRIDGE_PAR  # "bridge_up_if"
         EVENT_BRIDGE_SET_GROUP_IF = _BRIDGE_PAR
-        EVENT_ORDER = OrderedSet([EVENT_BRIDGE_ADD, _BRIDGE_PAR])#EVENT_BRIDGE_SET_HUB, EVENT_BRIDGE_UP, EVENT_BRIDGE_ADD_IF, EVENT_BRIDGE_UP_IF])
+        EVENT_ORDER = OrderedSet([EVENT_BRIDGE_ADD, _BRIDGE_PAR])  # EVENT_BRIDGE_SET_HUB, EVENT_BRIDGE_UP, EVENT_BRIDGE_ADD_IF, EVENT_BRIDGE_UP_IF])
 
         # TODO: var for prefixes
         def add_shell_command(self, event, cmd):
             singletons.network_backend.shell_command_executor.add_command(self.EVENT_ROOT, event, self.id, cmd, ["bridge"])
 
-
         def _start(self, bridge_dev_name=None, switch=False):
-            '''
+            """
             Create the bridge, add it to the bridge group and set the hub mode if appropriate.
 
             Parameters
@@ -50,7 +50,7 @@ def BridgeIproute2():
             Returns
             -------
 
-            '''
+            """
 
             self.bridge_dev_name = bridge_dev_name
             br_add_cmd = self._get_bridge_add_cmd()
@@ -63,7 +63,7 @@ def BridgeIproute2():
                 br_set_hub_cmd = self._get_bridge_set_hub_mode_cmd()
                 self.add_shell_command(self.EVENT_BRIDGE_SET_HUB, br_set_hub_cmd)
 
-        def add_if(self, _if_name, if_up = True):
+        def add_if(self, _if_name, if_up=True):
 
             try:
 
@@ -83,7 +83,6 @@ def BridgeIproute2():
                 %s
                 """ % (_if_name, self, check_output(["brctl", "show"]), pformat(Bridge.get_interfaces()),
                        pformat(singletons.network_backend._tap_id_mapping)), caused_by=e)
-
 
         def _get_bridge_add_cmd(self):
             return IPRoute2Commands.get_bridge_add_cmd(self.bridge_dev_name)

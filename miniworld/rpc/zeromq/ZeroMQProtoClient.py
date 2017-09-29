@@ -1,13 +1,9 @@
 #!/usr/bin/env python3
 import argparse
 import json
-import random
-import sys
-import uuid
 from pprint import pformat
 
 import netifaces
-from uuid import uuid5
 
 import zmq
 
@@ -24,13 +20,13 @@ from miniworld.rpc.zeromq import States
 
 
 def factory():
-    '''
+    """
     Use the config system to choose the zeromq client type.
 
     Returns
     -------
     type
-    '''
+    """
     if config.is_protocol_zeromq_mode_mcast():
         log.info("distance matrix distribution via publish-subscribe pattern")
         return ZeroMQClientSub
@@ -38,12 +34,13 @@ def factory():
         log.info("distance matrix distribution via request-reply pattern")
         return ZeroMQClientReq
 
+
 class ZeroMQException(BaseException):
     pass
 
-class ZeroMQClient:
 
-    '''
+class ZeroMQClient:
+    """
     This is a client for the :py:class:`.ZeroMQService` which uses a request socket.
     The socket is intended for synchronous communication in a blocking request-reply pattern.
 
@@ -83,7 +80,8 @@ class ZeroMQClient:
 
     serialize : see :py:meth:`Protocol.serialize`
     deserialize : :py:meth:`Protocol.deserialize`
-    '''
+    """
+
     def __init__(self, server_addr):
         self.server_addr = server_addr
         self.context = zmq.Context()
@@ -119,20 +117,20 @@ class ZeroMQClient:
 
     # TODO: create own logger!
     def myprint(self, str):
-        '''
+        """
         Include the server id in log messages
         Parameters
         ----------
         str : str
-        '''
+        """
         log.info('%s: %s', self.server_id, str)
 
     #####################################################################
-    ### Sending and receiving
+    # Sending and receiving
     #####################################################################
 
     def send_server_id(self, state, *args):
-        '''
+        """
         Send a message including the server id.
 
         Parameters
@@ -140,7 +138,7 @@ class ZeroMQClient:
         state : str
         args : list<obj>
 
-        '''
+        """
         # let server id be the first message part
         self.send_multi_part(state, self.server_id, *args)
 
@@ -150,32 +148,32 @@ class ZeroMQClient:
         )
 
     def send_no_server_id(self, *args):
-        '''
+        """
         Send a message exluding the server id
 
         Parameters
         ----------
         args
-        '''
+        """
         self.send_multi_part(*args)
 
     def recv(self):
-        '''
+        """
         Receive a message and deserialize it with the current protocol.
 
         Returns
         -------
         obj
-        '''
+        """
 
         return self.deserialize(self.svc.recv())
 
     #####################################################################
-    ### State handling
+    # State handling
     #####################################################################
 
     def start(self, tunnel_ip):
-        '''
+        """
         This method contains steps 1-3.
 
         Parameters
@@ -186,12 +184,12 @@ class ZeroMQClient:
         -------
         scenario_config : str
             The scenario config as json.
-        '''
+        """
 
         self.tunnel_ip = tunnel_ip
 
         #########################################################
-        ### State: Register
+        # State: Register
         #########################################################
 
         self.myprint("registering at server ...")
@@ -207,7 +205,7 @@ class ZeroMQClient:
 
         # TODO: RENAME state!
         #########################################################
-        ### State: Information exchange
+        # State: Information exchange
         #########################################################
 
         server_score = ServerScore.factory()()
@@ -218,7 +216,7 @@ class ZeroMQClient:
         self.myprint("scenario config: %s" % pformat(scenario_config))
 
         #########################################################
-        ### State: Start Nodes
+        # State: Start Nodes
         #########################################################
 
         self.myprint("starting nodes")
@@ -232,7 +230,7 @@ class ZeroMQClient:
         return scenario_config
 
     #####################################################################
-    ### Helpers
+    # Helpers
     #####################################################################
 
     def start_nodes(self, scenario_config_json):
@@ -240,25 +238,26 @@ class ZeroMQClient:
         log.info("starting nodes ...")
         singletons.simulation_manager.start(scenario_config_json)
 
-class ZeroMQClientReq(ZeroMQClient):
 
-    '''
+class ZeroMQClientReq(ZeroMQClient):
+    """
     This subclass implements step 4 by receiving the local distance matrix via the request socket.
     NOTE: the client does not see the whole distance matrix!
-    '''
+    """
+
     def start(self, tunnel_ip):
         # do steps 1-3
-        scenario_config = super(ZeroMQClientReq, self).start(tunnel_ip)
+        super(ZeroMQClientReq, self).start(tunnel_ip)
 
         #########################################################
-        ### State: Distance Matrix
+        # State: Distance Matrix
         #########################################################
 
         # wait for new distance matrices ...
         self.enter_run_loop()
 
     def enter_run_loop(self):
-        while 1:
+        while True:
             self.send_server_id(States.STATE_DISTANCE_MATRIX)
 
             distance_matrix = self.recv_distance_matrix()
@@ -272,19 +271,19 @@ class ZeroMQClientReq(ZeroMQClient):
             singletons.simulation_manager.step(1, distance_matrix=distance_matrix)
 
     def recv_distance_matrix(self):
-        '''
+        """
         Receive the distance matrix and detransform it to its actual form.
 
         Returns
         -------
         DistanceMatrix
-        '''
+        """
 
         return DistanceMatrix.factory()(DistanceMatrix.detransform_distance_matrix(self.recv()))
 
-class ZeroMQClientSub(ZeroMQClient, Resetable):
 
-    '''
+class ZeroMQClientSub(ZeroMQClient, Resetable):
+    """
     This client receives the whole distance matrix from a publish-subscribe socket.
     Therefore, the client is responsible for cutting out the necessary part of the distance matrix.
 
@@ -293,7 +292,7 @@ class ZeroMQClientSub(ZeroMQClient, Resetable):
     Attributes
     ----------
     sub_socket : zmq.sugar.socket.Socket
-    '''
+    """
 
     def __init__(self, *args, **kwargs):
         super(ZeroMQClientSub, self).__init__(*args, **kwargs)
@@ -306,18 +305,18 @@ class ZeroMQClientSub(ZeroMQClient, Resetable):
         log.info("connecting to: %s ...", addr)
 
     def start(self, tunnel_ip):
-        scenario_config = super(ZeroMQClientSub, self).start(tunnel_ip)
+        super(ZeroMQClientSub, self).start(tunnel_ip)
 
         #########################################################
-        ### State: Distance Matrix
+        # State: Distance Matrix
         #########################################################
 
         self.enter_run_loop()
 
     def sync(self):
-        '''
+        """
         Sync with the server. Stay in state distance matrix
-        '''
+        """
 
         self.send_sync()
         self.recv_sync()
@@ -332,19 +331,20 @@ class ZeroMQClientSub(ZeroMQClient, Resetable):
         self.recv()
 
     def recv_distance_matrix(self):
-        '''
+        """
         Receive the whole distance matrix via the publish-subscribe socket and filter out the relevant part.
 
         Returns
         -------
         DistanceMatrix
-        '''
-        whole_distance_matrix = DistanceMatrix.detransform_distance_matrix(self.deserialize( self.sub_socket.recv() ))
+        """
+        whole_distance_matrix = DistanceMatrix.detransform_distance_matrix(self.deserialize(self.sub_socket.recv()))
 
         if config.is_debug():
             log.info("server id: %d", scenario_config.get_distributed_server_id())
 
-        local_distance_matrix = singletons.simulation_manager.get_local_distance_matrix_to_servers(whole_distance_matrix)
+        local_distance_matrix = singletons.simulation_manager.get_local_distance_matrix_to_servers(
+            whole_distance_matrix)
 
         return DistanceMatrix.factory()(local_distance_matrix)
 
@@ -352,12 +352,12 @@ class ZeroMQClientSub(ZeroMQClient, Resetable):
     def reset(self):
         log.info("got reset message ...")
         singletons.simulation_manager.abort()
-        #super(ZeroMQClientSub, self).reset()
+        # super(ZeroMQClientSub, self).reset()
         self.start(self.tunnel_ip)
 
     # TODO: adjust doc for reset ...
     def enter_run_loop(self):
-        '''
+        """
         Receive the updates of the distance matrix.
 
         Steps:
@@ -367,7 +367,7 @@ class ZeroMQClientSub(ZeroMQClient, Resetable):
         Raises
         ------
         ZeroMQException
-        '''
+        """
         log.info("entering run loop ...")
 
         # initial sync
@@ -376,10 +376,10 @@ class ZeroMQClientSub(ZeroMQClient, Resetable):
         self.sync()
 
         # enable CTRL-C
-        while 1:
+        while True:
             def step():
 
-                #self.sync()
+                # self.sync()
                 rlist, _, xlist = zmq.select([self.reset_socket, self.sub_socket], [], [])
 
                 def handle_select(rlist, xlist):
@@ -404,12 +404,12 @@ class ZeroMQClientSub(ZeroMQClient, Resetable):
                         self.send_sync()
                         # wait for sync reply or error
                         rlist, _, xlist = zmq.select([self.reset_socket, self.svc], [], [])
-                        #rlist, _, xlist = zmq.select([self.svc], [], [])
+                        # rlist, _, xlist = zmq.select([self.svc], [], [])
 
                         if handle_select(rlist, xlist):
                             return True
 
-                        #self.sync()
+                        # self.sync()
 
                         if config.is_debug():
                             log.debug("stepped ...")
@@ -418,14 +418,14 @@ class ZeroMQClientSub(ZeroMQClient, Resetable):
                         self.recv_sync()
                         return True
 
-
                 if handle_select(rlist, xlist):
                     return
 
             if step():
                 return
-            # exec_time = timeit(step, number=1)
-            # log.info("took %0.2f seconds (sync + step)", exec_time)
+                # exec_time = timeit(step, number=1)
+                # log.info("took %0.2f seconds (sync + step)", exec_time)
+
 
 if __name__ == '__main__':
 

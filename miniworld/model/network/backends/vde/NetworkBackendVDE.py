@@ -1,4 +1,3 @@
-
 from miniworld import log
 from miniworld.management.network.manager.provisioner.NetworkConfiguratorSameSubnet import NetworkConfiguratorSameSubnet
 from miniworld.model.emulation.nodes.virtual.CentralNode import is_central_node_interface
@@ -10,14 +9,14 @@ from miniworld.model.network.interface.Interface import HubWiFi
 
 __author__ = 'Nils Schmidt'
 
-class NetworkBackendVDE(NetworkBackendDummy):
 
-    '''
+class NetworkBackendVDE(NetworkBackendDummy):
+    """
     Attributes
     ----------
     switches: dict<Interface, AbstractSwitch>
         One AbstractSwitch for each interface.
-    '''
+    """
 
     def __init__(self, *args, **kwargs):
         super(NetworkBackendVDE, self).__init__(*args, **kwargs)
@@ -31,7 +30,6 @@ class NetworkBackendVDE(NetworkBackendDummy):
 
     def _start(self, *args, **kwargs):
         pass
-
 
     def before_link_initial_start(self, network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y,
                                   connection_info, start_activated=False, **kwargs):
@@ -47,16 +45,16 @@ class NetworkBackendVDE(NetworkBackendDummy):
                                        network_backend, emulation_node_x, emulation_node_y, interface_x,
                                        interface_y, connection_info,
                                        **kwargs):
-        '''
+        """
         Adjust the link quality.
-        '''
+        """
         connection.adjust_link_quality(link_quality_dict)
 
     def get_interface_index(self, emulation_node, interface):
         return emulation_node.network_mixin.interfaces.index(interface)
 
     def create_n_connect_central_nodes(self, interfaces):
-        '''
+        """
 
         Parameters
         ----------
@@ -65,7 +63,7 @@ class NetworkBackendVDE(NetworkBackendDummy):
         Returns
         -------
         dict<int, CentralNode>
-        '''
+        """
         # create CentralNode s but only if there is a HubWiFi interface
         # TODO: REMOVE
         cnt = 0
@@ -76,11 +74,11 @@ class NetworkBackendVDE(NetworkBackendDummy):
 
             # TODO: REFACTOR!
             # TODO: #54: make amount of nodes configurable
-            count_central_nodes = 1#multiprocessing.cpu_count()
+            count_central_nodes = 1  # multiprocessing.cpu_count()
             network_backend_bootstrapper = NetworkBackends.get_current_network_backend_bootstrapper()
             for _ in range(0, count_central_nodes):
                 # create an own network backend for each node
-                #new_emulation_node_network_backend = network_backend_bootstrapper.emulation_node_network_backend_type(network_backend_bootstrapper)
+                # new_emulation_node_network_backend = network_backend_bootstrapper.emulation_node_network_backend_type(network_backend_bootstrapper)
 
                 central_node = network_backend_bootstrapper.central_node_type(network_backend_bootstrapper)
                 # TODO: #54 make configurable!

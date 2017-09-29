@@ -12,6 +12,7 @@ try:
 except curses.error:
     pass
 
+
 class TerminalWriter:
     """Create an object with a write method that writes to a
     specific place on the screen, defined at instantiation.
@@ -20,6 +21,7 @@ class TerminalWriter:
     Starts writing the text from the bottom of the screen.
     Each writer has its own line.
     """
+
     def __init__(self, x_location, idx):
         """
         Parameters
@@ -34,14 +36,14 @@ class TerminalWriter:
         self.idx = idx
 
     def write(self, string):
-        '''
+        """
         Write a `string` to the terminal.
          Use `blessings` if available, otherwise print to stdout.
 
         Parameters
         ----------
         string : string
-        '''
+        """
         msg = string
         if curses_ok:
             # clear line

@@ -1,14 +1,14 @@
 class Event(object):
 
     def __init__(self, event, event_system):
-        '''
+        """
         Helper class for the :py:class:`.EventSystem` to provide a context manager for a event.
 
         Parameters
         ----------
         event : str
         event_system : EventSystem
-        '''
+        """
         self.event = event
         self.event_system = event_system
 

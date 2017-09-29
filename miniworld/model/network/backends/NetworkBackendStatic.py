@@ -13,20 +13,22 @@ from miniworld.util import DictUtil
 # static lock for static methods ...
 static_lock = Lock()
 
+
 def NetworkBackendStatic():
     class NetworkBackendStatic(NetworkBackendDummy):
-        '''
+        """
         Base class for static :py:class:`.NetworkBackend`s.
 
         They are static because the connections are known beforehand.
         There is no :py:class:`.MovevementDirector` which moves the nodes according to a model.
-        '''
+        """
+
         def __init__(self, *args, **kwargs):
             super(NetworkBackendStatic, self).__init__(*args, **kwargs)
             self._all_connections = None
 
         def get_all_connections(self):
-            '''
+            """
             Get all the connections the nodes will have to each other.
 
             Returns
@@ -34,7 +36,7 @@ def NetworkBackendStatic():
             dict<int, set<int>>
                 The connections each node has. Sorted by id asc. id number.
                 Fully staffed matrix.
-            '''
+            """
 
             # we need a lock here, otherwise all threads (each node) try to read the config file simultaneously!
             # used by each :py:class:`.EmulationNode`

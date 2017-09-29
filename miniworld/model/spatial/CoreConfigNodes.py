@@ -1,4 +1,3 @@
-
 # encoding: utf-8
 from pprint import pformat
 
@@ -9,10 +8,10 @@ from miniworld.model.singletons.Singletons import singletons
 from miniworld.model.spatial import logger
 from miniworld.model.spatial.Location import Location
 
+from miniworld.util.CoreConfigFileParser import parse_core_config_file, parse_core_config_file_positions
+
 __author__ = "Patrick Lampe"
 __email__ = "uni at lampep.de"
-
-from miniworld.util.CoreConfigFileParser import parse_core_config_file, parse_core_config_file_positions
 
 
 def factory():
@@ -23,8 +22,9 @@ def factory():
 
     raise ValueError("Core mode '%s' not supported!" % scenario_config.get_core_mode())
 
+
 class CoreConfigNodes(Resetable):
-    '''
+    """
     Parameter
     ---------
     scenario_changes : list<list<str, int>>
@@ -34,7 +34,8 @@ class CoreConfigNodes(Resetable):
     Attributes
     ----------
 
-    '''
+    """
+
     def __init__(self, scenario_changes):
         self.orig_scenario_changes = scenario_changes
         self.reset()
@@ -49,52 +50,52 @@ class CoreConfigNodes(Resetable):
         logger().debug("scenario files: %s", self.scenario_changes)
 
     def get_list_of_nodes(self):
-        '''
+        """
         Stub-methode
-        '''
+        """
         return {}
 
     def get_node_for_node_id(self, node_id):
-        '''
+        """
         Stub-methode
-        '''
+        """
         return None
 
     # TODO: use distances from core config file
     def get_distance_matrix(self):
         # TODO: supply iterator function
         distance_matrix = DistanceMatrix.factory()()
-        for n in range(0, range(scenario_config.get_number_of_nodes()-1)):
+        for n in range(0, range(scenario_config.get_number_of_nodes() - 1)):
             for i in range(n + 1, range(scenario_config.get_number_of_nodes())):
                 if n != i:
                     if i in self.crnt_connections[n]:
                         # connected
                         distance = 0
-                        distance_matrix.set_distance(n+1, i+1, distance)
+                        distance_matrix.set_distance(n + 1, i + 1, distance)
                     else:
                         # not connected
-                        distance_matrix.set_unlimited_distance(n+1, i+1)
+                        distance_matrix.set_unlimited_distance(n + 1, i + 1)
         return distance_matrix
 
     def get_coordinates(self):
-        '''
+        """
         Stub-methode
-        '''
+        """
         return {}
 
     def get_geo_json(self):
-        '''
+        """
         Stub-methode
-        '''
-        return  ""
+        """
+        return ""
 
     def __get_next_scenario(self):
-        '''
+        """
 
         Returns
         -------
         str, int
-        '''
+        """
         if self.scenario_changes:
             return self.scenario_changes.pop()
         return []
@@ -126,8 +127,8 @@ class CoreConfigNodes(Resetable):
     def _walk(self):
         raise NotImplementedError
 
-class CoreConfigNodesLan(CoreConfigNodes):
 
+class CoreConfigNodesLan(CoreConfigNodes):
     def __init__(self, *args, **kwargs):
         super(CoreConfigNodesLan, self).__init__(*args, **kwargs)
         self.crnt_connections = None
@@ -166,7 +167,6 @@ class CoreConfigNodesWiFi(CoreConfigNodes):
         for n in singletons.simulation_manager.get_emulation_node_ids():
             for i in range(n + 1, singletons.simulation_manager.get_emulation_node_ids()[-1] + 1):
                 if n != i:
-
                     distance = Location(*self.crnt_distances[n]).get_distance_in_m(Location(*self.crnt_distances[i]))
                     distance_matrix.set_distance(n, i, distance)
 

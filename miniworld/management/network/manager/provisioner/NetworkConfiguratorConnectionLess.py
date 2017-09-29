@@ -7,10 +7,11 @@ from miniworld.model.emulation.nodes import EmulationNode
 from miniworld.util import DictUtil
 from miniworld.log import log
 
+
 class NetworkConfiguratorConnectionLess(NetworkConfigurator):
-    '''
+    """
     This IP provisioner iterates over the list of nodes instead of the connections.
-    '''
+    """
 
     def allocate_ips(self):
         # TODO:
@@ -23,7 +24,7 @@ class NetworkConfiguratorConnectionLess(NetworkConfigurator):
             self.configure_connection(emulation_node, None)
 
     def get_nic_configuration_commands(self, connections):
-        '''
+        """
         Get the configuration commands needed to configure the network and the check commands.
 
         Parameters
@@ -35,7 +36,7 @@ class NetworkConfiguratorConnectionLess(NetworkConfigurator):
         -------
         dict<EmulationNode, list<str>>, dict<EmulationNode, list<str>>
             First entry are the commands for network configuration, second for the network checking.
-        '''
+        """
 
         self._reset_internal_state()
 
@@ -60,10 +61,9 @@ class NetworkConfiguratorConnectionLess(NetworkConfigurator):
             check_commands_per_node = DictUtil.list_merge_values(check_commands_per_node, _check_commands_per_node)
 
         self.nic_check_commands = DictUtil.list_merge_values(self.nic_check_commands,
-                                    check_commands_per_node)
+                                                             check_commands_per_node)
 
         return commands_per_node
-
 
     def get_emulation_nodes(self):
         return singletons.simulation_manager.get_emulation_nodes()
@@ -73,7 +73,7 @@ class NetworkConfiguratorConnectionLess(NetworkConfigurator):
             yield EmulationNode.EmulationNode.factory(node_id)
 
     def filter_emulation_node(self, emulation_node):
-        '''
+        """
         Use a node filter for the ip provisioning.
 
         Parameters
@@ -83,12 +83,11 @@ class NetworkConfiguratorConnectionLess(NetworkConfigurator):
         Returns
         -------
         bool
-        '''
+        """
         return True
 
-
     def configure_connection(self, emulation_node):
-        '''
+        """
         Configure a single connection.
 
         Parameters
@@ -98,5 +97,5 @@ class NetworkConfiguratorConnectionLess(NetworkConfigurator):
         Returns
         -------
         dict<EmulationNode, list<str>>, dict<EmulationNode, list<str>>
-        '''
+        """
         raise NotImplementedError

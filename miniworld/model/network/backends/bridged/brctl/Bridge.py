@@ -1,15 +1,16 @@
 from miniworld.model.network.backends.bridged.iproute2.Bridge import BridgeIproute2
 
+
 def BridgeBrctl():
     class BridgeBrctl(BridgeIproute2()):
 
-        '''
+        """
         Attributes
         ----------
         id : str
             Name of the bridge.
         bridge:
-        '''
+        """
 
         def _get_bridge_add_cmd(self):
             return "brctl addbr {}".format(self.bridge_dev_name)

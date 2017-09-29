@@ -5,17 +5,17 @@ from miniworld.util.JSONConfig import customizable_attrs, arg2float
 
 __author__ = 'Nils Schmidt'
 
-'''
+"""
 Contains the global config and config functions.
-'''
+"""
 
 
 class GlobalConfig(JSONConfig.JSONConfig):
-    '''
+    """
     Attributes
     ----------
     is_mode_distributed : bool
-    '''
+    """
 
     def __init__(self):
         super(GlobalConfig, self).__init__()
@@ -81,7 +81,7 @@ class GlobalConfig(JSONConfig.JSONConfig):
         return self.data.get('coordinator', False)
 
     ###############################################
-    ### Protocol
+    # Protocol
     ###############################################
 
     PROTOCOL_MSG_PACK = "msgpack"
@@ -155,17 +155,17 @@ PATH_GLOBAL_CONFIG = "config.json"
 
 
 ###############################################
-### Helper
+# Helper
 ###############################################
 
 def set_global_config(*args, **kwargs):
-    ''' Set the global config.
+    """ Set the global config.
 
     Returns
     -------
     dict
         The config as JSON.
-    '''
+    """
 
     _config = JSONConfig.read_json_config(*args, **kwargs)
     from miniworld.log import log

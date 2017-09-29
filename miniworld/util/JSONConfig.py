@@ -1,6 +1,6 @@
-'''
+"""
 Utility functions and class to use json as config file format.
-'''
+"""
 import json
 import re
 from collections import UserDict
@@ -15,18 +15,22 @@ CONFIG_COMMENT = "//"
 
 CONFIG_KEY_NODE_DETAILS = "node_details"
 
+
 ###############################################
-### Decorators
+# Decorators
 ###############################################
+
 
 def arg2float(fun):
     def inner(*args, **kwargs):
         res = fun(*args, **kwargs)
         return float(res)
+
     return inner
 
+
 def customizable_attrs(*keys, **kwargs):
-    '''
+    """
     Decorator to read the value for the given keys.
     Prefers the node customized value.
 
@@ -55,7 +59,7 @@ def customizable_attrs(*keys, **kwargs):
         If the config is syntactically incorrect.
     ConfigOptionNotSupported
         If the option is not in the expected list.
-    '''
+    """
     not_null = kwargs.get('not_null', False)
 
     default = kwargs.get("default", nothing)
@@ -77,14 +81,15 @@ def customizable_attrs(*keys, **kwargs):
                 res = node_value
 
             if res in (None, nothing):
-                 res = get_dict_nested_value(self.data, keys)
+                res = get_dict_nested_value(self.data, keys)
 
-            #log.debug("%s : %s", _pretty_format(keys), res)
+            # log.debug("%s : %s", _pretty_format(keys), res)
 
             # not null check
             if res in (None, nothing):
                 if not_null:
-                    raise ConfigMalformed("A value for '%s' is required! Customizable: '%s'" % (_pretty_format(keys), customizable_key))
+                    raise ConfigMalformed(
+                        "A value for '%s' is required! Customizable: '%s'" % (_pretty_format(keys), customizable_key))
                 if default is not nothing:
                     res = default
 
@@ -97,15 +102,18 @@ def customizable_attrs(*keys, **kwargs):
                 # allow None
                 expected.append(None)
                 if res not in expected:
-                    raise ConfigOptionNotSupported("The value for key '%s' is not supported! Is: '%s'. Supported values are: '%s'" % (_pretty_format(keys), res, ', '.join(map(str, expected))))
+                    raise ConfigOptionNotSupported(
+                        "The value for key '%s' is not supported! Is: '%s'. Supported values are: '%s'" % (
+                            _pretty_format(keys), res, ', '.join(map(str, expected))))
             return res
 
         return wrap2
+
     return wrap
 
 
 def json2dict(func):
-    '''
+    """
     Converts json to dict. E.g {"1" : 2} => {1 : 2}.
     The function does not handle this recursive!
 
@@ -119,24 +127,29 @@ def json2dict(func):
         If value was not None
     None
         Else
-    '''
+    """
+
     @wraps(func)
     def func_wrapper(*args, **kwargs):
         res = func(*args, **kwargs)
         if res is None:
             return res
-        return {int(x) : y for x, y in res.items()}
+        return {int(x): y for x, y in res.items()}
+
     return func_wrapper
+
 
 def _pretty_format(keys):
     return '->'.join(keys)
 
+
 ###############################################
-### Subclassable Config object
+# Subclassable Config object
 ###############################################
 
+
 class JSONConfig(UserDict):
-    '''
+    """
     `JSONConfig` leverages JSON to form a config system.
     Access to the values in the config are provided by decorating functions.
     The decorators map the key(s) and therefore the structure of the config layout to the functions.
@@ -155,7 +168,8 @@ class JSONConfig(UserDict):
     1
     >>> print c.get_non_default()
     None
-    '''
+    """
+
     def __init__(self):
         self.data = {}
 
@@ -165,7 +179,7 @@ class JSONConfig(UserDict):
         pass
 
     # ONLY FOR DEMO
-    @customizable_attrs("default", default = 1)
+    @customizable_attrs("default", default=1)
     def get_default(self):
         pass
 
@@ -173,12 +187,15 @@ class JSONConfig(UserDict):
     @customizable_attrs("non_default")
     def get_non_default(self):
         pass
+
+
 ###############################################
-### Helper methods
+# Helper methods
 ###############################################
 
-def read_json_config(config = None, raw = False):
-    '''
+
+def read_json_config(config=None, raw=False):
+    """
     Read a json config file.
     Strips all lines beginning with `CONFIG_COMMENT`.
 
@@ -198,7 +215,7 @@ def read_json_config(config = None, raw = False):
     Raises
     ------
     ConfigError
-    '''
+    """
 
     try:
         if not raw:
@@ -211,8 +228,9 @@ def read_json_config(config = None, raw = False):
     except (ValueError, IOError):
         raise ConfigError("Config file '%s' could not be opened!" % config)
 
+
 def get_dict_nested_value(d, keys):
-    '''
+    """
     Get the nested dictionary value if present.
 
     Parameters
@@ -226,11 +244,11 @@ def get_dict_nested_value(d, keys):
         The value if found
     Nothing
 
-    '''
+    """
     cur_dict = d
 
     def dict_check(d):
-        if not d is None:
+        if d is not None:
             if not isinstance(d, dict):
                 raise ConfigMalformed("The value for '%s' should be a dictionary! Not a value!" % _pretty_format(keys))
 
@@ -247,11 +265,15 @@ def get_dict_nested_value(d, keys):
 
     return cur_dict
 
+
 # TODO: #40: DOC
+
+
 def keys_to_int(d):
     if not isinstance(d, dict):
         return d
     return dict(zip(map(int, d.keys()), keys_to_int(d.values())))
+
 
 if __name__ == '__main__':
     c = JSONConfig()

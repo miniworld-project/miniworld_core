@@ -23,8 +23,9 @@ REPL_MODE_VDE = "vde"
 REPL_MODE_WIREFILTER = "wirefilter"
 REPL_MODES = REPL_MODE_QEMU, REPL_MODE_VDE, REPL_MODE_WIREFILTER
 
+
 class REPL:
-    '''
+    """
     Models a read-eval-print-loop for all given qemu nodes.
 
     A command can be executed on all qemu nodes either concurrently or sequentially.
@@ -39,32 +40,31 @@ class REPL:
         Run commands concurrently
     mode : string, see `REPL_MODE_*` constants
         The active REPL mode.
-    '''
+    """
 
-    def __init__(self, number_of_nodes, async = False):
-        '''
+    def __init__(self, number_of_nodes, async=False):
+        """
         Parameters
         ----------
         number_of_nodes: int
         async: bool, optional (default is False)
             Run commands concurrently
-        '''
+        """
         # TODO: refactor to list<REPLable> ?
-
 
         # NOTE: give each node an own copy of the NetworkBackend and an own copy of the interfaces
         self.nodes = [EmulationNode(i,
                                     NetworkBackends.get_current_network_backend_bootstrapper().network_backend_type(NetworkBackends.get_current_network_backend_bootstrapper()),
-                                    interfaces = Interfaces.Interfaces.factory_from_interface_names(scenario_config.get_interfaces())) for i in range(1, number_of_nodes + 1)]
+                                    interfaces=Interfaces.Interfaces.factory_from_interface_names(scenario_config.get_interfaces())) for i in range(1, number_of_nodes + 1)]
         self.async = async
         self.active_qemu_uds_sockets = []
         self.mode = None
 
     def start(self):
-        '''
+        """
         Start the read-eval-print-loop.
         CTRL-D and CTLR-C are forwarded to the qemu instances.
-        '''
+        """
 
         log.info("starting interactive shell, streamlines commands to all qemu instances!")
         log.info("be sure to disconnect every instance connected to a qemu socket, otherwise this operations blocks!")
@@ -72,13 +72,13 @@ class REPL:
         log.info("enter '%s' to exit'", REPL_CMD_EXIT)
 
         # TODO: use lib for interactive shell stuff ?
-        while 1:
+        while True:
             try:
                 prompt = "$ "
                 if self.mode:
                     prompt = '%s %s' % (self.mode, prompt)
 
-                cmd = raw_input(prompt)
+                cmd = input(prompt)
                 uq_cmd = cmd.lower().strip()
 
                 # always let print help and exit
@@ -119,7 +119,7 @@ class REPL:
                 log.info("sending CTRL-C instances [done]")
 
     def run_command(self, args):
-        '''
+        """
         Runs the command on uds sockets.
         Before running the instance via a unix domain socket,
         the corresponding socket object is returned via a generator.
@@ -129,7 +129,7 @@ class REPL:
         Parameters
         ----------
         cmd : str
-        '''
+        """
         node, cmd = args
 
         # get unix domain socket before executing the commands
@@ -137,14 +137,14 @@ class REPL:
         if self.mode == REPL_MODE_QEMU:
             uds_socket_gen = node.virtualization_layer.run_commands_get_socket(
                 StringIO(cmd),
-                interactive_result_stdout_writing = not self.async,
-                logger = node.virtualization_layer.nlog
+                interactive_result_stdout_writing=not self.async,
+                logger=node.virtualization_layer.nlog
             )
         elif self.mode == REPL_MODE_VDE:
             uds_socket_gen = node.vde_switch.run_commands_get_socket(
                 StringIO(cmd),
-                interactive_result_stdout_writing = not self.async,
-                logger = node.vde_switch.nlog
+                interactive_result_stdout_writing=not self.async,
+                logger=node.vde_switch.nlog
             )
 
         elif self.mode == REPL_MODE_WIREFILTER:
@@ -160,11 +160,11 @@ class REPL:
                 # clean up
                 try:
                     self.active_qemu_uds_sockets.remove(uds_socket)
-                except:
+                except BaseException:
                     pass
 
     def _run_command_threaded(self, cmd):
-        '''
+        """
         Runs the command `cmd` threaded. If `self.async` execute all concurrently, otherwise use a single thread.
         The single thread is needed so that the repl is not blocking.
 
@@ -172,16 +172,16 @@ class REPL:
         ---------
         cmd : str
             The command to execute in the qemu instance
-        '''
+        """
         # one thread per node for async, else 1
-        pool =  ThreadPool(processes = len(self.nodes) if self.async else 1)
+        pool = ThreadPool(processes=len(self.nodes) if self.async else 1)
         pool.map_async(self.run_command, zip(self.nodes, repeat(cmd)))
 
     def _run_command_interrupt(self, cmd):
-        '''
+        """
         Simulate an interrupt. Close the active unix domain socket connections, so that `cmd` can be executed.
         Usefor for sending CTRL-D or CTRL-C to the qemu intances.
-        '''
+        """
         to_remove = []
 
         # remember sockets
@@ -205,16 +205,16 @@ class REPL:
         for uds_sock in to_remove:
             try:
                 self.active_qemu_uds_sockets.remove(uds_sock)
-            except:
+            except BaseException:
                 pass
 
         # finally run command
         self._run_command_threaded(cmd)
 
     def fmt_help(self):
-        '''
+        """
         Fmt a help string.
-        '''
+        """
         return """Commands:
         %s        Print this help.
         %s <mode> Switch to a different mode, where mode in (%s).

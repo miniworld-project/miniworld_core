@@ -13,7 +13,7 @@ from miniworld.util import PathUtil
 def NetworkBackendBridgedSingleDevice():
     # TODO: Ticket #84 make usable with all execution modes!
     class NetworkBackendBridgedSingleDevice(NetworkBackendBridgedDummy()):
-        '''
+        """
 
         Do not set default FORWARD policy to DROP, because ebtables should have no effect on the management network.
         All other connections are redirected to another chain.
@@ -22,7 +22,7 @@ def NetworkBackendBridgedSingleDevice():
         ----------
         bridges : dict<str, AbstractSwitch>
             Stores for each bridge name the according class.
-        '''
+        """
 
         ebtables_history_path = PathUtil.get_log_file_path("ebtables_history.txt")
 
@@ -40,7 +40,6 @@ def NetworkBackendBridgedSingleDevice():
 
         # TODO: DOC
         mark_cnt = 0
-
 
         def get_interface_filter(self):
             return InterfaceFilter.EqualInterfaceNumbers
@@ -71,7 +70,7 @@ def NetworkBackendBridgedSingleDevice():
             self.init_ebtables()
 
         def before_simulation_step(self, simulation_manager, step_cnt, network_backend, emulation_nodes, **kwargs):
-            '''
+            """
             Add atomic commit command for ebtables network change.
 
             Parameters
@@ -80,7 +79,7 @@ def NetworkBackendBridgedSingleDevice():
             step_cnt
             network_backend
             emulation_nodes
-            '''
+            """
 
             conn_type = self.network_backend_bootstrapper.connection_type
             # TODO: MOVE method here ...
@@ -171,11 +170,10 @@ def NetworkBackendBridgedSingleDevice():
 
             return True, bridge, connection
 
-
         def do_network_topology_change(self):
-            '''
+            """
             Run ebtable commands for batch or one shell call mode
-            '''
+            """
             is_pyroute2 = scenario_config.is_network_backend_bridged_execution_mode_pyroute2()
             is_batch = scenario_config.is_network_backend_bridged_execution_mode_batch()
             if is_batch:
