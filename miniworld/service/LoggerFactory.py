@@ -28,7 +28,7 @@ class LoggerFactory:
             formatter = self.get_std_formatter()
 
         if not isinstance(name, str):
-            name = f'{name.__module__}.{name.__class__.__name__}'
+            name = '{}.{}'.format(name.__module__, name.__class__.__name__)
 
         # create logger
         logger = logging.getLogger(name)

@@ -29,7 +29,8 @@ class REPLable(object):
         self.path_uds_socket = None
 
         self.verbose_logger = singletons.logger_factory.get_logger(
-            'verbose_%s' % f'{self.__module__}.{self.__class__.__name__}') if singletons.config.is_debug() else None
+            'verbose_%s' % '{}.{}'.format(self.__module__,
+                                          self.__class__.__name__)) if singletons.config.is_debug() else None
 
     ############################################
     # Implement these methods

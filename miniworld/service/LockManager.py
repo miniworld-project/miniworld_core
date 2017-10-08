@@ -10,7 +10,7 @@ class LockManager:
         pass
 
     def __init__(self):
-        self._locks: Dict[Lock.Resource, List[LockEntry]] = {}
+        self._locks = {}  # type: Dict[Lock.Resource, List[LockEntry]]
         self._plock = threading.Lock()
         self._logger_factory = singletons.logger_factory.get_logger(self)
 
@@ -20,7 +20,7 @@ class LockManager:
         ------
         Locked
         """
-        self._logger_factory.info(f'acquire {type} lock on {resource}')
+        self._logger_factory.info('acquire {} lock on {}'.format(type, resource))
 
         def add_lock_entry() -> LockEntry:
             lock_entry = LockEntry(type)
@@ -33,7 +33,7 @@ class LockManager:
             if resource not in self._locks:
                 self._locks[resource] = []
 
-            current_locks: List[LockEntry] = self._locks[resource]
+            current_locks = self._locks[resource]  # type: List[LockEntry]
             # only one write lock at a time
             if any(lock_entry.type == Type.write for lock_entry in current_locks):
                 raise self.Locked()
@@ -50,14 +50,14 @@ class LockManager:
     def release(self, lock_entry: LockEntry) -> bool:
         with self._plock:
             for resource in Resource:
-                current_locks: List[LockEntry] = self._locks[resource]
+                current_locks = self._locks[resource]  # type: List[LockEntry]
                 idx = None
                 for idx, a_lock_entry in enumerate(current_locks):
                     if a_lock_entry == lock_entry:
                         break
                 if idx is not None:
                     del current_locks[idx]
-                    self._logger_factory.info(f'released lock {lock_entry}')
+                    self._logger_factory.info('released lock {}'.format(lock_entry))
                     return
 
     @contextlib.contextmanager

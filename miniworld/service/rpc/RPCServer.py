@@ -379,7 +379,7 @@ class MiniWorldRPCServer(MiniWorldRPC):
         else:
             self._logger.info("starting in local mode ...")
 
-        scenario_config: Dict = JSONConfig.read_json_config(scenario_config_content, raw=True)
+        scenario_config = JSONConfig.read_json_config(scenario_config_content, raw=True)  # type: Dict
         singletons.simulation_manager.start(scenario_config, auto_stepping=auto_stepping,
                                             force_snapshot_boot=force_snapshot_boot)
 
