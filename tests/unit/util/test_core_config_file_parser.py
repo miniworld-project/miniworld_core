@@ -1,12 +1,13 @@
 import os
+
 import pytest
 
 
 @pytest.mark.parametrize('include_interfaces', (True, False))
 def test_parse_core_config_file(core_topologies_dir, include_interfaces):
-    from miniworld.util import CoreConfigFileParser
-    res = CoreConfigFileParser.parse_core_config_file(os.path.join(core_topologies_dir, 'chain5.xml'),
-                                                      include_interfaces=include_interfaces)
+    from miniworld.util.CoreConfigFileParser import CoreConfigFileParser
+    res = CoreConfigFileParser().parse_core_config_file(os.path.join(core_topologies_dir, 'chain5.xml'),
+                                                        include_interfaces=include_interfaces)
     if include_interfaces:
         assert res == {
             (1, 1): (2, 1),

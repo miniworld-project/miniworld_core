@@ -3,20 +3,19 @@
 import argparse
 import json
 import os
-import selectors
-import shlex
-import socket
 import sys
 import xmlrpc.client
-import subprocess
 
-from miniworld import Constants, Config
-from miniworld.Config import config
-from miniworld.log import log
-from miniworld.model.emulation.Qemu import Qemu
-from miniworld.rpc import RPCUtil
-from miniworld.util import CliUtil, PathUtil
+from miniworld import Constants
+from miniworld.service.rpc import RPCUtil
+from miniworld.util import CliUtil
 from miniworld.util.CliUtil import rpc_parser
+
+import logging
+
+logging.basicConfig()
+log = logging.getLogger()
+
 
 class Action:
     '''
@@ -39,7 +38,7 @@ class Action:
     def get_connection(addr):
         return xmlrpc.client.ServerProxy(addr, allow_none=True)
 
-    def get_connection_server(self, node_id=None, server_id=None, is_distributed:bool=None):
+    def get_connection_server(self, node_id=None, server_id=None, is_distributed: bool = None):
 
         if is_distributed:
 
@@ -175,9 +174,9 @@ def action_start(self, args):
     scenario_config, _, scenario_config_json = CliUtil.parse_scenario_config(args.scenario_config, args.custom_scenario)
 
     if args.progress:
-        return CliUtil.start_scenario(scenario_config_json, args.auto_stepping, False, args.force_snapshot_boot)
+        return CliUtil.start_scenario(scenario_config_json, args.auto_stepping, args.force_snapshot_boot)
 
-    return self.connection.simulation_start(scenario_config_json, args.auto_stepping, True, args.force_snapshot_boot)
+    return self.connection.simulation_start(scenario_config_json, args.auto_stepping, args.force_snapshot_boot)
 
 
 @new_action_decorator

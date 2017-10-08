@@ -5,11 +5,11 @@ import xmlrpc
 from collections import OrderedDict
 from threading import Thread
 
-from miniworld import Scenario, Config
-from miniworld import log
+from miniworld.singletons import singletons
+from miniworld.config import Config, Scenario
 from miniworld.errors import ConfigMalformed
 from miniworld.util import JSONConfig, DictUtil
-from miniworld.Config import config
+
 __author__ = "Nils Schmidt"
 
 
@@ -27,9 +27,9 @@ rpc_parser = argparse.ArgumentParser(add_help=False)
 
 def get_default_rpc_addr():
     try:
-        if not config.config:
-            Config.set_global_config(Config.PATH_GLOBAL_CONFIG)
-        return Config.config.get_server_addr()
+        if not singletons.config.data:
+            singletons.config.set_global_config(Config.PATH_GLOBAL_CONFIG)
+        return singletons.config.data.get_server_addr()
     except Exception:
         return "127.0.0.1"
 
@@ -67,7 +67,7 @@ def parse_scenario_config(scenario_config=None, customize_scenario=None):
             # TODO: #61
             DictUtil.merge_recursive_in_place(scenario_config, custom_scenario)
         except ValueError as e:
-            log.exception(e)
+            singletons.logger_factory.get_logger(__name__).exception(e)
             raise ConfigMalformed("The supplied custom json scenario is invalid!")
 
     scenario_config_json = json.dumps(scenario_config)
@@ -90,7 +90,7 @@ def start_scenario(scenario_config, autostepping=None, blocking=True, connection
     -------
     """
 
-    from miniworld.management.events.CLIEventDisplay import CLIEventDisplay
+    from miniworld.util.cli.events import CLIEventDisplay
 
     if connection is None:
         con_progress = xmlrpc.ServerProxy('http://localhost:5001/RPC2')
@@ -109,8 +109,8 @@ def start_scenario(scenario_config, autostepping=None, blocking=True, connection
                 if cli_display.is_finished(progress_dict):
 
                     t2 = time.time()
-                    log.info("took '%s'", t2 - t1)
-                    log.info("simulation started ...")
+                    singletons.logger_factory.get_logger(__name__).info("took '%s'", t2 - t1)
+                    singletons.logger_factory.get_logger(__name__).info("simulation started ...")
                     return
 
             time.sleep(CLI_REFRESH_RATE)

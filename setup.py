@@ -31,6 +31,6 @@ setup(
     },
     scripts=['mwcli'],
     entry_points={
-        'console_scripts': ['mwserver=miniworld.rpc.RPCServer:main'],
+        'console_scripts': ['mwserver=miniworld.service.rpc.RPCServer:main'],
     }
 )

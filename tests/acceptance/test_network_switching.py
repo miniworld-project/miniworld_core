@@ -1,9 +1,10 @@
+import os
+import subprocess
 from functools import partial
 
-import os
 import pytest
-import subprocess
-from miniworld import Scenario
+
+from miniworld.config import Scenario
 from tests.conftest import create_runner
 
 
@@ -58,9 +59,6 @@ def _create_scenarios(connection_mode):
                         "execution_mode": {
                             "name": execution_mode,
                         }
-                    },
-                    "links": {
-                        "model": "miniworld.model.network.linkqualitymodels.LinkQualityModelRange.LinkQualityModelRange"
                     },
                     "core": {
                         "topologies": [

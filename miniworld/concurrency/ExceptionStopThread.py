@@ -4,8 +4,7 @@
 import sys
 
 from miniworld.concurrency import StopThread
-from miniworld.log import log
-from miniworld.model.singletons.Singletons import singletons
+from miniworld.singletons import singletons
 
 __author__ = "Nils Tobias Schmidt"
 __email__ = "schmidt89 at informatik.uni-marburg.de"
@@ -66,7 +65,7 @@ class ExceptionStopThread(StopThread.StopThread):
         try:
             self._run()
         except self.exception_type as e:
-            log.exception(e)
+            singletons.log.exception(e)
             self.raise_objects = e, None, sys.exc_info()[2]
             self.exception_handler(e)
             self.terminate()

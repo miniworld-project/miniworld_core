@@ -40,11 +40,8 @@ def runner(tmpdir_factory, image_path, request, config_path, core_topologies_dir
                 "name": "bridged",
                 "connection_mode": "single",
                 "execution_mode": {
-                    "name": "brctl",
+                    "name": "iproute2",
                 }
-            },
-            "links": {
-                "model": "miniworld.model.network.linkqualitymodels.LinkQualityModelRange.LinkQualityModelRange"
             },
             "core": {
                 "topologies": [

@@ -1,4 +1,3 @@
-from miniworld.errors import WrapperException
 
 __author__ = 'Nils Schmidt'
 
@@ -6,7 +5,7 @@ __author__ = 'Nils Schmidt'
 """ Base Exception """
 
 
-class Base(WrapperException.WrapperException):
+class Base(Exception):
     pass
 
 
