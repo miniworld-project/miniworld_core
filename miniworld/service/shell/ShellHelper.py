@@ -1,4 +1,3 @@
-import os
 import re
 import selectors
 import shlex
@@ -83,25 +82,12 @@ def run_shell_get_output(cmd, shell=False):
     return stdout
 
 
-devnull = open(os.devnull, "r")
-
-
 def run_sub_process_popen(cmd, stdout=None, stderr=None, stdin=None, **kwargs):
     cmd = fmt_cmd_template(cmd)
-    symbol_devnull = "devnull"
 
     cmd_as_list = shlex.split(cmd)
     # note: do not use subprocess.PIPE! May cause deadlock!
     # see: http://thraxil.org/users/anders/posts/2008/03/13/Subprocess-Hanging-PIPE-is-your-enemy/
-    if stdin is None:
-        stdin = devnull
-
-    if stdout is symbol_devnull:
-        stdout = devnull
-
-    if stderr is symbol_devnull:
-        stderr = devnull
-
     p = subprocess.Popen(cmd_as_list, close_fds=True, stdout=stdout, stderr=stderr, stdin=stdin, **kwargs)
     singletons.log.debug("started %s", ' '.join(p.args) + (" (PID = %s)" % p.pid))
     return p, cmd
@@ -410,11 +396,11 @@ class ShellHelper(ResetableInterface):
         prefix_str = '>>> '.join(map(str, [node_name] + prefixes))
         nlog = singletons.logger_factory.get_node_logger(node_name)
         # TODO: #2 : catch/reraise exception if command malformed!
+        stdout = None
+        stderr = None
         if supervise_process:
             stdout = subprocess.PIPE
             stderr = subprocess.PIPE
-        else:
-            stdout, stderr = ["devnull"] * 2
         p, cmd = run_sub_process_popen(cmd, stdout=stdout, stderr=stderr)
         nlog.info('%s: %s', '>>> '.join(prefixes), cmd)
 
