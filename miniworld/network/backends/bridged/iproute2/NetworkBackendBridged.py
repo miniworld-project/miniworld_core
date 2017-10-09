@@ -1,9 +1,6 @@
-import netifaces
-import subprocess
 
 from ordered_set import OrderedSet
 
-from miniworld.errors import NetworkBackendBridgedError
 from miniworld.network.backends.bridged import NetworkBackendBridged
 from miniworld.network.backends.bridged.iproute2 import Constants
 from miniworld.singletons import singletons
@@ -64,19 +61,10 @@ def NetworkBackendBridgedIproute2():
                     ip_commands = '\n'.join(OrderedSet(NetworkBackendBridged.re_find_ip.findall(shell_commands)))
 
                     # NOTE: run shell_commands in batch mode, this is much faster than doing it sequentially
-                    try:
-                        cmd = "ip -d -batch -"
-                        self._logger.info("changing network topology with '%s'. See '%s' for the commands." % (
-                            cmd, NetworkBackendBridged.PATH_SHELL_COMMANDS))
-                        singletons.shell_helper.run_shell_with_input(cmd, ip_commands)
-
-                    except subprocess.CalledProcessError as e:
-                        raise NetworkBackendBridgedError(
-                            """Could not execute all iproute2 shell_commands!
-                            An old version of iproute2 may not have full bridge support!
-                            Try to use the brctl mode! Or run './install_newest_compatible_iproute2.sh'!
-                            Executed commands: %s
-                            Interface listing: %s """ % (ip_commands, netifaces.interfaces())) from e
+                    cmd = "ip -d -batch -"
+                    self._logger.info("changing network topology with '%s'. See '%s' for the commands." % (
+                        cmd, NetworkBackendBridged.PATH_SHELL_COMMANDS))
+                    singletons.shell_helper.run_shell_with_input(cmd, ip_commands)
 
                 # Use iproute2 only
                 execute_batch_iproute2_commands()
