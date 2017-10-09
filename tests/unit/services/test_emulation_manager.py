@@ -2,6 +2,7 @@ import functools
 from unittest.mock import MagicMock, Mock, call
 
 import pytest
+from copy import deepcopy
 
 from miniworld.impairment.ImpairmentModel import ImpairmentModel
 from miniworld.mobility.DistanceMatrix import DistanceMatrix
@@ -82,6 +83,34 @@ class TestEmulationManager:
 
         assert emulation_manager.running
         assert isinstance(emulation_manager.impairment, ImpairmentModel)
+
+    def test_scenario_hash_changes(self, emulation_manager, scenario_config):
+        """ Test that the scenario hash changes. This is necessary for the QEMU snapshot boot mode"""
+        emulation_manager._start = Mock()
+
+        emulation_manager.start(scenario_config=scenario_config, auto_stepping=False)
+        emulation_manager.abort()
+
+        # change scenario config
+        scenario_config = deepcopy(scenario_config)
+        scenario_config['foo'] = 'bar'
+        emulation_manager.start(scenario_config=scenario_config, auto_stepping=False)
+
+        assert emulation_manager.scenario_changed
+
+    def test_scenario_hash_does_not_change(self, emulation_manager, scenario_config):
+        """ Test that the scenario hash does not change for the same scenario_config """
+        emulation_manager._start = Mock()
+
+        emulation_manager.start(scenario_config=scenario_config, auto_stepping=False)
+        emulation_manager.abort()
+
+        # change scenario config
+        scenario_config = deepcopy(scenario_config)
+        scenario_config['foo'] = 'bar'
+        emulation_manager.start(scenario_config=scenario_config, auto_stepping=False)
+
+        assert emulation_manager.scenario_changed
 
     # TODO: test with distance matrix from MD
     # TODO: "ip link set dev" commands are in bridge group of ShellCommandExecutor, but should be in connection group instead, bridge.add_if(tap_x, if_up=True) adds the command to the bridge group. brctl backend

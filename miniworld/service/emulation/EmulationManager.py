@@ -274,11 +274,15 @@ class EmulationManager(ResetableInterface):
             else:
                 # calculate old and new hash of scenario_config and check if scenario changed
                 old_scenario_digest = self._get_scenario_hash()
-                new_scenario_digest = self._get_scenario_hash()
-                self.scenario_changed = old_scenario_digest != new_scenario_digest
 
             # store scenario file globally
             singletons.scenario_config.data = scenario_config
+
+            if not force_snapshot_boot:
+                # first set new scenario config
+                new_scenario_digest = self._get_scenario_hash()
+                self.scenario_changed = old_scenario_digest != new_scenario_digest
+
             self._logger.info('setting scenario config')
 
             # init EventSystem after scenario config is set
