@@ -7,6 +7,7 @@ from miniworld.model.connections.ConnectionDetails import ConnectionDetails
 from miniworld.model.connections.JSONEncoder import JSONStrMixin
 from miniworld.model.connections.NICConnectionStore import NICConnectionStore
 from miniworld.model.connections.NodeDictMixin import NodeDict
+from miniworld.network.AbstractConnection import AbstractConnection
 
 
 class UnknownConnection(Base):
@@ -190,8 +191,8 @@ class ConnectionStore(UserDict, JSONStrMixin):
     #########################################
 
     # TODO: #54,#55
-    def add_connection(self, emu_node_x, emu_node_y, interface_x, interface_y,
-                       connection, active=True, link_quality_dict=None):
+    def add_connection(self, connection: AbstractConnection,
+                       active=True, link_quality_dict=None):
         """
 
         Parameters
@@ -206,6 +207,10 @@ class ConnectionStore(UserDict, JSONStrMixin):
         link_quality_dict: optional (default is None)
             May not be present at this time.
         """
+        emu_node_x = connection.emulation_node_x
+        emu_node_y = connection.emulation_node_y
+        interface_x = connection.interface_x
+        interface_y = connection.interface_y
 
         conns = self.get_connections_explicit(active).get((emu_node_x, emu_node_y))
         if not conns:

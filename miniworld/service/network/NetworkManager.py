@@ -266,8 +266,7 @@ class NetworkManager(ResetableInterface, NetworkBackendNotifications.NetworkBack
         #     print "foo"
 
         if network_backend_connected:
-            self.connection_store.add_connection(emulation_node_x, emulation_node_y, interface_x, interface_y,
-                                                 connection,
+            self.connection_store.add_connection(connection,
                                                  network_backend_connected)
 
             # TODO: enable again!
