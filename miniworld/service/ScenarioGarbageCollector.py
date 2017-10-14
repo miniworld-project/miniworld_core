@@ -1,6 +1,6 @@
 from collections import defaultdict
-from miniworld.singletons import singletons
 
+from miniworld.singletons import singletons
 
 KEY_SINGLETON = "singleton"
 KEY_OBJECT = "object"
@@ -31,10 +31,9 @@ class ScenarioGarbageCollector(defaultdict):
 
     def reset_simulation_scenario_state(self):
         self._logger.info("resetting simulation_scenario_state")
-
         # objects may require singletons, hence first garbage collect objects
         for obj in self[KEY_OBJECT]:
-            self._logger.debug("resetting '%s'", obj)
+            self._logger.debug("resetting '{!r}'".format(obj))
             try:
                 obj.reset()
             except NotImplementedError:
@@ -44,7 +43,7 @@ class ScenarioGarbageCollector(defaultdict):
                     self._logger.exception(e)
 
         for singleton in self[KEY_SINGLETON]:
-            self._logger.debug("resetting '%s'", singleton)
+            self._logger.debug("resetting '{!r}'".format(singleton))
             try:
                 singleton.reset()
             except Exception as e:
