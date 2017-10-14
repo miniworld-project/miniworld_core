@@ -4,9 +4,6 @@
 pkill -fe -9 mwserver
 pkill -fe -9 RPCServer.py
 killall -9 qemu-system-x86_64
-killall -9 vde_switch
-killall -9 wirefilter
-killall -9 vde_plug
 
 umount /tmp/MiniWorld
 rm -r /tmp/MiniWorld
