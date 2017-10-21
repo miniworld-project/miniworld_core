@@ -12,7 +12,6 @@ NODE_MAC_PREFIX = "%02x:%06x"
 
 @total_ordering
 class Interface(TemplateContentProvider):
-
     node_class = 0
     node_class_name = "abstract"
 
@@ -146,11 +145,8 @@ class Interface(TemplateContentProvider):
     def get_ip_suc(self, node_id):
         return self.get_ip(node_id + 1)
 
-# TODO: DOC
-
 
 class HubWiFi(Interface):
-
     node_class = 6
     node_class_name = "hubwifi"
 
@@ -159,7 +155,6 @@ class HubWiFi(Interface):
 
 
 class Management(Interface):
-
     node_class = 10
     node_class_name = "management"
 
@@ -168,7 +163,6 @@ class Management(Interface):
 
 
 class AP(Interface):
-
     node_class = 1
     node_class_name = "ap"
 
@@ -177,7 +171,6 @@ class AP(Interface):
 
 
 class Mesh(Interface):
-
     node_class = 2
     node_class_name = "mesh"
 
@@ -186,7 +179,6 @@ class Mesh(Interface):
 
 
 class ADHoc(Interface):
-
     node_class = 3
     node_class_name = "adhoc"
 
@@ -195,7 +187,6 @@ class ADHoc(Interface):
 
 
 class Bluetooth(Interface):
-
     node_class = 4
     node_class_name = "bluetooth"
 
@@ -204,7 +195,6 @@ class Bluetooth(Interface):
 
 
 class WifiDirect(Interface):
-
     node_class = 5
     node_class_name = "wifidirect"
 
@@ -231,7 +221,6 @@ INTERFACE_ALL_CLASSES_TYPES = {
     HubWiFi,
     Management
 }
-
 
 subnets = None
 static_lock = Lock()

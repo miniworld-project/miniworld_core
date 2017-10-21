@@ -1,4 +1,3 @@
-
 from codecs import open
 from os import path
 
@@ -26,7 +25,7 @@ setup(
     extras_require={
         'server': ['ordered-set', 'argparse', 'ipaddress', 'colorlog', 'geojson', 'futures',
                    'netifaces', 'networkx', 'blessings', 'py-dictdiffer', 'pyroute2', 'psutil', 'LatLon23',
-                   'requests', 'msgpack-python', 'zmq'],
+                   'requests', 'msgpack-python', 'zmq', 'graphene>=2.0.dev', 'flask', 'flask-graphql', 'graphqlclient'],
         'develop': ['pytest', 'sphinx', 'pep8', 'flake8'],
     },
     scripts=['mwcli'],
