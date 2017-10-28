@@ -3,6 +3,7 @@
 
 pkill -fe -9 mwserver
 pkill -fe -9 RPCServer.py
+pkill -fe -9 webserver.py
 killall -9 qemu-system-x86_64
 
 umount /tmp/MiniWorld

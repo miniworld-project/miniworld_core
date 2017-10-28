@@ -2,6 +2,7 @@ import ipaddress
 from functools import total_ordering
 from threading import Lock
 
+from miniworld.model.base import Base
 from miniworld.service.provisioning.TemplateContentProvider import TemplateContentProvider
 from miniworld.util import NetUtil
 
@@ -11,10 +12,8 @@ NODE_MAC_PREFIX = "%02x:%06x"
 
 
 @total_ordering
-class Interface(TemplateContentProvider):
-    node_class = 0
-    node_class_name = "abstract"
-
+@Base.id_provider
+class Interface(Base, TemplateContentProvider):
     """
     Models an interface class like Access Point or Mesh.
 
@@ -31,8 +30,11 @@ class Interface(TemplateContentProvider):
     ------
     ValueError
     """
+    node_class = 0
+    node_class_name = "abstract"
 
     def __init__(self, nr_host_interface=1):
+        Base.__init__(self)
 
         if not nr_host_interface >= 1:
             raise ValueError("The number of the interface has to be greater 0!")

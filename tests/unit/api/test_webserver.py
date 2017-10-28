@@ -1,6 +1,3 @@
-from collections import OrderedDict
-
-
 class TestWebServer:
     def test_ping(self, client):
         res = client.execute('''
@@ -8,4 +5,6 @@ class TestWebServer:
             ping
         }
         ''')
-        assert res == {'data': OrderedDict([('ping', 'Pong')])}
+        assert res['data'] == {
+            "ping": "pong"
+        }

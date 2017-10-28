@@ -4,6 +4,9 @@ from flask_graphql import GraphQLView
 from graphene import ObjectType, String
 
 import miniworld
+from miniworld.api.impairmentmodel import ImpairmentQuery
+from miniworld.api.impairments import ImpairmentsQuery
+from miniworld.api.mobility import DistancesQuery
 from miniworld.api.node import NodeQuery
 from miniworld.api.scenario import ScenarioStart, ScenarioStep
 
@@ -12,7 +15,7 @@ class PingQuery(ObjectType):
     ping = String()
 
     def resolve_ping(self, args):
-        return 'Pong'
+        return 'pong'
 
 
 class Mutations(graphene.ObjectType):
@@ -20,7 +23,7 @@ class Mutations(graphene.ObjectType):
     scenario_step = ScenarioStep.Field()
 
 
-class Query(PingQuery, NodeQuery):
+class Query(PingQuery, ImpairmentsQuery, NodeQuery, DistancesQuery, ImpairmentQuery):
     pass
 
 

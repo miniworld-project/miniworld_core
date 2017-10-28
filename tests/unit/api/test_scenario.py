@@ -1,5 +1,4 @@
 import json
-from collections import OrderedDict
 from unittest.mock import Mock
 
 from miniworld import singletons
@@ -15,14 +14,23 @@ class TestScenario:
             }
         }
         ''', variable_values={'scenario_config': json.dumps({"foo": "bar"})})
-        assert res['data'] == OrderedDict([('scenarioStart', OrderedDict([('scenarioConfig', '{"foo": "bar"}')]))])
+        assert res['data'] == {
+            "scenarioStart": {
+                "scenarioConfig": "{\"foo\": \"bar\"}"
+            }
+        }
 
     def test_step(self, client):
+        singletons.simulation_manager = Mock()
         res = client.execute('''
-        mutation {
+        mutation MyMutations {
             scenarioStep(steps:1) {
                 steps
             }
         }
         ''')
-        print(res.data['scenarioStep'])
+        assert res['data'] == {
+            "scenarioStep": {
+                "steps": 1
+            }
+        }

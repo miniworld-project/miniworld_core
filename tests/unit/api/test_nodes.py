@@ -1,25 +1,4 @@
-from collections import OrderedDict
-from unittest.mock import MagicMock
-
-import pytest
-
-from miniworld import singletons
-
-
 class TestNodes:
-    @pytest.fixture
-    def mock_nodes(self):
-        node = MagicMock()
-        node.virtualization_layer.__class__.__name__ = 'Qemu'
-        interface = MagicMock()
-        interface.get_mac.return_value = '00:00:00:00:00:01'
-        interface.node_class = 2
-        interface.node_class_name = "mesh"
-        node.interfaces = [interface]
-        singletons.simulation_manager.nodes_id_mapping = {
-            1: node,
-        }
-
     def test_node(self, client, mock_nodes):
         res = client.execute('''
         query {
@@ -32,8 +11,36 @@ class TestNodes:
            }
         }
         ''')
-        assert res == {'data': OrderedDict([('nodes', [OrderedDict(
-            [('id', 1), ('virtualization', 'Qemu'), ('interfaces', [OrderedDict([('mac', '00:00:00:00:00:01')])])])])])}
+        assert res == {
+            "data": {
+                "nodes": [
+                    {
+                        "id": 1,
+                        "interfaces": [
+                            {
+                                "mac": "02:01:00:00:00:01"
+                            },
+                            {
+                                "mac": "0a:01:00:00:00:01"
+                            }
+                        ],
+                        "virtualization": "QemuTap"
+                    },
+                    {
+                        "id": 2,
+                        "interfaces": [
+                            {
+                                "mac": "02:01:00:00:00:02"
+                            },
+                            {
+                                "mac": "0a:01:00:00:00:02"
+                            }
+                        ],
+                        "virtualization": "QemuTap"
+                    }
+                ]
+            }
+        }
 
     def test_node_filter(self, client, mock_nodes):
         res = client.execute('''
@@ -42,13 +49,32 @@ class TestNodes:
                id
                virtualization
                interfaces {
-                   nodeClass
-                   nodeClassName
+                   id
+                   name
                    mac
                }
            }
         }
         ''')
-        assert res == {'data': OrderedDict([('nodes', [OrderedDict([('id', 1), ('virtualization', 'Qemu'), (
-            'interfaces',
-            [OrderedDict([('nodeClass', 2), ('nodeClassName', 'mesh'), ('mac', '00:00:00:00:00:01')])])])])])}
+        assert res == {
+            "data": {
+                "nodes": [
+                    {
+                        "id": 1,
+                        "interfaces": [
+                            {
+                                "id": 0,
+                                "mac": "02:01:00:00:00:01",
+                                "name": "mesh"
+                            },
+                            {
+                                "id": 1,
+                                "mac": "0a:01:00:00:00:01",
+                                "name": "management"
+                            }
+                        ],
+                        "virtualization": "QemuTap"
+                    }
+                ]
+            }
+        }

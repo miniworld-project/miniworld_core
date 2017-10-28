@@ -1,13 +1,17 @@
 from collections import UserDict
 from collections import defaultdict
 
+from typing import Tuple, Iterator
+
 from miniworld.errors import Base
 from miniworld.model.connections.NodeConnectionStore import NodeConnectionStore
 from miniworld.model.connections.ConnectionDetails import ConnectionDetails
 from miniworld.model.connections.JSONEncoder import JSONStrMixin
 from miniworld.model.connections.NICConnectionStore import NICConnectionStore
 from miniworld.model.connections.NodeDictMixin import NodeDict
+from miniworld.model.interface.Interfaces import Interfaces
 from miniworld.network.AbstractConnection import AbstractConnection
+from miniworld.nodes.EmulationNodes import EmulationNodes
 
 
 class UnknownConnection(Base):
@@ -394,6 +398,13 @@ class ConnectionStore(UserDict, JSONStrMixin):
 
         return NodeDict(
             {get_key(emu_nodes, ifaces): get_val(emu_nodes, ifaces) for emu_nodes, ifaces in self.iter_connections()})
+
+    def get_connections(self, emu_node_x, active=True) -> Iterator[Tuple[EmulationNodes, Interfaces, ConnectionDetails]]:
+        node_connection_store = self.get_connections_explicit(active=active)
+        for emu_nodes, nic_connections in node_connection_store.items():
+            if emu_node_x in emu_nodes:
+                for ifaces, connection_details in nic_connections.items():
+                    yield emu_nodes, ifaces, connection_details
 
     def get_link_quality(self, emu_node_x, emu_node_y, interface_x, interface_y):
         """
