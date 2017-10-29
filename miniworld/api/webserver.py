@@ -33,8 +33,13 @@ schema = graphene.Schema(query=Query, mutation=Mutations)
 app = Flask(__name__)
 app.add_url_rule('/graphql', view_func=GraphQLView.as_view('graphql', schema=schema, graphiql=True))
 
-if __name__ == '__main__':
+
+def main():
     # TODO: read from CLI
     config_path = None
     miniworld.init(config_path=config_path, do_init_singletons=True)
     app.run(host="0.0.0.0")
+
+
+if __name__ == '__main__':
+    main()

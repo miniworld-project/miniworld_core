@@ -65,7 +65,7 @@ class LockManager:
         lock_entry = self.acquire(resource=resource, type=type)
         try:
             yield
-        except:
+        except Exception:
             raise
         finally:
             self.release(lock_entry)
