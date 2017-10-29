@@ -31,7 +31,6 @@ class SocketExpect(object):
         self.output = ""
 
         # get the best selector for the system
-        self.selector = selectors.DefaultSelector()
 
         self.timeout = timeout
 
@@ -53,32 +52,33 @@ class SocketExpect(object):
         Timeout
             If `timeout` is not None.
         """
-        try:
-            self.selector.register(self.sock, selectors.EVENT_READ)
-            t_start = time.time()
-            last_check = None
+        with selectors.DefaultSelector() as selector:
+            try:
+                selector.register(self.sock, selectors.EVENT_READ)
+                t_start = time.time()
+                last_check = None
 
-            while True:
-                if last_check is None:
-                    last_check = time.time()
+                while True:
+                    if last_check is None:
+                        last_check = time.time()
 
-                # data available or timeout occurred ?
-                events = self.selector.select(0.5)
-                if time.time() - t_start > self.timeout:
-                    raise Timeout("Timeout (%s) occurred!" % self.timeout)
+                    # data available or timeout occurred ?
+                    events = selector.select(0.5)
+                    if time.time() - t_start > self.timeout:
+                        raise Timeout("Timeout (%s) occurred!" % self.timeout)
 
-                if self.send_data is not None and time.time() - last_check > 1:
-                    last_check = time.time()
-                    self.sock.send(self.send_data)
-                    self.logger.debug('sending {}'.format(self.send_data))
-                for key, mask in events:
-                    if mask == selectors.EVENT_READ:
-                        res = self.process_socket()
-                        if res:
-                            return self.output
+                    if self.send_data is not None and time.time() - last_check > 1:
+                        last_check = time.time()
+                        self.sock.send(self.send_data)
+                        self.logger.debug('sending {}'.format(self.send_data))
+                    for key, mask in events:
+                        if mask == selectors.EVENT_READ:
+                            res = self.process_socket()
+                            if res:
+                                return self.output
 
-        finally:
-            self.selector.unregister(self.sock)
+            finally:
+                selector.unregister(self.sock)
 
     def process_socket(self):
         data = self.sock.recv(self.read_buf_size)

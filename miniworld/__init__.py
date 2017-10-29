@@ -8,7 +8,7 @@ import sys
 from miniworld.Constants import PATH_TMP, PATH_LOGS, PROJECT_NAME, PATH_CLEANUP_SCRIPT
 from miniworld.config import Config
 from miniworld.errors import AlreadyRunning
-from miniworld.service.shell.ShellHelper import run_shell
+from miniworld.service.shell.shell import run_shell
 from miniworld.singletons.Singletons import singletons
 from miniworld.util import PathUtil
 

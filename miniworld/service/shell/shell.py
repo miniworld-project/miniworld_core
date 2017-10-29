@@ -1,3 +1,4 @@
+import contextlib
 import re
 import selectors
 import shlex
@@ -27,9 +28,6 @@ class MyCalledProcessError(CalledProcessError):
 
 class BackgroundProcessError(ShellHelperError):
     pass
-
-
-# TODO: DOC
 
 
 def run_shell(cmd, *args, **kwargs):
@@ -105,14 +103,9 @@ def fmt_cmd_template(cmd):
     return re.sub("\s+", " ", cmd)
 
 
-# TODO: FINISH
-# TODO: use selectors instead of epoll!
-# TODO: DOC
-class LogWriter(ResetableInterface):
+class StreamPortal:
     """
-    Read from all log files (stdout + stderr) and write line-buffered into a log file.
-
-    When resetting, data belonging to closed file descriptors is discarded.
+    Read from all file streams and multiplex the streams line-buffered into a log file.
 
     Attributes
     ----------
@@ -136,52 +129,51 @@ class LogWriter(ResetableInterface):
         -------
         """
 
+        self._logger = singletons.logger_factory.get_logger(self)
+
         if log_filename is None:
             log_filename = "background_shell_processes.txt"
-        self.log_filename = log_filename
+        self.log_filename = PathUtil.get_log_file_path(log_filename)
 
         self.fh_logfile = None
         self.descriptor_buffers = defaultdict(str)
         self.selector = selectors.DefaultSelector()
         self.prefixes = {}
 
-        self.writer_thread = None
-
-        self._logger = singletons.logger_factory.get_logger(self)
-
-    def reset(self):
-        self._logger.debug("resetting %s" % self.__class__.__name__)
-        self.stop()
-        # TODO: ?
-        # self.reset_fd_state()
-        # self.start()
+        self.writer_thread = None  # type: ExceptionStopThread
 
     def reset_fd_state(self):
         for selector_key in self.selector.get_map().values():
             _file = selector_key.fileobj
             if _file.closed:
                 self._logger.debug("removing closed file '%s' from '%s'", _file, self.__class__.__name__)
-                del self.descriptor_buffers[_file]
-                del self.prefixes[_file]
-                self.selector.unregister(_file)
+                self.unregister_fh(_file)
 
     def stop(self):
         self.writer_thread.terminate()
         self.writer_thread.join()
+        self.flush()
+        self.writer_thread = None
 
-    # TODO: only startable once
     def start(self):
         self._logger.info("starting log writer (file: '%s')", self.log_filename)
         if self.fh_logfile is None:
-            self.fh_logfile = open(PathUtil.get_log_file_path(self.log_filename), "w")
+            self.fh_logfile = open(self.log_filename, "w")
         self.writer_thread = ExceptionStopThread.run_fun_threaded_n_log_exception(target=self.check,
                                                                                   tkwargs=dict(name="LogWriter"))
         self.writer_thread.daemon = True
         self.writer_thread.start()
 
-    def register_object(self, sock, prefix):
+    def register_fh(self, sock, prefix):
         self.selector.register(sock, selectors.EVENT_READ)
         self.prefixes[sock] = prefix
+
+    def unregister_fh(self, fh):
+        with contextlib.suppress(KeyError):
+            # may be empty
+            del self.descriptor_buffers[fh]
+        del self.prefixes[fh]
+        self.selector.unregister(fh)
 
     def check(self):
         while True:
@@ -210,12 +202,24 @@ class LogWriter(ResetableInterface):
                     except ValueError:
                         continue
 
-                    data = self.descriptor_buffers[fd][:newline_idx]
+                    data = self.descriptor_buffers[fd][:newline_idx + 1]
 
-                    self.fh_logfile.write('%s: %s\n' % (prefix, data))
+                    self.fh_logfile.write('%s: %s' % (prefix, data))
                     self.fh_logfile.flush()
 
-                    self.descriptor_buffers[fd] = self.descriptor_buffers[fd][:newline_idx]
+                    # remove written byttes from string buffer
+                    self.descriptor_buffers[fd] = self.descriptor_buffers[fd][newline_idx + 1:]
+
+    def flush(self):
+        for fd, data in self.descriptor_buffers.items():
+            if data:
+                prefix = self.prefixes.get(fd, "N/A")
+                self.fh_logfile.write('%s: %s' % (prefix, data))
+                self.fh_logfile.flush()
+
+        keys = list(self.descriptor_buffers.keys())
+        for key in keys:
+            del self.descriptor_buffers[key]
 
 
 FOREGROUND_SHELL_LOG_PATH = PathUtil.get_log_file_path("foreground_shell_commands.txt")
@@ -269,9 +273,7 @@ class ShellHelper(ResetableInterface):
     ###############################################################
 
     def check_error_codes(self):
-
         # check processes every x seconds for return codes
-        subproc_error = None
         while True:
             if self.bg_checker_thread.shall_terminate():
                 return
@@ -280,6 +282,7 @@ class ShellHelper(ResetableInterface):
             with self.lock:
 
                 self._logger.debug("checking bg processes return codes ...")
+                subprocesses_to_delete = []
                 for subproc in self.subprocesses:
                     singletons.log.debug("%s => %s", subproc, subproc.returncode)
                     if subproc.returncode > 0:
@@ -287,8 +290,9 @@ class ShellHelper(ResetableInterface):
                             "The subprocess '%s' exited with error code '%s'. See the log file for the output!" % (
                                 subproc, subproc.returncode))
                         self.bg_checker_thread.exception_handler(exception)
-                    # delete subprocess with error, error is already logged
-                    del self.subprocesses[subproc_error]
+                        subprocesses_to_delete.append(subproc)
+                for subproc in subprocesses_to_delete:
+                    del self.subprocesses[subproc]
 
     # TODO: REMOVE?
     def start_bg_checker_thread(self):
@@ -387,7 +391,7 @@ class ShellHelper(ResetableInterface):
 
         with self.lock:
             if not self.log_writer:
-                self.log_writer = LogWriter()
+                self.log_writer = StreamPortal()
                 self.log_writer.start()
 
         if prefixes is None:
@@ -406,8 +410,8 @@ class ShellHelper(ResetableInterface):
 
         if supervise_process:
             # important: otherwise subprocess blocks!
-            self.log_writer.register_object(p.stdout, prefix_str)
-            self.log_writer.register_object(p.stderr, prefix_str)
+            self.log_writer.register_fh(p.stdout, prefix_str)
+            self.log_writer.register_fh(p.stderr, prefix_str)
 
         if take_process_ownership and self.garbage_collect:
             with self.lock:
@@ -430,7 +434,7 @@ class ShellHelper(ResetableInterface):
         with self.lock:
             # stop LogWriter first
             if self.log_writer:
-                self.log_writer.reset()
+                self.log_writer.stop()
 
             self._logger.warn("sending SIGTERM to all processes ...")
             # TODO: Ticket #2
@@ -451,9 +455,14 @@ class ShellHelper(ResetableInterface):
                     subproc.kill()
                     subproc.wait()
 
+                if self.log_writer:
+                    self.log_writer.unregister_fh(subproc.stdout)
+                    self.log_writer.unregister_fh(subproc.stderr)
+
             # clear subprocesses
             self._logger.debug("cleared subprocesses index ...")
             self.subprocesses = []
 
             if self.log_writer:
+                self.log_writer.reset_fd_state()
                 self.log_writer.start()
