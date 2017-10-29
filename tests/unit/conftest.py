@@ -66,7 +66,7 @@ def mock_nodes(request) -> Dict[int, EmulationNode]:
     network_backend_bootstrapper = singletons.network_backend_bootstrapper_factory.get()
     for i in range(cnt_nodes):
         interface = Interfaces.factory_from_interface_names(['mesh'])[0]
-        n = EmulationNode(i, network_backend_bootstrapper, [interface])
+        n = EmulationNode(network_backend_bootstrapper, [interface])
         for interface in n.interfaces:
             configure_net(interface, n)
         singletons.simulation_manager.nodes_id_mapping[i] = n

@@ -48,20 +48,20 @@ class EmulationNode(Base, ScenarioState):
     #############################################################
 
     @staticmethod
-    def factory(id):
+    def factory():
         from miniworld.model.interface.Interfaces import Interfaces
 
         interfaces_str = singletons.scenario_config.get_interfaces(node_id=id)
         interfaces = Interfaces.factory_from_interface_names(interfaces_str)
 
         network_backend_bootstrapper = singletons.network_backend_bootstrapper_factory.get()
-        return EmulationNode(id, network_backend_bootstrapper, interfaces)
+        return EmulationNode(network_backend_bootstrapper, interfaces)
 
     #############################################################
     # Magic and private methods
     #############################################################
 
-    def __init__(self, node_id, network_backend_bootstrapper, interfaces, network_mixin=None):
+    def __init__(self, network_backend_bootstrapper, interfaces, network_mixin=None):
 
         Base.__init__(self)
         ScenarioState.__init__(self)
@@ -73,7 +73,7 @@ class EmulationNode(Base, ScenarioState):
 
         if network_mixin is None:
             network_mixin_type = network_backend_bootstrapper.emulation_node_network_backend_type
-            self.network_mixin = network_mixin_type(network_backend_bootstrapper, node_id, interfaces=interfaces,
+            self.network_mixin = network_mixin_type(network_backend_bootstrapper, self._id, interfaces=interfaces,
                                                     management_switch=singletons.config.is_management_switch_enabled())
         else:
             self.network_mixin = network_mixin
@@ -82,10 +82,10 @@ class EmulationNode(Base, ScenarioState):
         self.interfaces = interfaces
 
         # create extra node logger
-        self.nlog = singletons.logger_factory.get_node_logger(node_id)
+        self.nlog = singletons.logger_factory.get_node_logger(self._id)
 
         # qemu instance, prevent cyclic import
-        self.virtualization_layer = network_backend_bootstrapper.virtualization_layer_type(node_id, self)
+        self.virtualization_layer = network_backend_bootstrapper.virtualization_layer_type(self._id, self)
 
     @property
     def name(self):
@@ -108,7 +108,7 @@ class EmulationNode(Base, ScenarioState):
 
     def __repr__(self):
         return str(self)
-        # return '%s(%s, %s)' % (self.__class__.__name__, self.id, self.network_mixin)
+        # return '%s(%s, %s)' % (self.__class__.__name__, self._id, self.network_mixin)
 
     def __hash__(self):
         return hash(self.name)
@@ -190,8 +190,8 @@ class EmulationNode(Base, ScenarioState):
         # TODO: use node_id everywhere possible for singletons.scenario_config.*()
         # # notify EventSystem even if there are no commands
         es = singletons.event_system
-        with es.event_no_init(es.EVENT_VM_SHELL_POST_NETWORK_COMMANDS, finish_ids=[self.id]):
-            commands = singletons.scenario_config.get_all_shell_commands_post_network_start(node_id=self.id)
+        with es.event_no_init(es.EVENT_VM_SHELL_POST_NETWORK_COMMANDS, finish_ids=[self._id]):
+            commands = singletons.scenario_config.get_all_shell_commands_post_network_start(node_id=self._id)
             if commands:
                 self.virtualization_layer.run_commands_eager(StringIO(commands))
 

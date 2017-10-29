@@ -60,7 +60,7 @@ class NetworkConfiguratorP2P(NetworkConfiguratorConnectionBased):
         (emulation_node_1, interface_1), (emulation_node_2, interface_2) = sorted(
             [(emulation_node_x, interface_x), (emulation_node_y, interface_y)])
         # TODO: reuse
-        key = emulation_node_1.id, emulation_node_2.id
+        key = emulation_node_1._id, emulation_node_2._id
 
         is_new_subnet = True
         # for each connection remember the subnet

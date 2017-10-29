@@ -16,8 +16,8 @@ class TestConnectionStore:
         }
         i = Interfaces.factory_from_interface_names(['mesh'])[0]
         i2 = Interfaces.factory_from_interface_names(['mesh'])[0]
-        n = EmulationNode(1, network_backend_bootstrapper, i)
-        n2 = EmulationNode(2, network_backend_bootstrapper, i2)
+        n = EmulationNode(network_backend_bootstrapper, i)
+        n2 = EmulationNode(network_backend_bootstrapper, i2)
 
         conn = AbstractConnection(n, n2, i, i2)
         conn_store.add_connection(conn, active=True,

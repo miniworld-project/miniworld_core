@@ -3,6 +3,7 @@ from collections import defaultdict
 from miniworld.singletons import singletons
 
 KEY_SINGLETON = "singleton"
+KEY_STATIC = "static"
 KEY_OBJECT = "object"
 
 
@@ -18,6 +19,11 @@ class ScenarioGarbageCollector(defaultdict):
     def __hash__(self):
         return id(self)
 
+    def add_static(self, cls):
+        self._logger.debug("adding %s to resettable static with simulation state", cls)
+        if cls not in self[KEY_STATIC]:
+            self[KEY_STATIC].append(cls)
+
     def add_singleton(self, singleton_class):
         self._logger.debug("adding %s to resettable singletons with simulation state", singleton_class)
         if singleton_class not in self[KEY_SINGLETON]:
@@ -32,23 +38,19 @@ class ScenarioGarbageCollector(defaultdict):
     def reset_simulation_scenario_state(self):
         self._logger.info("resetting simulation_scenario_state")
         # objects may require singletons, hence first garbage collect objects
-        for obj in self[KEY_OBJECT]:
-            self._logger.debug("resetting '{!r}'".format(obj))
-            try:
-                obj.reset()
-            except NotImplementedError:
-                self._logger.critical("Object '%s@%s' did not implement the reset() method!", obj, obj.__class__)
-            except Exception as e:
-                if singletons.config.is_log_cleanup():
-                    self._logger.exception(e)
-
-        for singleton in self[KEY_SINGLETON]:
-            self._logger.debug("resetting '{!r}'".format(singleton))
-            try:
-                singleton.reset()
-            except Exception as e:
-                if singletons.config.is_log_cleanup():
-                    self._logger.exception(e)
+        for key in (KEY_OBJECT, KEY_STATIC, KEY_SINGLETON):
+            for obj in self[key]:
+                self._logger.debug("resetting '{!r}'".format(obj))
+                try:
+                    if key == KEY_STATIC:
+                        obj.reset_class()
+                    else:
+                        obj.reset()
+                except NotImplementedError:
+                    self._logger.critical("Object '%s@%s' did not implement the reset() method!", obj, obj.__class__)
+                except Exception as e:
+                    if singletons.config.is_log_cleanup():
+                        self._logger.exception(e)
 
         self._logger.info("clearing simulate state objects ...")
         self[KEY_OBJECT] = []

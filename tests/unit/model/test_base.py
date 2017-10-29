@@ -1,4 +1,5 @@
 from miniworld.model.base import Base
+from miniworld.singletons import singletons
 
 
 class TestBase:
@@ -26,3 +27,16 @@ class TestBase:
 
         # new id provider
         assert Z()._id == 0
+
+    def test_reset_class(self):
+        """ Check that id generation is correctly resetted """
+
+        @Base.id_provider
+        class Foo(Base):
+            pass
+
+        foo1 = Foo()
+        assert foo1._id == 0
+        singletons.simulation_state_gc.reset_simulation_scenario_state()
+        foo2 = Foo()
+        assert foo2._id == 0

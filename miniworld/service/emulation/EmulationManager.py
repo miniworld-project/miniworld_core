@@ -12,7 +12,7 @@ from ordered_set import OrderedSet
 
 from miniworld.errors import Base, SimulationStateStartFailed
 from miniworld.impairment import LinkQualityConstants
-from miniworld.impairment.ImpairmentModel import ImpairmentModel
+from miniworld.impairment import ImpairmentModel
 from miniworld.mobility import DistanceMatrix
 from miniworld.mobility.MovementDirectorFactory import MovementDirectorFactory
 from miniworld.model import Lock
@@ -136,7 +136,7 @@ class EmulationManager(ResetableInterface):
         list<int>
         """
         # filter out virtual nodes!
-        return list(filter(lambda x: isinstance(x, int), self.nodes_id_mapping.keys()))
+        return [node._id for node in self.get_emulation_nodes()]
 
     ###############################################
     # CentralHub
@@ -168,7 +168,7 @@ class EmulationManager(ResetableInterface):
                 else:
                     idx_central_node = int(math.ceil(idx / nodes_stepping)) - 1
                 self._logger.info("idx_central_node: %s", idx_central_node)
-                bridge_node_id = self.central_nodes_id_mapping.keys()[idx_central_node]
+                bridge_node_id = list(self.central_nodes_id_mapping.keys())[idx_central_node]
 
                 if node.network_mixin.interfaces.filter_hub_wifi():
                     # NOTE: we keep the upper triangular matrix
@@ -339,7 +339,7 @@ class EmulationManager(ResetableInterface):
                       loss=LinkQualityConstants.LINK_QUALITY_VAL_LOSS_NONE)
         self._logger.info("using interface link quality: %s", pformat(kwargs))
         # load LinkQualityModel
-        link_quality_model = ImpairmentModel.import_link_quality_model(
+        link_quality_model = ImpairmentModel.ImpairmentModel.import_link_quality_model(
             singletons.scenario_config.get_link_quality_model())(**kwargs)
 
         with singletons.lock_manager.lock(resource=Lock.Resource.emulation, type=Lock.Type.write):

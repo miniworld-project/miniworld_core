@@ -38,7 +38,7 @@ class Action:
 
         def execute_graphql(query, *args, **kwargs):
             """ Monkey-patch execute method of GraphQLClient. """
-            print('executing query: {}'.format(query), file=sys.stderr)
+            print('executing graphql: {}'.format(query), file=sys.stderr)
             res_json = client_execute(query, *args, **kwargs)
             res = json.loads(res_json)
             if res.get('errors') is not None:

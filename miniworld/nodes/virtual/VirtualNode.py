@@ -15,7 +15,7 @@ class VirtualNode(EmulationNode):
     """
 
     # TODO: RENAME BRIDGE_NAME
-    def __init__(self, node_id, network_backend_bootstrapper, interfaces=None):
+    def __init__(self, network_backend_bootstrapper, interfaces=None):
         """
 
         Parameters
@@ -30,9 +30,9 @@ class VirtualNode(EmulationNode):
         # this call inits the interfaces of the :py:class:`.NetworkBackend`
 
         network_mixin = network_backend_bootstrapper.virtual_node_network_backend_type(network_backend_bootstrapper,
-                                                                                       node_id, interfaces=interfaces,
+                                                                                       self._id, interfaces=interfaces,
                                                                                        management_switch=singletons.config.is_management_switch_enabled())
-        super(VirtualNode, self).__init__(node_id, network_backend_bootstrapper, interfaces=interfaces,
+        super(VirtualNode, self).__init__(network_backend_bootstrapper, interfaces=interfaces,
                                           network_mixin=network_mixin)
 
         self.interface = self.network_mixin.interfaces[0]

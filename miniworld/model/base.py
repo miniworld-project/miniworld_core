@@ -1,4 +1,5 @@
 from collections import defaultdict
+from miniworld.singletons import singletons
 
 
 class Base:
@@ -11,7 +12,12 @@ class Base:
         cls.id_provider = cls
         return cls
 
+    @classmethod
+    def reset_class(cls):
+        cls.counter = defaultdict(lambda: 0)
+
     def __new__(cls, *args, **kwargs):
+        singletons.simulation_state_gc.add_static(Base)
         count = Base.counter[cls.id_provider]
         Base.counter[cls.id_provider] += 1
         instance = super().__new__(cls)

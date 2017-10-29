@@ -1,6 +1,5 @@
 from collections import defaultdict
 
-from miniworld.nodes import EmulationNode
 from miniworld.service.network.NetworkConfigurator import NetworkConfigurator
 from miniworld.singletons import singletons
 from miniworld.util import DictUtil
@@ -12,8 +11,7 @@ class NetworkConfiguratorConnectionLess(NetworkConfigurator):
     """
 
     def allocate_ips(self):
-        # TODO:
-        for emulation_node in self.get_all_emulation_nodes():
+        for emulation_node in self.get_emulation_nodes():
 
             if not self.filter_emulation_node(emulation_node):
                 continue
@@ -65,10 +63,6 @@ class NetworkConfiguratorConnectionLess(NetworkConfigurator):
 
     def get_emulation_nodes(self):
         return singletons.simulation_manager.get_emulation_nodes()
-
-    def get_all_emulation_nodes(self):
-        for node_id in singletons.scenario_config.get_all_emulation_node_ids():
-            yield EmulationNode.EmulationNode.factory(node_id)
 
     def filter_emulation_node(self, emulation_node):
         """

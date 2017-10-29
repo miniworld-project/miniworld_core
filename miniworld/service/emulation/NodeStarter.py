@@ -128,22 +128,6 @@ class NodeStarter:
                 for node in executor.map(self._start_node, args):
                     self.nodes.append(node)
 
-                    # TODO:
-                    # for arg in args:
-                    #     future_list.append( executor.submit(self._start_node, arg) )
-                    #
-                    #     # do not block the main thread too long -> eanbles listening to ctrl-c
-                    #     while 1:
-                    #
-                    #         for f in future_list:
-                    #             if not f.done():
-                    #                 sleep(1)
-                    #                 break
-                    #             else:
-                    #                 # raises the threads exception
-                    #                 self.nodes.append(f.result())
-                    #         break
-
             self._logger.info("all qemu instances started ...")
 
             # NOTE: create management switch after all nodes exist!
@@ -197,7 +181,7 @@ class NodeStarter:
         """
         args = args[0]
 
-        node = singletons.network_backend_bootstrapper_factory.get().emulation_node_type.factory(*args[:1])
+        node = singletons.network_backend_bootstrapper_factory.get().emulation_node_type.factory()
         node.start(args[1], flo_post_boot_script=args[2])
 
         with self.lock:
