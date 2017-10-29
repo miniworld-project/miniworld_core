@@ -2,6 +2,9 @@ import ipaddress
 from functools import total_ordering
 from threading import Lock
 
+from ordered_set import OrderedSet
+
+from miniworld.model.StartableObject import ScenarioState
 from miniworld.model.base import Base
 from miniworld.service.provisioning.TemplateContentProvider import TemplateContentProvider
 from miniworld.util import NetUtil
@@ -33,6 +36,9 @@ class Interface(Base, TemplateContentProvider):
     node_class = 0
     node_class_name = "abstract"
 
+    subnets = None
+    static_lock = Lock()
+
     def __init__(self, nr_host_interface=1):
         Base.__init__(self)
 
@@ -41,6 +47,11 @@ class Interface(Base, TemplateContentProvider):
 
         self.nr_host_interface = nr_host_interface
 
+        # set from outside
+        self.ipv4 = None
+        self.ipv6 = None
+        self.mac = None
+
     def __str__(self):
         return "%s_%d" % (self.node_class_name, self.nr_host_interface)
 
@@ -48,7 +59,7 @@ class Interface(Base, TemplateContentProvider):
         return '%s(%s)' % (self.__class__.__name__, self.nr_host_interface)
 
     def eq__comp_attrs(self):
-        return (self.node_class, self.nr_host_interface)
+        return self.node_class, self.nr_host_interface
 
     def __eq__(self, other):
         if issubclass(other.__class__, Interface):
@@ -67,6 +78,26 @@ class Interface(Base, TemplateContentProvider):
     def __hash__(self):
         return hash(self.eq__comp_attrs())
 
+    @classmethod
+    def subnet_for_type(cls):
+        """
+
+        Returns
+        -------
+        subnets : dict<type, IPv4Network>
+            For each interface type a subnet.
+        """
+
+        # there may be concurrent access
+        with cls.static_lock:
+            if cls.subnets is None:
+                # TODO: make subnet configurable via scenario config!
+                subnets = NetUtil.get_slash_x(ipaddress.ip_network(u"10.0.0.0/8").subnets(), 24)
+                # for each interface type create an extra subnet
+                cls.subnets = dict(zip(INTERFACE_ALL_CLASSES_TYPES, subnets))
+                cls.subnets[Management] = ipaddress.ip_network(u"172.21.0.0/16")
+            return cls.subnets[cls]
+
     def is_same_interface_type(self, other):
         return self.node_class == other.node_class
 
@@ -84,13 +115,13 @@ class Interface(Base, TemplateContentProvider):
         -------
         ipaddress._BaseAddress
         """
-        return self.get_ip_network()[node_id]
+        return self.get_ip_network()[node_id + 1]
 
     def get_last_ip(self):
         return self.get_ip_network()[-2]
 
     def get_ip_network(self):
-        return subnet_for_type()[type(self)]
+        return self.subnet_for_type()
 
     def get_mac(self, node_id):
         """
@@ -204,16 +235,21 @@ class WifiDirect(Interface):
         super(WifiDirect, self).__init__(*args, **kwargs)
 
 
-def is_management_interface(interface):
-    return isinstance(interface, Management)
+class InterfaceMeta(ScenarioState):
+    def reset(self):
+        pass
 
+    @staticmethod
+    def is_management_interface(interface):
+        return isinstance(interface, Management)
 
-def is_hubwifi_interface(interface):
-    return isinstance(interface, HubWiFi)
+    @staticmethod
+    def is_hubwifi_interface(interface):
+        return isinstance(interface, HubWiFi)
 
 
 # all interface types
-INTERFACE_ALL_CLASSES_TYPES = {
+INTERFACE_ALL_CLASSES_TYPES = OrderedSet(sorted({
     AP,
     Mesh,
     ADHoc,
@@ -222,31 +258,7 @@ INTERFACE_ALL_CLASSES_TYPES = {
 
     HubWiFi,
     Management
-}
-
-subnets = None
-static_lock = Lock()
-
-
-def subnet_for_type():
-    """
-
-    Returns
-    -------
-    subnets : dict<type, IPv4Network>
-        For each interface type a subnet.
-    """
-
-    # there may be concurrent access
-    with static_lock:
-        global subnets
-        if subnets is None:
-            # TODO: make subnet configurable via scenario config!
-            subnets = NetUtil.get_slash_x(ipaddress.ip_network(u"10.0.0.0/8").subnets(), 24)
-            # for each interface type create an extra subnet
-            subnets = dict(zip(INTERFACE_ALL_CLASSES_TYPES, subnets))
-            subnets[Management] = ipaddress.ip_network(u"172.21.0.0/16")
-        return subnets
+}, key=lambda interface: interface.node_class))
 
 
 # all interfaces which are treated equally

@@ -10,10 +10,10 @@ def test_parse_core_config_file(core_topologies_dir, include_interfaces):
                                                         include_interfaces=include_interfaces)
     if include_interfaces:
         assert res == {
-            (1, 1): (2, 1),
-            (2, 2): (3, 1),
-            (3, 2): (4, 1),
-            (4, 2): (5, 1),
+            (0, 0): (1, 0),
+            (1, 1): (2, 0),
+            (2, 1): (3, 0),
+            (3, 1): (4, 0),
         }
     else:
-        assert res == {1: set([2]), 2: set([3]), 3: set([4]), 4: set([5])}
+        assert res == {0: set([1]), 1: set([2]), 2: set([3]), 3: set([4])}

@@ -66,9 +66,8 @@ class CoreConfigFileParser:
                         self._logger.debug(member.childNodes[0].data)
                         # split "n1/eth1" to 1, 1
                         node_id, interface = member.childNodes[0].data.split("/")
-                        node_id = int(node_id[1:])
+                        node_id = int(node_id[1:]) - 1
                         interface = int(interface.split('eth')[1])
-                        interface += 1
 
                         if cur_node_id is None:
                             cur_node_id = node_id

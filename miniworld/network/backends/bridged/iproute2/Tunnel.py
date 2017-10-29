@@ -38,14 +38,14 @@ class AbstractTunnel(StartableObject.ScenarioState):
         singletons.network_backend.shell_command_executor.add_command(self.EVENT_ROOT, event, 0, cmd, self.PREFIXES)
 
     def get_tunnel_id(self):
-        return NetworkBackendUtil.szudzik_pairing_function(self.emulation_node_x.id, self.emulation_node_y.id)
+        return NetworkBackendUtil.szudzik_pairing_function(self.emulation_node_x._id, self.emulation_node_y._id)
 
     def get_tunnel_name(self):
         raise NotImplementedError
 
     def get_local_emulation_node(self):
         return self.emulation_node_x if singletons.simulation_manager.is_local_node(
-            self.emulation_node_x.id) else self.emulation_node_y
+            self.emulation_node_x._id) else self.emulation_node_y
 
 
 class TunnelIPRoute(AbstractTunnel):
@@ -65,7 +65,7 @@ class TunnelIPRoute(AbstractTunnel):
         self.PREFIXES = [TunnelIPRoute.__class__.__name__]
 
     def get_tunnel_name(self):
-        return singletons.network_backend.get_tunnel_name(self.emulation_node_x.id, self.emulation_node_y.id)
+        return singletons.network_backend.get_tunnel_name(self.emulation_node_x._id, self.emulation_node_y._id)
 
     def reset(self):
         from miniworld.network.backends.bridged.iproute2 import IPRoute2Commands
@@ -86,7 +86,7 @@ class GreTapTunnel(TunnelIPRoute):
         tunnel_cmd = IPRoute2Commands.get_gretap_tunnel_cmd(self.get_tunnel_name(), self.remote_ip,
                                                             self.get_tunnel_id())
 
-        self._logger.info("creating gretap tunnel for %s<->%s" % (self.emulation_node_x.id, self.emulation_node_y.id))
+        self._logger.info("creating gretap tunnel for %s<->%s" % (self.emulation_node_x._id, self.emulation_node_y._id))
 
         self.add_command(self.EVENT_TUNNEL_ADD, tunnel_cmd)
 

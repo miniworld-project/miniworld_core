@@ -1,5 +1,6 @@
 import gzip
 import json
+import logging
 import os
 import signal
 import subprocess
@@ -52,6 +53,7 @@ def create_runner(tmpdir_factory, request, config_path):
             self.config = config_path
             self.server_proc = None
             # self.is_start_server = not request.config.getoption("--no-server")
+            self.logger = logging.getLogger()
 
         def __enter__(self) -> 'Runner':
             self.start()
@@ -160,16 +162,15 @@ def create_runner(tmpdir_factory, request, config_path):
             """
             return self.run_mwcli_command_json_result(['info', 'addr'])
 
-        @staticmethod
-        def connect_to_server():
+        def connect_to_server(self):
             print('connecting to server')
             while True:
                 try:
                     Runner.run_mwcli_command_silently(['ping'])
                     sys.stderr.write('.')
                     return
-                except subprocess.CalledProcessError:
-                    pass
+                except subprocess.CalledProcessError as e:
+                    self.logger.error(e)
 
     return Runner
 

@@ -34,3 +34,11 @@ class TestScenario:
                 "steps": 1
             }
         }
+
+    def test_abort(self, client):
+        singletons.simulation_manager = Mock()
+        client.execute('''
+        mutation MyMutations {
+            scenarioAbort {status}
+        }
+        ''')

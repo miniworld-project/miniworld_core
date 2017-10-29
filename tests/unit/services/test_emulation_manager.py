@@ -17,19 +17,19 @@ class EmulationNode(Mock):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.id = EmulationNode.id
+        self._id = EmulationNode.id
         EmulationNode.id += 1
         self.network_mixin = MagicMock()
         self.network_mixin.interfaces = Interfaces.factory_from_interface_names(['mesh'])
 
     def __eq__(self, other):
-        return self.id == other.id
+        return self._id == other._id
 
     def __lt__(self, other):
-        return self.id < other.id
+        return self._id < other._id
 
     def __hash__(self):
-        return hash(self.id)
+        return hash(self._id)
 
     def __len__(self):
         return 0
@@ -52,8 +52,8 @@ def emulation_manager():
 @pytest.fixture
 def distance_matrix():
     dm = DistanceMatrix.factory()()
-    dm.set_distance(x=1, y=2, distance=10)
-    dm.set_distance(x=2, y=3, distance=30)
+    dm.set_distance(x=0, y=1, distance=10)
+    dm.set_distance(x=1, y=2, distance=30)
     return dm
 
 
@@ -134,7 +134,7 @@ class TestEmulationManager:
         emulation_manager.start(scenario_config=scenario_config, auto_stepping=False)
 
         # 2 nodes
-        emulation_manager.nodes_id_mapping = {1: EmulationNode(), 2: EmulationNode(), 3: EmulationNode()}
+        emulation_manager.nodes_id_mapping = {0: EmulationNode(), 1: EmulationNode(), 2: EmulationNode()}
         singletons.scenario_config.is_network_links_auto_ipv4 = MagicMock(return_value=False)
         singletons.network_manager.net_configurator = MagicMock()
 

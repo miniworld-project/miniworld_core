@@ -70,10 +70,10 @@ class CoreConfigNodes(ResetableInterface):
                     if i in self.crnt_connections[n]:
                         # connected
                         distance = 0
-                        distance_matrix.set_distance(n + 1, i + 1, distance)
+                        distance_matrix.set_distance(n, i, distance)
                     else:
                         # not connected
-                        distance_matrix.set_unlimited_distance(n + 1, i + 1)
+                        distance_matrix.set_unlimited_distance(n, i)
         return distance_matrix
 
     def get_coordinates(self):

@@ -22,6 +22,25 @@ class TestImpairment:
             "impairments": [
                 {
                     "node": {
+                        "id": 0,
+                        "links": [
+                            {
+                                "impairment": {
+                                    "bandwidth": 500,
+                                    "loss": 0.5
+                                },
+                                "interface": {
+                                    "name": "mesh"
+                                },
+                                "node": {
+                                    "id": 1
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "node": {
                         "id": 1,
                         "links": [
                             {
@@ -34,25 +53,6 @@ class TestImpairment:
                                 },
                                 "node": {
                                     "id": 2
-                                }
-                            }
-                        ]
-                    }
-                },
-                {
-                    "node": {
-                        "id": 2,
-                        "links": [
-                            {
-                                "impairment": {
-                                    "bandwidth": 500,
-                                    "loss": 0.5
-                                },
-                                "interface": {
-                                    "name": "mesh"
-                                },
-                                "node": {
-                                    "id": 3
                                 }
                             }
                         ]

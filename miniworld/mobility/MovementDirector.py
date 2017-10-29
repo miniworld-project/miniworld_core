@@ -73,7 +73,7 @@ class MovementDirector(MovementDirectorAbstract):
         for emulation_node, connected_emulation_nodes in singletons.network_manager.connection_store.get_connections_per_node().items():
             for connected_emulation_node in connected_emulation_nodes:
                 list_of_geo_json_objects.append(
-                    self.__get_geo_json_object_for_connection(emulation_node.id - 1, connected_emulation_node.id - 1))
+                    self.__get_geo_json_object_for_connection(emulation_node._id, connected_emulation_node._id))
 
         feature_coll_roads = geojson.FeatureCollection(list_of_geo_json_objects)
         return geojson.dumps(feature_coll_roads)

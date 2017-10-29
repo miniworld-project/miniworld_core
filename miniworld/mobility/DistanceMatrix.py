@@ -99,7 +99,7 @@ class DistanceMatrixDict(UserDict, DistanceMatrix):
         DistanceMatrix.__init__(self, data=data)
 
     def get_key(self, x, y):
-        return (x, y)
+        return x, y
 
     def set_distance(self, x, y, distance):
         self.data[self.get_key(x, y)] = distance

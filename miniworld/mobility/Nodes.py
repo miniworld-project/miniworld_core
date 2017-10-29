@@ -60,10 +60,10 @@ class Nodes:
 
         # TODO: REPLACE all calls with this
         # singletons.simulation_manager.get_emulation_node_ids(): -> range(scenario_config.get_number_of_nodes())
-        for n in range(singletons.scenario_config.get_number_of_nodes() - 1):
-            for i in range(n + 1, singletons.scenario_config.get_number_of_nodes()):
+        for n in singletons.simulation_manager.get_emulation_node_ids():
+            for i in range(n + 1, singletons.simulation_manager.get_emulation_node_ids()[-1] + 1):
                 if n != i:
-                    distance_matrix.set_distance(n + 1, i + 1,
+                    distance_matrix.set_distance(n, i,
                                                  self.dict_of_nodes[n].get_distance_in_m(self.dict_of_nodes[i]))
         return distance_matrix
 

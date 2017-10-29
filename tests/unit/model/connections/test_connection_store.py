@@ -23,23 +23,3 @@ class TestConnectionStore:
         conn_store.add_connection(conn, active=True,
                                   link_quality_dict=link_quality_dict)
         print(conn_store.get_link_quality_matrix(include_interfaces=False).to_json())
-        # assert conn_store.get_link_quality_matrix(include_interfaces=False).to_json() == {
-        #     "1": {
-        #         "2": {
-        #             "bandwidth": "500",
-        #             "loss": "0.5"
-        #         }
-        #     }
-        # }
-        # assert conn_store.get_link_quality_matrix(include_interfaces=True).to_json() == {
-        #     "1": {
-        #         "2": {
-        #             "mesh": {
-        #                 "mesh": {
-        #                     "bandwidth": "500",
-        #                     "loss": "0.5"
-        #                 }
-        #             }
-        #         }
-        #     }
-        # }

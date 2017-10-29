@@ -1,6 +1,7 @@
 import graphene
 
 from miniworld import singletons
+from miniworld.api import Status
 from miniworld.util import JSONConfig
 
 
@@ -28,3 +29,11 @@ class ScenarioStep(graphene.Mutation):
     def mutate(self, info, steps):
         singletons.simulation_manager.step(steps)
         return ScenarioStep(steps=steps)
+
+
+class ScenarioAbort(graphene.Mutation):
+    status = graphene.Field(graphene.Enum.from_enum(Status))
+
+    def mutate(self, info, *args, **kwargs):
+        singletons.simulation_manager.abort()
+        return ScenarioAbort(status=Status.ok)

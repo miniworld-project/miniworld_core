@@ -119,11 +119,11 @@ class NetworkConfigurator:
 
                 def _exec(emu_node, commands):
                     if commands:
-                        self._logger.debug("network config for node: %s:\n%s", emu_node.id, commands)
+                        self._logger.debug("network config for node: %s:\n%s", emu_node._id, commands)
                         emu_node.virtualization_layer.run_commands_eager_check_ret_val(StringIO(commands))
 
                     # notify EventSystem
-                    ev.update([emu_node.id], 1.0, add=True)
+                    ev.update([emu_node._id], 1.0, add=True)
 
                 future = executor.submit(_exec, emu_node, commands)
                 results.append(future)

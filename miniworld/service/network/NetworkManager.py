@@ -403,10 +403,10 @@ class NetworkManager(ResetableInterface, NetworkBackendNotifications.NetworkBack
         group_interface = 2
 
         def get_interface_name(emu_node, interface):
-            return "%s_%s" % (emu_node.id, interface.node_class_name)
+            return "%s_%s" % (emu_node._id, interface.node_class_name)
 
         def get_node_name(emu_node):
-            return emu_node.id
+            return emu_node._id
 
         def get_interface_group(interface):
             return group_interface + interface.node_class

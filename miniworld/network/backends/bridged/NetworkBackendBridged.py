@@ -281,7 +281,7 @@ def NetworkBackendBridgedDummy():
         #############################################################
 
         def get_interface_index(self, emulation_node, interface):
-            return self.get_id_tap_postfix(emulation_node.id, interface) - 1
+            return self.get_id_tap_postfix(emulation_node._id, interface) - 1
 
         #############################################################
         # Actual connection changing/qdisc
@@ -333,11 +333,11 @@ def NetworkBackendBridgedDummy():
             """
 
             max_id = 10 ** 5
-            if emulation_node_x.id > max_id or emulation_node_y.id > max_id:
+            if emulation_node_x._id > max_id or emulation_node_y._id > max_id:
                 raise ValueError("Only %d nodes supported!" % max_id)
 
             br_name = 'br_{id_fmt}_{id_fmt}'.format(id_fmt=Constants.NODE_ID_FMT) % (
-                emulation_node_x.id, emulation_node_y.id)
+                emulation_node_x._id, emulation_node_y._id)
 
             bridge = self.network_backend_bootstrapper.switch_type(br_name, interface_x)
             bridge.start(switch=False, bridge_dev_name=br_name)
@@ -378,12 +378,12 @@ def NetworkBackendBridgedDummy():
                         self.network_backend_bootstrapper, id=i + 1)
                     # central_node.id = self.get_br_name(central_node.id, central_node.interface)
                     # TODO: #54 make configurable!
-                    self._logger.debug("creating CentralNode with id: %s", central_node.id)
-                    central_node.start(switch=False, bridge_dev_name=central_node.id)
-                    central_nodes_dict[central_node.id] = central_node
+                    self._logger.debug("creating CentralNode with id: %s", central_node._id)
+                    central_node.start(switch=False, bridge_dev_name=central_node._id)
+                    central_nodes_dict[central_node._id] = central_node
 
                     # remember new bridges
-                    self.event_monitor.add_new_bridge(central_node.id)
+                    self.event_monitor.add_new_bridge(central_node._id)
 
                 cnt += 1
 

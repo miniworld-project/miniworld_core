@@ -2,6 +2,7 @@ from functools import total_ordering
 from io import StringIO
 
 from miniworld.model.StartableObject import ScenarioState
+from miniworld.model.base import Base
 from miniworld.singletons import singletons
 
 __author__ = 'Nils Schmidt'
@@ -23,7 +24,8 @@ __author__ = 'Nils Schmidt'
 
 # TODO: #54,#55: adjust doc
 @total_ordering
-class EmulationNode(ScenarioState):
+@Base.id_provider
+class EmulationNode(Base, ScenarioState):
     """ Models a node in a mesh network.
 
     A node consists of a QEMU instance running e.g. an OpenWRT image.
@@ -60,12 +62,11 @@ class EmulationNode(ScenarioState):
     #############################################################
 
     def __init__(self, node_id, network_backend_bootstrapper, interfaces, network_mixin=None):
-        # node id
-        self.id = node_id
-        if not isinstance(self.id, int):
-            raise ValueError('int required')
+
+        Base.__init__(self)
+        ScenarioState.__init__(self)
+
         self.name = None
-        super().__init__()
         self._logger = singletons.logger_factory.get_logger(self)
 
         self.network_backend_bootstrapper = network_backend_bootstrapper
@@ -88,7 +89,7 @@ class EmulationNode(ScenarioState):
 
     @property
     def name(self):
-        return self._name or str(self.id)
+        return str(self._id)
 
     @name.setter
     def name(self, name):
@@ -100,7 +101,7 @@ class EmulationNode(ScenarioState):
         return self.name == other.name
 
     def __lt__(self, other):
-        return self.id < other.id
+        return self._id < other._id
 
     def __str__(self):
         return str(self.name)
@@ -145,7 +146,7 @@ class EmulationNode(ScenarioState):
         self.nlog.info("node running ...")
 
         # notify EventSystem even if there are no commands
-        with es.event_no_init(es.EVENT_VM_SHELL_PRE_NETWORK_COMMANDS, finish_ids=[self.id]):
+        with es.event_no_init(es.EVENT_VM_SHELL_PRE_NETWORK_COMMANDS, finish_ids=[self._id]):
             # do this immediately after the node has been started
             self.run_pre_network_shell_commands(flo_post_boot_script)
 

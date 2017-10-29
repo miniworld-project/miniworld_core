@@ -217,7 +217,7 @@ class NodeStarter:
         """
         all_node_ids = set(self.node_ids)
 
-        nodes_remaining = all_node_ids.difference(set(map(lambda node: node.id, self.nodes_running)))
+        nodes_remaining = all_node_ids.difference(set(map(lambda node: node._id, self.nodes_running)))
         # all nodes started :)
         if not nodes_remaining:
             # remember last node id

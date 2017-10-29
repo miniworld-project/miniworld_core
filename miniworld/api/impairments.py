@@ -41,13 +41,13 @@ def resolve_impairments(id: int = None, active: bool = None):
         links[(emu_nodes[0], interfaces[0])].add(
             Connection(
                 node=serialize_node(emu_nodes[1]),
-                interface=serialize_interface(interface=interfaces[1], node=emu_nodes[1]),
+                interface=serialize_interface(interface=interfaces[1]),
                 impairment=connection_details.link_quality,
                 connected=connected,
             ),
         )
 
-    for node in filter(lambda node: (node.id == id) if id is not None else True, singletons.simulation_manager.nodes_id_mapping.values()):
+    for node in filter(lambda node: (node._id == id) if id is not None else True, singletons.simulation_manager.nodes_id_mapping.values()):
         if active is None or active is True:
             for emu_nodes, interfaces, connection_details in singletons.network_manager.connection_store.get_connections(
                     node, active=True):
@@ -65,8 +65,8 @@ def resolve_impairments(id: int = None, active: bool = None):
 
 def serialize_impairment_node(node, interface, links):
     return ImpairmentNode(
-        id=node.id,
+        id=node._id,
         virtualization=node.virtualization_layer.__class__.__name__,
-        interface=serialize_interface(interface, node),
+        interface=serialize_interface(interface),
         links=links,
     )

@@ -27,10 +27,10 @@ class AbstractConnection(StartableObject.ScenarioState, InterfaceDependentID):
 
         self.connection_info = connection_info
 
-        self.emulation_node_x_idid = self.get_interface_class_dependent_id(emulation_node_x.id,
+        self.emulation_node_x_idid = self.get_interface_class_dependent_id(emulation_node_x._id,
                                                                            self.interface_x.node_class,
                                                                            self.interface_x.nr_host_interface)
-        self.emulation_node_y_idid = self.get_interface_class_dependent_id(emulation_node_y.id,
+        self.emulation_node_y_idid = self.get_interface_class_dependent_id(emulation_node_y._id,
                                                                            self.interface_y.node_class,
                                                                            self.interface_y.nr_host_interface)
 

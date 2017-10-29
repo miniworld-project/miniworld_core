@@ -79,22 +79,10 @@ class EmulationNodeNetworkBackend(NetworkMixin):
     # Network Config
     #########################################
 
-    # TODO: DOC, sublcass methods
-
-    def _nic_ipv4_config(self, emulation_node):
-        for _if in self.interfaces.filter_normal_interfaces():
-            idx = self.interfaces.index(_if)
-            ip = _if.get_ip(emulation_node.id)
-            netmask = _if.get_netmask()
-
-            cmd_ip_change = NetUtil.get_ip_addr_change_cmd(
-                "%s%s" % (singletons.scenario_config.get_network_links_nic_prefix(), idx),
-                ip, netmask)
-            emulation_node.virtualization_layer.run_commands_eager(StringIO(cmd_ip_change))
-
     def _nic_mgmt_ipv4_config(self, emulation_node):
         for _if in self.interfaces.filter_mgmt():
-            ip = _if.get_ip(emulation_node.id)
+            ip = _if.get_ip(emulation_node._id)
+            _if.ipv4 = ip
             netmask = _if.get_netmask()
             # TODO: #63: we dont know if renaming worked, therefore try to rename both ethX and mgmt
             cmd_ip_change = NetUtil.get_ip_addr_change_cmd(singletons.config.get_bridge_tap_name(), ip, netmask)

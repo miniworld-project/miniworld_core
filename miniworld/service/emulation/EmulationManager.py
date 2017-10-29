@@ -160,7 +160,7 @@ class EmulationManager(ResetableInterface):
             nodes_stepping = cnt_nodes * 1.0 / cnt_central_nodes
             self._logger.info("nodes_stepping: %d", nodes_stepping)
             for idx, node in enumerate(nodes):
-                node_id = node.id
+                node_id = node._id
                 self._logger.info("loop: %s, %s, %s", idx, node_id, node)
 
                 if idx == 0:
@@ -381,7 +381,7 @@ class EmulationManager(ResetableInterface):
                 Interfaces.Interfaces.factory_from_interface_names(interfaces))
             self.pre_calculate_hubwifi_distance_matrix(emulation_nodes)
 
-            self.nodes_id_mapping = {node.id: node for node in
+            self.nodes_id_mapping = {node._id: node for node in
                                      (emulation_nodes + list(self.central_nodes_id_mapping.values()))}
 
             self._logger.debug("nodes: %s", pformat(self.nodes_id_mapping))
@@ -423,7 +423,7 @@ class EmulationManager(ResetableInterface):
             with ConcurrencyUtil.node_start_parallel() as executor:
                 for node in nodes:
                     fun = get_fun(node)
-                    jobs[node.id] = executor.submit(fun, StringIO(cmd))
+                    jobs[node._id] = executor.submit(fun, StringIO(cmd))
 
                 for node_id, job in jobs.items():
                     res[node_id] = job.result()
@@ -951,8 +951,8 @@ class SimulationManagerDistributedClient(DistributedModeSimulationManager):
             return False
 
         # an node
-        local_1 = self.is_local_node(emulation_node_x.id)
-        local_2 = self.is_local_node(emulation_node_y.id)
+        local_1 = self.is_local_node(emulation_node_x._id)
+        local_2 = self.is_local_node(emulation_node_y._id)
         if local_1 != local_2:
             return True
         return False
@@ -1007,7 +1007,7 @@ class SimulationManagerDistributedClient(DistributedModeSimulationManager):
             remote_node, if_remote_node, local_emu_node, if_local_emu_node
         """
         return (emulation_node_x, interface_x, emulation_node_y, interface_y) if not self.is_local_node(
-            emulation_node_x.id) else (emulation_node_y, interface_y, emulation_node_x, interface_x)
+            emulation_node_x._id) else (emulation_node_y, interface_y, emulation_node_x, interface_x)
 
 
 class SimulationManagerDistributedCoordinator(DistributedModeSimulationManager):

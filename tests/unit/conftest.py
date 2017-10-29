@@ -57,11 +57,18 @@ def client():
 
 @pytest.fixture
 def mock_nodes(request) -> Dict[int, EmulationNode]:
+    def configure_net(interface, node):
+        interface.ipv4 = interface.get_ip(node._id)
+        interface.ipv6 = interface.get_ip(node._id)
+        interface.mac = interface.get_mac(node._id)
+
     cnt_nodes = getattr(request, 'param', None) or 2
     network_backend_bootstrapper = singletons.network_backend_bootstrapper_factory.get()
-    for i in range(1, cnt_nodes + 1):
+    for i in range(cnt_nodes):
         interface = Interfaces.factory_from_interface_names(['mesh'])[0]
         n = EmulationNode(i, network_backend_bootstrapper, [interface])
+        for interface in n.interfaces:
+            configure_net(interface, n)
         singletons.simulation_manager.nodes_id_mapping[i] = n
 
     return singletons.simulation_manager.nodes_id_mapping
@@ -93,5 +100,5 @@ def mock_connections(mock_nodes):
 @pytest.fixture
 def mock_distances():
     singletons.simulation_manager.movement_director = MagicMock()
-    singletons.simulation_manager.movement_director.get_distances_from_nodes.return_value = {(1, 2): 1, (1, 3): -1,
-                                                                                             (2, 3): 1}
+    singletons.simulation_manager.movement_director.get_distances_from_nodes.return_value = {(0, 1): 1, (0, 2): -1,
+                                                                                             (1, 2): 1}

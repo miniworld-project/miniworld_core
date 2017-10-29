@@ -1,4 +1,3 @@
-
 from miniworld.model.interface import Interface
 from miniworld.nodes.qemu import Qemu
 from miniworld.singletons import singletons
@@ -27,7 +26,6 @@ def get_cmd_template_qemu_nic():
 
 
 class QemuTap(Qemu.Qemu):
-
     # TODO: #54,#55: DOC
     def _build_qemu_nic_command(self):
 
@@ -61,10 +59,12 @@ class QemuTap(Qemu.Qemu):
         return '\n'.join(cmd_setup_nics)
 
     def _build_qemu_nic_command_internal(self, _if, _if_name, vlan):
+        # node classes have a common mac address prefix
+        mac = _if.get_mac(self.emulation_node._id)
+        _if.mac = mac
         return get_cmd_template_qemu_nic().format(
             ifname=_if_name,
-            # node classes have a common mac address prefix
-            mac_addr=_if.get_mac(self.emulation_node.id),
+            mac_addr=mac,
             vlan=vlan,
             nic_model=singletons.scenario_config.get_qemu_nic()
         )

@@ -86,7 +86,7 @@ def NetworkBackendBridgedMultiDevice():
                     virtual_node, _if = connections.filter_mgmt_nodes()[0]
 
                 emu_node, emu_if = connections.filter_real_emulation_nodes()[0]
-                tap_dev_name = self.get_tap_name(emu_node.id, emu_if)
+                tap_dev_name = self.get_tap_name(emu_node._id, emu_if)
                 bridge = virtual_node.switch
                 bridge.add_if(tap_dev_name, if_up=True)
 
@@ -101,8 +101,8 @@ def NetworkBackendBridgedMultiDevice():
 
                 if create_new_conn:
                     # get tap device name
-                    tap_x = self.get_tap_name(emulation_node_x.id, interface_x)
-                    tap_y = self.get_tap_name(emulation_node_y.id, interface_y)
+                    tap_x = self.get_tap_name(emulation_node_x._id, interface_x)
+                    tap_y = self.get_tap_name(emulation_node_y._id, interface_y)
 
                     # create bridge
                     bridge = self.create_n_store_switch(emulation_node_x,

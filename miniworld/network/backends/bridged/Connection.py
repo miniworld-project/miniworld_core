@@ -87,12 +87,12 @@ def ConnectionDummy():
 
                 connection_id = None
                 if is_hubwifi:
-                    tap_dev_name = singletons.network_backend.get_tap_name(emu_node.id, if_emu_node)
+                    tap_dev_name = singletons.network_backend.get_tap_name(emu_node._id, if_emu_node)
                     self.shape_device(tap_dev_name, connection_id, link_quality_dict)
                 else:
                     # get tap device names
-                    tap_x = singletons.network_backend.get_tap_name(self.emulation_node_x.id, self.interface_x)
-                    tap_y = singletons.network_backend.get_tap_name(self.emulation_node_y.id, self.interface_y)
+                    tap_x = singletons.network_backend.get_tap_name(self.emulation_node_x._id, self.interface_x)
+                    tap_y = singletons.network_backend.get_tap_name(self.emulation_node_y._id, self.interface_y)
                     connection_id = self.get_connection_id(tap_x, tap_y)
 
                     # traffic shape downlinks
@@ -102,8 +102,8 @@ def ConnectionDummy():
                     # TODO: move to iproute2 connection!
                     if self.connection_info.is_remote_conn:
                         remote_node, if_remote_node, local_emu_node, if_local_emu_node = self.get_remote_node()
-                        tap_local = singletons.network_backend.get_tap_name(local_emu_node.id, if_local_emu_node)
-                        tunnel_dev = singletons.network_backend.get_tunnel_name(remote_node.id, local_emu_node.id)
+                        tap_local = singletons.network_backend.get_tap_name(local_emu_node._id, if_local_emu_node)
+                        tunnel_dev = singletons.network_backend.get_tunnel_name(remote_node._id, local_emu_node._id)
                         connection_id = self.get_connection_id(tap_local, tunnel_dev)
                         self.shape_device(tap_local, connection_id, link_quality_dict)
                         # NOTE: this happens at the other server!
@@ -213,7 +213,7 @@ def ConnectionDummy():
 
             if is_hubwifi:
                 emu_node, if_emu_node, emu_node_2, if_emu_node_2 = self.get_central_node()
-                tap_dev_name = singletons.network_backend.get_tap_name(emu_node.id, if_emu_node)
+                tap_dev_name = singletons.network_backend.get_tap_name(emu_node._id, if_emu_node)
                 tap_central_node = emu_node_2.switch.id
                 self.tap_link_up_central(tap_dev_name, tap_central_node, up=up)
             elif self.connection_info.is_remote_conn:
@@ -221,17 +221,17 @@ def ConnectionDummy():
                 remote_node, if_remote_node, local_emu_node, if_local_emu_node = self.get_remote_node()
 
                 # always produce the same dev name => sort nodes by id
-                node_id_1, node_id_2 = (remote_node.id, local_emu_node.id) if remote_node.id < local_emu_node.id else (
-                    local_emu_node.id, remote_node.id)
+                node_id_1, node_id_2 = (remote_node._id, local_emu_node._id) if remote_node._id < local_emu_node._id else (
+                    local_emu_node._id, remote_node._id)
                 tunnel_dev_name = singletons.network_backend.get_tunnel_name(node_id_1, node_id_2)
-                tap_local = singletons.network_backend.get_tap_name(local_emu_node.id, if_local_emu_node)
+                tap_local = singletons.network_backend.get_tap_name(local_emu_node.i_d, if_local_emu_node)
 
                 self.tap_link_up_remote(tunnel_dev_name, tap_local, up=up)
                 self.tap_link_up_remote(tap_local, tunnel_dev_name, up=up)
             else:
                 # get tap device names
-                tap_x = singletons.network_backend.get_tap_name(self.emulation_node_x.id, self.interface_x)
-                tap_y = singletons.network_backend.get_tap_name(self.emulation_node_y.id, self.interface_y)
+                tap_x = singletons.network_backend.get_tap_name(self.emulation_node_x._id, self.interface_x)
+                tap_y = singletons.network_backend.get_tap_name(self.emulation_node_y._id, self.interface_y)
 
                 self.tap_link_up(tap_x, tap_y, up=up)
                 self.tap_link_up(tap_y, tap_x, up=up)

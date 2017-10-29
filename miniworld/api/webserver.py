@@ -8,7 +8,7 @@ from miniworld.api.impairmentmodel import ImpairmentQuery
 from miniworld.api.impairments import ImpairmentsQuery
 from miniworld.api.mobility import DistancesQuery
 from miniworld.api.node import NodeQuery
-from miniworld.api.scenario import ScenarioStart, ScenarioStep
+from miniworld.api.scenario import ScenarioStart, ScenarioStep, ScenarioAbort
 
 
 class PingQuery(ObjectType):
@@ -21,6 +21,7 @@ class PingQuery(ObjectType):
 class Mutations(graphene.ObjectType):
     scenario_start = ScenarioStart.Field()
     scenario_step = ScenarioStep.Field()
+    scenario_abort = ScenarioAbort.Field()
 
 
 class Query(PingQuery, ImpairmentsQuery, NodeQuery, DistancesQuery, ImpairmentQuery):

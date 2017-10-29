@@ -62,7 +62,7 @@ def serialize_distances(node_id: int = None, between: BetweenDistances = None) -
             yield res
 
         distance_details.append(DistanceDetails(
-            node=singletons.simulation_manager.nodes_id_mapping[y],
+            node=serialize_node(singletons.simulation_manager.nodes_id_mapping[y]),
             distance=distance
         ))
 

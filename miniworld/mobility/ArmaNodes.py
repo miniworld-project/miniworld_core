@@ -22,8 +22,8 @@ class ArmaNodes:
 
     def get_distance_matrix(self):
         output = {}
-        for n in range(0, self.node_cnt - 1):
-            for i in range(n + 1, self.node_cnt):
+        for n in singletons.simulation_manager.get_emulation_node_ids():
+            for i in range(n + 1, singletons.simulation_manager.get_emulation_node_ids()[-1] + 1):
                 if n != i:
                     output[(n + 1, i + 1)] = self.list_of_nodes[n].get_distance_in_m(self.list_of_nodes[i])
         return output

@@ -52,7 +52,7 @@ class EmulationNodes(Objects):
         if singletons.simulation_manager.is_connection_among_servers(emulation_node_x, emulation_node_y):
 
             # one of both must be local
-            if singletons.simulation_manager.is_local_node(emulation_node_x.id):
+            if singletons.simulation_manager.is_local_node(emulation_node_x._id):
                 return EmulationNodes([emulation_node_x, emulation_node_y])
 
             return EmulationNodes([emulation_node_y, emulation_node_x])

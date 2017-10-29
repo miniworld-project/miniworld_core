@@ -10,7 +10,7 @@ class Interface(graphene.ObjectType):
     id = graphene.Int()
     name = graphene.String()
     nr_host_interface = graphene.Int()
-    # ip = graphene.String()
+    ipv4 = graphene.String()
     mac = graphene.String()
 
 
@@ -31,17 +31,18 @@ class NodeQuery(ObjectType):
 
 def serialize_node(node: EmulationNode) -> Node:
     return Node(
-        id=node.id,
+        id=node._id,
         virtualization=node.virtualization_layer.__class__.__name__,
-        interfaces=[serialize_interface(interface, node) for interface in
+        interfaces=[serialize_interface(interface) for interface in
                     node.interfaces]
     )
 
 
-def serialize_interface(interface: InterfaceModel, node: EmulationNode):
+def serialize_interface(interface: InterfaceModel):
     return Interface(
         id=interface._id,
         name=interface.node_class_name,
-        mac=interface.get_mac(node.id),
+        mac=interface.mac,
+        ipv4=interface.ipv4,
         nr_host_interface=interface.nr_host_interface,
     )

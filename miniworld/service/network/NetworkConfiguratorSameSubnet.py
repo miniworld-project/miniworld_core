@@ -8,7 +8,6 @@ from miniworld.singletons import singletons
 
 
 class NetworkConfiguratorSameSubnet(NetworkConfiguratorConnectionLess):
-
     """
     This configurator uses the node list to configure each interface.
     NOTE: the configurator has to run only once to configure all interfaces (in contrast to a connection-based configurator),
@@ -88,7 +87,7 @@ class NetworkConfiguratorSameSubnet(NetworkConfiguratorConnectionLess):
                 # NOTE: we do not use the type here! instead the count the interfaces (different eq operation)!
                 cnt_type_ifaces = c[interface]
 
-                offset = emulation_node.id * (cnt_total_type_ifaces - cnt_type_ifaces + 1)
+                offset = (emulation_node._id + 1) * (cnt_total_type_ifaces - cnt_type_ifaces + 1)
                 ip_addr = self.get_ip(subnet, offset=offset - 1)
             netmask = subnet.netmask
 
@@ -168,4 +167,4 @@ class NetworkConfiguratorSameSubnet(NetworkConfiguratorConnectionLess):
     ################################################
 
     def get_key_ip_dict(self, emulation_node, interface):
-        return emulation_node.id, interface
+        return emulation_node._id, interface
