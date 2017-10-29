@@ -15,7 +15,7 @@ def init_singletons():
     from miniworld.service.rpc import Protocol
     from miniworld.service.emulation import EmulationManager
     from miniworld.singletons.Singletons import singletons
-    from miniworld.service.shell import ShellHelper
+    from miniworld.service.shell import shell
     from miniworld.service.network import NetworkManager
     from miniworld.model import SimulationErrors
     from miniworld.service import ScenarioGarbageCollector
@@ -30,7 +30,7 @@ def init_singletons():
     singletons.lock_manager = LockManager()
 
     singletons.network_manager = NetworkManager.NetworkManager()
-    singletons.shell_helper = ShellHelper.ShellHelper()
+    singletons.shell_helper = shell.ShellHelper()
     singletons.spatial_singleton = Singleton.Singleton()
     singletons.spatial_singleton.roads = Roads()
     singletons.event_system = miniworld.service.event.MyEventSystem.MyEventSystem()

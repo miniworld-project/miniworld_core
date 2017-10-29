@@ -190,6 +190,7 @@ class NodeStarter:
 
         return node
 
+    # TODO: use _id from EmulationNode, current view is incorrect
     def nodes_not_ready(self):
         """
         Get all all nodes which have not started yet.
