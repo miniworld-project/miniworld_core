@@ -24,9 +24,11 @@ class NodeQuery(ObjectType):
     nodes = graphene.List(Node, id=graphene.Int(), others=graphene.List(graphene.Int))
 
     def resolve_nodes(self, info, id: int = None):
-        return [serialize_node(node) for id, node in filter(lambda x: (x[0] == id) if id is not None else True,
-                                                            singletons.simulation_manager.nodes_id_mapping.items())
-                ]
+        return sorted(
+            (serialize_node(node) for id, node in filter(lambda x: (x[0] == id) if id is not None else True,
+                                                         singletons.simulation_manager.nodes_id_mapping.items())),
+            key=lambda node: node.id
+        )
 
 
 def serialize_node(node: EmulationNode) -> Node:

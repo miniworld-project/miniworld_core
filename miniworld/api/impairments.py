@@ -29,7 +29,8 @@ class ImpairmentsQuery(graphene.ObjectType):
     impairments = graphene.List(Impairment, id=graphene.Int(), active=graphene.Boolean(description='Only include (in)active connections'))
 
     def resolve_impairments(self, info, id: int = None, active: bool = None):
-        return list(resolve_impairments(id=id, active=active))
+        return sorted(resolve_impairments(id=id, active=active),
+                      key=lambda impairment: impairment.node.id)
 
 
 def resolve_impairments(id: int = None, active: bool = None):

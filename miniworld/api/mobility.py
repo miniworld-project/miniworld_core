@@ -5,6 +5,7 @@ from typing import Iterator
 
 import graphene
 
+from collections import defaultdict
 from miniworld.api.node import Node, serialize_node
 from miniworld.singletons import singletons
 
@@ -31,7 +32,9 @@ class DistancesQuery(graphene.ObjectType):
     distances = graphene.List(Distance, id=graphene.Int(), between=BetweenDistances())
 
     def resolve_distances(self, info, id: int = None, between: BetweenDistances = None):
-        return list(serialize_distances(node_id=id, between=between))
+        return sorted(serialize_distances(node_id=id, between=between),
+                      key=lambda distance: distance.node.id
+                      )
 
 
 def serialize_linked_node(node, distance_details):
@@ -42,8 +45,7 @@ def serialize_linked_node(node, distance_details):
 
 def serialize_distances(node_id: int = None, between: BetweenDistances = None) -> Iterator[Distance]:
     distances = singletons.simulation_manager.movement_director.get_distances_from_nodes()
-    last_x = None
-    distance_details = []
+    distance_details = defaultdict(list)
     for (x, y), distance in distances.items():
 
         # filters
@@ -53,23 +55,14 @@ def serialize_distances(node_id: int = None, between: BetweenDistances = None) -
             if not between.min <= distance <= between.max:
                 continue
 
-        if last_x is not None and last_x != x:
-            node = singletons.simulation_manager.nodes_id_mapping[last_x]
-            res = Distance(
-                node=serialize_linked_node(node, distance_details),
-            )
-            distance_details = []
-            yield res
-
-        distance_details.append(DistanceDetails(
+        distance_details[x].append(DistanceDetails(
             node=serialize_node(singletons.simulation_manager.nodes_id_mapping[y]),
             distance=distance
         ))
 
-        last_x = x
-
-    if distance_details:
-        node = singletons.simulation_manager.nodes_id_mapping[last_x]
-        yield Distance(
+    for node_id, distance_details in distance_details.items():
+        node = singletons.simulation_manager.nodes_id_mapping[node_id]
+        res = Distance(
             node=serialize_linked_node(node, distance_details),
         )
+        yield res
