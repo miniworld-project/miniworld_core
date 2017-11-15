@@ -30,9 +30,11 @@ script:
     # disable until graphql api is ready
     # docker-compose exec core ./scripts/test_functional.sh
     - docker-compose exec core ./scripts/test_acceptance.sh -x -m "not examples"
-after_script:
+after_failure:
     - docker-compose logs > docker-compose.txt
+    - tail -n 500 docker-compose.txt
 after_success:
+    - docker-compose logs > docker-compose.txt
     - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
     - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
     # push docker image
