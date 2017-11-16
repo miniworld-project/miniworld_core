@@ -1,4 +1,6 @@
+import argparse
 import graphene
+import os
 from flask import Flask
 from flask_graphql import GraphQLView
 from graphene import ObjectType, String
@@ -35,8 +37,10 @@ app.add_url_rule('/graphql', view_func=GraphQLView.as_view('graphql', schema=sch
 
 
 def main():
-    # TODO: read from CLI
-    config_path = None
+    root_parser = argparse.ArgumentParser(description='MiniWorld network emulator')
+    root_parser.add_argument('-c', '--config', default=os.environ.get('MW_CONFIG'), help="The config file")
+    args = root_parser.parse_args()
+    config_path = os.path.abspath(args.config) if args.config is not None else None
     miniworld.init(config_path=config_path, do_init_singletons=True)
     app.run(host="0.0.0.0")
 
