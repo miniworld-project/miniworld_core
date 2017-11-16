@@ -17,7 +17,7 @@ from miniworld.nodes.VirtualizationLayer import VirtualizationLayer
 from miniworld.nodes.qemu.QemuMonitorRepl import QemuMonitorRepl
 from miniworld.service.provisioning.SocketExpect import SocketExpect
 from miniworld.service.provisioning import TemplateEngine
-from miniworld.service.shell.shell import run_shell
+from miniworld.service.shell.ShellHelper import run_shell
 from miniworld.singletons import singletons
 from miniworld.util import PathUtil
 from miniworld.util.NetUtil import Timeout

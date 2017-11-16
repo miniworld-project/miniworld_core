@@ -73,7 +73,7 @@ class ScenarioConfig(JSONConfig.JSONConfig):
             return res[self.get_distributed_server_id()]
 
         else:
-            return range(0, self.get_number_of_nodes())
+            return range(1, self.get_number_of_nodes() + 1)
 
     def get_all_emulation_node_ids(self):
         """

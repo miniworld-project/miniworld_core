@@ -1,4 +1,4 @@
-from miniworld.service.shell.shell import run_shell
+from miniworld.service.shell.ShellHelper import run_shell
 
 
 def find_empty_group(start=1, end=10000):
