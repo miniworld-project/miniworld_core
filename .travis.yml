@@ -21,6 +21,7 @@ script:
     - sleep 10
     - MW_CONFIG=tests/config.json BRANCH=$TRAVIS_BRANCH docker-compose logs
     - docker-compose exec core ./scripts/test_unit.sh
+    - docker-compose exec core ./scripts/test_integration.sh
     # disable until graphql api is ready
     # docker-compose exec core ./scripts/test_functional.sh
     - docker-compose exec core ./scripts/test_acceptance.sh -x -m "not examples"

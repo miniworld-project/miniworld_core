@@ -283,6 +283,10 @@ class EmulationManager(ResetableInterface):
                 new_scenario_digest = self._get_scenario_hash()
                 self.scenario_changed = old_scenario_digest != new_scenario_digest
 
+            # no shapshot boot, clear database
+            if self.scenario_changed:
+                singletons.db_session.clear_state()
+
             self._logger.info('setting scenario config')
 
             # init EventSystem after scenario config is set
@@ -332,7 +336,6 @@ class EmulationManager(ResetableInterface):
         path_qemu_image = singletons.scenario_config.get_path_image()
         post_boot_script_string_io = StringIO(singletons.scenario_config.get_all_shell_commands_pre_network_start())
         network_backend_name = singletons.scenario_config.get_network_backend()
-        parallel = singletons.scenario_config.is_parallel_node_starting()
         node_ids = singletons.scenario_config.get_local_node_ids()
         # supply the LinkQualityModel the default link settings
         kwargs = dict(bandwidth=singletons.scenario_config.get_link_bandwidth(),
@@ -345,7 +348,7 @@ class EmulationManager(ResetableInterface):
         with singletons.lock_manager.lock(resource=Lock.Resource.emulation, type=Lock.Type.write):
 
             if node_ids is None:
-                node_ids = range(1, cnt_nodes + 1)
+                node_ids = range(0, cnt_nodes)
 
             self.impairment = link_quality_model
 
@@ -371,9 +374,8 @@ class EmulationManager(ResetableInterface):
 
             # start nodes
             node_starter = NodeStarter.NodeStarter(node_ids, network_backend_name)
-            emulation_nodes, _ = node_starter.start_nodes(self.network_backend,
-                                                          path_qemu_image, post_boot_script_string_io,
-                                                          parallel=parallel, interfaces=interfaces,
+            emulation_nodes, _ = node_starter.start_nodes(path_qemu_image, post_boot_script_string_io,
+                                                          interfaces=interfaces,
                                                           )
 
             # NOTE: first the EmulationNodes then the CentralHubs need to be created

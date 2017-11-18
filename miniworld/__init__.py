@@ -24,7 +24,7 @@ Module structure:
 """
 
 
-def init(config_path: str = None, do_init_singletons=True):
+def init(config_path: str = None, do_init_singletons=True, do_init_db=True):
     """ Init the module by installing signal handlers and creating the temp files """
 
     Config.set_global_config(config_path or Config.PATH_GLOBAL_CONFIG)
@@ -43,10 +43,19 @@ def init(config_path: str = None, do_init_singletons=True):
     clean_miniworld_dir()
     singletons.log.addHandler(logging.FileHandler(PathUtil.get_log_file_path("stdout.txt")))
 
+    if do_init_db:
+        init_db()
+
 
 def init_singletons():
     from miniworld.singletons import SingletonInit
     SingletonInit.init_singletons()
+
+
+def init_db():
+    from miniworld.singletons import singletons
+    singletons.db_session.create_session()
+    singletons.db_session.create_schema()
 
 
 def clean_miniworld_dir():

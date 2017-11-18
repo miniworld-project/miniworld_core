@@ -3,8 +3,10 @@ from threading import Lock, Event
 
 from miniworld.concurrency.ExceptionStopThread import ExceptionStopThread
 from miniworld.errors import Unsupported
+from miniworld.model.db.base import Node as DbNode
 from miniworld.model.interface.Interface import HubWiFi
 from miniworld.nodes.virtual.CentralNode import CentralNode
+from miniworld.service.persistence.nodes import NodePersistenceService
 from miniworld.singletons import singletons
 from miniworld.util import ConcurrencyUtil
 
@@ -67,11 +69,8 @@ class NodeStarter:
     # TODO: #51: suppliy node - interface - mapping
     # TOO: #82: DOC
     def start_nodes(self,
-                    network_backend,
                     # node options
                     path_qemu_base_image, stringio_post_boot_script, interfaces=None,
-                    # start options
-                    parallel=False,
                     ):
         """
         Start the nodes (a)synchronously.
@@ -81,8 +80,6 @@ class NodeStarter:
         path_qemu_base_image: str
         stringio_post_boot_script: StringIO, not file!
             If `parallel` each thread gets a copy!
-        parallel: bool, optional (default is False)
-            Use threads to start the nodes concurrently.
         interfaces: list<str>
             NOTE: Influences the order of the network devices in the virtual machine!
         network_backend
@@ -188,9 +185,20 @@ class NodeStarter:
             # keep track of started nodes
             self.nodes_running.append(node)
 
+            node_persistence_service = NodePersistenceService()
+
+            add_node = True
+            # if snapshot boot, do not add node again to db
+            # node can not have changed since the scenario is still the same
+            if not singletons.simulation_manager.scenario_changed:
+                if node_persistence_service.exists(node._id):
+                    add_node = False
+
+            if add_node:
+                node_persistence_service.add(DbNode.from_domain(node))
+
         return node
 
-    # TODO: use _id from EmulationNode, current view is incorrect
     def nodes_not_ready(self):
         """
         Get all all nodes which have not started yet.

@@ -20,12 +20,17 @@ from miniworld.singletons import singletons
 
 @pytest.fixture(autouse=True)
 def fresh_env():
-    miniworld.init()
+    miniworld.init(do_init_db=False)
     # make domain model IDs predictable
     old_counter = deepcopy(Base.counter)
     yield
     # restore old counter
     Base.counter = old_counter
+
+
+@pytest.fixture(autouse=True)
+def mock_db(fresh_env):
+    singletons.db_session = MagicMock()
 
 
 class GraphQLError(Exception):

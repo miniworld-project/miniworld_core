@@ -33,6 +33,7 @@ class Singletons:
 
         self.scenario_config = None
         self.config = None
+        self.db_session = None
 
 
 #################################################

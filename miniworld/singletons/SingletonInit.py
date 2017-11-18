@@ -1,6 +1,7 @@
 import sys
 
 from miniworld.network.backends.NetworkBackends import NetworkBackendBootstrapperFactory
+from miniworld.service.persistence.session import Session
 
 
 def init_singletons():
@@ -43,6 +44,7 @@ def init_singletons():
     singletons.qemu_process_singletons = QemuProcessSingletons()
     singletons.scenario_config = ScenarioConfig()
     singletons.network_backend_bootstrapper_factory = NetworkBackendBootstrapperFactory()
+    singletons.db_session = Session()
 
     # they share state which needs to be cleared for a new simulation
     for singleton_with_simulation_scenario_state in [singletons.network_manager, singletons.shell_helper,
