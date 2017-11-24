@@ -266,7 +266,7 @@ class ShellHelper(ResetableInterface):
         self.garbage_collect = garbage_collect
         self.bg_checker_thread = None
         self.start_bg_checker_thread()
-        self._logger = True
+        self._logger = singletons.logger_factory.get_logger(self)
 
     ###############################################################
     # Background Error Checking
