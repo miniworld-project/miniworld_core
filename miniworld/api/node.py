@@ -31,6 +31,20 @@ class NodeQuery(ObjectType):
         )
 
 
+class NodeExecuteCommand(graphene.Mutation):
+    class Arguments:
+        id = graphene.Int()
+        cmd = graphene.String()
+        validate = graphene.Boolean(default_value=None)
+        timeout = graphene.Float(default_value=1.0)
+
+    result = graphene.String()
+
+    def mutate(self, info, id: int, cmd: str,
+               validate: bool, timeout: float):
+        return NodeExecuteCommand(result=singletons.simulation_manager.exec_node_cmd(cmd, node_id=id, validation=validate, timeout=timeout))
+
+
 def serialize_node(node: EmulationNode) -> Node:
     return Node(
         id=node._id,
