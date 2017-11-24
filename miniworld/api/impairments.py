@@ -1,9 +1,12 @@
 import graphene
 from collections import defaultdict
 
+from typing import List
+
 from miniworld.api import DictScalar
 from miniworld.api.node import Node, Interface, serialize_node, serialize_interface
-from miniworld.singletons import singletons
+from miniworld.network.AbstractConnection import AbstractConnection
+from miniworld.service.persistence import connections as conns
 
 
 # TODO: implement __eq__ and __hash__ and use domain model id
@@ -29,34 +32,31 @@ class ImpairmentsQuery(graphene.ObjectType):
     impairments = graphene.List(Impairment, id=graphene.Int(), active=graphene.Boolean(description='Only include (in)active connections'))
 
     def resolve_impairments(self, info, id: int = None, active: bool = None):
-        return sorted(resolve_impairments(id=id, active=active),
-                      key=lambda impairment: impairment.node.id)
+        connection_persistence_service = conns.ConnectionPersistenceService()
+        connections = connection_persistence_service.all(
+            id=id,
+            active=active
+        )
+        return list(serialize_impairments(connections))
 
 
-def resolve_impairments(id: int = None, active: bool = None):
+def serialize_impairments(connections: List[AbstractConnection]):
     # TODO: ticket to support generators in graphene
     #  singletons.network_manager.connection_store.get_connections() returns duplicate values
     links = defaultdict(set)
 
-    def add_impairment(emu_nodes, interfaces, connection_details, connected):
-        links[(emu_nodes[0], interfaces[0])].add(
+    def add_impairment(connection: AbstractConnection):
+        links[(connection.emulation_node_x, connection.interface_x)].add(
             Connection(
-                node=serialize_node(emu_nodes[1]),
-                interface=serialize_interface(interface=interfaces[1]),
-                impairment=connection_details.link_quality,
-                connected=connected,
+                node=serialize_node(connection.emulation_node_y),
+                interface=serialize_interface(interface=connection.interface_y),
+                impairment=connection.impairment,
+                connected=connection.connected,
             ),
         )
 
-    for node in filter(lambda node: (node._id == id) if id is not None else True, singletons.simulation_manager.nodes_id_mapping.values()):
-        if active is None or active is True:
-            for emu_nodes, interfaces, connection_details in singletons.network_manager.connection_store.get_connections(
-                    node, active=True):
-                add_impairment(emu_nodes, interfaces, connection_details, True)
-        if active is None or active is False:
-            for emu_nodes, interfaces, connection_details in singletons.network_manager.connection_store.get_connections(
-                    node, active=False):
-                add_impairment(emu_nodes, interfaces, connection_details, False)
+    for connection in connections:
+        add_impairment(connection)
     for (emu_node, interface), links in links.items():
         yield Impairment(
             node=serialize_impairment_node(emu_node, interface, links)

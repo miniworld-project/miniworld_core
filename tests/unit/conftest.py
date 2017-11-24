@@ -1,20 +1,18 @@
 import json
 import sys
-from typing import Dict
+from copy import deepcopy
+from typing import Dict, List
 from unittest.mock import MagicMock
 
 import pytest
-from copy import deepcopy
 from graphene.test import Client
 
 import miniworld
-from miniworld.model.base import Base
 from miniworld.api.webserver import schema
-from miniworld.model.connections.ConnectionDetails import ConnectionDetails
+from miniworld.model.base import Base
 from miniworld.model.interface.Interfaces import Interfaces
 from miniworld.network.AbstractConnection import AbstractConnection
 from miniworld.nodes.EmulationNode import EmulationNode
-from miniworld.nodes.EmulationNodes import EmulationNodes
 from miniworld.singletons import singletons
 
 
@@ -80,10 +78,10 @@ def mock_nodes(request) -> Dict[int, EmulationNode]:
 
 
 @pytest.fixture
-def mock_connections(mock_nodes):
+def mock_connections(mock_nodes) -> List[AbstractConnection]:
     """ Connect nodes pair-wise. """
 
-    connections = {}
+    abstract_connections = []
     for node1, node2 in zip(mock_nodes.values(), list(mock_nodes.values())[1:]):
         link_quality_dict = {
             'bandwidth': 500,
@@ -91,15 +89,11 @@ def mock_connections(mock_nodes):
         }
         interface1 = node1.interfaces[0]
         interface2 = node2.interfaces[0]
-        conn = AbstractConnection(node1, node2, interface1, interface2)
-        connection_details = ConnectionDetails(conn, link_quality_dict)
-        connections[node1] = [(EmulationNodes([node1, node2]), Interfaces([interface1, interface2]), connection_details)]
+        conn = AbstractConnection(node1, node2, interface1, interface2, _id=0, impairment=link_quality_dict, connected=True)
+        abstract_connections.append(conn)
 
-    # only return active connections
-    def get_connections(node, active):
-        return connections.get(node, []) if active else []
-
-    singletons.network_manager.connection_store.get_connections = MagicMock(side_effect=get_connections)
+    singletons.network_manager.connections = {conn._id: conn for conn in abstract_connections}
+    return abstract_connections
 
 
 @pytest.fixture

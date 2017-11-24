@@ -1,5 +1,7 @@
 from collections import defaultdict, OrderedDict, Counter
 
+from miniworld.network.AbstractConnection import AbstractConnection
+from miniworld.nodes.EmulationNode import EmulationNode
 from miniworld.nodes.EmulationNodes import EmulationNodes
 from miniworld.service.network.NetworkConfigurator import NetworkConfigurator, \
     NoMoreSubnetsAvailable, SubnetNoMoreIps
@@ -58,15 +60,7 @@ class NetworkConfiguratorSameSubnet(NetworkConfiguratorConnectionLess):
                 raise NoMoreSubnetsAvailable("All /%s subnets from base network: %s used!" % (self.prefixlen, self.base_network_cidr))
         return self.subnets[interface]
 
-    def configure_connection(self, emulation_node, connections):
-        """
-
-        Parameters
-        ----------
-        emulation_node : EmulationNode
-        connections : OrderedDict<EmulationNodes, tuple<Interfaces>>
-            Must be fully staffed if you want bidirectional links!
-        """
+    def configure_connection(self, emulation_node: EmulationNode):
         # dict<int, list<str>>
         commands_per_node = defaultdict(list)
         c = Counter()
@@ -110,7 +104,7 @@ class NetworkConfiguratorSameSubnet(NetworkConfiguratorConnectionLess):
         except IndexError:
             raise SubnetNoMoreIps("No more ips in subnet: '%s' available for offset: '%s'!" % (subnet, offset + 1))
 
-    def get_nic_check_commands(self, connections):
+    def get_nic_check_commands(self):
         """
         Do link checking connection-based, there check which nodes are reachable!
 
@@ -127,35 +121,27 @@ class NetworkConfiguratorSameSubnet(NetworkConfiguratorConnectionLess):
         self._logger.info("assuming bidirectional links ...")
         check_commands_per_node = defaultdict(list)
 
-        for emulation_nodes, list_ifaces in connections.items():
-
-            if not emulation_nodes.filter_real_emulation_nodes():
-                break
+        for connection in self._connection_persistence_service.get_new(connection_type=AbstractConnection.ConnectionType.user):  # type: AbstractConnection
 
             # NOTE: for the distributed mode, we have to check which node is local and which is remote
             # because connections might not be fully staffed, we need to perform the check from the local node to the remote node!
-            emulation_node_x, emulation_node_y = emulation_nodes.sort_by_locality()
+            emulation_node_x, emulation_node_y = EmulationNodes([connection.emulation_node_x, connection.emulation_node_y]).sort_by_locality()
 
-            for interfaces in list_ifaces:
+            interface_y = connection.interface_y
 
-                if not interfaces.filter_normal_interfaces():
-                    break
+            def add_check_cmd(ip_addr):
 
-                interface_x, interface_y = interfaces
+                ping_cmd = self.connectivity_checker_fun(ip_addr, self.network_timeout)
+                check_commands_per_node[emulation_node_x].append(ping_cmd)
 
-                def add_check_cmd(ip_addr):
-
-                    ping_cmd = self.connectivity_checker_fun(ip_addr, self.network_timeout)
-                    check_commands_per_node[emulation_node_x].append(ping_cmd)
-
-                # for CentralNode let each node ping all allocated ips
-                if EmulationNodes([emulation_node_y]).filter_central_nodes():
-                    for ip_addr in self.ips.values():
-                        add_check_cmd(ip_addr)
-                # check which ip is allocated to emulation_node_y
-                else:
-                    ip_addr = self.ips[self.get_key_ip_dict(emulation_node_y, interface_y)]
+            # for CentralNode let each node ping all allocated ips
+            if EmulationNodes([emulation_node_y]).filter_central_nodes():
+                for ip_addr in self.ips.values():
                     add_check_cmd(ip_addr)
+            # check which ip is allocated to emulation_node_y
+            else:
+                ip_addr = self.ips[self.get_key_ip_dict(emulation_node_y, interface_y)]
+                add_check_cmd(ip_addr)
 
         return check_commands_per_node
 

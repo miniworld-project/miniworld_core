@@ -13,7 +13,7 @@ class TestNodePersistenceService:
     def nodes(self, service):
         return [service.add(
             Node(
-                id=1,
+                id=0,
                 interfaces=[],
             )
         )]

@@ -1,5 +1,22 @@
 # Queries
 
+## API Introspection
+
+```graphql
+query {
+  __schema {
+    types {
+      name
+      kind
+      description
+      fields {
+        name
+      }
+    }
+  }
+}
+```
+
 ## Ping
 
 ```grapqhl
@@ -47,8 +64,6 @@ query {
       id
       virtualization
       interface {
-        nodeClass
-        nodeClassName
         nrHostInterface
         mac
         name

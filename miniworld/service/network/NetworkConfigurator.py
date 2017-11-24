@@ -4,6 +4,9 @@ from io import StringIO
 import miniworld.config.Scenario
 from miniworld import singletons
 from miniworld.errors import Base
+from miniworld.network.AbstractConnection import AbstractConnection
+from miniworld.service.persistence.connections import ConnectionPersistenceService
+from miniworld.service.persistence.nodes import NodePersistenceService
 from miniworld.util import DictUtil, NetUtil, ConcurrencyUtil
 
 
@@ -86,19 +89,16 @@ class NetworkConfigurator:
         # /x subnet generator
         self.subnet_generator = NetUtil.get_slash_x(ipaddress.ip_network(base_network_cidr).subnets(), prefixlen)
 
+        self._node_persistence_service = NodePersistenceService()
+        self._connection_persistence_service = ConnectionPersistenceService()
+
     def reset(self):
         self.nic_check_commands = {}
 
     def needs_reconfiguration(self, step_cnt):
         return step_cnt < 1
 
-    def get_nic_check_commands(self, connections):
-        """
-        Parameters
-        ----------
-        connections : dict<(EmulationNode,EmulationNode), iterable<(Interface, Interface)]>>
-            Must be fully staffed if you want bidirectional links!
-        """
+    def get_nic_check_commands(self):
         return self.nic_check_commands
 
     def get_active_connections(self):
@@ -154,14 +154,9 @@ class NetworkConfigurator:
             with es.event_init(es.EVENT_NETWORK_CHECK) as ev:
                 ev.finish()
 
-    def configure_connection(self, emulation_nodes, interfaces):
+    def configure_connection(self, connection: AbstractConnection):
         """
         Configure a single connection.
-
-        Parameters
-        ----------
-        emulation_nodes : EmulationNodes
-        interfaces : Interfaces
 
         Returns
         -------

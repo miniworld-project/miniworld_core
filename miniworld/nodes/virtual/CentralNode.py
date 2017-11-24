@@ -1,5 +1,6 @@
 from miniworld.model.interface import Interfaces
 from miniworld.model.interface.Interface import HubWiFi
+from miniworld.network.AbstractConnection import AbstractConnection
 from miniworld.network.backends.NetworkBackendNotifications import ConnectionInfo
 from miniworld.nodes.virtual import VirtualNode
 
@@ -29,7 +30,7 @@ class CentralNode(VirtualNode.VirtualNode):
         -------
         ConnectionInfo
         """
-        return ConnectionInfo(is_central=True)
+        return ConnectionInfo(connection_type=AbstractConnection.ConnectionType.central)
 
     # TODO: REMOVE ?
     # @staticmethod

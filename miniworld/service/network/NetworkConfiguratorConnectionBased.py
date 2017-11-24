@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+from miniworld.network.AbstractConnection import AbstractConnection
 from miniworld.service.network.NetworkConfigurator import NetworkConfigurator
 from miniworld.util import DictUtil
 
@@ -9,14 +10,9 @@ class NetworkConfiguratorConnectionBased(NetworkConfigurator):
     Based on the current connections (including the interfaces), the network cards can be configured (e.g. IP).
     """
 
-    def get_nic_configuration_commands(self, connections):
+    def get_nic_configuration_commands(self):
         """
         Get the configuration commands needed to configure the network and precalculate the check commands if possible yet.
-
-        Parameters
-        ----------
-        connections : OrderedDict<EmulationNodes, tuple<Interfaces>>
-            Must be fully staffed if you want bidirectional links!
 
         Returns
         -------
@@ -28,23 +24,13 @@ class NetworkConfiguratorConnectionBased(NetworkConfigurator):
         commands_per_node = defaultdict(list)
         check_commands_per_node = defaultdict(list)
 
-        # run over items of form: (EmulationNodes, [Interfaces])
-        for emulation_nodes, list_interfaces in sorted(connections.items()):
+        for connection in self._connection_persistence_service.get_new(connection_type=AbstractConnection.ConnectionType.user):  # type: AbstractConnection
 
-            if not self.filter_emulation_nodes(emulation_nodes):
-                continue
-
-            # iterate over Interfaces
-            for interfaces in list_interfaces:
-
-                if not self.filter_interfaces(interfaces):
-                    continue
-
-                # get nic configuration commands + check commands per connection
-                _commands_per_node, _check_commands_per_node = self.configure_connection(emulation_nodes, interfaces)
-                # update dicts
-                commands_per_node = DictUtil.list_merge_values(commands_per_node, _commands_per_node)
-                check_commands_per_node = DictUtil.list_merge_values(check_commands_per_node, _check_commands_per_node)
+            # get nic configuration commands + check commands per connection
+            _commands_per_node, _check_commands_per_node = self.configure_connection(connection)
+            # update dicts
+            commands_per_node = DictUtil.list_merge_values(commands_per_node, _commands_per_node)
+            check_commands_per_node = DictUtil.list_merge_values(check_commands_per_node, _check_commands_per_node)
 
         # The commands for network checking may not be available at this time. But if they are,
         # they are stored for later retrieval so that they need to be calculated only once.

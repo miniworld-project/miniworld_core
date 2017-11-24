@@ -1,6 +1,7 @@
 from ordered_set import OrderedSet
 
 from miniworld.model.connections.Connections import Connections
+from miniworld.network.AbstractConnection import AbstractConnection
 from miniworld.network.backends import InterfaceFilter
 from miniworld.network.backends.bridged.NetworkBackendBridged import NetworkBackendBridgedDummy
 from miniworld.service.network.NetworkConfiguratorSameSubnet import NetworkConfiguratorSameSubnet
@@ -139,13 +140,13 @@ def NetworkBackendBridgedSingleDevice():
             else:
                 bridge = self.get_bridge(interface_x)
 
-            connection = connection_type(emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info)
+            connection = connection_type.from_connection_info(emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info)
             connection.start(self)
 
             # TODO: #84: improve
             connections = Connections([(emulation_node_x, interface_x), (emulation_node_y, interface_y)])
 
-            is_one_tap_mode = connection_info.is_central or connection_info.is_mgmt or connection_info.is_remote_conn
+            is_one_tap_mode = connection_info.is_one_tap_mode
             if not is_one_tap_mode:
                 tap_x = self.get_tap_name(emulation_node_x._id, interface_x)
                 tap_y = self.get_tap_name(emulation_node_y._id, interface_y)
@@ -158,9 +159,9 @@ def NetworkBackendBridgedSingleDevice():
             # TODO: nearly same code as in NetworkBackendBridgedMultiDevice!
             else:
                 virtual_node, _if = None, None
-                if connection_info.is_central:
+                if connection_info.connection_type == AbstractConnection.ConnectionType.central:
                     virtual_node, _if = connections.filter_central_nodes()[0]
-                elif connection_info.is_mgmt:
+                elif connection_info.connection_type == AbstractConnection.ConnectionType.mgmt:
                     virtual_node, _if = connections.filter_mgmt_nodes()[0]
 
                 tap_dev_name = None

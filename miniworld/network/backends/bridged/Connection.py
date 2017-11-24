@@ -82,7 +82,7 @@ def ConnectionDummy():
             self.nlog.info("adjusting link quality ...")
 
             if bandwidth is not None:
-                is_hubwifi = self.connection_info.is_central
+                is_hubwifi = self.connection_type == AbstractConnection.ConnectionType.central
                 _, _, emu_node, if_emu_node = self.get_central_node()
 
                 connection_id = None
@@ -100,7 +100,7 @@ def ConnectionDummy():
                     # the connection between the two hosts is shaped in down- and uplink.
 
                     # TODO: move to iproute2 connection!
-                    if self.connection_info.is_remote_conn:
+                    if self.is_remote_conn:
                         remote_node, if_remote_node, local_emu_node, if_local_emu_node = self.get_remote_node()
                         tap_local = singletons.network_backend.get_tap_name(local_emu_node._id, if_local_emu_node)
                         tunnel_dev = singletons.network_backend.get_tunnel_name(remote_node._id, local_emu_node._id)
@@ -209,14 +209,14 @@ def ConnectionDummy():
             -------
 
             """
-            is_hubwifi = self.connection_info.is_central
+            is_hubwifi = self.connection_type == AbstractConnection.ConnectionType.central
 
             if is_hubwifi:
                 emu_node, if_emu_node, emu_node_2, if_emu_node_2 = self.get_central_node()
                 tap_dev_name = singletons.network_backend.get_tap_name(emu_node._id, if_emu_node)
                 tap_central_node = emu_node_2.switch.id
                 self.tap_link_up_central(tap_dev_name, tap_central_node, up=up)
-            elif self.connection_info.is_remote_conn:
+            elif self.is_remote_conn:
 
                 remote_node, if_remote_node, local_emu_node, if_local_emu_node = self.get_remote_node()
 

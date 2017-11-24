@@ -1,7 +1,6 @@
 from collections import defaultdict
 
 from miniworld.service.network.NetworkConfigurator import NetworkConfigurator
-from miniworld.singletons import singletons
 from miniworld.util import DictUtil
 
 
@@ -11,22 +10,13 @@ class NetworkConfiguratorConnectionLess(NetworkConfigurator):
     """
 
     def allocate_ips(self):
-        for emulation_node in self.get_emulation_nodes():
-
-            if not self.filter_emulation_node(emulation_node):
-                continue
-
+        for emulation_node in self._node_persistence_service.all():
             # get nic configuration commands + check commands per connection
-            self.configure_connection(emulation_node, None)
+            self.configure_connection(emulation_node)
 
-    def get_nic_configuration_commands(self, connections):
+    def get_nic_configuration_commands(self):
         """
         Get the configuration commands needed to configure the network and the check commands.
-
-        Parameters
-        ----------
-        connections : OrderedDict<EmulationNodes, tuple<Interfaces>>
-            Must be fully staffed if you want bidirectional links!
 
         Returns
         -------
@@ -44,14 +34,9 @@ class NetworkConfiguratorConnectionLess(NetworkConfigurator):
         commands_per_node = defaultdict(list)
         check_commands_per_node = defaultdict(list)
 
-        # TODO:
-        for emulation_node in self.get_emulation_nodes():
-
-            if not self.filter_emulation_node(emulation_node):
-                continue
-
+        for emulation_node in self._node_persistence_service.all():
             # get nic configuration commands + check commands per connection
-            _commands_per_node, _check_commands_per_node = self.configure_connection(emulation_node, None)
+            _commands_per_node, _check_commands_per_node = self.configure_connection(emulation_node)
             # update dicts
             commands_per_node = DictUtil.list_merge_values(commands_per_node, _commands_per_node)
             check_commands_per_node = DictUtil.list_merge_values(check_commands_per_node, _check_commands_per_node)
@@ -60,34 +45,3 @@ class NetworkConfiguratorConnectionLess(NetworkConfigurator):
                                                              check_commands_per_node)
 
         return commands_per_node
-
-    def get_emulation_nodes(self):
-        return singletons.simulation_manager.get_emulation_nodes()
-
-    def filter_emulation_node(self, emulation_node):
-        """
-        Use a node filter for the ip provisioning.
-
-        Parameters
-        ----------
-        emulation_node : EmulationNode
-
-        Returns
-        -------
-        bool
-        """
-        return True
-
-    def configure_connection(self, emulation_node):
-        """
-        Configure a single connection.
-
-        Parameters
-        ----------
-        emulation_node : EmulationNode
-
-        Returns
-        -------
-        dict<EmulationNode, list<str>>, dict<EmulationNode, list<str>>
-        """
-        raise NotImplementedError

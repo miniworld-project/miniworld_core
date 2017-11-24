@@ -1,3 +1,7 @@
+import enum
+
+from typing import Dict
+
 from miniworld import singletons
 from miniworld.impairment import LinkQualityConstants
 from miniworld.misc.InterfaceDependentID import InterfaceDependentID
@@ -18,14 +22,27 @@ class AbstractConnection(StartableObject.ScenarioState, InterfaceDependentID):
     connection_info : ConnectionInfo, optional (default is None)
     """
 
-    def __init__(self, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info=None):
+    class ConnectionType(enum.Enum):
+        user = 'user'
+        mgmt = 'mgmt'
+        central = 'central'
+
+    # TODO: add step_added
+    def __init__(self, emulation_node_x, emulation_node_y, interface_x, interface_y,
+                 connection_type: ConnectionType = ConnectionType.user, is_remote_conn: bool = None,
+                 impairment: Dict = None, connected: bool=None,
+                 _id: int = None,
+                 ):
         StartableObject.ScenarioState.__init__(self)
+        self._id = _id
         self.emulation_node_x = emulation_node_x
         self.emulation_node_y = emulation_node_y
         self.interface_x = interface_x
         self.interface_y = interface_y
-
-        self.connection_info = connection_info
+        self.connection_type = connection_type
+        self.is_remote_conn = is_remote_conn
+        self.impairment = impairment
+        self.connected = connected
 
         self.emulation_node_x_idid = self.get_interface_class_dependent_id(emulation_node_x._id,
                                                                            self.interface_x.node_class,
@@ -34,10 +51,20 @@ class AbstractConnection(StartableObject.ScenarioState, InterfaceDependentID):
                                                                            self.interface_y.node_class,
                                                                            self.interface_y.nr_host_interface)
 
+        # TODO: REMOVE/RENAME? ?
         self.id = '%s,%s' % (self.emulation_node_x_idid, self.emulation_node_y_idid)
 
         # create extra node logger
         self.nlog = singletons.logger_factory.get_node_logger(self.id)
+
+    @classmethod
+    def from_connection_info(cls, emulation_node_x, emulation_node_y, interface_x, interface_y,
+                             connection_info: 'ConnectionInfo'):
+        return cls(emulation_node_x=emulation_node_x, emulation_node_y=emulation_node_y,
+                   interface_x=interface_x, interface_y=interface_y,
+                   connection_type=connection_info.connection_type,
+                   is_remote_conn=connection_info.is_remote_conn,
+                   )
 
     # TODO: adjust doc: set the link up ...
     def start(self, start_activated=False):

@@ -36,7 +36,7 @@ def NetworkBackendBridgedMultiDevice():
 
             if connected:
                 # create connection
-                connection = self.network_backend_bootstrapper.connection_type(emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info)
+                connection = self.network_backend_bootstrapper.connection_type.from_connection_info(emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info)
                 # TODO: does nothing atm
                 connection.start(self)
                 self._logger.debug("created connection between: %s@%s, %s@%s", emulation_node_x, interface_x, emulation_node_y, interface_y)

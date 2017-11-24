@@ -1,5 +1,6 @@
 from miniworld.model.interface import Interfaces
 from miniworld.model.interface.Interface import Management
+from miniworld.network.AbstractConnection import AbstractConnection
 from miniworld.network.backends.NetworkBackendNotifications import ConnectionInfo
 from miniworld.nodes.virtual.VirtualNode import VirtualNode
 
@@ -27,7 +28,7 @@ class ManagementNode(VirtualNode):
         -------
         ConnectionInfo
         """
-        return ConnectionInfo(is_mgmt=True)
+        return ConnectionInfo(connection_type=AbstractConnection.ConnectionType.mgmt)
 
     @staticmethod
     def is_management_node(node):

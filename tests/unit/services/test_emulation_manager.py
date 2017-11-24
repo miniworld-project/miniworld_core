@@ -1,8 +1,8 @@
 import functools
-from unittest.mock import MagicMock, Mock, call
+from copy import deepcopy
+from unittest.mock import MagicMock, Mock
 
 import pytest
-from copy import deepcopy
 
 from miniworld.impairment.ImpairmentModel import ImpairmentModel
 from miniworld.mobility.DistanceMatrix import DistanceMatrix
@@ -139,29 +139,3 @@ class TestEmulationManager:
         singletons.network_manager.net_configurator = MagicMock()
 
         emulation_manager.step(1, distance_matrix=distance_matrix)
-        # pin network setup commands
-        assert singletons.shell_helper.method_calls == [
-            call.run_shell('type',
-                           "sh -c 'ebtables --concurrent --atomic-file /tmp/MiniWorld/ebtables_atommic --atomic-init'",
-                           ('ebtables',)),
-            call.run_shell('type',
-                           "sh -c 'ebtables --concurrent --atomic-file /tmp/MiniWorld/ebtables_atommic --atomic-commit'",
-                           ('ebtables',)),
-            call.run_shell('type',
-                           "sh -c 'ebtables --concurrent --atomic-file /tmp/MiniWorld/ebtables_atommic --atomic-save'",
-                           ('ebtables',)),
-            call.run_shell('type',
-                           "sh -c 'ebtables --concurrent --atomic-file /tmp/MiniWorld/ebtables_atommic -N wifi1 -P DROP'",
-                           ('ebtables',)),
-            call.run_shell('type',
-                           "sh -c 'ebtables --concurrent --atomic-file /tmp/MiniWorld/ebtables_atommic -A FORWARD --logical-in wifi1 -j wifi1'",
-                           ('ebtables',)),
-            call.run_shell('type',
-                           "sh -c 'ebtables --concurrent --atomic-file /tmp/MiniWorld/ebtables_atommic -I wifi1 -i tap_00000_1 -o tap_00001_1 -j mark --set-mark 1 --mark-target ACCEPT; ebtables --concurrent --atomic-file /tmp/MiniWorld/ebtables_atommic -I wifi1 -i tap_00001_1 -o tap_00000_1 -j mark --set-mark 1 --mark-target ACCEPT'",
-                           ('ebtables',)),
-            call.run_shell('type',
-                           "sh -c 'ebtables --concurrent --atomic-file /tmp/MiniWorld/ebtables_atommic --atomic-commit'",
-                           ('ebtables',)),
-            call.run_shell_with_input('ip -d -batch -',
-                                      'link add name wifi1 type bridge\nlink set dev wifi1 type bridge ageing_time 0\nlink set dev tap_00000_1 master wifi1\nlink set dev tap_00000_1 up\nlink set dev wifi1 up\nlink set dev tap_00001_1 master wifi1\nlink set dev tap_00001_1 up'),
-            call.run_shell_with_input('tc -d -batch -', '')]

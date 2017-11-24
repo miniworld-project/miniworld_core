@@ -1,6 +1,6 @@
-
 # TODO: #54: DOC
 # TODO: provide context managers!
+from miniworld.network.AbstractConnection import AbstractConnection
 
 
 class NetworkBackendNotifications:
@@ -218,16 +218,15 @@ class NetworkBackendNotifications:
 
 
 class ConnectionInfo:
+    __slots__ = (
+        'is_remote_conn',
+        'connection_type',
+    )
 
-    """
-    Attributes
-    ----------
-    is_remote_conn : bool, optional (default is False)
-    is_central : bool, optional (default is False)
-    is_mgmt : bool, optional (default is False)
-    """
-
-    def __init__(self, is_remote_conn=False, is_central=False, is_mgmt=False):
+    def __init__(self, connection_type: AbstractConnection.ConnectionType = AbstractConnection.ConnectionType.user, is_remote_conn=False):
         self.is_remote_conn = is_remote_conn
-        self.is_central = is_central
-        self.is_mgmt = is_mgmt
+        self.connection_type = connection_type
+
+    @property
+    def is_one_tap_mode(self) -> bool:
+        return self.connection_type in (AbstractConnection.ConnectionType.central, AbstractConnection.ConnectionType.mgmt) or self.is_remote_conn

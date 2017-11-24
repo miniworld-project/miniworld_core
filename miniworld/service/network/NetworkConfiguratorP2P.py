@@ -1,8 +1,8 @@
 from collections import defaultdict
 
+from miniworld.network.AbstractConnection import AbstractConnection
 from miniworld.service.network.NetworkConfiguratorConnectionBased import \
     NetworkConfiguratorConnectionBased
-from miniworld.util import DictUtil
 
 
 class NetworkConfiguratorP2P(NetworkConfiguratorConnectionBased):
@@ -30,62 +30,45 @@ class NetworkConfiguratorP2P(NetworkConfiguratorConnectionBased):
     def needs_reconfiguration(self, step_cnt):
         return True
 
-    def get_nic_configuration_commands(self, connections):
-
-        # make fully staffed matrix
-        connections = DictUtil.to_fully_staffed_matrix_2(connections)
-
-        return super(NetworkConfiguratorP2P, self).get_nic_configuration_commands(connections)
-
-    def configure_connection(self, emulation_nodes, interfaces):
-        """
-        Assign connected nodes an ip address of the same subnet.
-
-        Parameters
-        ----------
-        emulation_nodes
-        interfaces
-
-        Returns
-        -------
-        """
+    def configure_connection(self, connection: AbstractConnection):
         # dict<int, list<str>>
         commands_per_node = defaultdict(list)
         check_commands_per_node = defaultdict(list)
 
-        emulation_node_x, emulation_node_y = emulation_nodes
+        for emulation_node_x, emulation_node_y, interface_x, interface_y in (
+                (connection.emulation_node_x, connection.emulation_node_y, connection.interface_x, connection.interface_y),
+                (connection.emulation_node_y, connection.emulation_node_x, connection.interface_y, connection.interface_x),
+        ):
 
-        interface_x, interface_y = interfaces
+            (emulation_node_1, interface_1), (emulation_node_2, interface_2) = sorted(
+                [(emulation_node_x, interface_x), (emulation_node_y, interface_y)])
+            # use same subnet for connection from both sides
+            key = emulation_node_1._id, emulation_node_2._id
 
-        (emulation_node_1, interface_1), (emulation_node_2, interface_2) = sorted(
-            [(emulation_node_x, interface_x), (emulation_node_y, interface_y)])
-        # TODO: reuse
-        key = emulation_node_1._id, emulation_node_2._id
+            is_new_subnet = True
+            # for each connection remember the subnet
+            if key in self.used_subnets:
+                is_new_subnet = False
+                subnet = self.used_subnets[key]
+            else:
+                # new subnet -> remember
+                subnet = next(self.subnet_generator)
+                self.used_subnets[key] = subnet
 
-        is_new_subnet = True
-        # for each connection remember the subnet
-        if key in self.used_subnets:
-            is_new_subnet = False
-            subnet = self.used_subnets[key]
-        else:
-            # new subnet -> remember
-            subnet = next(self.subnet_generator)
-            self.used_subnets[key] = subnet
+            # new subnet -> 0, else 1
+            idx_ip = int(not is_new_subnet)
 
-        # new subnet -> 0, else 1
-        idx_ip = int(not is_new_subnet)
+            # get ip addresses
+            ip = self.get_ip(subnet, offset=idx_ip)
 
-        # get ip addresses
-        ip = self.get_ip(subnet, offset=idx_ip)
+            # Ticket #81
+            idx_iface = self.get_interface_index_fun(emulation_node_x, interface_x)
+            ip_set_command_up = self.get_ip_addr_change_cmd(self.get_nic_name(idx_iface), ip, subnet.netmask)
+            commands_per_node[emulation_node_x].append(ip_set_command_up)
 
-        # Ticket #81
-        idx_iface = self.get_interface_index_fun(emulation_node_x, interface_x)
-        ip_set_command_up = self.get_ip_addr_change_cmd(self.get_nic_name(idx_iface), ip, subnet.netmask)
-        commands_per_node[emulation_node_x].append(ip_set_command_up)
-
-        ping_cmd = self.connectivity_checker_fun(ip, self.network_timeout)
-        # my peer must be able to ping me
-        check_commands_per_node[emulation_node_y].append(ping_cmd)
+            ping_cmd = self.connectivity_checker_fun(ip, self.network_timeout)
+            # my peer must be able to ping me
+            check_commands_per_node[emulation_node_y].append(ping_cmd)
 
         return commands_per_node, check_commands_per_node
 

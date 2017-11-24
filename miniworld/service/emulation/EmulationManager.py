@@ -8,6 +8,7 @@ from io import StringIO
 from pprint import pformat
 from typing import Dict, Union
 
+from miniworld.network.AbstractConnection import AbstractConnection
 from ordered_set import OrderedSet
 
 from miniworld.errors import Base, SimulationStateStartFailed
@@ -25,6 +26,7 @@ from miniworld.nodes.virtual.CentralNode import CentralNode
 from miniworld.service.emulation import NodeStarter
 from miniworld.service.emulation.RunLoop import RunLoop
 from miniworld.service.event.MyEventSystem import MyEventSystem
+from miniworld.service.persistence.connections import ConnectionPersistenceService
 from miniworld.singletons import singletons
 from miniworld.util import PathUtil, ConcurrencyUtil
 
@@ -83,6 +85,7 @@ class EmulationManager(ResetableInterface):
         self.path_log_file = PathUtil.get_log_file_path(self.__class__.__name__)
         self._logger = singletons.logger_factory.get_logger(self)
         self._logger.info("starting ...")
+        self._connection_persistence_service = ConnectionPersistenceService()
 
         # NOTE: init resets first for reset()
         self.reset()
@@ -286,6 +289,8 @@ class EmulationManager(ResetableInterface):
             # no shapshot boot, clear database
             if self.scenario_changed:
                 singletons.db_session.clear_state()
+            else:
+                self._connection_persistence_service.delete()
 
             self._logger.info('setting scenario config')
 
@@ -306,7 +311,7 @@ class EmulationManager(ResetableInterface):
             self._logger.critical("Encountered an error while starting the simulation! Resetting the system!")
             self._logger.exception(e)
             self.abort()
-            raise SimulationStateStartFailed("Failed to start the simulation! Check the rpc log for details!") from e
+            raise SimulationStateStartFailed("Failed to start the simulation!") from e
 
     def _start(self, auto_stepping=None):
         """
@@ -485,7 +490,8 @@ class EmulationManager(ResetableInterface):
         """
         # HubWiFi interface: do not change connections, but apply link quality
         is_hubwifi_iface = isinstance(interface, Interface.HubWiFi)
-        connection_info.is_central = is_hubwifi_iface
+        if is_hubwifi_iface:
+            connection_info.connection_type = AbstractConnection.ConnectionType.central
 
         return is_hubwifi_iface
 
@@ -659,12 +665,10 @@ class EmulationManager(ResetableInterface):
         self._logger.debug("LinkQuality for %s,%s: %s", x, y, pformat(link_quality_dict))
 
         node_x, node_y = self.get_emulation_node_for_idx(x), self.get_emulation_node_for_idx(y)
-        key = node_x, node_y
 
         # no connect yet and shall not be connected -> ignore
         # NOTE: for connected nodes which shall be disconnected we cannot simply break here -> existing connections must be closed
-        if not link_quality_model_says_connected and not singletons.network_manager.connection_store.get_active_node_connection_store().get(
-                key):
+        if not link_quality_model_says_connected and not self._connection_persistence_service.exists(node_x_id=x, node_y_id=y):
             self._logger.debug("ignoring %s,%s: %s", x, y, pformat(link_quality_dict))
             return
 
@@ -750,9 +754,8 @@ class EmulationManager(ResetableInterface):
                     Interface.Management()):
 
                 # does a connection already exists? (active or inactive)
-                key, conns = singletons.network_manager.connection_store.get_connections_for_nodes_implicit(
-                    emulation_node_x, emulation_node_y, interface_x, interface_y)
-                if not conns:
+                if not self._connection_persistence_service.exists(node_x_id=emulation_node_x._id, node_y_id=emulation_node_y._id,
+                                                                   interface_x_id=interface_x._id, interface_y_id=interface_y._id):
                     # no connection exists
 
                     # HubWiFi interface: do not change connections, but apply link quality
@@ -807,7 +810,6 @@ class EmulationManager(ResetableInterface):
         emulation_node_y: EmulationNode
         connection_info : ConnectionInfo
         """
-        key = emulation_node_x, emulation_node_y
 
         def call_link_quality_adjustment_notifications(connection, link_quality_dict, interface_x, interface_y):
             # no step done yet -> new connection -> set initial link quality, used e.g. to set the initial bandwidth
@@ -828,37 +830,37 @@ class EmulationManager(ResetableInterface):
                 connection, link_quality_model_says_connected, link_quality_dict, self.network_backend,
                 emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info)
 
-        if key in singletons.network_manager.connection_store.get_active_node_connection_store():
-            vals = []
-            for (interface_x, interface_y), connection_details in \
-                    singletons.network_manager.connection_store.get_active_node_connection_store()[key].items():
-                vals.append((interface_x, interface_y, connection_details))
-            for interface_x, interface_y, connection_details in vals:
+        for connection in self._connection_persistence_service.all(
+                node_x_id=emulation_node_x._id,
+                node_y_id=emulation_node_y._id,
+                active=True,
+                connection_type=AbstractConnection.ConnectionType.user,
+        ):  # type: List[AbstractConnection]
+            interface_x, interface_y = connection.interface_x, connection.interface_y
 
-                # get the connection
-                connection = connection_details.connection
+            if link_quality_model_says_connected:
+                call_link_quality_adjustment_notifications(connection, link_quality_dict, interface_x, interface_y)
+            else:
+                # active connection moved to inactive
+                singletons.network_manager.link_down(connection, link_quality_dict, self.network_backend,
+                                                     emulation_node_x, emulation_node_y, interface_x, interface_y,
+                                                     connection_info)
 
-                if link_quality_model_says_connected:
-                    call_link_quality_adjustment_notifications(connection, link_quality_dict, interface_x, interface_y)
-                else:
-                    # active connection moved to inactive
-                    singletons.network_manager.link_down(connection, link_quality_dict, self.network_backend,
-                                                         emulation_node_x, emulation_node_y, interface_x, interface_y,
-                                                         connection_info)
+        if link_quality_model_says_connected:
+            # inactive connection moved to active
+            for connection in self._connection_persistence_service.all(
+                    node_x_id=emulation_node_x._id,
+                    node_y_id=emulation_node_y._id,
+                    active=False,
+                    connection_type=AbstractConnection.ConnectionType.user,
+            ):  # type: List[AbstractConnection]
+                interface_x, interface_y = connection.interface_x, connection.interface_y
 
-        # inactive connection moved to active
-        else:
-            if link_quality_model_says_connected and key in singletons.network_manager.connection_store.get_inactive_node_connection_store():
-                for (interface_x, interface_y), connection_details in \
-                        singletons.network_manager.connection_store.get_inactive_node_connection_store()[key].items():
-                    # get the connection
-                    connection = connection_details.connection
+                call_link_quality_adjustment_notifications(connection, link_quality_dict, interface_x, interface_y)
 
-                    call_link_quality_adjustment_notifications(link_quality_dict, interface_x, interface_y)
-
-                    singletons.network_manager.link_up(connection, link_quality_dict, self.network_backend,
-                                                       emulation_node_x, emulation_node_y, interface_x, interface_y,
-                                                       connection_info)
+                singletons.network_manager.link_up(connection, link_quality_dict, self.network_backend,
+                                                   emulation_node_x, emulation_node_y, interface_x, interface_y,
+                                                   connection_info)
 
     def get_server_for_node(self, node_id):
         return 1
