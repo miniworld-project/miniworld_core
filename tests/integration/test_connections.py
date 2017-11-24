@@ -23,7 +23,7 @@ class TestConnectionPersistenceService:
     def connections(self, request, service) -> List[Connection]:
         conns = []
         singletons.config.is_management_switch_enabled = MagicMock(return_value=False)
-        for x in range(request.param):
+        for x in range(getattr(request, 'param', 3)):
             # TODO: move to nodes
             network_backend_bootstrapper = singletons.network_backend_bootstrapper_factory.get()
             i = Interfaces.factory_from_interface_names(['mesh'])[0]
@@ -35,6 +35,8 @@ class TestConnectionPersistenceService:
 
             conn = AbstractConnection(n, n2, i, i2)
             service.add(conn)
+            # check that the correct autoincrement start value is used
+            assert conn._id == x
             NodePersistenceService().add(Node.from_domain(n))
             NodePersistenceService().add(Node.from_domain(n2))
             conns.append(conn)
@@ -43,7 +45,7 @@ class TestConnectionPersistenceService:
         return conns
 
     def test_add(self, service, connections):
-        assert service.get(connections[0].id).step_added == singletons.simulation_manager.current_step
+        assert service.get(connections[0]._id).step_added == singletons.simulation_manager.current_step
 
     def test_delete(self, service, connections):
         service.delete()
@@ -51,19 +53,19 @@ class TestConnectionPersistenceService:
             service.get(connections[0].id)
 
     def test_get(self, connections, service: ConnectionPersistenceService):
-        assert service.get(connections[0].id).id == 0
+        assert service.get(connections[0]._id).id == 0
 
     def test_exists(self, connections, service: ConnectionPersistenceService):
         assert service.exists(node_x_id=0, node_y_id=1)
 
     def test_update_impairment(self, connections, service: ConnectionPersistenceService):
-        id = connections[0].id
+        id = connections[0]._id
         service.update_impairment(id, {'loss': 0.5})
 
         assert service.get(id).impairment == {'loss': 0.5}
 
     def test_update_state(self, connections, service: ConnectionPersistenceService):
-        id = connections[0].id
+        id = connections[0]._id
         service.update_state(id, False)
 
         assert service.get(id).active is False

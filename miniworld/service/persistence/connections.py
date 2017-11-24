@@ -16,6 +16,10 @@ class ConnectionPersistenceService:
         db_connection = Connection.from_domain(connection)
         with singletons.db_session.session_scope() as session:
             db_connection.step_added = singletons.simulation_manager.current_step
+            # very dirty hack to let sqlite start with autoincrement = 0
+            conn = session.query(Connection).get(0)
+            if not conn:
+                db_connection.id = 0
             session.add(db_connection)
         connection._id = db_connection.id
 

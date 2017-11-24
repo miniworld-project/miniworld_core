@@ -1,6 +1,6 @@
 import json
 
-from sqlalchemy import Column, Integer, ForeignKey, String, Boolean, types
+from sqlalchemy import Column, Integer, ForeignKey, String, Boolean, types, Sequence
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.sqltypes import Enum
@@ -27,7 +27,6 @@ class StringyJSON(types.TypeDecorator):
 
 
 MagicJSON = types.JSON().with_variant(StringyJSON, 'sqlite')
-
 
 class Node(Base):
     __tablename__ = 'nodes'
