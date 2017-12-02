@@ -1,77 +1,151 @@
 from unittest.mock import MagicMock
 
+import pytest
+
 from miniworld.singletons import singletons
 
 
 class TestNodes:
-    def test_node(self, client, mock_nodes):
+    def test_node_get(self, client, mock_nodes, snapshot):
         res = client.execute('''
-        query {
-           nodes {
-               id
-           }
-        }
+{
+  node(id: "RW11bGF0aW9uTm9kZTow") {
+    id
+    ... on InternalIdentifier {
+      iid
+    }
+  }
+}
         ''')
-        assert res['data'] == {
-            "nodes": [
-                {
-                    "id": 0,
-                },
-                {
-                    "id": 1,
-                }
-            ]
-        }
+        snapshot.assert_match(res)
 
-    def test_node_filter(self, client, mock_nodes):
+    def test_connection_get(self, client, mock_nodes, mock_connections, snapshot):
         res = client.execute('''
-        query {
-           nodes(id: 0) {
-               id
-               virtualization
-               interfaces {
-                   id
-                   name
-                   mac
-                   ipv4
-               }
-           }
-        }
+{
+  node(id: "Q29ubmVjdGlvbjowCg==") {
+    id
+    ... on InternalIdentifier {
+      iid
+    }
+  }
+}
         ''')
-        assert res['data'] == {
-            "nodes": [
-                {
-                    "id": 0,
-                    "interfaces": [
-                        {
-                            "id": 0,
-                            "ipv4": "10.0.1.1",
-                            "mac": "02:01:00:00:00:00",
-                            "name": "mesh"
-                        },
-                        {
-                            "id": 1,
-                            "ipv4": "172.21.0.1",
-                            "mac": "0a:01:00:00:00:00",
-                            "name": "management"
-                        }
-                    ],
-                    "virtualization": "QemuTap"
-                }
-            ]
+        snapshot.assert_match(res)
+
+    def test_interface_get(self, client, mock_nodes, snapshot):
+        res = client.execute('''
+{
+  node(id: "SW50ZXJmYWNlOjAK") {
+    id
+    ... on InternalIdentifier {
+      iid
+    }
+  }
+}
+        ''')
+        snapshot.assert_match(res)
+
+    def test_node_id_filter(self, client, mock_nodes, snapshot):
+        res = client.execute('''
+{
+  emulationNodes(iid:0) {
+    id
+    iid
+  }
+}
+        ''')
+        snapshot.assert_match(res)
+
+    def test_node_interfaces(self, client, mock_nodes, snapshot):
+        res = client.execute('''
+{
+  emulationNodes(kind: "user") {
+    id
+    iid
+    virtualization
+    interfaces(kind: "user") {
+      edges {
+        node {
+          id
+          iid
+          name
+          mac
+          ipv4
+          kind
         }
+      }
+    }
+  }
+}
+        ''')
+        snapshot.assert_match(res)
+
+    @pytest.mark.parametrize('mock_nodes', [3], indirect=True)
+    def test_node_links(self, client, mock_nodes, mock_connections, snapshot, monkeypatch):
+        def get_connection(connection_id):
+            return mock_connections[connection_id]
+
+        mock = MagicMock(side_effect=get_connection)
+        monkeypatch.setattr('miniworld.service.persistence.connections.ConnectionPersistenceService.get', mock)
+        res = client.execute('''
+{
+  emulationNodes(kind: "user") {
+    iid
+    virtualization
+    links(connected: true) {
+      edges {
+      node {
+        id
+        iid
+        impairment
+        connected
+        kind
+        this {
+          interface {iid}
+        }
+        other {
+          interface {iid}
+          emulationNode {iid}
+        }
+      }
+      }
+    }
+  }
+}
+        ''')
+        snapshot.assert_match(res)
+
+    @pytest.mark.parametrize('mock_nodes', [3], indirect=True)
+    def test_node_distances(self, client, mock_nodes, mock_distances, snapshot):
+        res = client.execute('''
+{
+  emulationNodes(kind: "user") {
+    iid
+    distances(between:{min: 0}) {
+      edges {
+        node {
+          distance
+          emulationNode {
+            id
+            iid
+          }
+        }
+      }
+    }
+  }
+}
+        ''')
+        snapshot.assert_match(res)
 
     def test_node_execute_command(self, client):
         result = "bin\nboot"
         singletons.simulation_manager.exec_node_cmd = MagicMock(return_value=result)
-        # $validate:Boolean, $timeout:Float
-        # , $validate: $validate, $timeout: $timeout
         res = client.execute('''
-        mutation ($nodeID: Int, $cmd: String, $validate: Boolean, $timeout: Float){
-           nodeExecuteCommand(id: $nodeID, cmd: $cmd, validate: $validate, timeout: $timeout) {
-               result
-           }
-        }
+mutation ($nodeID: Int, $cmd: String, $validate: Boolean, $timeout: Float){
+   nodeExecuteCommand(id: $nodeID, cmd: $cmd, validate: $validate, timeout: $timeout) {
+       result
+   }
+}
         ''', variable_values={
             "nodeID": 0,
             "cmd": "ls -1 /",

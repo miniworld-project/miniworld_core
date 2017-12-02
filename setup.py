@@ -25,8 +25,8 @@ setup(
     extras_require={
         'server': ['ordered-set', 'argparse', 'ipaddress', 'colorlog', 'geojson', 'futures',
                    'netifaces', 'networkx', 'blessings', 'py-dictdiffer', 'pyroute2', 'psutil', 'LatLon23',
-                   'requests', 'msgpack-python', 'zmq', 'graphene==v2.0.0', 'flask', 'flask-graphql', 'graphqlclient', 'sqlalchemy'],
-        'develop': ['pytest', 'sphinx', 'pep8', 'flake8'],
+                   'requests', 'msgpack-python', 'zmq', 'graphene', 'flask', 'flask-graphql', 'graphqlclient', 'sqlalchemy'],
+        'develop': ['pytest', 'sphinx', 'pep8', 'flake8', 'snapshottest'],
     },
     scripts=['mwcli'],
     entry_points={

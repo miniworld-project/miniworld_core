@@ -1,14 +1,13 @@
 import argparse
-import graphene
 import os
+
+import graphene
 from flask import Flask
 from flask_graphql import GraphQLView
 from graphene import ObjectType, String
 
 import miniworld
 from miniworld.api.impairmentmodel import ImpairmentQuery
-from miniworld.api.impairments import ImpairmentsQuery
-from miniworld.api.mobility import DistancesQuery
 from miniworld.api.node import NodeQuery, NodeExecuteCommand
 from miniworld.api.scenario import ScenarioStart, ScenarioStep, ScenarioAbort
 
@@ -27,12 +26,11 @@ class Mutations(graphene.ObjectType):
     node_execute_command = NodeExecuteCommand.Field()
 
 
-class Query(PingQuery, ImpairmentsQuery, NodeQuery, DistancesQuery, ImpairmentQuery):
-    pass
+class Query(PingQuery, NodeQuery, ImpairmentQuery):
+    node = graphene.relay.Node.Field()
 
 
 schema = graphene.Schema(query=Query, mutation=Mutations)
-
 app = Flask(__name__)
 app.add_url_rule('/graphql', view_func=GraphQLView.as_view('graphql', schema=schema, graphiql=True))
 

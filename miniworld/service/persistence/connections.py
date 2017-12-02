@@ -72,13 +72,13 @@ class ConnectionPersistenceService:
     def to_domain(self, connection: Connection) -> AbstractConnection:
         return singletons.network_manager.connections[connection.id]
 
-    def _add_filters(self, query, id: int = None, active: bool = None,
+    def _add_filters(self, query, connection_id: int = None, active: bool = None,
                      connection_type: AbstractConnection.ConnectionType = None,
                      step: int = None,
                      interface_x_id: int = None, interface_y_id: int = None, node_x_id: int = None, node_y_id: int = None,
                      ):
-        if id is not None:
-            query = query.filter(Connection.id == id)
+        if connection_id is not None:
+            query = query.filter(Connection.id == connection_id)
         if active is not None:
             query = query.filter(Connection.active == active)
         if connection_type is not None:

@@ -46,10 +46,7 @@ def client():
             raise GraphQLError(res['errors'])
 
         # print json in the same structure as we can assert it in tests later
-        print(json.dumps(res['data'], indent=4, sort_keys=True)
-              .replace('null', 'None')
-              .replace('false', 'False')
-              .replace('true', 'True'), file=sys.stderr)
+        print(json.dumps(res['data'], indent=2))
 
         sys.stderr.flush()
         return res
@@ -59,7 +56,17 @@ def client():
 
 
 @pytest.fixture
-def mock_nodes(request) -> Dict[int, EmulationNode]:
+def mock_nodes(request, monkeypatch) -> Dict[int, EmulationNode]:
+    def get_interface(interface_id):
+        for emulation_node in singletons.simulation_manager.nodes_id_mapping.values():
+            for interface in emulation_node.network_mixin.interfaces:
+                if interface._id == interface_id:
+                    return interface
+        raise RuntimeError('interface {} not found'.format(interface_id))
+
+    get = MagicMock(side_effect=get_interface)
+    monkeypatch.setattr('miniworld.service.persistence.interfaces.InterfacePersistenceService.get', get)
+
     def configure_net(interface, node):
         interface.ipv4 = interface.get_ip(node._id)
         interface.ipv6 = interface.get_ip(node._id)
@@ -74,25 +81,31 @@ def mock_nodes(request) -> Dict[int, EmulationNode]:
             configure_net(interface, n)
         singletons.simulation_manager.nodes_id_mapping[i] = n
 
+    get = MagicMock(side_effect=lambda node_id: singletons.simulation_manager.nodes_id_mapping[node_id])
+    monkeypatch.setattr('miniworld.service.persistence.nodes.NodePersistenceService.get', get)
+
     return singletons.simulation_manager.nodes_id_mapping
 
 
 @pytest.fixture
-def mock_connections(mock_nodes) -> List[AbstractConnection]:
+def mock_connections(mock_nodes, monkeypatch) -> List[AbstractConnection]:
     """ Connect nodes pair-wise. """
 
     abstract_connections = []
-    for node1, node2 in zip(mock_nodes.values(), list(mock_nodes.values())[1:]):
+    for idx, (node1, node2) in enumerate(zip(mock_nodes.values(), list(mock_nodes.values())[1:])):
         link_quality_dict = {
             'bandwidth': 500,
             'loss': 0.5
         }
         interface1 = node1.interfaces[0]
         interface2 = node2.interfaces[0]
-        conn = AbstractConnection(node1, node2, interface1, interface2, _id=0, impairment=link_quality_dict, connected=True)
+        conn = AbstractConnection(node1, node2, interface1, interface2, _id=idx, impairment=link_quality_dict, connected=True)
         abstract_connections.append(conn)
 
     singletons.network_manager.connections = {conn._id: conn for conn in abstract_connections}
+    monkeypatch.setattr('miniworld.service.persistence.connections.ConnectionPersistenceService.all', MagicMock(return_value=abstract_connections))
+    monkeypatch.setattr('miniworld.service.persistence.connections.ConnectionPersistenceService.get', MagicMock(side_effect=lambda connection_id: singletons.network_manager.connections[connection_id]))
+
     return abstract_connections
 
 

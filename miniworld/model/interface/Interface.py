@@ -39,7 +39,7 @@ class Interface(Base, TemplateContentProvider):
     subnets = None
     static_lock = Lock()
 
-    def __init__(self, nr_host_interface=1):
+    def __init__(self, nr_host_interface=1, _id: int = None, ipv4: str = None, ipv6: str = None, mac: str = None):
         Base.__init__(self)
 
         if not nr_host_interface >= 1:
@@ -48,9 +48,12 @@ class Interface(Base, TemplateContentProvider):
         self.nr_host_interface = nr_host_interface
 
         # set from outside
-        self.ipv4 = None
-        self.ipv6 = None
-        self.mac = None
+        self.ipv4 = ipv4
+        self.ipv6 = ipv6
+        self.mac = mac
+
+        if _id is not None:
+            self._id = _id
 
     def __str__(self):
         return "%s_%d" % (self.node_class_name, self.nr_host_interface)
@@ -259,7 +262,6 @@ INTERFACE_ALL_CLASSES_TYPES = OrderedSet(sorted({
     HubWiFi,
     Management
 }, key=lambda interface: interface.node_class))
-
 
 # all interfaces which are treated equally
 # the missing ones need sometimes special treatment

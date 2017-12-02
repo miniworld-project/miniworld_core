@@ -22,6 +22,7 @@ class AbstractConnection(StartableObject.ScenarioState, InterfaceDependentID):
     connection_info : ConnectionInfo, optional (default is None)
     """
 
+    # TODO: use for node, connection and interface
     class ConnectionType(enum.Enum):
         user = 'user'
         mgmt = 'mgmt'
