@@ -35,7 +35,8 @@ class Interface(graphene.ObjectType):
         id = int(id)
         interface_persistence_service = interfaces.InterfacePersistenceService()
         interface = interface_persistence_service.get(id)
-        return serialize_interface(interface)
+        if interface is not None:
+            return serialize_interface(interface)
 
 
 class NodeRef(graphene.ObjectType):
@@ -57,7 +58,9 @@ class Connection(graphene.ObjectType):
     def get_node(cls, info, id):
         id = int(id)
         connection_persistence_service = connections.ConnectionPersistenceService()
-        return serialize_connection(connection_persistence_service.get(connection_id=id))
+        connection = connection_persistence_service.get(connection_id=id)
+        if connection is not None:
+            return serialize_connection(connection)
 
 
 class Distance(graphene.ObjectType):
@@ -81,8 +84,8 @@ class DistanceConnection(graphene.relay.Connection):
 
 
 class BetweenDistances(graphene.InputObjectType):
-    min = graphene.Int(description="distance => min")
-    max = graphene.Int(description="distance <= max")
+    min = graphene.Float(description="distance => min", defaul_value=None)
+    max = graphene.Float(description="distance <= max", default_value=None)
 
 
 class EmulationNode(graphene.ObjectType):
@@ -128,16 +131,16 @@ class EmulationNode(graphene.ObjectType):
         for (x, y), distance in distances.items():
 
             if between is not None:
-                if between.min is not None:
+                if isinstance(between.min, float):
                     if not between.min <= distance:
                         continue
 
-                if between.max is not None:
-                    if not distance <= between.max:
+                if isinstance(between.max, float):
+                    if not distance <= int(between.max):
                         continue
 
             distance_objs[x].append(Distance(
-                emulation_node=serialize_node(singletons.simulation_manager.nodes_id_mapping[y]),
+                emulation_node=serialize_node(singletons.simulation_manager.nodes_id_mapping.get(y)),
                 distance=distance
             ))
         return distance_objs[self.iid]
@@ -147,7 +150,8 @@ class EmulationNode(graphene.ObjectType):
         id = int(id)
         node_persistence_service = nodes.NodePersistenceService()
         node = node_persistence_service.get(id)
-        return serialize_node(node)
+        if node is not None:
+            return serialize_node(node)
 
 
 class NodeQuery(graphene.ObjectType):

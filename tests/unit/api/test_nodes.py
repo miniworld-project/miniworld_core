@@ -5,11 +5,24 @@ import pytest
 from miniworld.singletons import singletons
 
 
+# TODO: test get non existent id
 class TestNodes:
     def test_node_get(self, client, mock_nodes, snapshot):
         res = client.execute('''
 {
   node(id: "RW11bGF0aW9uTm9kZTow") {
+    id
+    ... on InternalIdentifier {
+      iid
+    }
+  }
+}
+        ''')
+
+    def test_node_get_nonexisting(self, client, mock_nodes, snapshot):
+        res = client.execute('''
+{
+  node(id: "RW11bGF0aW9uTm9kZToxMDAwMAo=") {
     id
     ... on InternalIdentifier {
       iid
@@ -32,10 +45,36 @@ class TestNodes:
         ''')
         snapshot.assert_match(res)
 
+    def test_connection_get_nonexisting(self, client, mock_nodes, mock_connections, snapshot):
+        res = client.execute('''
+{
+  node(id: "Q29ubmVjdGlvbjoxMDAwMAo=") {
+    id
+    ... on InternalIdentifier {
+      iid
+    }
+  }
+}
+        ''')
+        snapshot.assert_match(res)
+
     def test_interface_get(self, client, mock_nodes, snapshot):
         res = client.execute('''
 {
   node(id: "SW50ZXJmYWNlOjAK") {
+    id
+    ... on InternalIdentifier {
+      iid
+    }
+  }
+}
+        ''')
+        snapshot.assert_match(res)
+
+    def test_interface_get_non_existing(self, client, mock_nodes, snapshot):
+        res = client.execute('''
+{
+  node(id: "SW50ZXJmYWNlOjEwMDAwCg==") {
     id
     ... on InternalIdentifier {
       iid
@@ -94,20 +133,20 @@ class TestNodes:
     virtualization
     links(connected: true) {
       edges {
-      node {
-        id
-        iid
-        impairment
-        connected
-        kind
-        this {
-          interface {iid}
+        node {
+          id
+          iid
+          impairment
+          connected
+          kind
+          this {
+            interface {iid}
+          }
+          other {
+            interface {iid}
+            emulationNode {iid}
+          }
         }
-        other {
-          interface {iid}
-          emulationNode {iid}
-        }
-      }
       }
     }
   }

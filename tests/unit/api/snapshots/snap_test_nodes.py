@@ -336,3 +336,21 @@ snapshots['TestNodes.test_connection_get 1'] = {
         }
     }
 }
+
+snapshots['TestNodes.test_node_get_nonexisting 1'] = {
+    'data': {
+        'node': None
+    }
+}
+
+snapshots['TestNodes.test_connection_get_nonexisting 1'] = {
+    'data': {
+        'node': None
+    }
+}
+
+snapshots['TestNodes.test_interface_get_non_existing 1'] = {
+    'data': {
+        'node': None
+    }
+}
