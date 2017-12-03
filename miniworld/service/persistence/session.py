@@ -13,7 +13,7 @@ class Session:
         self.session = None
 
     def create_session(self):
-        self.engine = create_engine('sqlite:///:memory:', echo=False, connect_args={'check_same_thread': False},
+        self.engine = create_engine('sqlite:///db.sql', echo=False, connect_args={'check_same_thread': False},
                                     poolclass=StaticPool)  # type: Engine
         self.session = sessionmaker(bind=self.engine, expire_on_commit=False)
 
