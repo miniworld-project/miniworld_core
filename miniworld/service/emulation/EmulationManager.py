@@ -660,6 +660,7 @@ class EmulationManager(ResetableInterface):
         x, y = node_ids
 
         connection_info = ConnectionInfo()
+        connection_info.step_added = self.current_step
 
         link_quality_model_says_connected, link_quality_dict = self.impairment.distance_2_link_quality(distance)
         self._logger.debug("LinkQuality for %s,%s: %s", x, y, pformat(link_quality_dict))

@@ -188,7 +188,7 @@ class NetworkManager(ResetableInterface, NetworkBackendNotifications.NetworkBack
                 network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info,
                 **kwargs):
         # flag as active/inactive connection
-        self.connection_persistence_service.update_state(connection_id=connection._id, active=True)
+        self.connection_persistence_service.update_state(connection_id=connection._id, connected=True)
 
         res = network_backend.link_up(
             connection, link_quality_dict,
@@ -199,7 +199,7 @@ class NetworkManager(ResetableInterface, NetworkBackendNotifications.NetworkBack
     def link_down(self, connection, link_quality_dict,
                   network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info,
                   **kwargs):
-        self.connection_persistence_service.update_state(connection_id=connection._id, active=False)
+        self.connection_persistence_service.update_state(connection_id=connection._id, connected=False)
         res = network_backend.link_down(
             connection, link_quality_dict,
             network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info,

@@ -18,6 +18,7 @@ class TestNodes:
   }
 }
         ''')
+        snapshot.assert_match(res)
 
     def test_node_get_nonexisting(self, client, mock_nodes, snapshot):
         res = client.execute('''

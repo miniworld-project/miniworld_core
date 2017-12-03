@@ -34,6 +34,7 @@ class Node(Base):
 
     id = Column(Integer, primary_key=True)
     interfaces = relationship('Interface', order_by='Interface.id', back_populates='node')
+    connections = relationship('Connection', primaryjoin='or_(Node.id==Connection.node_x_id, Node.id==Connection.node_y_id)')
 
     @staticmethod
     def from_domain(node) -> 'Node':
@@ -83,12 +84,12 @@ class Connection(Base):
     interface_y = relationship('Interface', foreign_keys=[interface_y_id])
 
     node_x_id = Column(Integer, ForeignKey('nodes.id'))
-    node_x = relationship('Node', foreign_keys=[node_x_id])
+    node_x = relationship('Node', foreign_keys=[node_x_id], back_populates='connections')
     node_y_id = Column(Integer, ForeignKey('nodes.id'))
-    node_y = relationship('Node', foreign_keys=[node_y_id])
+    node_y = relationship('Node', foreign_keys=[node_y_id], back_populates='connections')
 
     impairment = Column(MagicJSON, nullable=False, default={})
-    active = Column(Boolean, default=True, nullable=False)
+    connected = Column(Boolean, default=True, nullable=False)
     step_added = Column(Integer, nullable=False)
 
     @staticmethod
@@ -99,4 +100,6 @@ class Connection(Base):
             interface_x_id=connection.interface_x._id,
             interface_y_id=connection.interface_y._id,
             type=connection.connection_type,
+            connected=connection.connected,
+            impairment=connection.impairment,
         )

@@ -61,7 +61,7 @@ class EmulationNode(Base, ScenarioState):
     # Magic and private methods
     #############################################################
 
-    def __init__(self, network_backend_bootstrapper, interfaces, network_mixin=None):
+    def __init__(self, network_backend_bootstrapper, interfaces, network_mixin=None, connections=None):
 
         Base.__init__(self)
         ScenarioState.__init__(self)
@@ -86,6 +86,8 @@ class EmulationNode(Base, ScenarioState):
 
         # qemu instance, prevent cyclic import
         self.virtualization_layer = network_backend_bootstrapper.virtualization_layer_type(self._id, self)
+
+        self.connections = connections
 
     @property
     def name(self):

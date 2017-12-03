@@ -7,7 +7,7 @@ from miniworld.errors import Base
 from miniworld.network.AbstractConnection import AbstractConnection
 from miniworld.service.persistence.connections import ConnectionPersistenceService
 from miniworld.service.persistence.nodes import NodePersistenceService
-from miniworld.util import DictUtil, NetUtil, ConcurrencyUtil
+from miniworld.util import NetUtil, ConcurrencyUtil
 
 
 class NetworkConfiguratorError(Base):
@@ -100,14 +100,6 @@ class NetworkConfigurator:
 
     def get_nic_check_commands(self):
         return self.nic_check_commands
-
-    def get_active_connections(self):
-        # get all active connections
-        active_interfaces_per_connection = singletons.network_manager.connection_store.get_active_interfaces_per_connection()
-        # fully staffed matrix
-        active_interfaces_per_connection = DictUtil.to_fully_staffed_matrix_2(active_interfaces_per_connection)
-
-        return active_interfaces_per_connection
 
     def run_emulation_node_commands(self, commands_per_emulation_node, ev, cnt_minions=None):
         results = []

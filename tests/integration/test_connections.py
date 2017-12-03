@@ -1,17 +1,9 @@
-from typing import List
-from unittest.mock import MagicMock
-
 import pytest
 from sqlalchemy.orm.exc import NoResultFound
 
-from miniworld.model.db.base import Connection, Node
 from miniworld.model.interface.Interface import Interface
-from miniworld.model.interface.Interfaces import Interfaces
-from miniworld.network.AbstractConnection import AbstractConnection
 from miniworld.nodes.EmulationNode import EmulationNode
 from miniworld.service.persistence.connections import ConnectionPersistenceService
-from miniworld.service.persistence.nodes import NodePersistenceService
-from miniworld.singletons import singletons
 
 
 class TestConnectionPersistenceService:
@@ -19,33 +11,8 @@ class TestConnectionPersistenceService:
     def service(self) -> ConnectionPersistenceService:
         return ConnectionPersistenceService()
 
-    @pytest.fixture
-    def connections(self, request, service) -> List[Connection]:
-        conns = []
-        singletons.config.is_management_switch_enabled = MagicMock(return_value=False)
-        for x in range(getattr(request, 'param', 3)):
-            # TODO: move to nodes
-            network_backend_bootstrapper = singletons.network_backend_bootstrapper_factory.get()
-            i = Interfaces.factory_from_interface_names(['mesh'])[0]
-            i.mac = i.get_mac(x * 2)
-            i2 = Interfaces.factory_from_interface_names(['mesh'])[0]
-            i2.mac = i2.get_mac(x * 2 + 1)
-            n = EmulationNode(network_backend_bootstrapper, [i])
-            n2 = EmulationNode(network_backend_bootstrapper, [i2])
-
-            conn = AbstractConnection(n, n2, i, i2)
-            service.add(conn)
-            # check that the correct autoincrement start value is used
-            assert conn._id == x
-            NodePersistenceService().add(Node.from_domain(n))
-            NodePersistenceService().add(Node.from_domain(n2))
-            conns.append(conn)
-
-        singletons.network_manager.connections = {conn._id: conn for conn in conns}
-        return conns
-
     def test_add(self, service, connections):
-        assert service.get(connections[0]._id).step_added == singletons.simulation_manager.current_step
+        assert service.get(0)._id == 0
 
     def test_delete(self, service, connections):
         service.delete()
@@ -53,7 +20,7 @@ class TestConnectionPersistenceService:
             service.get(connections[0].id)
 
     def test_get(self, connections, service: ConnectionPersistenceService):
-        assert service.get(connections[0]._id).id == 0
+        assert service.get(connections[0]._id)._id == 0
 
     def test_exists(self, connections, service: ConnectionPersistenceService):
         assert service.exists(node_x_id=0, node_y_id=1)
@@ -68,7 +35,7 @@ class TestConnectionPersistenceService:
         id = connections[0]._id
         service.update_state(id, False)
 
-        assert service.get(id).active is False
+        assert service.get(id).connected is False
 
     @pytest.mark.parametrize('connections', [1], indirect=True)
     def test_all(self, connections, service: ConnectionPersistenceService):

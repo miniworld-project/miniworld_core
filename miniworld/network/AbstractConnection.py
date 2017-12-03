@@ -31,8 +31,8 @@ class AbstractConnection(StartableObject.ScenarioState, InterfaceDependentID):
     # TODO: add step_added
     def __init__(self, emulation_node_x, emulation_node_y, interface_x, interface_y,
                  connection_type: ConnectionType = ConnectionType.user, is_remote_conn: bool = None,
-                 impairment: Dict = None, connected: bool=None,
-                 _id: int = None,
+                 impairment: Dict = None, connected: bool = None,
+                 _id: int = None, step_added: int = None
                  ):
         StartableObject.ScenarioState.__init__(self)
         self._id = _id
@@ -44,6 +44,7 @@ class AbstractConnection(StartableObject.ScenarioState, InterfaceDependentID):
         self.is_remote_conn = is_remote_conn
         self.impairment = impairment
         self.connected = connected
+        self.step_added = step_added
 
         self.emulation_node_x_idid = self.get_interface_class_dependent_id(emulation_node_x._id,
                                                                            self.interface_x.node_class,
@@ -65,6 +66,7 @@ class AbstractConnection(StartableObject.ScenarioState, InterfaceDependentID):
                    interface_x=interface_x, interface_y=interface_y,
                    connection_type=connection_info.connection_type,
                    is_remote_conn=connection_info.is_remote_conn,
+                   step_added=connection_info.step_added,
                    )
 
     # TODO: adjust doc: set the link up ...

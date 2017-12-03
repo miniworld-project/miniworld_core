@@ -55,7 +55,7 @@ def init_singletons():
 def init_db():
     from miniworld.singletons import singletons
     singletons.db_session.create_session()
-    singletons.db_session.create_schema()
+    singletons.db_session.clear_state()
 
 
 def clean_miniworld_dir():

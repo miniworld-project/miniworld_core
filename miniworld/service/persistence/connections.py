@@ -12,8 +12,12 @@ class ConnectionPersistenceService:
         self._node_persistence_service = NodePersistenceService()
         self._interface_persistence_service = InterfacePersistenceService()
 
-    def add(self, connection: AbstractConnection):
-        db_connection = Connection.from_domain(connection)
+    def add(self, connection: Connection):
+        is_domain = False
+        db_connection = connection
+        if isinstance(connection, AbstractConnection):
+            is_domain = True
+            db_connection = Connection.from_domain(connection)
         with singletons.db_session.session_scope() as session:
             db_connection.step_added = singletons.simulation_manager.current_step
             # very dirty hack to let sqlite start with autoincrement = 0
@@ -21,19 +25,21 @@ class ConnectionPersistenceService:
             if not conn:
                 db_connection.id = 0
             session.add(db_connection)
-        connection._id = db_connection.id
+        if is_domain:
+            connection._id = db_connection.id
 
-    def get(self, *args, **kwargs) -> Connection:
+    def get(self, *args, **kwargs) -> AbstractConnection:
         with singletons.db_session.session_scope() as session:
             query = session.query(Connection)
-            query = self._add_filters(query, *args, **kwargs)
+            query = self._add_filters(query)
             connection = query.one()
-            return connection
 
-    def all(self, *args, **kwargs) -> List[Connection]:
+            return self.to_domain(connection)
+
+    def all(self, *args, **kwargs) -> List[AbstractConnection]:
         with singletons.db_session.session_scope() as session:
             query = session.query(Connection)
-            query = self._add_filters(query, *args, **kwargs)
+            query = self._add_filters(query)
             connections = query.all()
             return [self.to_domain(connection) for connection in connections]
 
@@ -41,14 +47,14 @@ class ConnectionPersistenceService:
         """ New connections are those which have been added in the current step """
         with singletons.db_session.session_scope() as session:
             query = session.query(Connection)
-            query = self._add_filters(query, *args, step=singletons.simulation_manager.current_step, **kwargs)
+            query = self._add_filters(query, step=singletons.simulation_manager.current_step)
             connections = query.all()
             return [self.to_domain(connection) for connection in connections]
 
     def exists(self, **kwargs) -> bool:
         with singletons.db_session.session_scope() as session:
             query = session.query(Connection)
-            query = self._add_filters(query, **kwargs)
+            query = self._add_filters(query)
             return query.first() is not None
 
     def update_impairment(self, connection_id: int, impairment: Dict):
@@ -58,29 +64,26 @@ class ConnectionPersistenceService:
              .update({Connection.impairment: impairment})
              )
 
-    def update_state(self, connection_id: int, active: bool):
+    def update_state(self, connection_id: int, connected: bool):
         with singletons.db_session.session_scope() as session:
             (session.query(Connection)
              .filter(Connection.id == connection_id)
-             .update({Connection.active: active})
+             .update({Connection.connected: connected})
              )
 
     def delete(self):
         with singletons.db_session.session_scope() as session:
             session.query(Connection).delete()
 
-    def to_domain(self, connection: Connection) -> AbstractConnection:
+    @staticmethod
+    def to_domain(connection: Connection) -> AbstractConnection:
         return singletons.network_manager.connections[connection.id]
 
-    def _add_filters(self, query, connection_id: int = None, active: bool = None,
-                     connection_type: AbstractConnection.ConnectionType = None,
-                     step: int = None,
-                     interface_x_id: int = None, interface_y_id: int = None, node_x_id: int = None, node_y_id: int = None,
-                     ):
+    def _add_filters(self, query, connection_id: int = None, connected: bool = None, connection_type: AbstractConnection.ConnectionType = None, step: int = None, interface_x_id: int = None, interface_y_id: int = None, node_x_id: int = None, node_y_id: int = None):
         if connection_id is not None:
             query = query.filter(Connection.id == connection_id)
-        if active is not None:
-            query = query.filter(Connection.active == active)
+        if connected is not None:
+            query = query.filter(Connection.connected == connected)
         if connection_type is not None:
             query = query.filter(Connection.type == connection_type)
         if step is not None:
