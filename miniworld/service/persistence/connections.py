@@ -28,33 +28,33 @@ class ConnectionPersistenceService:
         if is_domain:
             connection._id = db_connection.id
 
-    def get(self, *args, **kwargs) -> AbstractConnection:
+    def get(self, **kwargs) -> AbstractConnection:
         with singletons.db_session.session_scope() as session:
             query = session.query(Connection)
-            query = self._add_filters(query)
+            query = self._add_filters(query, **kwargs)
             connection = query.one()
 
             return self.to_domain(connection)
 
-    def all(self, *args, **kwargs) -> List[AbstractConnection]:
+    def all(self, **kwargs) -> List[AbstractConnection]:
         with singletons.db_session.session_scope() as session:
             query = session.query(Connection)
-            query = self._add_filters(query)
+            query = self._add_filters(query, **kwargs)
             connections = query.all()
             return [self.to_domain(connection) for connection in connections]
 
-    def get_new(self, *args, **kwargs) -> List[AbstractConnection]:
+    def get_new(self, **kwargs) -> List[AbstractConnection]:
         """ New connections are those which have been added in the current step """
         with singletons.db_session.session_scope() as session:
             query = session.query(Connection)
-            query = self._add_filters(query, step=singletons.simulation_manager.current_step)
+            query = self._add_filters(query, step=singletons.simulation_manager.current_step, **kwargs)
             connections = query.all()
             return [self.to_domain(connection) for connection in connections]
 
     def exists(self, **kwargs) -> bool:
         with singletons.db_session.session_scope() as session:
             query = session.query(Connection)
-            query = self._add_filters(query)
+            query = self._add_filters(query, **kwargs)
             return query.first() is not None
 
     def update_impairment(self, connection_id: int, impairment: Dict):

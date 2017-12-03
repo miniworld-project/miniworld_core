@@ -35,6 +35,7 @@ class Node(Base):
     id = Column(Integer, primary_key=True)
     interfaces = relationship('Interface', order_by='Interface.id', back_populates='node')
     connections = relationship('Connection', primaryjoin='or_(Node.id==Connection.node_x_id, Node.id==Connection.node_y_id)')
+    type = Column(Enum(AbstractConnection.ConnectionType), nullable=False, default=AbstractConnection.ConnectionType.user)
 
     @staticmethod
     def from_domain(node) -> 'Node':
@@ -45,7 +46,8 @@ class Node(Base):
             )
         db_node = Node(
             id=node._id,
-            interfaces=interfaces
+            interfaces=interfaces,
+            type=node.connection_type
         )
         return db_node
 
@@ -57,7 +59,7 @@ class Interface(Base):
     node_id = Column(Integer, ForeignKey('nodes.id'))
     node = relationship('Node', back_populates='interfaces')
 
-    mac = Column(String, nullable=False, unique=True)
+    mac = Column(String, nullable=True, unique=True)
     ipv4 = Column(String, unique=True)
     ipv6 = Column(String, unique=True)
 

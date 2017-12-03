@@ -9,7 +9,7 @@ class TestNodePersistenceService:
         return NodePersistenceService()
 
     def test_add(self, service, connections):
-        assert service.get(0)._id == 0
+        assert service.get(node_id=0)._id == 0
 
     def test_exists(self, service, connections):
         assert service.exists(connections[0].emulation_node_x._id)

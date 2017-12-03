@@ -3,6 +3,7 @@ from io import StringIO
 
 from miniworld.model.StartableObject import ScenarioState
 from miniworld.model.base import Base
+from miniworld.network.AbstractConnection import AbstractConnection
 from miniworld.singletons import singletons
 
 __author__ = 'Nils Schmidt'
@@ -61,7 +62,9 @@ class EmulationNode(Base, ScenarioState):
     # Magic and private methods
     #############################################################
 
-    def __init__(self, network_backend_bootstrapper, interfaces, network_mixin=None, connections=None):
+    def __init__(self, network_backend_bootstrapper, interfaces, network_mixin=None, connections=None, connection_type=None):
+        if connection_type is None:
+            connection_type = AbstractConnection.ConnectionType.user
 
         Base.__init__(self)
         ScenarioState.__init__(self)
@@ -87,6 +90,7 @@ class EmulationNode(Base, ScenarioState):
         # qemu instance, prevent cyclic import
         self.virtualization_layer = network_backend_bootstrapper.virtualization_layer_type(self._id, self)
 
+        self.connection_type = connection_type
         self.connections = connections
 
     @property

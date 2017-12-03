@@ -27,6 +27,7 @@ from miniworld.service.emulation import NodeStarter
 from miniworld.service.emulation.RunLoop import RunLoop
 from miniworld.service.event.MyEventSystem import MyEventSystem
 from miniworld.service.persistence.connections import ConnectionPersistenceService
+from miniworld.service.persistence.nodes import NodePersistenceService
 from miniworld.singletons import singletons
 from miniworld.util import PathUtil, ConcurrencyUtil
 
@@ -308,9 +309,9 @@ class EmulationManager(ResetableInterface):
             return self._start(auto_stepping=auto_stepping)
 
         except Exception as e:
-            self._logger.critical("Encountered an error while starting the simulation! Resetting the system!")
+            self._logger.critical("Encountered an error while starting the simulation! You should reset the system (mwcli stop)!")
             self._logger.exception(e)
-            self.abort()
+            # self.abort()
             raise SimulationStateStartFailed("Failed to start the simulation!") from e
 
     def _start(self, auto_stepping=None):
@@ -388,8 +389,9 @@ class EmulationManager(ResetableInterface):
                 Interfaces.Interfaces.factory_from_interface_names(interfaces))
             self.pre_calculate_hubwifi_distance_matrix(emulation_nodes)
 
-            self.nodes_id_mapping = {node._id: node for node in
-                                     (emulation_nodes + list(self.central_nodes_id_mapping.values()))}
+            node_persistence_service = NodePersistenceService()
+            for central_node in self.central_nodes_id_mapping.values():
+                node_persistence_service.add(central_node)
 
             self._logger.debug("nodes: %s", pformat(self.nodes_id_mapping))
             self._logger.info("topology mode : '%s'", singletons.scenario_config.get_walk_model_name())
@@ -834,7 +836,7 @@ class EmulationManager(ResetableInterface):
         for connection in self._connection_persistence_service.all(
                 node_x_id=emulation_node_x._id,
                 node_y_id=emulation_node_y._id,
-                active=True,
+                connected=True,
                 connection_type=AbstractConnection.ConnectionType.user,
         ):  # type: List[AbstractConnection]
             interface_x, interface_y = connection.interface_x, connection.interface_y
@@ -852,7 +854,7 @@ class EmulationManager(ResetableInterface):
             for connection in self._connection_persistence_service.all(
                     node_x_id=emulation_node_x._id,
                     node_y_id=emulation_node_y._id,
-                    active=False,
+                    connected=False,
                     connection_type=AbstractConnection.ConnectionType.user,
             ):  # type: List[AbstractConnection]
                 interface_x, interface_y = connection.interface_x, connection.interface_y

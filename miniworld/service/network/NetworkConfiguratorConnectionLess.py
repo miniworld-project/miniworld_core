@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+from miniworld.network.AbstractConnection import AbstractConnection
 from miniworld.service.network.NetworkConfigurator import NetworkConfigurator
 from miniworld.util import DictUtil
 
@@ -10,7 +11,7 @@ class NetworkConfiguratorConnectionLess(NetworkConfigurator):
     """
 
     def allocate_ips(self):
-        for emulation_node in self._node_persistence_service.all():
+        for emulation_node in self._node_persistence_service.all(connection_type=AbstractConnection.ConnectionType.user):
             # get nic configuration commands + check commands per connection
             self.configure_connection(emulation_node)
 
@@ -34,7 +35,7 @@ class NetworkConfiguratorConnectionLess(NetworkConfigurator):
         commands_per_node = defaultdict(list)
         check_commands_per_node = defaultdict(list)
 
-        for emulation_node in self._node_persistence_service.all():
+        for emulation_node in self._node_persistence_service.all(connection_type=AbstractConnection.ConnectionType.user):
             # get nic configuration commands + check commands per connection
             _commands_per_node, _check_commands_per_node = self.configure_connection(emulation_node)
             # update dicts

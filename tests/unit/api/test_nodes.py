@@ -103,7 +103,7 @@ class TestNodes:
     id
     iid
     virtualization
-    interfaces(kind: "user") {
+    interfaces {
       edges {
         node {
           id

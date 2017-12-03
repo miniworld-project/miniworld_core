@@ -34,7 +34,7 @@ class Interface(graphene.ObjectType):
     def get_node(cls, info, id):
         id = int(id)
         interface_persistence_service = interfaces.InterfacePersistenceService()
-        interface = interface_persistence_service.get(id)
+        interface = interface_persistence_service.get(interface_id=id)
         if interface is not None:
             return serialize_interface(interface)
 
@@ -97,10 +97,6 @@ class EmulationNode(graphene.ObjectType):
 
     interfaces = graphene.relay.ConnectionField(
         InterfaceConnection,
-        # TODO: report bug!
-        # TypeError: '<' not supported between instances of 'String' and 'EnumMeta'
-        # typ=graphene.Enum.from_enum(AbstractConnection.ConnectionType),
-        kind=graphene.String(),
         description='The interfaces of the node.'
     )
 
@@ -113,43 +109,44 @@ class EmulationNode(graphene.ObjectType):
         between=BetweenDistances()
     )
 
-    def resolve_interfaces(self, info, kind) -> List[Interface]:
+    def resolve_interfaces(self, info) -> List[Interface]:
         # TODO: filter by type!
         interface_persistence_service = interfaces.InterfacePersistenceService()
-        return [serialize_interface(interface_persistence_service.get(interface.iid)) for interface in self.interfaces]
+        return [serialize_interface(interface_persistence_service.get(interface_id=interface.iid)) for interface in self.interfaces]
 
     def resolve_links(self, info, iid=None, connected: bool = None) -> List[Connection]:
         # TODO: respect connection ids!
         connection_persistence_service = connections.ConnectionPersistenceService()
-        return [serialize_connection(connection_persistence_service.get(connection._id)) for connection in self.links]
+        return [serialize_connection(connection_persistence_service.get(connection_id=connection._id)) for connection in self.links]
 
     def resolve_distances(self, info, between: BetweenDistances = None) -> List[Distance]:
 
         # TODO: persist distance matrix
         distances = singletons.simulation_manager.movement_director.get_distances_from_nodes()
-        distance_objs = defaultdict(list)
-        for (x, y), distance in distances.items():
+        if distances:
+            distance_objs = defaultdict(list)
+            for (x, y), distance in distances.items():
 
-            if between is not None:
-                if isinstance(between.min, float):
-                    if not between.min <= distance:
-                        continue
+                if between is not None:
+                    if isinstance(between.min, float):
+                        if not between.min <= distance:
+                            continue
 
-                if isinstance(between.max, float):
-                    if not distance <= int(between.max):
-                        continue
+                    if isinstance(between.max, float):
+                        if not distance <= int(between.max):
+                            continue
 
-            distance_objs[x].append(Distance(
-                emulation_node=serialize_node(singletons.simulation_manager.nodes_id_mapping.get(y)),
-                distance=distance
-            ))
-        return distance_objs[self.iid]
+                distance_objs[x].append(Distance(
+                    emulation_node=serialize_node(singletons.simulation_manager.nodes_id_mapping.get(y)),
+                    distance=distance
+                ))
+            return distance_objs[self.iid]
 
     @classmethod
     def get_node(cls, info, id):
         id = int(id)
         node_persistence_service = nodes.NodePersistenceService()
-        node = node_persistence_service.get(id)
+        node = node_persistence_service.get(node_id=id)
         if node is not None:
             return serialize_node(node)
 

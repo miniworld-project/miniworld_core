@@ -3,7 +3,6 @@ from threading import Lock, Event
 
 from miniworld.concurrency.ExceptionStopThread import ExceptionStopThread
 from miniworld.errors import Unsupported
-from miniworld.model.db.base import Node as DbNode
 from miniworld.model.interface.Interface import HubWiFi
 from miniworld.nodes.virtual.CentralNode import CentralNode
 from miniworld.service.persistence.nodes import NodePersistenceService
@@ -128,7 +127,10 @@ class NodeStarter:
             self._logger.info("all qemu instances started ...")
 
             # NOTE: create management switch after all nodes exist!
-            management_node = self.start_management_node()
+            # TODO: return management node and not None if scenario changed
+            management_node = None
+            if singletons.simulation_manager.scenario_changed:
+                management_node = self.start_management_node()
 
             return self.nodes, management_node
 
@@ -166,6 +168,11 @@ class NodeStarter:
             for node in self.nodes:
                 management_node.connect_to_emu_node(singletons.network_backend, node)
 
+            # persist node
+            node_persistence_service = NodePersistenceService()
+            # TODO: management node should not have 2 interfaces
+            node_persistence_service.add(management_node)
+
             return management_node
 
     def _start_node(self, *args):
@@ -195,7 +202,7 @@ class NodeStarter:
                     add_node = False
 
             if add_node:
-                node_persistence_service.add(DbNode.from_domain(node))
+                node_persistence_service.add(node)
 
         return node
 

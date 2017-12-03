@@ -358,8 +358,6 @@ def NetworkBackendBridgedDummy():
             -------
             dict<int, CentralNode>
             """
-            from miniworld.singletons import singletons
-
             # create CentralNode s but only if there is a HubWiFi interface
             # TODO: REMOVE
             cnt = 0
@@ -386,14 +384,6 @@ def NetworkBackendBridgedDummy():
                     self.event_monitor.add_new_bridge(central_node._id)
 
                 cnt += 1
-
-            # connect via server boundaries (overlay)
-            node_ids = singletons.simulation_manager.get_emulation_node_ids()
-            for x, y in zip(node_ids, node_ids[1:]):
-                emulation_node_x = singletons.simulation_manager.get_emulation_node_for_idx(x)
-                emulation_node_y = singletons.simulation_manager.get_emulation_node_for_idx(y)
-                self._logger.info("connecting %s<->%s", emulation_node_x, emulation_node_y)
-                self.connection_across_servers(self, emulation_node_x, emulation_node_y)
 
             return central_nodes_dict
 
