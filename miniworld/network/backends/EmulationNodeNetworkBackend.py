@@ -42,10 +42,7 @@ class EmulationNodeNetworkBackend(NetworkMixin):
 
         self.nlog = singletons.logger_factory.get_node_logger(self.node_id)
 
-        if interfaces is None:
-            self.interfaces = Interfaces.Interfaces.factory([Interface.Mesh])
-        else:
-            self.interfaces = interfaces
+        self.interfaces = interfaces or Interfaces.Interfaces()
 
         if management_switch:
             self.interfaces.append(Interfaces.Interfaces.factory([Interface.Management])[0])

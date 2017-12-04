@@ -1,5 +1,3 @@
-from miniworld.model.interface import Interfaces
-from miniworld.model.interface.Interface import Management
 from miniworld.network.AbstractConnection import AbstractConnection
 from miniworld.network.backends.NetworkBackendNotifications import ConnectionInfo
 from miniworld.nodes.virtual.VirtualNode import VirtualNode
@@ -15,8 +13,8 @@ class ManagementNode(VirtualNode):
     """
 
     def __init__(self, network_backend_bootstrapper):
-        interfaces = Interfaces.Interfaces.factory([Management])
-        super(ManagementNode, self).__init__(network_backend_bootstrapper, interfaces)
+        super(ManagementNode, self).__init__(network_backend_bootstrapper)
+        self.connection_type = AbstractConnection.ConnectionType.mgmt
 
     def _start(self, switch=True, bridge_dev_name=None):
         super(ManagementNode, self)._start(switch=switch, bridge_dev_name=bridge_dev_name)

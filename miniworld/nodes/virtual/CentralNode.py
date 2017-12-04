@@ -1,4 +1,3 @@
-from miniworld.model.interface import Interfaces
 from miniworld.model.interface.Interface import HubWiFi
 from miniworld.network.AbstractConnection import AbstractConnection
 from miniworld.network.backends.NetworkBackendNotifications import ConnectionInfo
@@ -19,9 +18,8 @@ class CentralNode(VirtualNode.VirtualNode):
         id : int, optional (default is generated)
         bridge_name : str
         """
-        interfaces = Interfaces.Interfaces.factory([HubWiFi])
-
-        super(CentralNode, self).__init__(network_backend_bootstrapper, interfaces=interfaces)
+        super(CentralNode, self).__init__(network_backend_bootstrapper)
+        self.connection_type = AbstractConnection.ConnectionType.central
 
     def init_connection_info(self):
         """
@@ -31,11 +29,6 @@ class CentralNode(VirtualNode.VirtualNode):
         ConnectionInfo
         """
         return ConnectionInfo(connection_type=AbstractConnection.ConnectionType.central)
-
-    # TODO: REMOVE ?
-    # @staticmethod
-    # def is_bridge_node_id(node_id):
-    #     return CentralNode.gen_bridge_node_id() <= node_id < ManagementNode.MANAGEMENT_NODE_ID
 
     @staticmethod
     def is_central_node_interface(interface):

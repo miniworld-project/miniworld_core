@@ -15,12 +15,14 @@ class Interfaces(Objects):
     Includes a factory method for the creation of multiple interfaces.
     """
 
-    def __init__(self, interfaces):
+    def __init__(self, interfaces=None):
         """
         Parameters
         ----------
         node_classes : list<Interface>
         """
+        if interfaces is None:
+            interfaces = []
         self.data = interfaces
         super(Interfaces, self).__init__(interfaces)
 
