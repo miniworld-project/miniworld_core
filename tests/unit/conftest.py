@@ -67,22 +67,25 @@ def mock_nodes(request, mock_persistence, monkeypatch) -> Dict[int, EmulationNod
             for interface in emulation_node.network_mixin.interfaces:
                 if interface._id == interface_id:
                     return interface
-
+    interface_id_counter = 0
     if mock_persistence:
         get = MagicMock(side_effect=get_interface)
         monkeypatch.setattr('miniworld.service.persistence.interfaces.InterfacePersistenceService.get', get)
 
     def configure_net(interface, node):
+        nonlocal interface_id_counter
         interface.ipv4 = interface.get_ip(node._id)
         interface.ipv6 = interface.get_ip(node._id)
         interface.mac = interface.get_mac(node._id)
+        interface._id = interface_id_counter
+        interface_id_counter += 1
 
     cnt_nodes = getattr(request, 'param', None) or 2
     network_backend_bootstrapper = singletons.network_backend_bootstrapper_factory.get()
     for i in range(cnt_nodes):
         interface = Interfaces.factory_from_interface_names(['mesh'])[0]
         n = EmulationNode(network_backend_bootstrapper, [interface])
-        for interface in n.interfaces:
+        for interface in n.network_mixin.interfaces:
             configure_net(interface, n)
         singletons.simulation_manager.nodes_id_mapping[i] = n
 
@@ -103,8 +106,8 @@ def mock_connections(mock_nodes, mock_persistence, monkeypatch) -> List[Abstract
             'bandwidth': 500,
             'loss': 0.5
         }
-        interface1 = node1.interfaces[0]
-        interface2 = node2.interfaces[0]
+        interface1 = node1.network_mixin.interfaces[0]
+        interface2 = node2.network_mixin.interfaces[0]
         conn = AbstractConnection(node1, node2, interface1, interface2, _id=idx, impairment=link_quality_dict, connected=True, step_added=0)
         abstract_connections.append(conn)
 

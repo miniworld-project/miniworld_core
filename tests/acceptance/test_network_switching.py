@@ -7,7 +7,7 @@ import pytest
 from typing import Dict, List, Iterable
 
 from miniworld.config import Scenario
-from tests.conftest import create_runner
+from tests.acceptance.conftest import create_runner
 
 
 @pytest.fixture(scope='session')

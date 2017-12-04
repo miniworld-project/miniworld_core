@@ -12,7 +12,11 @@ class TestConnectionPersistenceService:
         return ConnectionPersistenceService()
 
     def test_add(self, service, connections):
+        # check that obj is persisted and start by 0 hack is working
         assert service.get(connection_id=0)._id == 0
+
+        # domain model got updated
+        assert connections[0]._id == 0
 
     def test_delete(self, service, connections):
         service.delete()

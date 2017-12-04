@@ -21,7 +21,7 @@ class Interfaces(Objects):
         ----------
         node_classes : list<Interface>
         """
-        self.interfaces = self.data = interfaces
+        self.data = interfaces
         super(Interfaces, self).__init__(interfaces)
 
     @staticmethod

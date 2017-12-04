@@ -3,7 +3,7 @@ from typing import List
 
 from sqlalchemy.orm import joinedload
 
-from miniworld.model.db.base import Node
+from miniworld.model.db.base import Node, Interface
 from miniworld.network.AbstractConnection import AbstractConnection
 from miniworld.nodes.EmulationNode import EmulationNode
 from miniworld.singletons import singletons
@@ -16,17 +16,29 @@ class NodePersistenceService:
         if isinstance(node, EmulationNode):
             db_node = Node.from_domain(node)
             is_domain = True
+
         with singletons.db_session.session_scope() as session:
+
             # very dirty hack to let sqlite start with autoincrement = 0
             if db_node.id is None and not session.query(Node).get(0):
                 db_node.id = 0
-            # for interface in node.interfaces:
-            #     session.add(interface)
+
+            for db_interface, interface in zip(db_node.interfaces, node.network_mixin.interfaces):
+                # very dirty hack to let sqlite start with autoincrement = 0
+                if db_interface.id is None and not session.query(Interface).get(0):
+                    db_interface.id = 0
+                session.add(db_interface)
+                session.flush()
+                assert db_interface.id is not None
+                if is_domain:
+                    interface._id = db_interface.id
+
             session.add(db_node)
             session.commit()
 
         if is_domain:
             node._id = db_node.id
+            assert node._id is not None
             singletons.simulation_manager.nodes_id_mapping[node._id] = node
 
         return node

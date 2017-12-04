@@ -182,7 +182,7 @@ def serialize_node(node: EmulationNode) -> EmulationNode:
         id=node._id,
         iid=node._id,
         virtualization=node.virtualization_layer.__class__.__name__,
-        interfaces=[serialize_interface(interface) for interface in node.interfaces],
+        interfaces=[serialize_interface(interface) for interface in node.network_mixin.interfaces],
     )
 
 

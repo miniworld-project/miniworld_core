@@ -80,14 +80,14 @@ class Connection(Base):
     id = Column(Integer, primary_key=True)
     type = Column(Enum(AbstractConnection.ConnectionType), nullable=False, default=AbstractConnection.ConnectionType.user)
 
-    interface_x_id = Column(Integer, ForeignKey('interfaces.id'))
+    interface_x_id = Column(Integer, ForeignKey('interfaces.id'), nullable=False)
     interface_x = relationship('Interface', foreign_keys=[interface_x_id])
-    interface_y_id = Column(Integer, ForeignKey('interfaces.id'))
+    interface_y_id = Column(Integer, ForeignKey('interfaces.id'), nullable=False)
     interface_y = relationship('Interface', foreign_keys=[interface_y_id])
 
-    node_x_id = Column(Integer, ForeignKey('nodes.id'))
+    node_x_id = Column(Integer, ForeignKey('nodes.id'), nullable=False)
     node_x = relationship('Node', foreign_keys=[node_x_id], back_populates='connections')
-    node_y_id = Column(Integer, ForeignKey('nodes.id'))
+    node_y_id = Column(Integer, ForeignKey('nodes.id'), nullable=False)
     node_y = relationship('Node', foreign_keys=[node_y_id], back_populates='connections')
 
     impairment = Column(MagicJSON, nullable=False, default={})

@@ -165,13 +165,13 @@ class NodeStarter:
 
             management_node = network_backend_bootstrapper.management_node_type(network_backend_bootstrapper)
             management_node.start(switch=True, bridge_dev_name=singletons.config.get_bridge_tap_name())
-            for node in self.nodes:
-                management_node.connect_to_emu_node(singletons.network_backend, node)
-
             # persist node
             node_persistence_service = NodePersistenceService()
             # TODO: management node should not have 2 interfaces
             node_persistence_service.add(management_node)
+
+            for node in self.nodes:
+                management_node.connect_to_emu_node(singletons.network_backend, node)
 
             return management_node
 

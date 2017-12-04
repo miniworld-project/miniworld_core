@@ -23,10 +23,10 @@ def connections(mock_connections):
     connection = mock_connections[0]  # type: AbstractConnection
     node_0 = connection.emulation_node_x
     node_1 = connection.emulation_node_y
-    connection_persistence_service = ConnectionPersistenceService()
-    connection_persistence_service.add(connection)
     node_persistence_service = NodePersistenceService()
     node_persistence_service.add(node_0)
     node_persistence_service.add(node_1)
+    connection_persistence_service = ConnectionPersistenceService()
+    connection_persistence_service.add(connection)
 
     return mock_connections

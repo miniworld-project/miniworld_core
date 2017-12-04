@@ -81,9 +81,6 @@ class EmulationNode(Base, ScenarioState):
         else:
             self.network_mixin = network_mixin
 
-        # TODO: keep or remove?
-        self.interfaces = interfaces
-
         # create extra node logger
         self.nlog = singletons.logger_factory.get_node_logger(self._id)
 

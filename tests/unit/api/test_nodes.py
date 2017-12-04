@@ -181,7 +181,7 @@ class TestNodes:
         result = "bin\nboot"
         singletons.simulation_manager.exec_node_cmd = MagicMock(return_value=result)
         res = client.execute('''
-mutation ($nodeID: Int, $cmd: String, $validate: Boolean, $timeout: Float){
+mutation ($nodeID: Int, $cmd: String, $validate: Boolean, $timeout: Float) {
    nodeExecuteCommand(id: $nodeID, cmd: $cmd, validate: $validate, timeout: $timeout) {
        result
    }

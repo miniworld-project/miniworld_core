@@ -5,7 +5,6 @@ from threading import Lock
 from ordered_set import OrderedSet
 
 from miniworld.model.StartableObject import ScenarioState
-from miniworld.model.base import Base
 from miniworld.service.provisioning.TemplateContentProvider import TemplateContentProvider
 from miniworld.util import NetUtil
 
@@ -15,8 +14,7 @@ NODE_MAC_PREFIX = "%02x:%06x"
 
 
 @total_ordering
-@Base.id_provider
-class Interface(Base, TemplateContentProvider):
+class Interface(TemplateContentProvider):
     """
     Models an interface class like Access Point or Mesh.
 
@@ -40,7 +38,6 @@ class Interface(Base, TemplateContentProvider):
     static_lock = Lock()
 
     def __init__(self, nr_host_interface=1, _id: int = None, ipv4: str = None, ipv6: str = None, mac: str = None):
-        Base.__init__(self)
 
         if not nr_host_interface >= 1:
             raise ValueError("The number of the interface has to be greater 0!")
@@ -52,8 +49,7 @@ class Interface(Base, TemplateContentProvider):
         self.ipv6 = ipv6
         self.mac = mac
 
-        if _id is not None:
-            self._id = _id
+        self._id = _id
 
     def __str__(self):
         return "%s_%d" % (self.node_class_name, self.nr_host_interface)
