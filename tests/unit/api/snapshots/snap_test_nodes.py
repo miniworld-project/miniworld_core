@@ -128,6 +128,7 @@ snapshots['TestNodes.test_node_links[3] 1'] = {
                         {
                             'node': {
                                 'connected': True,
+                                'distance': 10.0,
                                 'id': 'Q29ubmVjdGlvbjow',
                                 'iid': 0,
                                 'impairment': {
@@ -153,6 +154,7 @@ snapshots['TestNodes.test_node_links[3] 1'] = {
                         {
                             'node': {
                                 'connected': True,
+                                'distance': 10.0,
                                 'id': 'Q29ubmVjdGlvbjox',
                                 'iid': 1,
                                 'impairment': {
@@ -186,6 +188,7 @@ snapshots['TestNodes.test_node_links[3] 1'] = {
                         {
                             'node': {
                                 'connected': True,
+                                'distance': 10.0,
                                 'id': 'Q29ubmVjdGlvbjow',
                                 'iid': 0,
                                 'impairment': {
@@ -211,6 +214,7 @@ snapshots['TestNodes.test_node_links[3] 1'] = {
                         {
                             'node': {
                                 'connected': True,
+                                'distance': 10.0,
                                 'id': 'Q29ubmVjdGlvbjox',
                                 'iid': 1,
                                 'impairment': {
@@ -244,6 +248,7 @@ snapshots['TestNodes.test_node_links[3] 1'] = {
                         {
                             'node': {
                                 'connected': True,
+                                'distance': 10.0,
                                 'id': 'Q29ubmVjdGlvbjow',
                                 'iid': 0,
                                 'impairment': {
@@ -269,6 +274,7 @@ snapshots['TestNodes.test_node_links[3] 1'] = {
                         {
                             'node': {
                                 'connected': True,
+                                'distance': 10.0,
                                 'id': 'Q29ubmVjdGlvbjox',
                                 'iid': 1,
                                 'impairment': {

@@ -29,14 +29,12 @@ class TestConnectionPersistenceService:
     def test_exists(self, connections, service: ConnectionPersistenceService):
         assert service.exists(node_x_id=0, node_y_id=1)
 
-    @pytest.mark.skip(reason='ToDo')
     def test_update_impairment(self, connections, service: ConnectionPersistenceService):
         id = connections[0]._id
         service.update_impairment(id, {'loss': 0.5})
 
         assert service.get(connection_id=id).impairment == {'loss': 0.5}
 
-    @pytest.mark.skip(reason='ToDo')
     def test_update_state(self, connections, service: ConnectionPersistenceService):
         id = connections[0]._id
         service.update_state(id, False)

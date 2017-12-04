@@ -53,6 +53,7 @@ class Connection(graphene.ObjectType):
     other = graphene.Field(NodeRef)
     impairment = graphene.Field(DictScalar)
     connected = graphene.Boolean()
+    distance = graphene.Float()
 
     @classmethod
     def get_node(cls, info, id):
@@ -213,4 +214,5 @@ def serialize_connection(connection: AbstractConnection) -> Connection:
         impairment=connection.impairment,
         connected=connection.connected,
         kind=connection.connection_type.value,
+        distance=connection.distance,
     )

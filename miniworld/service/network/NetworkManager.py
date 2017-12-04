@@ -180,6 +180,7 @@ class NetworkManager(ResetableInterface, NetworkBackendNotifications.NetworkBack
 
         connection.impairment = link_quality_dict
         self.connection_persistence_service.update_impairment(connection._id, link_quality_dict)
+        self.connection_persistence_service.update_distance(connection._id, connection_info.distance)
         return network_backend.after_link_quality_adjustment(
             connection, link_quality_still_connected, link_quality_dict, network_backend, emulation_node_x,
             emulation_node_y, interface_x, interface_y, connection_info)

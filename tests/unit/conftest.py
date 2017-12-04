@@ -108,7 +108,7 @@ def mock_connections(mock_nodes, mock_persistence, monkeypatch) -> List[Abstract
         }
         interface1 = node1.network_mixin.interfaces[0]
         interface2 = node2.network_mixin.interfaces[0]
-        conn = AbstractConnection(node1, node2, interface1, interface2, _id=idx, impairment=link_quality_dict, connected=True, step_added=0)
+        conn = AbstractConnection(node1, node2, interface1, interface2, _id=idx, impairment=link_quality_dict, connected=True, step_added=0, distance=10)
         abstract_connections.append(conn)
 
     singletons.network_manager.connections = {conn._id: conn for conn in abstract_connections}

@@ -178,5 +178,3 @@ def create_runner(tmpdir_factory, request, config_path):
 @pytest.fixture
 def runner(tmpdir_factory, config_path, request):
     return create_runner(tmpdir_factory, request, config_path)
-
-

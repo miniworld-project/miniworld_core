@@ -139,6 +139,7 @@ class TestNodes:
           iid
           impairment
           connected
+          distance
           kind
           this {
             interface {iid}

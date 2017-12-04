@@ -3,7 +3,7 @@ import json
 from sqlalchemy import Column, Integer, ForeignKey, String, Boolean, types
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql.sqltypes import Enum
+from sqlalchemy.sql.sqltypes import Enum, Float
 
 from miniworld.network.AbstractConnection import AbstractConnection
 
@@ -93,6 +93,7 @@ class Connection(Base):
     impairment = Column(MagicJSON, nullable=False, default={})
     connected = Column(Boolean, default=True, nullable=False)
     step_added = Column(Integer, nullable=False)
+    distance = Column(Float)
 
     @staticmethod
     def from_domain(connection) -> 'Connection':
@@ -104,4 +105,5 @@ class Connection(Base):
             type=connection.connection_type,
             connected=connection.connected,
             impairment=connection.impairment,
+            distance=connection.distance,
         )

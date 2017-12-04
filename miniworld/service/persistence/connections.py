@@ -57,12 +57,22 @@ class ConnectionPersistenceService:
             query = self._add_filters(query, **kwargs)
             return query.first() is not None
 
+    # TODO: generic update ?
+    def update_distance(self, connection_id: int, distance: Dict):
+        with singletons.db_session.session_scope() as session:
+            (session.query(Connection)
+             .filter(Connection.id == connection_id)
+             .update({Connection.distance: distance})
+             )
+        singletons.network_manager.connections[connection_id].impairment = distance
+
     def update_impairment(self, connection_id: int, impairment: Dict):
         with singletons.db_session.session_scope() as session:
             (session.query(Connection)
              .filter(Connection.id == connection_id)
              .update({Connection.impairment: impairment})
              )
+        singletons.network_manager.connections[connection_id].impairment = impairment
 
     def update_state(self, connection_id: int, connected: bool):
         with singletons.db_session.session_scope() as session:
@@ -70,6 +80,7 @@ class ConnectionPersistenceService:
              .filter(Connection.id == connection_id)
              .update({Connection.connected: connected})
              )
+        singletons.network_manager.connections[connection_id].connected = connected
 
     def delete(self):
         with singletons.db_session.session_scope() as session:

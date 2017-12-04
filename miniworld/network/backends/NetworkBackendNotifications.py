@@ -222,13 +222,15 @@ class ConnectionInfo:
         'is_remote_conn',
         'connection_type',
         'step_added',
+        'distance'
     )
 
     def __init__(self, connection_type: AbstractConnection.ConnectionType = AbstractConnection.ConnectionType.user, is_remote_conn=False,
-                 step_added: int = None):
+                 step_added: int = None, distance: int = None):
         self.is_remote_conn = is_remote_conn
         self.connection_type = connection_type
         self.step_added = step_added
+        self.distance = distance
 
     @property
     def is_one_tap_mode(self) -> bool:
