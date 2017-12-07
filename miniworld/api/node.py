@@ -2,14 +2,16 @@ from collections import defaultdict
 from typing import List
 
 import graphene
+from sqlalchemy.orm.exc import NoResultFound
 
 from miniworld import singletons
 from miniworld.api import DictScalar
 from miniworld.model.interface.Interface import Interface as InterfaceModel
-from miniworld.network.AbstractConnection import AbstractConnection
+from miniworld.network.connection import Connection
 from miniworld.service.persistence import connections
 from miniworld.service.persistence import interfaces, nodes
-from miniworld.service.persistence.connections import ConnectionPersistenceService
+from miniworld.service.persistence.nodes import NodePersistenceService
+from miniworld.nodes.EmulationNode import EmulationNode as DomainEmulationNode
 
 
 class InternalIdentifier(graphene.Interface):
@@ -34,13 +36,17 @@ class Interface(graphene.ObjectType):
     def get_node(cls, info, id):
         id = int(id)
         interface_persistence_service = interfaces.InterfacePersistenceService()
-        interface = interface_persistence_service.get(interface_id=id)
-        if interface is not None:
-            return serialize_interface(interface)
+
+        try:
+            interface = interface_persistence_service.get(interface_id=id)
+        except NoResultFound:
+            return
+
+        return serialize_interface(interface)
 
 
 class NodeRef(graphene.ObjectType):
-    interface = graphene.Field(Interface)
+    interface = graphene.Field(lambda: Interface)
     emulation_node = graphene.Field(lambda: EmulationNode)
 
 
@@ -48,9 +54,10 @@ class Connection(graphene.ObjectType):
     class Meta:
         interfaces = (graphene.relay.Node, InternalIdentifier, ConnectionTypeInterface)
 
-    # TODO: add distance
-    this = graphene.Field(NodeRef)
-    other = graphene.Field(NodeRef)
+    emulation_node_x = graphene.Field(lambda: EmulationNode)
+    emulation_node_y = graphene.Field(lambda: EmulationNode)
+    interface_x = graphene.Field(lambda: Interface)
+    interface_y = graphene.Field(lambda: Interface)
     impairment = graphene.Field(DictScalar)
     connected = graphene.Boolean()
     distance = graphene.Float()
@@ -59,9 +66,13 @@ class Connection(graphene.ObjectType):
     def get_node(cls, info, id):
         id = int(id)
         connection_persistence_service = connections.ConnectionPersistenceService()
-        connection = connection_persistence_service.get(connection_id=id)
-        if connection is not None:
-            return serialize_connection(connection)
+
+        try:
+            connection = connection_persistence_service.get(connection_id=id)
+        except NoResultFound:
+            return None
+
+        return serialize_connection(connection)
 
 
 class Distance(graphene.ObjectType):
@@ -115,12 +126,13 @@ class EmulationNode(graphene.ObjectType):
         interface_persistence_service = interfaces.InterfacePersistenceService()
         return [serialize_interface(interface_persistence_service.get(interface_id=interface.iid)) for interface in self.interfaces]
 
-    def resolve_links(self, info, iid=None, connected: bool = None) -> List[Connection]:
+    def resolve_links(self, info, connected: bool = None) -> List[Connection]:
         # TODO: respect connection ids!
         connection_persistence_service = connections.ConnectionPersistenceService()
-        return [serialize_connection(connection_persistence_service.get(connection_id=connection._id)) for connection in self.links]
+        return [serialize_connection(connection_persistence_service.get(connection_id=connection.id)) for connection in self.links]
 
     def resolve_distances(self, info, between: BetweenDistances = None) -> List[Distance]:
+        # TODO: use persistence service! current implementation returns the next distance matrix!
 
         # TODO: persist distance matrix
         distances = singletons.simulation_manager.movement_director.get_distances_from_nodes()
@@ -147,21 +159,21 @@ class EmulationNode(graphene.ObjectType):
     def get_node(cls, info, id):
         id = int(id)
         node_persistence_service = nodes.NodePersistenceService()
-        node = node_persistence_service.get(node_id=id)
-        if node is not None:
-            return serialize_node(node)
+
+        try:
+            node = node_persistence_service.get(node_id=id)
+        except NoResultFound:
+            return
+
+        return serialize_node(node)
 
 
 class NodeQuery(graphene.ObjectType):
     emulation_nodes = graphene.List(EmulationNode, iid=graphene.Int(), kind=graphene.String())
 
     def resolve_emulation_nodes(self, info, iid: int = None, kind=None):
-        connection_persistence_service = ConnectionPersistenceService()
-        nodes = [serialize_node(node) for id, node in filter(lambda x: (x[0] == iid) if iid is not None else True,
-                                                             singletons.simulation_manager.nodes_id_mapping.items())]
-        for node in nodes:
-            node.links = connection_persistence_service.all(node_x_id=node.id)
-        return sorted(nodes, key=lambda node: node.iid)
+        node_persistence_service = NodePersistenceService()
+        return [serialize_node(node) for node in node_persistence_service.all()]
 
 
 class NodeExecuteCommand(graphene.Mutation):
@@ -178,19 +190,21 @@ class NodeExecuteCommand(graphene.Mutation):
         return NodeExecuteCommand(result=singletons.simulation_manager.exec_node_cmd(cmd, node_id=id, validation=validate, timeout=timeout))
 
 
-def serialize_node(node: EmulationNode) -> EmulationNode:
+def serialize_node(node: DomainEmulationNode) -> EmulationNode:
     return EmulationNode(
-        id=node._id,
-        iid=node._id,
+        id=node.id,
+        iid=node.id,
         virtualization=node.virtualization_layer.__class__.__name__,
         interfaces=[serialize_interface(interface) for interface in node.network_mixin.interfaces],
+        links=node.connections,
+        kind=node.connection_type.value,
     )
 
 
 def serialize_interface(interface: InterfaceModel):
     return Interface(
-        id=interface._id,
-        iid=interface._id,
+        id=interface.id,
+        iid=interface.id,
         name=interface.node_class_name,
         mac=interface.mac,
         ipv4=interface.ipv4,
@@ -198,21 +212,15 @@ def serialize_interface(interface: InterfaceModel):
     )
 
 
-def serialize_connection(connection: AbstractConnection) -> Connection:
-    # TODO: is self always the first?
+def serialize_connection(connection: Connection) -> Connection:
     return Connection(
-        id=connection._id,
-        iid=connection._id,
-        this=NodeRef(
-            interface=serialize_interface(connection.interface_x),
-            emulation_node=serialize_node(connection.emulation_node_x),
-        ),
-        other=NodeRef(
-            interface=serialize_interface(connection.interface_y),
-            emulation_node=serialize_node(connection.emulation_node_y),
-        ),
-        impairment=connection.impairment,
+        id=connection.id,
+        iid=connection.id,
         connected=connection.connected,
+        emulation_node_x=serialize_node(connection.emulation_node_x),
+        emulation_node_y=serialize_node(connection.emulation_node_y),
+        interface_x=serialize_interface(connection.interface_x),
+        interface_y=serialize_interface(connection.interface_y),
         kind=connection.connection_type.value,
         distance=connection.distance,
     )

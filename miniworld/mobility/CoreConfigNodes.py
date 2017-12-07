@@ -67,7 +67,7 @@ class CoreConfigNodes(ResetableInterface):
         for n in range(0, range(singletons.scenario_config.get_number_of_nodes() - 1)):
             for i in range(n + 1, range(singletons.scenario_config.get_number_of_nodes())):
                 if n != i:
-                    if i in self.crnt_connections[n]:
+                    if self.crnt_connections is not None and i in self.crnt_connections[n]:
                         # connected
                         distance = 0
                         distance_matrix.set_distance(n, i, distance)
@@ -139,7 +139,7 @@ class CoreConfigNodesLan(CoreConfigNodes):
         for n in singletons.simulation_manager.get_emulation_node_ids():
             for i in range(n + 1, singletons.simulation_manager.get_emulation_node_ids()[-1] + 1):
                 if n != i:
-                    if i in self.crnt_connections[n]:
+                    if self.crnt_connections is not None and i in self.crnt_connections[n]:
                         # connected
                         distance = 1
                         distance_matrix.set_distance(n, i, distance)
