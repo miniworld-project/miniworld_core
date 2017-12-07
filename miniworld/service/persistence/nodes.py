@@ -63,10 +63,11 @@ class NodePersistenceService:
         with singletons.db_session.session_scope() as session:
             return session.query(exists().where(Node.id == node_id)).scalar()
 
-    def to_domain(self, node: Node) -> EmulationNode:
+    def to_domain(self, node: Node, include_connections=True) -> EmulationNode:
         from miniworld.service.persistence.connections import ConnectionPersistenceService
         emulation_node = singletons.simulation_manager.nodes_id_mapping[node.id]
-        emulation_node.connections = [ConnectionPersistenceService.to_domain(connection) for connection in node.connections]
+        if include_connections:
+            emulation_node.connections = [ConnectionPersistenceService.to_domain(connection) for connection in node.connections]
         return emulation_node
 
     @staticmethod

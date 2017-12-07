@@ -9,7 +9,7 @@ def ConnectionMultiBridges():
         # Superclass stuff
         #########################################
 
-        def tap_link_up(self, tap_x, tap_y, up=True):
+        def tap_link_up(self, connection, tap_x, tap_y, up=True):
 
             # use internal :py:class:`.connection_book_keeper` to only change the NIC state if necessary
             state_correct = up and singletons.network_backend.connection_book_keeper.interface_states[tap_x]
@@ -17,9 +17,9 @@ def ConnectionMultiBridges():
             if not state_correct:
                 self._tap_link_up(tap_x, tap_y, up=up)
 
-        def tap_link_up_central(self, tap_x, tap_y, up=True):
+        def tap_link_up_central(self, connection, tap_x, tap_y, up=True):
 
-            self.tap_link_up(tap_x, tap_y, up=up)
+            self.tap_link_up(connection, tap_x, tap_y, up=up)
 
         @staticmethod
         def get_connection_id(tap_x, tap_y):

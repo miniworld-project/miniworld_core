@@ -360,6 +360,7 @@ class EmulationManager(ResetableInterface):
 
             # create and start network backend
             network_backend_bootstrapper = singletons.network_backend_bootstrapper_factory.get()
+            singletons.network_backend_bootstrapper = network_backend_bootstrapper
             self._logger.info("creating network backend ...")
             self.network_backend = network_backend_bootstrapper.network_backend_type(network_backend_bootstrapper)
             # store singleton reference to network backend

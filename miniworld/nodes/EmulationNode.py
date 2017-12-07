@@ -55,7 +55,7 @@ class EmulationNode(Base, ScenarioState):
         interfaces_str = singletons.scenario_config.get_interfaces(node_id=id)
         interfaces = Interfaces.factory_from_interface_names(interfaces_str)
 
-        network_backend_bootstrapper = singletons.network_backend_bootstrapper_factory.get()
+        network_backend_bootstrapper = singletons.network_backend_bootstrapper
         return EmulationNode(network_backend_bootstrapper, interfaces)
 
     #############################################################

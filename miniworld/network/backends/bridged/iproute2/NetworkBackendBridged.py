@@ -31,14 +31,14 @@ def NetworkBackendBridgedIproute2():
             super(NetworkBackendBridgedIproute2, self).setup_shell_command_executor(shell_command_executor)
 
             bridge_type = self.network_backend_bootstrapper.switch_type
-            conn_type = self.network_backend_bootstrapper.connection_type
+            conn_service = self.network_backend_bootstrapper.connection_service
             tunnel_type = self.network_backend_bootstrapper.tunnel_type
-            EVENT_ORDER = [conn_type.EVENT_ROOT, tunnel_type.EVENT_ROOT, bridge_type.EVENT_ROOT]
+            EVENT_ORDER = [conn_service.EVENT_ROOT, tunnel_type.EVENT_ROOT, bridge_type.EVENT_ROOT]
             for elm in EVENT_ORDER:
                 shell_command_executor.add_group(elm)
 
             shell_command_executor.set_event_order(bridge_type.EVENT_ROOT, bridge_type.EVENT_ORDER)
-            shell_command_executor.set_event_order(conn_type.EVENT_ROOT, conn_type.EVENT_ORDER)
+            shell_command_executor.set_event_order(conn_service.EVENT_ROOT, conn_service.EVENT_ORDER)
             shell_command_executor.set_event_order(tunnel_type.EVENT_ROOT, tunnel_type.EVENT_ORDER)
 
         def do_network_topology_change(self):

@@ -31,6 +31,9 @@ class Singletons:
         self.qemu_process_singletons = None
         self.network_backend_bootstrapper_factory = None
 
+        # the object is a singleton during a scenario
+        self.network_backend_bootstrapper = None
+
         self.scenario_config = None
         self.config = None
         self.db_session = None

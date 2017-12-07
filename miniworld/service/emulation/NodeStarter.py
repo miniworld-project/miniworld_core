@@ -155,7 +155,7 @@ class NodeStarter:
         ManagementNode
         """
 
-        network_backend_bootstrapper = singletons.network_backend_bootstrapper_factory.get()
+        network_backend_bootstrapper = singletons.network_backend_bootstrapper
         if singletons.config.is_management_switch_enabled():
             # late import needed
             self._logger.info("creating management node/switch ...")
@@ -185,7 +185,7 @@ class NodeStarter:
         """
         args = args[0]
 
-        node = singletons.network_backend_bootstrapper_factory.get().emulation_node_type.factory()
+        node = singletons.network_backend_bootstrapper.emulation_node_type.factory()
         node.start(args[1], flo_post_boot_script=args[2])
 
         with self.lock:

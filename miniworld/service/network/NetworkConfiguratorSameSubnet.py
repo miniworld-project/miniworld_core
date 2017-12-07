@@ -153,4 +153,4 @@ class NetworkConfiguratorSameSubnet(NetworkConfiguratorConnectionLess):
     ################################################
 
     def get_key_ip_dict(self, emulation_node, interface):
-        return emulation_node._id, interface
+        return emulation_node._id, interface._id

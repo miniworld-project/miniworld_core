@@ -1,6 +1,7 @@
 from typing import List, Dict
 
 from miniworld.model.db.base import Connection
+from miniworld.model.domain.connection import Connection as DomainConnection
 from miniworld.network.AbstractConnection import AbstractConnection
 from miniworld.service.persistence.interfaces import InterfacePersistenceService
 from miniworld.service.persistence.nodes import NodePersistenceService
@@ -15,7 +16,7 @@ class ConnectionPersistenceService:
     def add(self, connection: Connection):
         is_domain = False
         db_connection = connection
-        if isinstance(connection, AbstractConnection):
+        if isinstance(connection, DomainConnection):
             is_domain = True
             db_connection = Connection.from_domain(connection)
         with singletons.db_session.session_scope() as session:
@@ -87,8 +88,31 @@ class ConnectionPersistenceService:
             session.query(Connection).delete()
 
     @staticmethod
-    def to_domain(connection: Connection) -> AbstractConnection:
-        return singletons.network_manager.connections[connection.id]
+    def to_domain(connection: Connection) -> DomainConnection:
+        node_persistence_service = NodePersistenceService()
+        interface_persistence_service = InterfacePersistenceService()
+        todo = DomainConnection(
+            _id=connection.id,
+            interface_x=interface_persistence_service.to_domain(connection.interface_x),
+            interface_y=interface_persistence_service.to_domain(connection.interface_y),
+            emulation_node_x=node_persistence_service.to_domain(connection.node_x, include_connections=False),
+            emulation_node_y=node_persistence_service.to_domain(connection.node_y, include_connections=False),
+            connection_type=AbstractConnection.ConnectionType(connection.type),
+            distance=connection.distance,
+            step_added=connection.step_added,
+            impairment=connection.impairment,
+            # TODO:
+            is_remote_conn=False
+
+        )
+        res = singletons.network_manager.connections[connection.id]
+        assert res._id == todo._id
+        assert res.interface_x._id == todo.interface_x._id
+        assert res.interface_y._id == todo.interface_y._id
+        assert res.emulation_node_x._id == todo.emulation_node_x._id
+        assert res.emulation_node_y._id == todo.emulation_node_y._id
+        # TODO: return connection from database instead
+        return res
 
     def _add_filters(self, query, connection_id: int = None, connected: bool = None, connection_type: AbstractConnection.ConnectionType = None, step: int = None, interface_x_id: int = None, interface_y_id: int = None, node_x_id: int = None, node_y_id: int = None):
         if connection_id is not None:

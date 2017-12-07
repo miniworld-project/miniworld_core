@@ -6,6 +6,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql.sqltypes import Enum, Float
 
 from miniworld.network.AbstractConnection import AbstractConnection
+from miniworld.model.domain.connection import Connection as DomainConnection
 
 Base = declarative_base()
 
@@ -96,7 +97,7 @@ class Connection(Base):
     distance = Column(Float)
 
     @staticmethod
-    def from_domain(connection) -> 'Connection':
+    def from_domain(connection: DomainConnection) -> 'Connection':
         return Connection(
             node_x_id=connection.emulation_node_x._id,
             node_y_id=connection.emulation_node_y._id,

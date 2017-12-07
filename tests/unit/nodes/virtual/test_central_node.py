@@ -5,6 +5,6 @@ from miniworld.singletons import singletons
 
 class TestCentralNode:
     def test_interfaces(self):
-        node = CentralNode(singletons.network_backend_bootstrapper_factory.get())
+        node = CentralNode(singletons.network_backend_bootstrapper)
         assert len(node.network_mixin.interfaces) == 1
         assert node.connection_type == AbstractConnection.ConnectionType.central

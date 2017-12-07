@@ -5,6 +5,6 @@ from miniworld.singletons import singletons
 
 class TestManagementNode:
     def test_interfaces(self):
-        node = ManagementNode(singletons.network_backend_bootstrapper_factory.get())
+        node = ManagementNode(singletons.network_backend_bootstrapper)
         assert len(node.network_mixin.interfaces) == 1
         assert node.connection_type == AbstractConnection.ConnectionType.mgmt

@@ -119,7 +119,7 @@ class TestEmulationManager:
         singletons.scenario_config.data = scenario_config
 
         # mock Qemu and ManagementNode type
-        network_backend_bootstrapper = singletons.network_backend_bootstrapper_factory.get()
+        network_backend_bootstrapper = singletons.network_backend_bootstrapper
         network_backend_bootstrapper.virtualization_layer_type = MagicMock()
         network_backend_bootstrapper.management_node_type = MagicMock()
         singletons.network_backend_bootstrapper_factory = MagicMock()

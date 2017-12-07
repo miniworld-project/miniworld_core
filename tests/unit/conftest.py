@@ -81,7 +81,7 @@ def mock_nodes(request, mock_persistence, monkeypatch) -> Dict[int, EmulationNod
         interface_id_counter += 1
 
     cnt_nodes = getattr(request, 'param', None) or 2
-    network_backend_bootstrapper = singletons.network_backend_bootstrapper_factory.get()
+    network_backend_bootstrapper = singletons.network_backend_bootstrapper
     for i in range(cnt_nodes):
         interface = Interfaces.factory_from_interface_names(['mesh'])[0]
         n = EmulationNode(network_backend_bootstrapper, [interface])

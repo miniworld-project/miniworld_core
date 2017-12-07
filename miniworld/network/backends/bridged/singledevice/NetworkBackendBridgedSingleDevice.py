@@ -85,21 +85,21 @@ def NetworkBackendBridgedSingleDevice():
             emulation_nodes
             """
 
-            conn_type = self.network_backend_bootstrapper.connection_type
+            conn_service = self.network_backend_bootstrapper.connection_service
             # TODO: MOVE method here ...
             if singletons.scenario_config.is_network_backend_bridged_execution_mode_batch():
-                self.add_shell_ebtables_command(self.EVENT_EBTABLES_UPDATE, conn_type.ebtable_cmd_atomic_save)
+                self.add_shell_ebtables_command(self.EVENT_EBTABLES_UPDATE, conn_service.ebtable_cmd_atomic_save)
 
             if step_cnt == 0:
                 self.init_ebtables()
 
         def init_ebtables(self):
             # TODO: call from ShellCommandRunner
-            conn_type = self.network_backend_bootstrapper.connection_type
+            conn_service = self.network_backend_bootstrapper.connection_service
 
             # reset to initial ebtables state
-            self.add_shell_ebtables_command(self.EVENT_EBTABLES_INIT, conn_type.ebtable_cmd_atomic_init)
-            self.add_shell_ebtables_command(self.EVENT_EBTABLES_INIT_COMMIT, conn_type.ebtable_cmd_atomic_commit)
+            self.add_shell_ebtables_command(self.EVENT_EBTABLES_INIT, conn_service.ebtable_cmd_atomic_init)
+            self.add_shell_ebtables_command(self.EVENT_EBTABLES_INIT_COMMIT, conn_service.ebtable_cmd_atomic_commit)
 
         def get_br_name(self, number):
             return 'wifi%d' % number
@@ -118,30 +118,28 @@ def NetworkBackendBridgedSingleDevice():
                                                                                      **kwargs)
             # start a single bridge here and add all tap devices to it
             # afterwards use ebtables for connection filtering on layer 2
-            connection = None
-
             connection_type = self.network_backend_bootstrapper.connection_type
+            connection_service = self.network_backend_bootstrapper.connection_service
 
             # TODO: DOC
             br_name = self.get_br_name(interface_x.nr_host_interface)
-            bridge = None
             if not self.bridges.get(br_name, None):
                 self._logger.info("creating bridge %s", br_name)
                 bridge = self.bridges[br_name] = self.network_backend_bootstrapper.switch_type(br_name, interface_x)
                 # create extra chain for bridge
                 self.add_shell_ebtables_command(self.EVENT_EBTABLES_CREATE_CHAINS,
-                                                connection_type.get_ebtables_chain_cmd(br_name,
-                                                                                       connection_type.policy_drop))
+                                                connection_service.get_ebtables_chain_cmd(br_name,
+                                                                                       connection_service.policy_drop))
                 # redirect to new chain
                 self.add_shell_ebtables_command(self.EVENT_EBTABLES_REDIRECT,
-                                                connection_type.get_ebtables_redirect_cmd(br_name))
+                                                connection_service.get_ebtables_redirect_cmd(br_name))
 
                 bridge.start(switch=False, bridge_dev_name=br_name)
             else:
                 bridge = self.get_bridge(interface_x)
 
             connection = connection_type.from_connection_info(emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info)
-            connection.start(self)
+            connection_service.start(connection=connection)
 
             # TODO: #84: improve
             connections = Connections([(emulation_node_x, interface_x), (emulation_node_y, interface_y)])
@@ -170,7 +168,7 @@ def NetworkBackendBridgedSingleDevice():
                     tunnel_dev_name = self.get_tunnel_name(emulation_node_x._id, emulation_node_y._id)
                     # add the tunnel to the bridge
                     bridge.add_if(tunnel_dev_name, if_up=True)
-                    remote_node, if_remote_node, local_emu_node, if_local_emu_node = singletons.simulation_manager.get_remote_node(
+                    remote_node, if_remote_node, local_emu_node, if_local_emu_node = singletons.simulation_manager._get_remote_node(
                         emulation_node_x, emulation_node_y, interface_x, interface_y)
                     # the tap device we want to add to the bridge is the local one, not the remote one!
                     tap_dev_name = self.get_tap_name(local_emu_node._id, if_local_emu_node)
@@ -192,8 +190,8 @@ def NetworkBackendBridgedSingleDevice():
             is_batch = singletons.scenario_config.is_network_backend_bridged_execution_mode_batch()
             if is_batch:
                 # add atomic commit command for ebtables network change
-                conn_type = self.network_backend_bootstrapper.connection_type
-                self.add_shell_ebtables_command(self.EVENT_EBTABLES_FINISH, conn_type.ebtable_cmd_atomic_commit)
+                conn_service = self.network_backend_bootstrapper.connection_service
+                self.add_shell_ebtables_command(self.EVENT_EBTABLES_FINISH, conn_service.ebtable_cmd_atomic_commit)
 
                 # ebtables_cmds = self.shell_command_executor.get_serialized_commands_event_order(self.EBTABLES_EVENT_ROOT)
                 #

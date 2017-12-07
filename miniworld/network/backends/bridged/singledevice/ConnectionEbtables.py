@@ -78,21 +78,20 @@ def ConnectionEbtables():
         # Overwrite connection handling methods
         #########################################
 
-        # TODO: #84:
-        def tap_link_up(self, tap_x, tap_y, up=True):
-            chain = singletons.network_backend.get_br_name(self.interface_x.nr_host_interface)
+        def tap_link_up(self, connection, tap_x, tap_y, up=True):
+            chain = singletons.network_backend.get_br_name(connection.interface_x.nr_host_interface)
             change_cmd = self._get_ebtables_cmd(chain, tap_x, tap_y, up)
 
             network_backend = singletons.network_backend
             # add to command queue
             network_backend.add_shell_ebtables_command(network_backend.EVENT_EBTABLES_COMMANDS, change_cmd)
 
-        def tap_link_up_central(self, tap_x, tap_y, up=True):
+        def tap_link_up_central(self, connection, tap_x, tap_y, up=True):
             self._logger.info("accept all packets in FORWARD chain ...")
             self.run_shell("{ebtables} -P FORWARD ACCEPT".format(ebtables=ConnectionEbtables.ebtables_cmd))
 
-        def tap_link_up_remote(self, tap_x, tap_y, up=True):
-            self.tap_link_up(tap_x, tap_y, up=up)
+        def tap_link_up_remote(self, connection, tap_x, tap_y, up=True):
+            self.tap_link_up(connection, tap_x, tap_y, up=up)
 
         #########################################
         ###

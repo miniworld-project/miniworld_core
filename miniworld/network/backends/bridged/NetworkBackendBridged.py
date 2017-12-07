@@ -111,10 +111,10 @@ def NetworkBackendBridgedDummy():
             ----------
             shell_command_executor : ShellCommandSerializer
             """
-            conn_type = self.network_backend_bootstrapper.connection_type
-            EVENT_ORDER = [conn_type.EVENT_ROOT]
+            conn_service = self.network_backend_bootstrapper.connection_service
+            EVENT_ORDER = [conn_service.EVENT_ROOT]
             shell_command_executor.set_group_order(EVENT_ORDER)
-            shell_command_executor.set_event_order(conn_type.EVENT_ROOT, conn_type.EVENT_ORDER)
+            shell_command_executor.set_event_order(conn_service.EVENT_ROOT, conn_service.EVENT_ORDER)
 
         def reset_shell_command_executor(self):
             self.init_shell_command_executor()
@@ -258,20 +258,23 @@ def NetworkBackendBridgedDummy():
             """
             Adjust the link quality.
             """
+            connection_service = singletons.network_backend_bootstrapper.connection_service
             if connection:
-                connection.adjust_link_quality(link_quality_dict)
+                connection_service.adjust_link_quality(connection=connection, link_quality_dict=link_quality_dict)
 
         def link_up(self, connection, link_quality_dict,
                     network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info,
                     **kwargs):
+            connection_service = singletons.network_backend_bootstrapper.connection_service
             if connection:
-                connection.link_up(link_quality_dict)
+                connection_service.link_up(connection=connection, link_quality_dict=link_quality_dict)
 
         def link_down(self, connection, link_quality_dict,
                       network_backend, emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info,
                       **kwargs):
+            connection_service = singletons.network_backend_bootstrapper.connection_service
             if connection:
-                connection.link_down(link_quality_dict)
+                connection_service.link_down(connection=connection, link_quality_dict=link_quality_dict)
                 # TODO:
                 # if connection_info.is_remote_conn():
                 #    run_shell("ip l del {}".format(self.get_tunnel_name(emulation_node_x.id, emulation_node_y.id)))
