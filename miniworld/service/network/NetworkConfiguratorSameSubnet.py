@@ -1,6 +1,6 @@
 from collections import defaultdict, OrderedDict, Counter
 
-from miniworld.network.AbstractConnection import AbstractConnection
+from miniworld.network.connection import AbstractConnection
 from miniworld.nodes.EmulationNode import EmulationNode
 from miniworld.nodes.EmulationNodes import EmulationNodes
 from miniworld.service.network.NetworkConfigurator import NetworkConfigurator, \

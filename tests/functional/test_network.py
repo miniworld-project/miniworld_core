@@ -2,7 +2,8 @@ import os
 
 import pytest
 
-from tests.functional.conftest import create_runner, assert_topologies_equal
+from tests.acceptance.conftest import create_runner
+from tests.functional.conftest import assert_topologies_equal
 
 
 @pytest.fixture(scope='module')

@@ -1,3 +1,5 @@
+import pytest
+
 from miniworld.model.base import Base
 from miniworld.singletons import singletons
 
@@ -49,6 +51,7 @@ class TestBase:
         assert sub.foo == 'foo'
         assert sub.bar == 'bar'
 
+    @pytest.mark.skip(reason='enable if _id generation in Base class has been removed')
     def test_repr(self):
         class Sub(Base):
             pass

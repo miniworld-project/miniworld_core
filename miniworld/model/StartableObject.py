@@ -43,6 +43,7 @@ class StartableObject:
         raise NotImplementedError
 
 
+# TODO: REMOVE all domain objects are fetched from db
 class ScenarioState(StartableObject):
     """ Object whose state can be cleared with the `shutdown` method at the end of a scenario. """
 
@@ -52,3 +53,14 @@ class ScenarioState(StartableObject):
 
     def reset(self):
         self.shutdown()
+
+
+class ScenarioStateReset:
+    """ Object whose state can be cleared with the `reset` method at the end of a scenario. """
+
+    def __init__(self):
+        super().__init__()
+        singletons.simulation_state_gc.add_object(self)
+
+    def reset(self):
+        raise NotImplementedError

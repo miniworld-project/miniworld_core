@@ -1,11 +1,11 @@
 import enum
 from typing import Dict
 
-from miniworld.model import StartableObject
+from miniworld.model.StartableObject import ScenarioStateReset
 from miniworld.model.domain.connection import Connection
 
 
-class ConnectionServiceBase(StartableObject.ScenarioState):
+class ConnectionServiceBase(ScenarioStateReset):
     def start(self, connection: Connection):
         """
         Start the connection.

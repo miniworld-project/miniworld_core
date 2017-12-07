@@ -34,7 +34,6 @@ class NetworkManager(ResetableInterface, NetworkBackendNotifications.NetworkBack
         self.reset()
         self._logger = singletons.logger_factory.get_logger(self)
         self.connection_persistence_service = ConnectionPersistenceService()
-        self.connections = {}  # type: Dict[int, AbstractConnection]
 
     def init_for_next_scenario(self):
         """
@@ -159,7 +158,6 @@ class NetworkManager(ResetableInterface, NetworkBackendNotifications.NetworkBack
         if network_backend_connected:
             connection.connected = True
             self.connection_persistence_service.add(connection)
-            self.connections[connection._id] = connection
 
         return network_backend.after_link_initial_start(network_backend_connected, switch, connection, network_backend,
                                                         emulation_node_x, emulation_node_y, interface_x, interface_y,

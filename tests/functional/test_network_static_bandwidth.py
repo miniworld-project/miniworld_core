@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from tests.functional.conftest import create_runner
+from tests.acceptance.conftest import *
 
 
 @pytest.fixture(scope='module')

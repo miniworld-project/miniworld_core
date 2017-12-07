@@ -1,7 +1,7 @@
 from ordered_set import OrderedSet
 
 from miniworld.model.connections.Connections import Connections
-from miniworld.network.AbstractConnection import AbstractConnection
+from miniworld.network.connection import AbstractConnection
 from miniworld.network.backends import InterfaceFilter
 from miniworld.network.backends.bridged.NetworkBackendBridged import NetworkBackendBridgedDummy
 from miniworld.service.network.NetworkConfiguratorSameSubnet import NetworkConfiguratorSameSubnet

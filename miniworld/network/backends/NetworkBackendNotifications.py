@@ -1,6 +1,6 @@
 # TODO: #54: DOC
 # TODO: provide context managers!
-from miniworld.network.AbstractConnection import AbstractConnection
+from miniworld.network.connection import AbstractConnection
 
 
 class NetworkBackendNotifications:

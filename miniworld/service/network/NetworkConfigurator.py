@@ -4,7 +4,7 @@ from io import StringIO
 import miniworld.config.Scenario
 from miniworld import singletons
 from miniworld.errors import Base
-from miniworld.network.AbstractConnection import AbstractConnection
+from miniworld.network.connection import AbstractConnection
 from miniworld.service.persistence.connections import ConnectionPersistenceService
 from miniworld.service.persistence.nodes import NodePersistenceService
 from miniworld.util import NetUtil, ConcurrencyUtil

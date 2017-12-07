@@ -1,5 +1,5 @@
 from miniworld.model.interface.Interface import HubWiFi
-from miniworld.network.AbstractConnection import AbstractConnection
+from miniworld.network.connection import AbstractConnection
 from miniworld.network.backends.NetworkBackendNotifications import ConnectionInfo
 from miniworld.nodes.virtual import VirtualNode
 

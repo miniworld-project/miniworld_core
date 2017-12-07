@@ -1,6 +1,7 @@
 import pytest
 
 from miniworld.model.db.base import Connection, Node, Interface
+from miniworld.network.connection import AbstractConnection
 from miniworld.service.persistence.connections import ConnectionPersistenceService
 
 
@@ -16,6 +17,7 @@ class TestConnectionPersistenceService:
         db_connection.node_y = Node(id=connection.emulation_node_y._id)
         db_connection.interface_x = Interface(id=connection.interface_x._id)
         db_connection.interface_y = Interface(id=connection.interface_y._id)
+        db_connection.type = AbstractConnection.ConnectionType.user
 
         abstract_connection = service.to_domain(db_connection)
         assert abstract_connection.interface_x._id == connection.interface_x._id

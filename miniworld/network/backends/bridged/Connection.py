@@ -6,7 +6,7 @@ from typing import Dict
 
 from miniworld.impairment import LinkQualityConstants
 from miniworld.impairment.bridged.NetEm import NetEm
-from miniworld.network.AbstractConnection import AbstractConnection, ConnectionServiceBase
+from miniworld.network.connection import AbstractConnection, ConnectionServiceBase
 from miniworld.singletons import singletons
 from miniworld.model.domain.connection import Connection as DomainConnection
 
@@ -42,6 +42,7 @@ def ConnectionDummy():
         cleanup_commands = set()
 
         def __init__(self):
+            super().__init__()
             self._logger = singletons.logger_factory.get_logger(self)
             # TODO: just for prototyping
             self.id = 100000
@@ -123,7 +124,8 @@ def ConnectionDummy():
             tc class add dev $DEV parent 1:0 classid 1:1 htb rate 190kbit ceil 190kbit
             tc class add dev $DEV parent 1:1 classid 1:12 htb rate 100kbit ceil 190kbit prio 2
             """
-
+            connection_id += 1
+            assert connection_id > 0, 'causes problems with `tc` command'
             rate = link_quality_dict.get(LinkQualityConstants.LINK_QUALITY_KEY_BANDWIDTH)
 
             if rate is not None:
@@ -235,16 +237,16 @@ def ConnectionDummy():
                 self.tap_link_up(connection, tap_y, tap_x, up=up)
 
         def reset(self):
-            ConnectionDummy.shaped_ifaces = defaultdict(lambda: False)
+            self.shaped_ifaces = defaultdict(lambda: False)
 
             # we stored the commands since the tap dev mapping is already reseted at this point
-            for cleanup_cmd in ConnectionDummy.cleanup_commands:
+            for cleanup_cmd in self.cleanup_commands:
                 try:
                     self.run(cleanup_cmd)
                 except subprocess.CalledProcessError as e:
                     self._logger.exception(e)
 
-            ConnectionDummy.cleanup_commands = set()
+            self.cleanup_commands = set()
 
         def add_cleanup(self, dev_name):
             self.cleanup_commands.add('tc qdisc del dev {dev_name} root'.format(dev_name=dev_name))

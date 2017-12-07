@@ -1,4 +1,4 @@
-from miniworld.network.AbstractConnection import AbstractConnection
+from miniworld.network.connection import AbstractConnection
 from miniworld.network.backends.NetworkBackendNotifications import ConnectionInfo
 from miniworld.nodes.virtual.VirtualNode import VirtualNode
 

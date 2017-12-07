@@ -4,7 +4,7 @@ from typing import List
 from sqlalchemy.orm import joinedload
 
 from miniworld.model.db.base import Node, Interface
-from miniworld.network.AbstractConnection import AbstractConnection
+from miniworld.network.connection import AbstractConnection
 from miniworld.nodes.EmulationNode import EmulationNode
 from miniworld.singletons import singletons
 

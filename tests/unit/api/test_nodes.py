@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock
 
 import pytest
+from sqlalchemy.orm.exc import NoResultFound
 
 from miniworld.singletons import singletons
 
@@ -20,7 +21,9 @@ class TestNodes:
         ''')
         snapshot.assert_match(res)
 
-    def test_node_get_nonexisting(self, client, mock_nodes, snapshot):
+    def test_node_get_nonexisting(self, client, mock_nodes, snapshot, monkeypatch):
+        monkeypatch.setattr('miniworld.service.persistence.nodes.NodePersistenceService.get', MagicMock(side_effect=NoResultFound))
+
         res = client.execute('''
         {
           node(id: "RW11bGF0aW9uTm9kZToxMDAwMAo=") {
@@ -46,7 +49,9 @@ class TestNodes:
             ''')
         snapshot.assert_match(res)
 
-    def test_connection_get_nonexisting(self, client, mock_nodes, mock_connections, snapshot):
+    def test_connection_get_nonexisting(self, client, mock_nodes, mock_connections, snapshot, monkeypatch):
+        monkeypatch.setattr('miniworld.service.persistence.connections.ConnectionPersistenceService.get', MagicMock(side_effect=NoResultFound))
+
         res = client.execute('''
 {
   node(id: "Q29ubmVjdGlvbjoxMDAwMAo=") {
@@ -72,7 +77,9 @@ class TestNodes:
         ''')
         snapshot.assert_match(res)
 
-    def test_interface_get_non_existing(self, client, mock_nodes, snapshot):
+    def test_interface_get_non_existing(self, client, mock_nodes, snapshot, monkeypatch):
+        monkeypatch.setattr('miniworld.service.persistence.interfaces.InterfacePersistenceService.get', MagicMock(side_effect=NoResultFound))
+
         res = client.execute('''
         {
           node(id: "SW50ZXJmYWNlOjEwMDAwCg==") {
@@ -85,21 +92,10 @@ class TestNodes:
         ''')
         snapshot.assert_match(res)
 
-    def test_node_id_filter(self, client, mock_nodes, snapshot):
-        res = client.execute('''
-        {
-          emulationNodes(iid:0) {
-            id
-            iid
-          }
-        }
-        ''')
-        snapshot.assert_match(res)
-
     def test_node_interfaces(self, client, mock_nodes, snapshot):
         res = client.execute('''
         {
-          emulationNodes(kind: "user") {
+          emulationNodes {
             id
             iid
             virtualization
@@ -129,25 +125,22 @@ class TestNodes:
         monkeypatch.setattr('miniworld.service.persistence.connections.ConnectionPersistenceService.get', mock)
         res = client.execute('''
         {
-          emulationNodes(kind: "user") {
+          emulationNodes {
             iid
             virtualization
             links(connected: true) {
               edges {
                 node {
-                  id
-                  iid
-                  impairment
-                  connected
-                  distance
-                  kind
-                  this {
-                    interface {iid}
-                  }
-                  other {
-                    interface {iid}
-                    emulationNode {iid}
-                  }
+                    id
+                    iid
+                    kind
+                    impairment
+                    connected
+                    distance
+                    emulationNodeX { iid kind }
+                    emulationNodeY { iid kind }
+                    interfaceX { iid }
+                    interfaceY { iid }
                 }
               }
             }
@@ -160,7 +153,7 @@ class TestNodes:
     def test_node_distances(self, client, mock_nodes, mock_distances, snapshot):
         res = client.execute('''
         {
-          emulationNodes(kind: "user") {
+          emulationNodes {
             iid
             distances(between:{min: 0}) {
               edges {

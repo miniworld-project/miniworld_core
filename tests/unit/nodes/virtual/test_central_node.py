@@ -1,4 +1,4 @@
-from miniworld.network.AbstractConnection import AbstractConnection
+from miniworld.network.connection import AbstractConnection
 from miniworld.nodes.virtual.CentralNode import CentralNode
 from miniworld.singletons import singletons
 

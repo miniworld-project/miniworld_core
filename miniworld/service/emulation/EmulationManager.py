@@ -8,7 +8,7 @@ from io import StringIO
 from pprint import pformat
 from typing import Dict, Union
 
-from miniworld.network.AbstractConnection import AbstractConnection
+from miniworld.network.connection import AbstractConnection
 from ordered_set import OrderedSet
 
 from miniworld.errors import Base, SimulationStateStartFailed
@@ -90,6 +90,7 @@ class EmulationManager(ResetableInterface):
 
         # NOTE: init resets first for reset()
         self.reset()
+        self.reset_scenario_changed()
 
     ###############################################
     # Resetable
@@ -100,8 +101,6 @@ class EmulationManager(ResetableInterface):
         self.scenario_changed = False
         self.auto_stepping = None
         self.running = False
-        self.nodes_id_mapping = {}
-        self.central_nodes_id_mapping = {}
 
         self.current_step = 0
 
@@ -112,6 +111,10 @@ class EmulationManager(ResetableInterface):
         self.distance_matrix_hubwifi = DistanceMatrix.factory()()
 
         self.network_backend = None
+
+    def reset_scenario_changed(self):
+        self.nodes_id_mapping = {}
+        self.central_nodes_id_mapping = {}
 
     ###############################################
     # Getter
@@ -286,6 +289,8 @@ class EmulationManager(ResetableInterface):
                 # first set new scenario config
                 new_scenario_digest = self._get_scenario_hash()
                 self.scenario_changed = old_scenario_digest != new_scenario_digest
+                if self.scenario_changed:
+                    self.reset_scenario_changed()
 
             # no shapshot boot, clear database
             if self.scenario_changed:

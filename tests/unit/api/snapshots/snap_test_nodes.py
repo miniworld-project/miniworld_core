@@ -129,52 +129,27 @@ snapshots['TestNodes.test_node_links[3] 1'] = {
                             'node': {
                                 'connected': True,
                                 'distance': 10.0,
+                                'emulationNodeX': {
+                                    'iid': 0,
+                                    'kind': 'user'
+                                },
+                                'emulationNodeY': {
+                                    'iid': 1,
+                                    'kind': 'user'
+                                },
                                 'id': 'Q29ubmVjdGlvbjow',
                                 'iid': 0,
                                 'impairment': {
                                     'bandwidth': 500,
                                     'loss': 0.5
                                 },
-                                'kind': 'user',
-                                'other': {
-                                    'emulationNode': {
-                                        'iid': 1
-                                    },
-                                    'interface': {
-                                        'iid': 2
-                                    }
+                                'interfaceX': {
+                                    'iid': 0
                                 },
-                                'this': {
-                                    'interface': {
-                                        'iid': 0
-                                    }
-                                }
-                            }
-                        },
-                        {
-                            'node': {
-                                'connected': True,
-                                'distance': 10.0,
-                                'id': 'Q29ubmVjdGlvbjox',
-                                'iid': 1,
-                                'impairment': {
-                                    'bandwidth': 500,
-                                    'loss': 0.5
+                                'interfaceY': {
+                                    'iid': 2
                                 },
-                                'kind': 'user',
-                                'other': {
-                                    'emulationNode': {
-                                        'iid': 2
-                                    },
-                                    'interface': {
-                                        'iid': 4
-                                    }
-                                },
-                                'this': {
-                                    'interface': {
-                                        'iid': 2
-                                    }
-                                }
+                                'kind': 'user'
                             }
                         }
                     ]
@@ -189,52 +164,27 @@ snapshots['TestNodes.test_node_links[3] 1'] = {
                             'node': {
                                 'connected': True,
                                 'distance': 10.0,
-                                'id': 'Q29ubmVjdGlvbjow',
-                                'iid': 0,
-                                'impairment': {
-                                    'bandwidth': 500,
-                                    'loss': 0.5
+                                'emulationNodeX': {
+                                    'iid': 1,
+                                    'kind': 'user'
                                 },
-                                'kind': 'user',
-                                'other': {
-                                    'emulationNode': {
-                                        'iid': 1
-                                    },
-                                    'interface': {
-                                        'iid': 2
-                                    }
+                                'emulationNodeY': {
+                                    'iid': 2,
+                                    'kind': 'user'
                                 },
-                                'this': {
-                                    'interface': {
-                                        'iid': 0
-                                    }
-                                }
-                            }
-                        },
-                        {
-                            'node': {
-                                'connected': True,
-                                'distance': 10.0,
                                 'id': 'Q29ubmVjdGlvbjox',
                                 'iid': 1,
                                 'impairment': {
                                     'bandwidth': 500,
                                     'loss': 0.5
                                 },
-                                'kind': 'user',
-                                'other': {
-                                    'emulationNode': {
-                                        'iid': 2
-                                    },
-                                    'interface': {
-                                        'iid': 4
-                                    }
+                                'interfaceX': {
+                                    'iid': 2
                                 },
-                                'this': {
-                                    'interface': {
-                                        'iid': 2
-                                    }
-                                }
+                                'interfaceY': {
+                                    'iid': 4
+                                },
+                                'kind': 'user'
                             }
                         }
                     ]
@@ -245,72 +195,9 @@ snapshots['TestNodes.test_node_links[3] 1'] = {
                 'iid': 2,
                 'links': {
                     'edges': [
-                        {
-                            'node': {
-                                'connected': True,
-                                'distance': 10.0,
-                                'id': 'Q29ubmVjdGlvbjow',
-                                'iid': 0,
-                                'impairment': {
-                                    'bandwidth': 500,
-                                    'loss': 0.5
-                                },
-                                'kind': 'user',
-                                'other': {
-                                    'emulationNode': {
-                                        'iid': 1
-                                    },
-                                    'interface': {
-                                        'iid': 2
-                                    }
-                                },
-                                'this': {
-                                    'interface': {
-                                        'iid': 0
-                                    }
-                                }
-                            }
-                        },
-                        {
-                            'node': {
-                                'connected': True,
-                                'distance': 10.0,
-                                'id': 'Q29ubmVjdGlvbjox',
-                                'iid': 1,
-                                'impairment': {
-                                    'bandwidth': 500,
-                                    'loss': 0.5
-                                },
-                                'kind': 'user',
-                                'other': {
-                                    'emulationNode': {
-                                        'iid': 2
-                                    },
-                                    'interface': {
-                                        'iid': 4
-                                    }
-                                },
-                                'this': {
-                                    'interface': {
-                                        'iid': 2
-                                    }
-                                }
-                            }
-                        }
                     ]
                 },
                 'virtualization': 'QemuTap'
-            }
-        ]
-    }
-}
-
-snapshots['TestNodes.test_node_id_filter 1'] = {
-    'data': {
-        'emulationNodes': [
-            {
-                'id': 'RW11bGF0aW9uTm9kZTow',
-                'iid': 0
             }
         ]
     }

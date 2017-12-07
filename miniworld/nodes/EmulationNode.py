@@ -3,7 +3,7 @@ from io import StringIO
 
 from miniworld.model.StartableObject import ScenarioState
 from miniworld.model.base import Base
-from miniworld.network.AbstractConnection import AbstractConnection
+from miniworld.network.connection import AbstractConnection
 from miniworld.singletons import singletons
 
 __author__ = 'Nils Schmidt'

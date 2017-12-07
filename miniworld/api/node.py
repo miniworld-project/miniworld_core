@@ -7,7 +7,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from miniworld import singletons
 from miniworld.api import DictScalar
 from miniworld.model.interface.Interface import Interface as InterfaceModel
-from miniworld.network.AbstractConnection import AbstractConnection as Connection
+from miniworld.model.domain.connection import Connection as DomainConnection
+from miniworld.network.connection import AbstractConnection as Connection
 from miniworld.service.persistence import connections
 from miniworld.service.persistence import interfaces, nodes
 from miniworld.service.persistence.nodes import NodePersistenceService
@@ -129,7 +130,7 @@ class EmulationNode(graphene.ObjectType):
     def resolve_links(self, info, connected: bool = None) -> List[Connection]:
         # TODO: respect connection ids!
         connection_persistence_service = connections.ConnectionPersistenceService()
-        return [serialize_connection(connection_persistence_service.get(connection_id=connection.id)) for connection in self.links]
+        return [serialize_connection(connection_persistence_service.get(connection_id=connection._id)) for connection in self.links]
 
     def resolve_distances(self, info, between: BetweenDistances = None) -> List[Distance]:
         # TODO: use persistence service! current implementation returns the next distance matrix!
@@ -169,9 +170,9 @@ class EmulationNode(graphene.ObjectType):
 
 
 class NodeQuery(graphene.ObjectType):
-    emulation_nodes = graphene.List(EmulationNode, iid=graphene.Int(), kind=graphene.String())
+    emulation_nodes = graphene.List(EmulationNode)
 
-    def resolve_emulation_nodes(self, info, iid: int = None, kind=None):
+    def resolve_emulation_nodes(self, info):
         node_persistence_service = NodePersistenceService()
         return [serialize_node(node) for node in node_persistence_service.all()]
 
@@ -192,8 +193,8 @@ class NodeExecuteCommand(graphene.Mutation):
 
 def serialize_node(node: DomainEmulationNode) -> EmulationNode:
     return EmulationNode(
-        id=node.id,
-        iid=node.id,
+        id=node._id,
+        iid=node._id,
         virtualization=node.virtualization_layer.__class__.__name__,
         interfaces=[serialize_interface(interface) for interface in node.network_mixin.interfaces],
         links=node.connections,
@@ -203,8 +204,8 @@ def serialize_node(node: DomainEmulationNode) -> EmulationNode:
 
 def serialize_interface(interface: InterfaceModel):
     return Interface(
-        id=interface.id,
-        iid=interface.id,
+        id=interface._id,
+        iid=interface._id,
         name=interface.node_class_name,
         mac=interface.mac,
         ipv4=interface.ipv4,
@@ -212,10 +213,10 @@ def serialize_interface(interface: InterfaceModel):
     )
 
 
-def serialize_connection(connection: Connection) -> Connection:
+def serialize_connection(connection: DomainConnection) -> Connection:
     return Connection(
-        id=connection.id,
-        iid=connection.id,
+        id=connection._id,
+        iid=connection._id,
         connected=connection.connected,
         emulation_node_x=serialize_node(connection.emulation_node_x),
         emulation_node_y=serialize_node(connection.emulation_node_y),
@@ -223,4 +224,5 @@ def serialize_connection(connection: Connection) -> Connection:
         interface_y=serialize_interface(connection.interface_y),
         kind=connection.connection_type.value,
         distance=connection.distance,
+        impairment=connection.impairment if connection.impairment is not None else {},  # TODO: REMOVE after objects come from db!
     )

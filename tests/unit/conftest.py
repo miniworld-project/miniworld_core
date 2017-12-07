@@ -10,8 +10,9 @@ from graphene.test import Client
 import miniworld
 from miniworld.api.webserver import schema
 from miniworld.model.base import Base
+from miniworld.model.domain.connection import Connection
 from miniworld.model.interface.Interfaces import Interfaces
-from miniworld.network.AbstractConnection import AbstractConnection
+from miniworld.network.connection import AbstractConnection
 from miniworld.nodes.EmulationNode import EmulationNode
 from miniworld.singletons import singletons
 
@@ -19,6 +20,7 @@ from miniworld.singletons import singletons
 @pytest.fixture(autouse=True)
 def fresh_env():
     miniworld.init(do_init_db=False)
+    singletons.network_backend_bootstrapper = singletons.network_backend_bootstrapper_factory.get()
     # make domain model IDs predictable
     old_counter = deepcopy(Base.counter)
     yield
@@ -67,6 +69,7 @@ def mock_nodes(request, mock_persistence, monkeypatch) -> Dict[int, EmulationNod
             for interface in emulation_node.network_mixin.interfaces:
                 if interface._id == interface_id:
                     return interface
+
     interface_id_counter = 0
     if mock_persistence:
         get = MagicMock(side_effect=get_interface)
@@ -92,6 +95,7 @@ def mock_nodes(request, mock_persistence, monkeypatch) -> Dict[int, EmulationNod
     if mock_persistence:
         get = MagicMock(side_effect=lambda node_id: singletons.simulation_manager.nodes_id_mapping.get(node_id))
         monkeypatch.setattr('miniworld.service.persistence.nodes.NodePersistenceService.get', get)
+        monkeypatch.setattr('miniworld.service.persistence.nodes.NodePersistenceService.all', MagicMock(return_value=singletons.simulation_manager.nodes_id_mapping.values()))
 
     return singletons.simulation_manager.nodes_id_mapping
 
@@ -100,7 +104,7 @@ def mock_nodes(request, mock_persistence, monkeypatch) -> Dict[int, EmulationNod
 def mock_connections(mock_nodes, mock_persistence, monkeypatch) -> List[AbstractConnection]:
     """ Connect nodes pair-wise. """
 
-    abstract_connections = []
+    connections = []
     for idx, (node1, node2) in enumerate(zip(mock_nodes.values(), list(mock_nodes.values())[1:])):
         link_quality_dict = {
             'bandwidth': 500,
@@ -108,15 +112,33 @@ def mock_connections(mock_nodes, mock_persistence, monkeypatch) -> List[Abstract
         }
         interface1 = node1.network_mixin.interfaces[0]
         interface2 = node2.network_mixin.interfaces[0]
-        conn = AbstractConnection(node1, node2, interface1, interface2, _id=idx, impairment=link_quality_dict, connected=True, step_added=0, distance=10)
-        abstract_connections.append(conn)
+        conn = Connection(
+            _id=idx,
+            emulation_node_x=node1,
+            emulation_node_y=node2,
+            interface_x=interface1,
+            interface_y=interface2,
+            connection_type=AbstractConnection.ConnectionType.user,
+            is_remote_conn=False,
+            impairment=link_quality_dict,
+            connected=True,
+            step_added=0,
+            distance=10,
+        )
+        connections.append(conn)
+        # TODO: is this ensured for functional tests too?
+        if node1.connections is None:
+            node1.connections = []
+        if node2.connections is None:
+            node2.connections = []
+        node1.connections.append(conn)
 
-    singletons.network_manager.connections = {conn._id: conn for conn in abstract_connections}
+    connections = {conn._id: conn for conn in connections}
     if mock_persistence:
-        monkeypatch.setattr('miniworld.service.persistence.connections.ConnectionPersistenceService.all', MagicMock(return_value=abstract_connections))
-        monkeypatch.setattr('miniworld.service.persistence.connections.ConnectionPersistenceService.get', MagicMock(side_effect=lambda connection_id: singletons.network_manager.connections.get(connection_id)))
+        monkeypatch.setattr('miniworld.service.persistence.connections.ConnectionPersistenceService.all', MagicMock(return_value=connections))
+        monkeypatch.setattr('miniworld.service.persistence.connections.ConnectionPersistenceService.get', MagicMock(side_effect=lambda connection_id: connections.get(connection_id)))
 
-    return abstract_connections
+    return connections
 
 
 @pytest.fixture

@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from miniworld.network.AbstractConnection import AbstractConnection
+from miniworld.network.connection import AbstractConnection
 from miniworld.service.network.NetworkConfigurator import NetworkConfigurator
 from miniworld.util import DictUtil
 
