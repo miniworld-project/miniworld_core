@@ -40,3 +40,18 @@ class TestBase:
         singletons.simulation_state_gc.reset_simulation_scenario_state()
         foo2 = Foo()
         assert foo2._id == 0
+
+    def test_init(self):
+        class Sub(Base):
+            pass
+
+        sub = Sub(foo='foo', bar='bar')
+        assert sub.foo == 'foo'
+        assert sub.bar == 'bar'
+
+    def test_repr(self):
+        class Sub(Base):
+            pass
+
+        sub = Sub(foo='foo', bar='bar')
+        assert repr(sub) == "Sub(foo='foo', bar='bar')"

@@ -157,6 +157,7 @@ class NetworkManager(ResetableInterface, NetworkBackendNotifications.NetworkBack
                                  emulation_node_y, interface_x, interface_y, connection_info, start_activated=False,
                                  **kwargs):
         if network_backend_connected:
+            connection.connected = True
             self.connection_persistence_service.add(connection)
             self.connections[connection._id] = connection
 

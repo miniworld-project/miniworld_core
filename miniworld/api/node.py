@@ -7,7 +7,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from miniworld import singletons
 from miniworld.api import DictScalar
 from miniworld.model.interface.Interface import Interface as InterfaceModel
-from miniworld.network.connection import Connection
+from miniworld.network.AbstractConnection import AbstractConnection as Connection
 from miniworld.service.persistence import connections
 from miniworld.service.persistence import interfaces, nodes
 from miniworld.service.persistence.nodes import NodePersistenceService
