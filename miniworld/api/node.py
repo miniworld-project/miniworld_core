@@ -6,9 +6,8 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from miniworld import singletons
 from miniworld.api import DictScalar
-from miniworld.model.interface.Interface import Interface as InterfaceModel
+from miniworld.model.domain.interface import Interface as InterfaceModel
 from miniworld.model.domain.connection import Connection as DomainConnection
-from miniworld.network.connection import AbstractConnection as Connection
 from miniworld.service.persistence import connections
 from miniworld.service.persistence import interfaces, nodes
 from miniworld.service.persistence.nodes import NodePersistenceService
@@ -206,7 +205,7 @@ def serialize_interface(interface: InterfaceModel):
     return Interface(
         id=interface._id,
         iid=interface._id,
-        name=interface.node_class_name,
+        name=interface.name,
         mac=interface.mac,
         ipv4=interface.ipv4,
         nr_host_interface=interface.nr_host_interface,

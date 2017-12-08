@@ -1,5 +1,8 @@
 from collections import defaultdict
 
+from typing import List
+
+from miniworld.model.domain.interface import Interface
 from miniworld.network.connection import AbstractConnection
 from miniworld.service.network.NetworkConfigurator import NetworkConfigurator
 from miniworld.util import DictUtil
@@ -56,17 +59,9 @@ class NetworkConfiguratorConnectionBased(NetworkConfigurator):
 
         # return True
 
-    def filter_interfaces(self, interfaces):
+    def filter_interfaces(self, interfaces: List[Interface]) -> bool:
         """
         Use a interface filter for the ip provisioning.
-
-        Parameters
-        ----------
-        interfaces : Interfaces
-
-        Returns
-        -------
-        bool
         """
-        return len(interfaces.filter_normal_interfaces()) > 0
+        return len(self._interface_service.filter_normal_interfaces(interfaces)) > 0
         # return True

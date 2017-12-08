@@ -1,7 +1,7 @@
 import pytest
 from sqlalchemy.orm.exc import NoResultFound
 
-from miniworld.model.interface.Interface import Interface
+from miniworld.model.domain.interface import Interface
 from miniworld.nodes.EmulationNode import EmulationNode
 from miniworld.service.persistence.connections import ConnectionPersistenceService
 

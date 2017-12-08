@@ -2,12 +2,12 @@ import os
 
 import pytest
 
-from tests.acceptance.conftest import *
+from tests.acceptance.conftest import *  # noqa
 
 
 @pytest.fixture(scope='module')
 def runner(tmpdir_factory, image_path, request, config_path, core_topologies_dir):
-    runner = create_runner(tmpdir_factory, request, config_path)
+    runner = create_runner(tmpdir_factory, request, config_path)  # noqa
 
     scenario = {
         "scenario": "",

@@ -1,9 +1,10 @@
 from io import StringIO
 
-from miniworld.model.interface import Interfaces, Interface
 from miniworld.network.backends.NetworkMixin import NetworkMixin
+from miniworld.service.emulation.interface import InterfaceService
 from miniworld.singletons import singletons
 from miniworld.util import NetUtil
+from miniworld.model.domain.interface import Interface
 
 __author__ = 'Nils Schmidt'
 
@@ -38,17 +39,19 @@ class EmulationNodeNetworkBackend(NetworkMixin):
         self._logger = singletons.logger_factory.get_logger(self)
         super(EmulationNodeNetworkBackend, self).__init__(network_backend_bootstrapper)
 
+        self._interface_service = InterfaceService()
         self.node_id = node_id
 
         self.nlog = singletons.logger_factory.get_node_logger(self.node_id)
 
-        self.interfaces = interfaces or Interfaces.Interfaces()
+        self.interfaces = interfaces or []
 
         if management_switch:
-            self.interfaces.append(Interfaces.Interfaces.factory([Interface.Management])[0])
+            self.interfaces.append(self._interface_service.factory([Interface.InterfaceType.management])[0])
 
-        # let the management interface be the last one
-        self.interfaces.sort()
+            # TODO: REMOVE
+            # let the management interface be the last one
+            self.interfaces = list(sorted(self.interfaces, key=lambda interface: interface.class_id))
 
     def _start(self, *args, **kwargs):
         pass
@@ -77,10 +80,10 @@ class EmulationNodeNetworkBackend(NetworkMixin):
     #########################################
 
     def _nic_mgmt_ipv4_config(self, emulation_node):
-        for _if in self.interfaces.filter_mgmt():
-            ip = _if.get_ip(emulation_node._id)
-            _if.ipv4 = ip
-            netmask = _if.get_netmask()
+        for _if in [interface for interface in self.interfaces if interface.name == Interface.InterfaceType.management.value]:
+            ip = self._interface_service.get_ip(node_id=emulation_node._id, interface=_if)
+            _if.ipv4 = str(ip)
+            netmask = self._interface_service.get_netmask(interface=_if)
             # TODO: #63: we dont know if renaming worked, therefore try to rename both ethX and mgmt
             cmd_ip_change = NetUtil.get_ip_addr_change_cmd(singletons.config.get_bridge_tap_name(), ip, netmask)
             emulation_node.virtualization_layer.run_commands_eager(StringIO(cmd_ip_change))

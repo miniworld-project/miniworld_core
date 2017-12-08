@@ -1,3 +1,6 @@
+from typing import List
+
+from miniworld.model.domain.interface import Interface
 from miniworld.nodes.EmulationNode import EmulationNode
 from miniworld.singletons import singletons
 
@@ -15,16 +18,7 @@ class VirtualNode(EmulationNode):
     """
 
     # TODO: RENAME BRIDGE_NAME
-    def __init__(self, network_backend_bootstrapper, interfaces=None):
-        """
-
-        Parameters
-        ----------
-        node_id : int
-
-        network_backend_bootstrapper : NetworkBackendBootStrapper
-        interfaces : Interfaces
-        """
+    def __init__(self, network_backend_bootstrapper, interfaces: List[Interface] = None):
 
         # TODO: #82: network_backend is of type NetworkBackendEmulationNode
         # this call inits the interfaces of the :py:class:`.NetworkBackend`
@@ -81,7 +75,7 @@ class VirtualNode(EmulationNode):
         self._logger.info("connecting '%s' to '%s' ...", emulation_node, self)
 
         # get the interface with the same type
-        emu_node_if = emulation_node.network_mixin.interfaces.filter_type(type(interface))[0]
+        emu_node_if = [iface for iface in emulation_node.network_mixin.interfaces if iface.name == interface.name][0]
 
         connection_info = self.init_connection_info()
         # NetworkBackendNotifications

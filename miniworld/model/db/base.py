@@ -1,12 +1,13 @@
 import json
 
-from sqlalchemy import Column, Integer, ForeignKey, String, Boolean, types
+from sqlalchemy import Column, Integer, ForeignKey, String, Boolean, types, UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.sqltypes import Enum, Float
 
 from miniworld.network.connection import AbstractConnection
 from miniworld.model.domain.connection import Connection as DomainConnection
+from miniworld.model.domain.interface import Interface as DomainInterface
 
 Base = declarative_base()
 
@@ -55,23 +56,30 @@ class Node(Base):
 
 class Interface(Base):
     __tablename__ = 'interfaces'
+    __table_args__ = (
+        UniqueConstraint('node_id', 'name', 'nr_host_interface'),
+    )
 
     id = Column(Integer, primary_key=True)
     node_id = Column(Integer, ForeignKey('nodes.id'))
     node = relationship('Node', back_populates='interfaces')
 
+    nr_host_interface = Column(Integer, nullable=False)
+    name = Column(String, nullable=False)
     mac = Column(String, nullable=True, unique=True)
     ipv4 = Column(String, unique=True)
     ipv6 = Column(String, unique=True)
 
     @staticmethod
-    def from_domain(node, interface) -> 'Interface':
+    def from_domain(node, interface: DomainInterface) -> 'Interface':
         return Interface(
             id=interface._id,
+            name=interface.name,
+            nr_host_interface=interface.nr_host_interface,
             node_id=node._id,
             mac=interface.mac,
-            ipv4=None,
-            ipv6=None,
+            ipv4=interface.ipv4,
+            ipv6=interface.ipv6,
         )
 
 

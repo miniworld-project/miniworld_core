@@ -11,9 +11,9 @@ import miniworld
 from miniworld.api.webserver import schema
 from miniworld.model.base import Base
 from miniworld.model.domain.connection import Connection
-from miniworld.model.interface.Interfaces import Interfaces
 from miniworld.network.connection import AbstractConnection
 from miniworld.nodes.EmulationNode import EmulationNode
+from miniworld.service.emulation.interface import InterfaceService
 from miniworld.singletons import singletons
 
 
@@ -64,6 +64,8 @@ def mock_persistence():
 
 @pytest.fixture
 def mock_nodes(request, mock_persistence, monkeypatch) -> Dict[int, EmulationNode]:
+    interface_service = InterfaceService()
+
     def get_interface(interface_id):
         for emulation_node in singletons.simulation_manager.nodes_id_mapping.values():
             for interface in emulation_node.network_mixin.interfaces:
@@ -77,16 +79,15 @@ def mock_nodes(request, mock_persistence, monkeypatch) -> Dict[int, EmulationNod
 
     def configure_net(interface, node):
         nonlocal interface_id_counter
-        interface.ipv4 = interface.get_ip(node._id)
-        interface.ipv6 = interface.get_ip(node._id)
-        interface.mac = interface.get_mac(node._id)
+        interface.ipv4 = interface_service.get_ip(node_id=node._id, interface=interface)
+        interface.mac = interface_service.get_mac(node_id=node._id, interface=interface)
         interface._id = interface_id_counter
         interface_id_counter += 1
 
     cnt_nodes = getattr(request, 'param', None) or 2
     network_backend_bootstrapper = singletons.network_backend_bootstrapper
     for i in range(cnt_nodes):
-        interface = Interfaces.factory_from_interface_names(['mesh'])[0]
+        interface = InterfaceService.factory(['mesh'])[0]
         n = EmulationNode(network_backend_bootstrapper, [interface])
         for interface in n.network_mixin.interfaces:
             configure_net(interface, n)

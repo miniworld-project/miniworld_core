@@ -104,7 +104,7 @@ def ConnectionDummy():
                     if connection.is_remote_conn:
                         remote_node, if_remote_node, local_emu_node, if_local_emu_node = self._get_remote_node(connection=connection)
                         tap_local = singletons.network_backend.get_tap_name(local_emu_node._id, if_local_emu_node)
-                        tunnel_dev = singletons.network_backend.get_tunnel_name(remote_node._id, local_emu_node._id)
+                        # tunnel_dev = singletons.network_backend.get_tunnel_name(remote_node._id, local_emu_node._id)
                         self._shape_device(tap_local, connection_id, link_quality_dict)
                         # NOTE: this happens at the other server!
                         # self.shape_device(tap_remote, connection_id, link_quality_dict)

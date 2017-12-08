@@ -3,7 +3,7 @@ from threading import Lock, Event
 
 from miniworld.concurrency.ExceptionStopThread import ExceptionStopThread
 from miniworld.errors import Unsupported
-from miniworld.model.interface.Interface import HubWiFi
+from miniworld.model.domain.interface import Interface
 from miniworld.nodes.virtual.CentralNode import CentralNode
 from miniworld.service.persistence.nodes import NodePersistenceService
 from miniworld.singletons import singletons
@@ -142,7 +142,7 @@ class NodeStarter:
     @staticmethod
     def assert_only_one_wifibridge_interface(interfaces):
         if len(list(filter(lambda x: CentralNode.is_central_node_interface(x), interfaces))) > 1:
-            raise Unsupported("Multiple '%s' are not supported at the moment!" % HubWiFi)
+            raise Unsupported("Multiple '%s' are not supported at the moment!" % Interface.InterfaceType.hub)
 
     # TODO: #82: DOC, maybe singleton ref?
     def start_management_node(self):

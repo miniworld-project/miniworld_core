@@ -1,5 +1,5 @@
 from miniworld.model.db.base import Interface
-from miniworld.model.interface.Interface import Interface as DomainInterface
+from miniworld.model.domain.interface import Interface as DomainInterface
 from miniworld.network.connection import AbstractConnection
 from miniworld.service.persistence.nodes import NodePersistenceService
 from miniworld.singletons import singletons
@@ -11,15 +11,10 @@ class InterfacePersistenceService:
 
     @staticmethod
     def to_domain(interface: Interface) -> DomainInterface:
-        for node in singletons.simulation_manager.nodes_id_mapping.values():
-            for iface in node.network_mixin.interfaces:
-                if iface._id == interface.id:
-                    return iface
-        raise RuntimeError()
-
-        # TODO:
         return DomainInterface(
             _id=interface.id,
+            name=interface.name,
+            nr_host_interface=interface.nr_host_interface,
             mac=interface.mac,
             ipv4=interface.ipv4,
             ipv6=interface.ipv6,
@@ -33,3 +28,12 @@ class InterfacePersistenceService:
                  .filter(Interface.id == interface_id)
                  .one())
             )
+
+    # TODO: generic update ?
+    def update_ipv4(self, interface: DomainInterface, ipv4: str):
+        with singletons.db_session.session_scope() as session:
+            (session.query(Interface)
+             .filter(Interface.id == interface._id)
+             .update({Interface.ipv4: ipv4})
+             )
+            interface.ipv4 = ipv4

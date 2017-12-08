@@ -5,7 +5,9 @@ import miniworld.config.Scenario
 from miniworld import singletons
 from miniworld.errors import Base
 from miniworld.network.connection import AbstractConnection
+from miniworld.service.emulation.interface import InterfaceService
 from miniworld.service.persistence.connections import ConnectionPersistenceService
+from miniworld.service.persistence.interfaces import InterfacePersistenceService
 from miniworld.service.persistence.nodes import NodePersistenceService
 from miniworld.util import NetUtil, ConcurrencyUtil
 
@@ -66,6 +68,8 @@ class NetworkConfigurator:
             connectivity_checker_fun = self.get_scenario_config_checker
 
         self._logger = singletons.logger_factory.get_logger(self)
+        self._interface_service = InterfaceService()
+        self._interface_persistence_service = InterfacePersistenceService()
 
         self.get_interface_index_fun = get_interface_index_fun
         self.connectivity_checker_fun = connectivity_checker_fun

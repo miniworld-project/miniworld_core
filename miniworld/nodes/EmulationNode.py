@@ -4,6 +4,7 @@ from io import StringIO
 from miniworld.model.StartableObject import ScenarioState
 from miniworld.model.base import Base
 from miniworld.network.connection import AbstractConnection
+from miniworld.service.emulation.interface import InterfaceService
 from miniworld.singletons import singletons
 
 __author__ = 'Nils Schmidt'
@@ -48,15 +49,14 @@ class EmulationNode(Base, ScenarioState):
     # Factory stuff
     #############################################################
 
-    @staticmethod
-    def factory():
-        from miniworld.model.interface.Interfaces import Interfaces
-
-        interfaces_str = singletons.scenario_config.get_interfaces(node_id=id)
-        interfaces = Interfaces.factory_from_interface_names(interfaces_str)
+    @classmethod
+    def factory(cls):
+        interfaces = singletons.scenario_config.get_interfaces(node_id=id)
+        assert isinstance(interfaces, list)
+        interfaces = InterfaceService.factory(interfaces)
 
         network_backend_bootstrapper = singletons.network_backend_bootstrapper
-        return EmulationNode(network_backend_bootstrapper, interfaces)
+        return cls(network_backend_bootstrapper, interfaces)
 
     #############################################################
     # Magic and private methods
@@ -69,6 +69,7 @@ class EmulationNode(Base, ScenarioState):
         Base.__init__(self)
         ScenarioState.__init__(self)
 
+        self._interface_service = InterfaceService()
         self.name = None
         self._logger = singletons.logger_factory.get_logger(self)
 

@@ -8,11 +8,9 @@ from ordered_set import OrderedSet
 
 from miniworld.concurrency.serialization.ShellCommandSerializer import ShellCommandSerializer
 from miniworld.model.ResetableInterface import ResetableInterface
-from miniworld.model.interface import Interface
 from miniworld.network.backends import NetworkBackend
 from miniworld.network.backends.bridged.ConnectionBookKeeper import ConnectionBookKeeper
 from miniworld.network.backends.bridged.iproute2 import Constants
-from miniworld.nodes.virtual.CentralNode import CentralNode
 from miniworld.singletons import singletons
 from miniworld.util import PathUtil
 
@@ -168,7 +166,7 @@ def NetworkBackendBridgedDummy():
                 node_id, self.get_id_br_postfix(node_id, interface))
 
         def get_id_br_postfix(self, node_id, interface):
-            long_id = '%s_%s_%s' % (node_id, interface.node_class, interface.nr_host_interface)
+            long_id = '%s_%s_%s' % (node_id, interface.class_id, interface.nr_host_interface)
             if long_id in self._br_id_mapping:
                 return self._br_id_mapping[long_id]
             short_id = self._current_br_dev_nr[node_id]
@@ -196,7 +194,7 @@ def NetworkBackendBridgedDummy():
         def get_id_tap_postfix(self, node_id, interface):
             # self._logger.debug("get_id_tap_postfix interface: '%s'", repr(interface))
             long_id = '%s_{id_fmt}_{id_fmt}'.format(id_fmt=Constants.NODE_ID_FMT) % (
-                node_id, interface.node_class, interface.nr_host_interface)
+                node_id, interface.class_id, interface.nr_host_interface)
             short_id = self._current_tap_dev_nr[node_id]
             if long_id in self._tap_id_mapping:
                 return self._tap_id_mapping[long_id]
@@ -350,43 +348,34 @@ def NetworkBackendBridgedDummy():
             return bridge
 
         # TODO: #54, #55: MERGE WITH ...
-        def create_n_connect_central_nodes(self, interfaces):
+        def create_n_connect_central_nodes(self):
             """
-
-            Parameters
-            ----------
-            interfaces
-
             Returns
             -------
             dict<int, CentralNode>
             """
             # create CentralNode s but only if there is a HubWiFi interface
             # TODO: REMOVE
-            cnt = 0
             central_nodes_dict = {}
+            return central_nodes_dict  # currently disabled
 
-            # connect local devices
-            for _if in filter(lambda x: CentralNode.is_central_node_interface(x), interfaces):
-                if cnt == 1:
-                    raise ValueError("Only one '%s' interface supported at the moment!" % Interface.HubWiFi)
+            cnt = 0
+            # TODO: REFACTOR!
+            # TODO: #54: make amount of nodes configurable
+            count_central_nodes = 1
+            for i in range(0, count_central_nodes):
+                central_node = self.network_backend_bootstrapper.central_node_type(
+                    self.network_backend_bootstrapper, id=i + 1)
+                # central_node.id = self.get_br_name(central_node.id, central_node.interface)
+                # TODO: #54 make configurable!
+                self._logger.debug("creating CentralNode with id: %s", central_node._id)
+                central_node.start(switch=False, bridge_dev_name=central_node._id)
+                central_nodes_dict[central_node._id] = central_node
 
-                # TODO: REFACTOR!
-                # TODO: #54: make amount of nodes configurable
-                count_central_nodes = 1
-                for i in range(0, count_central_nodes):
-                    central_node = self.network_backend_bootstrapper.central_node_type(
-                        self.network_backend_bootstrapper, id=i + 1)
-                    # central_node.id = self.get_br_name(central_node.id, central_node.interface)
-                    # TODO: #54 make configurable!
-                    self._logger.debug("creating CentralNode with id: %s", central_node._id)
-                    central_node.start(switch=False, bridge_dev_name=central_node._id)
-                    central_nodes_dict[central_node._id] = central_node
+            # remember new bridges
+            self.event_monitor.add_new_bridge(central_node._id)
 
-                    # remember new bridges
-                    self.event_monitor.add_new_bridge(central_node._id)
-
-                cnt += 1
+            cnt += 1
 
             return central_nodes_dict
 

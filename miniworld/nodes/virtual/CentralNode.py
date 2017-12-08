@@ -1,4 +1,4 @@
-from miniworld.model.interface.Interface import HubWiFi
+from miniworld.model.domain.interface import Interface
 from miniworld.network.connection import AbstractConnection
 from miniworld.network.backends.NetworkBackendNotifications import ConnectionInfo
 from miniworld.nodes.virtual import VirtualNode
@@ -31,8 +31,8 @@ class CentralNode(VirtualNode.VirtualNode):
         return ConnectionInfo(connection_type=AbstractConnection.ConnectionType.central)
 
     @staticmethod
-    def is_central_node_interface(interface):
-        return isinstance(interface, HubWiFi)
+    def is_central_node_interface(interface: str):
+        return interface == Interface.InterfaceType.hub.value
 
     @staticmethod
     def is_central_node(node):

@@ -27,7 +27,8 @@ class AbstractSwitch(StartableObject.ScenarioState, InterfaceDependentID):
         StartableObject.ScenarioState.__init__(self)
 
         self.interface = interface
-        self.id = self.get_interface_class_dependent_id(id, interface.node_class, interface.nr_host_interface)
+        # TODO: just for prototyping
+        self.id = 10000
 
         # create extra node logger
         self.nlog = singletons.logger_factory.get_node_logger(id)

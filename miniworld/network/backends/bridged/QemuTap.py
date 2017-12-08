@@ -1,5 +1,6 @@
-from miniworld.model.interface import Interface
+from miniworld.model.domain.interface import Interface
 from miniworld.nodes.qemu import Qemu
+from miniworld.service.emulation.interface import InterfaceService
 from miniworld.singletons import singletons
 
 
@@ -42,7 +43,7 @@ class QemuTap(Qemu.Qemu):
         for vlan, _if in enumerate(self.emulation_node.network_mixin.interfaces):
 
             _if_name = None
-            if type(_if) in (Interface.HubWiFi, Interface.Management):
+            if not Interface.InterfaceType(_if.name) in Interface.INTERFACE_TYPE_NORMAL:
                 _if_name = singletons.network_backend.get_tap_name(self.id, _if)
             else:
                 # create for each connection a tap device
@@ -60,7 +61,7 @@ class QemuTap(Qemu.Qemu):
 
     def _build_qemu_nic_command_internal(self, _if, _if_name, vlan):
         # node classes have a common mac address prefix
-        mac = _if.get_mac(self.emulation_node._id)
+        mac = InterfaceService.get_mac(node_id=self.emulation_node._id, interface=_if)
         _if.mac = mac
         return get_cmd_template_qemu_nic().format(
             ifname=_if_name,

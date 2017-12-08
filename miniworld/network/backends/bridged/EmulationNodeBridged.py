@@ -10,7 +10,7 @@ class EmulationNodeBridged(EmulationNode.EmulationNode):
         # TODO:
         # set NIC state up
         for _if in self.network_mixin.interfaces:
-            tap = singletons.network_backend.get_tap_name(self.id, _if)
+            tap = singletons.network_backend.get_tap_name(self._id, _if)
             # TODO: abstract NIC COMMANDS!
             cmd = "ifconfig {} up" .format(tap)
-            singletons.shell_helper.run_shell("host shell", cmd, prefixes=[str(self.id)])
+            singletons.shell_helper.run_shell("host shell", cmd, prefixes=[str(self._id)])

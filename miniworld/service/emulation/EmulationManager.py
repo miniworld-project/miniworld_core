@@ -8,6 +8,7 @@ from io import StringIO
 from pprint import pformat
 from typing import Dict, Union
 
+from miniworld.model.domain.interface import Interface
 from miniworld.network.connection import AbstractConnection
 from ordered_set import OrderedSet
 
@@ -18,7 +19,6 @@ from miniworld.mobility import DistanceMatrix
 from miniworld.mobility.MovementDirectorFactory import MovementDirectorFactory
 from miniworld.model import Lock
 from miniworld.model.ResetableInterface import ResetableInterface
-from miniworld.model.interface import Interfaces, Interface
 from miniworld.network.backends import NetworkBackends
 from miniworld.network.backends.NetworkBackendNotifications import ConnectionInfo
 from miniworld.nodes.EmulationNodes import EmulationNodes
@@ -177,7 +177,7 @@ class EmulationManager(ResetableInterface):
                 self._logger.info("idx_central_node: %s", idx_central_node)
                 bridge_node_id = list(self.central_nodes_id_mapping.keys())[idx_central_node]
 
-                if node.network_mixin.interfaces.filter_hub_wifi():
+                if [interface for interface in node.network_mixin.interfaces if interface.name == Interface.InterfaceType.hub.value]:
                     # NOTE: we keep the upper triangular matrix
                     matrix[(node_id, bridge_node_id)] = ImpairmentModel.VAL_DISTANCE_ZERO
                 else:
@@ -379,10 +379,7 @@ class EmulationManager(ResetableInterface):
             singletons.network_manager.init_for_next_scenario()
 
             self._logger.info("starting network backend ...")
-            self.network_backend.start(
-                interfaces=Interfaces.Interfaces.factory_from_interface_names(
-                    singletons.scenario_config.get_interfaces()),
-                management_switch=singletons.config.is_management_switch_enabled())
+            self.network_backend.start()
 
             # start nodes
             node_starter = NodeStarter.NodeStarter(node_ids, network_backend_name)
@@ -391,8 +388,7 @@ class EmulationManager(ResetableInterface):
                                                           )
 
             # NOTE: first the EmulationNodes then the CentralHubs need to be created
-            self.central_nodes_id_mapping = self.network_backend.create_n_connect_central_nodes(
-                Interfaces.Interfaces.factory_from_interface_names(interfaces))
+            self.central_nodes_id_mapping = self.network_backend.create_n_connect_central_nodes()
             self.pre_calculate_hubwifi_distance_matrix(emulation_nodes)
 
             node_persistence_service = NodePersistenceService()
@@ -483,21 +479,9 @@ class EmulationManager(ResetableInterface):
     # Helpers
     ###############################################
 
-    def set_hubwifi_on_connection_info(self, interface, connection_info):
-        """
-
-        Parameters
-        ----------
-        interface
-        connection_info
-
-        Returns
-        -------
-        bool
-            Whether we have a HubWifi interface
-        """
+    def set_hubwifi_on_connection_info(self, interface: Interface, connection_info: ConnectionInfo) -> bool:
         # HubWiFi interface: do not change connections, but apply link quality
-        is_hubwifi_iface = isinstance(interface, Interface.HubWiFi)
+        is_hubwifi_iface = interface.name == Interface.InterfaceType.hub
         if is_hubwifi_iface:
             connection_info.connection_type = AbstractConnection.ConnectionType.central
 
@@ -760,8 +744,7 @@ class EmulationManager(ResetableInterface):
             # TODO: improvement #1: store mgmt iface in extra variable
             # TODO: improvement #2: store hubwifi iface in extra variable
             # TODO: improvement #3: own method for central node connection management -> iterate over nodes and connect central node interface
-            if interface_x.is_same_interface_type(interface_y) and not interface_x.is_same_interface_type(
-                    Interface.Management()):
+            if interface_x.name == interface_y.name and not interface_x.name == Interface.InterfaceType.management:
 
                 # does a connection already exists? (active or inactive)
                 if not self._connection_persistence_service.exists(node_x_id=emulation_node_x._id, node_y_id=emulation_node_y._id,

@@ -2,10 +2,9 @@ import logging
 import os
 from copy import deepcopy
 
-import miniworld.ScenarioConstants
-import miniworld.model.interface.Interface
 from miniworld.errors import ConfigMalformed
 from miniworld.impairment import LinkQualityConstants
+from miniworld.model.domain.interface import Interface
 from miniworld.singletons import singletons
 from miniworld.util import JSONConfig, ConcurrencyUtil
 from miniworld.util.JSONConfig import customizable_attrs, json2dict
@@ -357,10 +356,12 @@ class ScenarioConfig(JSONConfig.JSONConfig):
     # Network
     #################################################
 
-    @customizable_attrs("network", "links", "interfaces", default=[
-        miniworld.model.interface.Interface.Mesh.node_class_name])
+    @customizable_attrs("network", "links", "interfaces", default=[Interface.InterfaceType.mesh.value])
     def get_interfaces(self):
         pass
+
+    def any_hub_interface(self) -> bool:
+        return Interface.InterfaceType.hub.value in self.get_interfaces()
 
     @customizable_attrs("network", "core", "topologies")
     def get_core_scenarios(self):

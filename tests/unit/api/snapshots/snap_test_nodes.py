@@ -19,9 +19,9 @@ snapshots['TestNodes.test_node_interfaces 1'] = {
                             'node': {
                                 'id': 'SW50ZXJmYWNlOjA=',
                                 'iid': 0,
-                                'ipv4': '10.0.1.1',
+                                'ipv4': '10.0.0.1',
                                 'kind': None,
-                                'mac': '02:01:00:00:00:00',
+                                'mac': '00:00:00:00:00:00',
                                 'name': 'mesh'
                             }
                         },
@@ -31,7 +31,7 @@ snapshots['TestNodes.test_node_interfaces 1'] = {
                                 'iid': 1,
                                 'ipv4': '172.21.0.1',
                                 'kind': None,
-                                'mac': '0a:01:00:00:00:00',
+                                'mac': '06:00:00:00:00:00',
                                 'name': 'management'
                             }
                         }
@@ -48,9 +48,9 @@ snapshots['TestNodes.test_node_interfaces 1'] = {
                             'node': {
                                 'id': 'SW50ZXJmYWNlOjI=',
                                 'iid': 2,
-                                'ipv4': '10.0.1.2',
+                                'ipv4': '10.0.0.2',
                                 'kind': None,
-                                'mac': '02:01:00:00:00:01',
+                                'mac': '00:00:00:00:00:01',
                                 'name': 'mesh'
                             }
                         },
@@ -60,7 +60,7 @@ snapshots['TestNodes.test_node_interfaces 1'] = {
                                 'iid': 3,
                                 'ipv4': '172.21.0.2',
                                 'kind': None,
-                                'mac': '0a:01:00:00:00:01',
+                                'mac': '06:00:00:00:00:01',
                                 'name': 'management'
                             }
                         }

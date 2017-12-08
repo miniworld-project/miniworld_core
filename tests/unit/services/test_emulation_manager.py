@@ -6,8 +6,8 @@ import pytest
 
 from miniworld.impairment.ImpairmentModel import ImpairmentModel
 from miniworld.mobility.DistanceMatrix import DistanceMatrix
-from miniworld.model.interface.Interfaces import Interfaces
 from miniworld.service.emulation.EmulationManager import EmulationManager
+from miniworld.service.emulation.interface import InterfaceService
 from miniworld.singletons import singletons
 
 
@@ -20,7 +20,7 @@ class EmulationNode(Mock):
         self._id = EmulationNode.id
         EmulationNode.id += 1
         self.network_mixin = MagicMock()
-        self.network_mixin.interfaces = Interfaces.factory_from_interface_names(['mesh'])
+        self.network_mixin.interfaces = InterfaceService.factory(['mesh'])
 
     def __eq__(self, other):
         return self._id == other._id
@@ -114,7 +114,9 @@ class TestEmulationManager:
 
     # TODO: test with distance matrix from MD
     # TODO: "ip link set dev" commands are in bridge group of ShellCommandExecutor, but should be in connection group instead, bridge.add_if(tap_x, if_up=True) adds the command to the bridge group. brctl backend
-    def test_step(self, emulation_manager, scenario_config, distance_matrix):
+    def test_step(self, emulation_manager, scenario_config, distance_matrix, monkeypatch):
+        mock = MagicMock(side_effect=lambda _: _)
+        monkeypatch.setattr('miniworld.service.persistence.interfaces.NodePersistenceService.add', mock)
         # required by to monkeypatch network_backend_bootstrapper
         singletons.scenario_config.data = scenario_config
 

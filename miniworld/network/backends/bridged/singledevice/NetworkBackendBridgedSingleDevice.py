@@ -129,7 +129,7 @@ def NetworkBackendBridgedSingleDevice():
                 # create extra chain for bridge
                 self.add_shell_ebtables_command(self.EVENT_EBTABLES_CREATE_CHAINS,
                                                 connection_service.get_ebtables_chain_cmd(br_name,
-                                                                                       connection_service.policy_drop))
+                                                                                          connection_service.policy_drop))
                 # redirect to new chain
                 self.add_shell_ebtables_command(self.EVENT_EBTABLES_REDIRECT,
                                                 connection_service.get_ebtables_redirect_cmd(br_name))

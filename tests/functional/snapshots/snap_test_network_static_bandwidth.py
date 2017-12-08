@@ -13,12 +13,6 @@ snapshots['TestAPI.test_connection_get 1'] = {
     }
 }
 
-snapshots['TestAPI.test_node_get_nonexisting 1'] = {
-    'data': {
-        'node': None
-    }
-}
-
 snapshots['TestAPI.test_node_get 1'] = {
     'data': {
         'node': {
@@ -26,6 +20,12 @@ snapshots['TestAPI.test_node_get 1'] = {
             'iid': 0,
             'virtualization': 'QemuTap'
         }
+    }
+}
+
+snapshots['TestAPI.test_node_get_nonexisting 1'] = {
+    'data': {
+        'node': None
     }
 }
 
@@ -52,7 +52,7 @@ snapshots['TestAPI.test_connection_get 2'] = {
                 'iid': 0
             },
             'interfaceY': {
-                'iid': 4
+                'iid': 2
             },
             'kind': 'user'
         }
@@ -70,10 +70,10 @@ snapshots['TestAPI.test_interface_get 1'] = {
         'node': {
             'id': 'SW50ZXJmYWNlOjA=',
             'iid': 0,
-            'ipv4': None,
-            'mac': '02:01:00:00:00:00',
+            'ipv4': '10.0.0.1',
+            'mac': '00:00:00:00:00:00',
             'name': 'mesh',
-            'nrHostInterface': 1
+            'nrHostInterface': 0
         }
     }
 }
@@ -127,10 +127,10 @@ snapshots['TestAPI.test_interfaces 1'] = {
                             'node': {
                                 'id': 'SW50ZXJmYWNlOjA=',
                                 'iid': 0,
-                                'ipv4': None,
-                                'mac': '02:01:00:00:00:00',
+                                'ipv4': '10.0.0.1',
+                                'mac': '00:00:00:00:00:00',
                                 'name': 'mesh',
-                                'nrHostInterface': 1
+                                'nrHostInterface': 0
                             }
                         },
                         {
@@ -138,9 +138,9 @@ snapshots['TestAPI.test_interfaces 1'] = {
                                 'id': 'SW50ZXJmYWNlOjE=',
                                 'iid': 1,
                                 'ipv4': '172.21.0.1',
-                                'mac': '0a:01:00:00:00:00',
+                                'mac': '06:00:00:00:00:00',
                                 'name': 'management',
-                                'nrHostInterface': 1
+                                'nrHostInterface': 0
                             }
                         }
                     ]
@@ -155,22 +155,22 @@ snapshots['TestAPI.test_interfaces 1'] = {
                     'edges': [
                         {
                             'node': {
-                                'id': 'SW50ZXJmYWNlOjQ=',
-                                'iid': 4,
-                                'ipv4': None,
-                                'mac': '02:01:00:00:00:01',
+                                'id': 'SW50ZXJmYWNlOjI=',
+                                'iid': 2,
+                                'ipv4': '10.0.0.2',
+                                'mac': '00:00:00:00:00:01',
                                 'name': 'mesh',
-                                'nrHostInterface': 1
+                                'nrHostInterface': 0
                             }
                         },
                         {
                             'node': {
-                                'id': 'SW50ZXJmYWNlOjU=',
-                                'iid': 5,
+                                'id': 'SW50ZXJmYWNlOjM=',
+                                'iid': 3,
                                 'ipv4': '172.21.0.2',
-                                'mac': '0a:01:00:00:00:01',
+                                'mac': '06:00:00:00:00:01',
                                 'name': 'management',
-                                'nrHostInterface': 1
+                                'nrHostInterface': 0
                             }
                         }
                     ]
@@ -185,22 +185,22 @@ snapshots['TestAPI.test_interfaces 1'] = {
                     'edges': [
                         {
                             'node': {
-                                'id': 'SW50ZXJmYWNlOjI=',
-                                'iid': 2,
-                                'ipv4': None,
-                                'mac': '02:01:00:00:00:02',
+                                'id': 'SW50ZXJmYWNlOjQ=',
+                                'iid': 4,
+                                'ipv4': '10.0.0.3',
+                                'mac': '00:00:00:00:00:02',
                                 'name': 'mesh',
-                                'nrHostInterface': 1
+                                'nrHostInterface': 0
                             }
                         },
                         {
                             'node': {
-                                'id': 'SW50ZXJmYWNlOjM=',
-                                'iid': 3,
+                                'id': 'SW50ZXJmYWNlOjU=',
+                                'iid': 5,
                                 'ipv4': '172.21.0.3',
-                                'mac': '0a:01:00:00:00:02',
+                                'mac': '06:00:00:00:00:02',
                                 'name': 'management',
-                                'nrHostInterface': 1
+                                'nrHostInterface': 0
                             }
                         }
                     ]
@@ -220,7 +220,7 @@ snapshots['TestAPI.test_interfaces 1'] = {
                                 'ipv4': None,
                                 'mac': None,
                                 'name': 'management',
-                                'nrHostInterface': 1
+                                'nrHostInterface': 0
                             }
                         }
                     ]
@@ -310,7 +310,7 @@ snapshots['TestAPI.test_links 2'] = {
                                     'iid': 0
                                 },
                                 'interfaceY': {
-                                    'iid': 4
+                                    'iid': 2
                                 },
                                 'kind': 'user'
                             }
@@ -347,7 +347,7 @@ snapshots['TestAPI.test_links 2'] = {
                                     'iid': 0
                                 },
                                 'interfaceY': {
-                                    'iid': 4
+                                    'iid': 2
                                 },
                                 'kind': 'user'
                             }
@@ -371,10 +371,10 @@ snapshots['TestAPI.test_links 2'] = {
                                     'loss': 0
                                 },
                                 'interfaceX': {
-                                    'iid': 4
+                                    'iid': 2
                                 },
                                 'interfaceY': {
-                                    'iid': 2
+                                    'iid': 4
                                 },
                                 'kind': 'user'
                             }
@@ -408,10 +408,10 @@ snapshots['TestAPI.test_links 2'] = {
                                     'loss': 0
                                 },
                                 'interfaceX': {
-                                    'iid': 4
+                                    'iid': 2
                                 },
                                 'interfaceY': {
-                                    'iid': 2
+                                    'iid': 4
                                 },
                                 'kind': 'user'
                             }

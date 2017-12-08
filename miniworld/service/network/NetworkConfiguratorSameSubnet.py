@@ -14,14 +14,12 @@ class NetworkConfiguratorSameSubnet(NetworkConfiguratorConnectionLess):
     This configurator uses the node list to configure each interface.
     NOTE: the configurator has to run only once to configure all interfaces (in contrast to a connection-based configurator),
         but each step the new active connections can be checked for connectivity.
-    Each interface is put into a different subnet. Even interfaes of the same type but with a different `nr_host_interface` attribute.
+    Each interface is put into a different subnet. Even interfaces of the same type but with a different `nr_host_interface` attribute.
 
     Attributes
     ----------
     base_network_cidr : str, optional (default is the value from the scenario config)
         The network from which the subnets are generated.
-    subnet_counter : defaultdict<subnet, int>
-        For each subnet store the number of allocated ips.
     ips : OrderedDict<tuple<EmulationNode, Interface>, str>
         For each link store the allocated ip.
     """
@@ -36,7 +34,6 @@ class NetworkConfiguratorSameSubnet(NetworkConfiguratorConnectionLess):
 
         self._logger = singletons.logger_factory.get_logger(self)
         self.subnets = {}
-        self.subnet_counter = defaultdict(lambda: 0)
         self.ips = OrderedDict()
 
     def get_subnet(self, interface):
@@ -53,21 +50,30 @@ class NetworkConfiguratorSameSubnet(NetworkConfiguratorConnectionLess):
         ------
         NoMoreSubnetsAvailable
         """
-        if interface not in self.subnets:
+        # use for each `class_id` and `nr_host_interface` a different subnet
+        key = interface.class_id, interface.nr_host_interface
+        if key not in self.subnets:
             try:
-                self.subnets[interface] = next(self.subnet_generator)
+                self.subnets[key] = next(self.subnet_generator)
             except StopIteration:
                 raise NoMoreSubnetsAvailable("All /%s subnets from base network: %s used!" % (self.prefixlen, self.base_network_cidr))
-        return self.subnets[interface]
+        return self.subnets[key]
 
     def configure_connection(self, emulation_node: EmulationNode):
+        assert emulation_node._id is not None
         # dict<int, list<str>>
         commands_per_node = defaultdict(list)
         c = Counter()
-        normal_ifaces = emulation_node.network_mixin.interfaces.filter_normal_interfaces()
+
+        normal_ifaces = self._interface_service.filter_normal_interfaces(emulation_node.network_mixin.interfaces)
+
         for idx, interface in enumerate(normal_ifaces):
+            assert interface._id is not None
+            assert interface.class_id is not None
+            assert interface.name is not None
+
             idx_iface = self.get_interface_index_fun(emulation_node, interface)
-            c = Counter(list(c.keys()) + [interface])
+            c = Counter(list(c.keys()) + [interface.class_id])
             subnet = self.get_subnet(interface)
 
             key = self.get_key_ip_dict(emulation_node, interface)
@@ -76,19 +82,16 @@ class NetworkConfiguratorSameSubnet(NetworkConfiguratorConnectionLess):
             if not ip_addr:
                 # first offset is 0
                 # this solution is usable in the distributed scenario without global state
-                # TODO: this works only for situations where all nods have the same number of interfaces!
-                cnt_total_type_ifaces = len(emulation_node.network_mixin.interfaces.filter_type(type(interface)))
-                # NOTE: we do not use the type here! instead the count the interfaces (different eq operation)!
-                cnt_type_ifaces = c[interface]
-
-                offset = (emulation_node._id + 1) * (cnt_total_type_ifaces - cnt_type_ifaces + 1)
+                # TODO: this works only for situations where all nodes have the same number of interfaces!
+                cnt_type_ifaces = c[interface.class_id]
+                assert cnt_type_ifaces >= 1
+                offset = (emulation_node._id + 1)
                 ip_addr = self.get_ip(subnet, offset=offset - 1)
             netmask = subnet.netmask
 
             ip_set_command_up = NetworkConfigurator.get_ip_addr_change_cmd(self.get_nic_name(idx_iface), ip_addr, netmask)
+            self._interface_persistence_service.update_ipv4(interface=interface, ipv4=str(ip_addr))
             commands_per_node[emulation_node].append(ip_set_command_up)
-
-            self.subnet_counter[subnet] += 1
 
             # remember allocated ip
             self.ips[key] = ip_addr
@@ -140,7 +143,8 @@ class NetworkConfiguratorSameSubnet(NetworkConfiguratorConnectionLess):
                     add_check_cmd(ip_addr)
             # check which ip is allocated to emulation_node_y
             else:
-                ip_addr = self.ips[self.get_key_ip_dict(emulation_node_y, interface_y)]
+                # ip_addr = self.ips[self.get_key_ip_dict(emulation_node_y, interface_y)]
+                ip_addr = interface_y.ipv4
                 add_check_cmd(ip_addr)
 
         return check_commands_per_node

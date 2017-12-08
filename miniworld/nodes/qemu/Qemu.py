@@ -9,14 +9,14 @@ from io import StringIO
 from os.path import basename, abspath
 from os.path import splitext
 
-import miniworld.model.interface.Interface
 from miniworld.errors import QemuBootWaitTimeout
 from miniworld.model.ShellProcess import ShellProcess
 from miniworld.nodes.REPLable import REPLable
 from miniworld.nodes.VirtualizationLayer import VirtualizationLayer
 from miniworld.nodes.qemu.QemuMonitorRepl import QemuMonitorRepl
-from miniworld.service.provisioning.SocketExpect import SocketExpect
+from miniworld.service.emulation.interface import InterfaceService
 from miniworld.service.provisioning import TemplateEngine
+from miniworld.service.provisioning.SocketExpect import SocketExpect
 from miniworld.service.shell.shell import run_shell
 from miniworld.singletons import singletons
 from miniworld.util import PathUtil
@@ -132,6 +132,7 @@ class Qemu(VirtualizationLayer, ShellProcess, REPLable):
     def __init__(self, id, emulation_node):
         VirtualizationLayer.__init__(self, id, emulation_node)
 
+        self._interface_service = InterfaceService()
         self.emulation_node = emulation_node
 
         # log file for qemu boot
@@ -541,8 +542,7 @@ class Qemu(VirtualizationLayer, ShellProcess, REPLable):
         # set node id
         vars[TemplateEngine.KEYWORD_NODE_ID] = id
         # get key/value pairs from each node class
-        for node_class_type in miniworld.model.interface.Interface.INTERFACE_ALL_CLASSES_TYPES:
-            vars.update(node_class_type().get_template_dict(id))
+        # TODO: adjust to new InterfaceService
 
         return vars
 
@@ -564,8 +564,9 @@ class Qemu(VirtualizationLayer, ShellProcess, REPLable):
         -------
         list<str>
         """
+        interface_service = InterfaceService()
         return ['%s%s' % (singletons.scenario_config.get_network_links_nic_prefix(), iface_idx) for iface_idx in
-                range(len(self.emulation_node.network_mixin.interfaces.filter_normal_interfaces()))]
+                range(len(interface_service.filter_normal_interfaces(self.emulation_node.network_mixin.interfaces)))]
         # res = self.run_commands_eager_check_ret_val(
         #     StringIO("ls /sys/class/net/|grep {iface_prefix}".format(iface_prefix=singletons.scenario_config.get_network_links_nic_prefix())))
         # return res.split("\n")[2:][0].split(" ")
