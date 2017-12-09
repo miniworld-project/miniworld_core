@@ -1,19 +1,19 @@
 from typing import List
 
 from miniworld.model.base import Base
-from miniworld.model.interface.Interfaces import Interfaces
+from miniworld.model.domain.interface import Interface
 from miniworld.network.connection import Connection
 
 
-class EmulationNode(Base):
+class Node(Base):
     def __init__(self,
-                 id: int = None,
-                 interfaces: Interfaces = None,
+                 _id: int = None,
+                 interfaces: List[Interface] = None,
                  connections: List[Connection] = None,
                  type: Connection.ConnectionType = None
                  ):
         super().__init__()
-        self.id = id
+        self._id = _id
         self.interfaces = interfaces
         self.connections = connections
         self.type = type
