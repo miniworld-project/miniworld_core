@@ -31,19 +31,6 @@ class EmulationNode(AbstractNode):
     """
 
     #############################################################
-    # Factory stuff
-    #############################################################
-
-    @classmethod
-    def factory(cls):
-        interfaces = singletons.scenario_config.get_interfaces(node_id=id)
-        assert isinstance(interfaces, list)
-        interfaces = InterfaceService.factory(interfaces)
-
-        network_backend_bootstrapper = singletons.network_backend_bootstrapper
-        return cls(network_backend_bootstrapper, interfaces)
-
-    #############################################################
     # Magic and private methods
     #############################################################
 
@@ -60,14 +47,6 @@ class EmulationNode(AbstractNode):
         # qemu instance, prevent cyclic import
         self.virtualization_layer = self.network_backend_bootstrapper.virtualization_layer_type(self._node._id, self)
 
-    def __repr__(self):
-        return repr(self._node._id)
-        # return '%s(%s, %s)' % (self.__class__.__name__, self._id, self.network_mixin)
-
-    def __hash__(self):
-        return hash(self._node._id)
-
-    # TODO: adjust DOC
     def _start(self, *args, **kwargs):
         """
         Starting a node involves the following steps:
@@ -112,7 +91,6 @@ class EmulationNode(AbstractNode):
     # Shell-command execution
     #############################################################
 
-    # TODO: #54,#55: adjust doc
     def run_pre_network_shell_commands(self, flo_post_boot_script, *args, **kwargs):
         """
         Run user commands
@@ -133,7 +111,6 @@ class EmulationNode(AbstractNode):
 
         self.nlog.info("pre_network_shell_commands done")
 
-    # TODO: #54,#55: adjust doc
     def run_post_network_shell_commands(self, *args, **kwargs):
         """
         Run user commands. This method is called from the :py:class:`.SimulationManager`
@@ -153,7 +130,6 @@ class EmulationNode(AbstractNode):
     # EmulationNode notifications
     #############################################################
 
-    # TODO: DOC
     def after_pre_shell_commands(self):
         pass
 
@@ -174,7 +150,6 @@ class EmulationNode(AbstractNode):
             ip = self._interface_service.get_ip(node_id=self._node._id, interface=_if)
             _if.ipv4 = str(ip)
             netmask = self._interface_service.get_netmask(interface=_if)
-            # TODO: #63: we dont know if renaming worked, therefore try to rename both ethX and mgmt
             cmd_ip_change = NetUtil.get_ip_addr_change_cmd(singletons.config.get_bridge_tap_name(), ip, netmask)
             try:
                 self.virtualization_layer.run_commands_eager_check_ret_val(StringIO(cmd_ip_change))
