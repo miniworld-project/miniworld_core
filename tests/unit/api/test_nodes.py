@@ -6,7 +6,6 @@ from sqlalchemy.orm.exc import NoResultFound
 from miniworld.singletons import singletons
 
 
-# TODO: test get non existent id
 class TestNodes:
     def test_node_get(self, client, mock_nodes, snapshot):
         res = client.execute('''

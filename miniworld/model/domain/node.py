@@ -2,7 +2,7 @@ from typing import List
 
 from miniworld.model.base import Base
 from miniworld.model.domain.interface import Interface
-from miniworld.network.connection import Connection
+from miniworld.network.connection import Connection, AbstractConnection
 
 
 class Node(Base):
@@ -10,7 +10,7 @@ class Node(Base):
                  _id: int = None,
                  interfaces: List[Interface] = None,
                  connections: List[Connection] = None,
-                 type: Connection.ConnectionType = None
+                 type: AbstractConnection.ConnectionType = None
                  ):
         super().__init__()
         self._id = _id

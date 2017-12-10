@@ -24,16 +24,6 @@ snapshots['TestNodes.test_node_interfaces 1'] = {
                                 'mac': '00:00:00:00:00:00',
                                 'name': 'mesh'
                             }
-                        },
-                        {
-                            'node': {
-                                'id': 'SW50ZXJmYWNlOjE=',
-                                'iid': 1,
-                                'ipv4': '172.21.0.1',
-                                'kind': None,
-                                'mac': '06:00:00:00:00:00',
-                                'name': 'management'
-                            }
                         }
                     ]
                 },
@@ -46,22 +36,12 @@ snapshots['TestNodes.test_node_interfaces 1'] = {
                     'edges': [
                         {
                             'node': {
-                                'id': 'SW50ZXJmYWNlOjI=',
-                                'iid': 2,
+                                'id': 'SW50ZXJmYWNlOjE=',
+                                'iid': 1,
                                 'ipv4': '10.0.0.2',
                                 'kind': None,
                                 'mac': '00:00:00:00:00:01',
                                 'name': 'mesh'
-                            }
-                        },
-                        {
-                            'node': {
-                                'id': 'SW50ZXJmYWNlOjM=',
-                                'iid': 3,
-                                'ipv4': '172.21.0.2',
-                                'kind': None,
-                                'mac': '06:00:00:00:00:01',
-                                'name': 'management'
                             }
                         }
                     ]
@@ -144,10 +124,10 @@ snapshots['TestNodes.test_node_links[3] 1'] = {
                                     'loss': 0.5
                                 },
                                 'interfaceX': {
-                                    'iid': 0
+                                    'iid': 1
                                 },
                                 'interfaceY': {
-                                    'iid': 2
+                                    'iid': 1
                                 },
                                 'kind': 'user'
                             }
@@ -179,10 +159,10 @@ snapshots['TestNodes.test_node_links[3] 1'] = {
                                     'loss': 0.5
                                 },
                                 'interfaceX': {
-                                    'iid': 2
+                                    'iid': 1
                                 },
                                 'interfaceY': {
-                                    'iid': 4
+                                    'iid': 1
                                 },
                                 'kind': 'user'
                             }

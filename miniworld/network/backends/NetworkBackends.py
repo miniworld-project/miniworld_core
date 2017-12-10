@@ -1,8 +1,7 @@
-from miniworld.singletons import singletons
 from miniworld.errors import NetworkBackendUnknown
-from miniworld.network.backends import VirtualNodeNetworkBackend
 from miniworld.network.backends.NetworkBackendBootStrapper import NetworkBackendBootStrapper
-from miniworld.service.network import NetworkConfiguratorP2P
+from miniworld.service.network import NetworkConfiguratorSameSubnet
+from miniworld.singletons import singletons
 
 __author__ = 'Nils Schmidt'
 
@@ -106,22 +105,15 @@ class NetworkBackendBootstrapperFactory:
         """
         from miniworld.network.backends.bridged import EmulationNodeBridged
         from miniworld.network.backends.bridged import ManagementNodeBridged
-        from miniworld.network.backends.bridged import EmulationNodeNetworkBackendBridgedMultiDevice
         from miniworld.network.backends.bridged import CentralBridgeNode
-        from miniworld.network.backends import EmulationNodeNetworkBackend
         from miniworld.network.backends.bridged import QemuTap
 
-        # dynamic
-        emulation_node_network_mixin = EmulationNodeNetworkBackend.EmulationNodeNetworkBackend if singletons.scenario_config.is_network_backend_bridged_connection_mode_single() else EmulationNodeNetworkBackendBridgedMultiDevice.EmulationNodeNetworkBackendBridgedMultiDevice
-
         return NetworkBackendBootStrapper(network_backend,
-                                          emulation_node_network_mixin,
                                           EmulationNodeBridged.EmulationNodeBridged,
                                           QemuTap.QemuTap,
                                           connection,
                                           bridge,
-                                          NetworkConfiguratorP2P.NetworkConfiguratorP2P,
-                                          VirtualNodeNetworkBackend.VirtualNodeNetworkBackend,
+                                          NetworkConfiguratorSameSubnet.NetworkConfiguratorSameSubnet,
                                           CentralBridgeNode.CentralBridgeNode,
                                           ManagementNodeBridged.ManagementNodeBridged,
                                           tunnel_type=tunnel_type)

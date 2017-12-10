@@ -37,10 +37,10 @@ class QemuTap(Qemu.Qemu):
             cmd_setup_nics.append(self._build_qemu_nic_command_internal(_if, _if_name, vlan))
 
         cnt_normal_iface = 0
-        self._logger.debug("using ifaces: '%s'", self.emulation_node.network_mixin.interfaces)
+        self._logger.debug("using ifaces: '%s'", self.emulation_node._node.interfaces)
 
         # NOTE: sort the interfaces so that the Management interface is the last one
-        for vlan, _if in enumerate(self.emulation_node.network_mixin.interfaces):
+        for vlan, _if in enumerate(self.emulation_node._node.interfaces):
 
             _if_name = None
             if not Interface.InterfaceType(_if.name) in Interface.INTERFACE_TYPE_NORMAL:
@@ -61,7 +61,8 @@ class QemuTap(Qemu.Qemu):
 
     def _build_qemu_nic_command_internal(self, _if, _if_name, vlan):
         # node classes have a common mac address prefix
-        mac = InterfaceService.get_mac(node_id=self.emulation_node._id, interface=_if)
+        mac = InterfaceService.get_mac(node_id=self.emulation_node._node._id, interface=_if)
+        # self._interface_persistence_service.update_mac(interface=_if, mac=mac)
         _if.mac = mac
         return get_cmd_template_qemu_nic().format(
             ifname=_if_name,

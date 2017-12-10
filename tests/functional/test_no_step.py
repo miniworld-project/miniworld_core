@@ -7,7 +7,7 @@ import sys
 
 import time
 
-from tests.acceptance.conftest import strip_output, create_runner
+from tests.acceptance.conftest import create_runner, strip_output
 
 
 @pytest.fixture(scope='session')

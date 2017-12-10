@@ -37,3 +37,11 @@ class InterfacePersistenceService:
              .update({Interface.ipv4: ipv4})
              )
             interface.ipv4 = ipv4
+
+    def update_mac(self, interface: DomainInterface, mac: str):
+        with singletons.db_session.session_scope() as session:
+            (session.query(Interface)
+             .filter(Interface.id == interface._id)
+             .update({Interface.ipv4: mac})
+             )
+            interface.mac = mac

@@ -49,7 +49,6 @@ EXECUTE_MODE_PYROUTE2 = "pyroute2"
 
 # TODO: use for scenario config expect parameter!
 CONNECTION_MODE_SINGLE = "single"
-CONNECTION_MODE_MULTI = "multi"
 
 
 # TODO: is marshmallow sufficient for schema checking?
@@ -201,7 +200,7 @@ class ScenarioConfig(JSONConfig.JSONConfig):
     # Network Link Configuration
     #################################################
 
-    @customizable_attrs("network", "links", "configuration", "ip_provisioner", "name", expected=["p2p", "same_subnet"],
+    @customizable_attrs("network", "links", "configuration", "ip_provisioner", "name", expected=["same_subnet"],
                         default=None)
     def get_network_provisioner_name(self):
         pass
@@ -256,7 +255,7 @@ class ScenarioConfig(JSONConfig.JSONConfig):
     #################################################
 
     @customizable_attrs("network", "backend", "connection_mode", default="single",
-                        expected=["single", "multi"])
+                        expected=["single"])
     def get_network_backend_bridged_connection_mode(self):
         pass
 
@@ -285,19 +284,6 @@ class ScenarioConfig(JSONConfig.JSONConfig):
 
     def is_network_backend_bridged_connection_mode_set(self):
         return self.get_network_backend_bridged_connection_mode() is not None
-
-    def is_network_backend_bridged_connection_mode_multi(self):
-        """
-        Raises
-        ------
-        ValueError
-        """
-        if not self.get_core_scenarios():
-            # TODO: use abstract variable for network backend name
-            raise ValueError("""Network backend '%s' is only usable with a previously known network topology.
-                             Currently only implemented for core scenario files ...""" % 'bridged')
-
-        return self.get_network_backend_bridged_connection_mode() == CONNECTION_MODE_MULTI
 
     @customizable_attrs("network", "backend", "execution_mode", "one_shell_call", default=True)
     def is_network_backend_bridged_execution_mode_one_shell_call(self):

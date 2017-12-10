@@ -1,3 +1,4 @@
+from miniworld.model.domain.node import Node
 from miniworld.network.connection import AbstractConnection
 from miniworld.network.backends.NetworkBackendNotifications import ConnectionInfo
 from miniworld.nodes.virtual.VirtualNode import VirtualNode
@@ -12,8 +13,8 @@ class ManagementNode(VirtualNode):
     No link quality adjustment is done. This is intended for management stuff.
     """
 
-    def __init__(self, network_backend_bootstrapper):
-        super(ManagementNode, self).__init__(network_backend_bootstrapper)
+    def __init__(self, node: Node):
+        super(ManagementNode, self).__init__(node=node)
         self.connection_type = AbstractConnection.ConnectionType.mgmt
 
     def _start(self, switch=True, bridge_dev_name=None):

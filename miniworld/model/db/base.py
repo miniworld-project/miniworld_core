@@ -8,6 +8,8 @@ from sqlalchemy.sql.sqltypes import Enum, Float
 from miniworld.network.connection import AbstractConnection
 from miniworld.model.domain.connection import Connection as DomainConnection
 from miniworld.model.domain.interface import Interface as DomainInterface
+from miniworld.model.domain.node import Node as DomainNode
+
 
 Base = declarative_base()
 
@@ -40,16 +42,16 @@ class Node(Base):
     type = Column(Enum(AbstractConnection.ConnectionType), nullable=False, default=AbstractConnection.ConnectionType.user)
 
     @staticmethod
-    def from_domain(node) -> 'Node':
+    def from_domain(node: DomainNode) -> 'Node':
         interfaces = []
-        for interface in node.network_mixin.interfaces:
+        for interface in node.interfaces:
             interfaces.append(
                 Interface.from_domain(node, interface)
             )
         db_node = Node(
             id=node._id,
             interfaces=interfaces,
-            type=node.connection_type
+            type=node.type
         )
         return db_node
 
@@ -60,7 +62,7 @@ class Interface(Base):
         UniqueConstraint('node_id', 'name', 'nr_host_interface'),
     )
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, unique=True)
     node_id = Column(Integer, ForeignKey('nodes.id'))
     node = relationship('Node', back_populates='interfaces')
 
@@ -107,8 +109,8 @@ class Connection(Base):
     @staticmethod
     def from_domain(connection: DomainConnection) -> 'Connection':
         return Connection(
-            node_x_id=connection.emulation_node_x._id,
-            node_y_id=connection.emulation_node_y._id,
+            node_x_id=connection.emulation_node_x._node._id,
+            node_y_id=connection.emulation_node_y._node._id,
             interface_x_id=connection.interface_x._id,
             interface_y_id=connection.interface_y._id,
             type=connection.connection_type,

@@ -1,11 +1,11 @@
-from typing import List
+from collections import OrderedDict
 
-from miniworld.model.domain.interface import Interface
-from miniworld.nodes.EmulationNode import EmulationNode
+from miniworld.model.domain.node import Node
+from miniworld.nodes import AbstractNode
 from miniworld.singletons import singletons
 
 
-class VirtualNode(EmulationNode):
+class VirtualNode(AbstractNode):
     """
     This class in contrast to an `EmulationNode`is virtual in the sense of not being backed by a qemu instance.
     This virtual node is used to have a custom hub/switch while still  being able to use existing node which requires an `EmulationNode`.
@@ -18,19 +18,27 @@ class VirtualNode(EmulationNode):
     """
 
     # TODO: RENAME BRIDGE_NAME
-    def __init__(self, network_backend_bootstrapper, interfaces: List[Interface] = None):
+    def __init__(self, node: Node):
+        super().__init__(node=node)
 
         # TODO: #82: network_backend is of type NetworkBackendEmulationNode
         # this call inits the interfaces of the :py:class:`.NetworkBackend`
+        self.network_backend_bootstrapper = singletons.network_backend_bootstrapper
 
-        network_mixin = network_backend_bootstrapper.virtual_node_network_backend_type(network_backend_bootstrapper,
-                                                                                       self._id, interfaces=interfaces,
-                                                                                       management_switch=singletons.config.is_management_switch_enabled())
-        super(VirtualNode, self).__init__(network_backend_bootstrapper, interfaces=interfaces,
-                                          network_mixin=network_mixin)
-
-        self.interface = self.network_mixin.interfaces[0]
+        self.interface = self._node.interfaces[0]
         self.switch = None
+        self.switches = None
+        self.create_switches()
+
+    def create_switches(self):
+        # create one switch for each node interface
+        self.switches = OrderedDict(
+            (_if, self.network_backend_bootstrapper.switch_type(self._node._id, _if)) for _if in self._node.interfaces
+        )
+
+    def start_switches(self, *args, **kwargs):
+        for switch in self.switches.values():
+            switch.start(*args, **kwargs)
 
     def _start(self, bridge_dev_name=None, switch=None):
         """
@@ -45,8 +53,8 @@ class VirtualNode(EmulationNode):
 
         """
 
-        self.network_mixin.start(bridge_dev_name=bridge_dev_name, switch=switch)
-        self.switch = next(iter(self.network_mixin.switches.values()))
+        self.switch = next(iter(self.switches.values()))
+        self.start_switches(switch=switch, bridge_dev_name=bridge_dev_name)
 
     def init_connection_info(self):
         """
@@ -75,7 +83,7 @@ class VirtualNode(EmulationNode):
         self._logger.info("connecting '%s' to '%s' ...", emulation_node, self)
 
         # get the interface with the same type
-        emu_node_if = [iface for iface in emulation_node.network_mixin.interfaces if iface.name == interface.name][0]
+        emu_node_if = [iface for iface in emulation_node._node.interfaces if iface.name == interface.name][0]
 
         connection_info = self.init_connection_info()
         # NetworkBackendNotifications
@@ -89,15 +97,3 @@ class VirtualNode(EmulationNode):
                                                             start_activated=True)
 
         return switch, connection, interface, emu_node_if
-
-    #########################################
-    # Disable shell stuff
-    #########################################
-
-    # TODO: #54,#55: adjust doc
-    def run_pre_network_shell_commands(self, flo_post_boot_script, *args, **kwargs):
-        pass
-
-    # TODO: #54,#55: adjust doc
-    def run_post_network_shell_commands(self, *args, **kwargs):
-        pass

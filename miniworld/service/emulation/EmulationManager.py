@@ -8,19 +8,19 @@ from io import StringIO
 from pprint import pformat
 from typing import Dict, Union
 
-from miniworld.model.domain.interface import Interface
-from miniworld.network.connection import AbstractConnection
 from ordered_set import OrderedSet
 
 from miniworld.errors import Base, SimulationStateStartFailed
-from miniworld.impairment import LinkQualityConstants
 from miniworld.impairment import ImpairmentModel
+from miniworld.impairment import LinkQualityConstants
 from miniworld.mobility import DistanceMatrix
 from miniworld.mobility.MovementDirectorFactory import MovementDirectorFactory
 from miniworld.model import Lock
 from miniworld.model.ResetableInterface import ResetableInterface
+from miniworld.model.domain.interface import Interface
 from miniworld.network.backends import NetworkBackends
 from miniworld.network.backends.NetworkBackendNotifications import ConnectionInfo
+from miniworld.network.connection import AbstractConnection
 from miniworld.nodes.EmulationNodes import EmulationNodes
 from miniworld.nodes.virtual.CentralNode import CentralNode
 from miniworld.service.emulation import NodeStarter
@@ -143,7 +143,7 @@ class EmulationManager(ResetableInterface):
         list<int>
         """
         # filter out virtual nodes!
-        return [node._id for node in self.get_emulation_nodes()]
+        return [node._node._id for node in self.get_emulation_nodes()]
 
     ###############################################
     # CentralHub
@@ -177,7 +177,7 @@ class EmulationManager(ResetableInterface):
                 self._logger.info("idx_central_node: %s", idx_central_node)
                 bridge_node_id = list(self.central_nodes_id_mapping.keys())[idx_central_node]
 
-                if [interface for interface in node.network_mixin.interfaces if interface.name == Interface.InterfaceType.hub.value]:
+                if [interface for interface in node._node.interfaces if interface.name == Interface.InterfaceType.hub.value]:
                     # NOTE: we keep the upper triangular matrix
                     matrix[(node_id, bridge_node_id)] = ImpairmentModel.VAL_DISTANCE_ZERO
                 else:
@@ -747,7 +747,7 @@ class EmulationManager(ResetableInterface):
             if interface_x.name == interface_y.name and not interface_x.name == Interface.InterfaceType.management:
 
                 # does a connection already exists? (active or inactive)
-                if not self._connection_persistence_service.exists(node_x_id=emulation_node_x._id, node_y_id=emulation_node_y._id,
+                if not self._connection_persistence_service.exists(node_x_id=emulation_node_x._node._id, node_y_id=emulation_node_y._node._id,
                                                                    interface_x_id=interface_x._id, interface_y_id=interface_y._id):
                     # no connection exists
 
@@ -824,8 +824,8 @@ class EmulationManager(ResetableInterface):
                 emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info)
 
         for connection in self._connection_persistence_service.all(
-                node_x_id=emulation_node_x._id,
-                node_y_id=emulation_node_y._id,
+                node_x_id=emulation_node_x._node._id,
+                node_y_id=emulation_node_y._node._id,
                 connected=True,
                 connection_type=AbstractConnection.ConnectionType.user,
         ):  # type: List[AbstractConnection]
@@ -842,8 +842,8 @@ class EmulationManager(ResetableInterface):
         if link_quality_model_says_connected:
             # inactive connection moved to active
             for connection in self._connection_persistence_service.all(
-                    node_x_id=emulation_node_x._id,
-                    node_y_id=emulation_node_y._id,
+                    node_x_id=emulation_node_x._node._id,
+                    node_y_id=emulation_node_y._node._id,
                     connected=False,
                     connection_type=AbstractConnection.ConnectionType.user,
             ):  # type: List[AbstractConnection]
@@ -948,8 +948,8 @@ class SimulationManagerDistributedClient(DistributedModeSimulationManager):
             return False
 
         # an node
-        local_1 = self.is_local_node(emulation_node_x._id)
-        local_2 = self.is_local_node(emulation_node_y._id)
+        local_1 = self.is_local_node(emulation_node_x._node._id)
+        local_2 = self.is_local_node(emulation_node_y._node._id)
         if local_1 != local_2:
             return True
         return False
@@ -1004,7 +1004,7 @@ class SimulationManagerDistributedClient(DistributedModeSimulationManager):
             remote_node, if_remote_node, local_emu_node, if_local_emu_node
         """
         return (emulation_node_x, interface_x, emulation_node_y, interface_y) if not self.is_local_node(
-            emulation_node_x._id) else (emulation_node_y, interface_y, emulation_node_x, interface_x)
+            emulation_node_x._node._id) else (emulation_node_y, interface_y, emulation_node_x, interface_x)
 
 
 class SimulationManagerDistributedCoordinator(DistributedModeSimulationManager):

@@ -6,12 +6,12 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from miniworld import singletons
 from miniworld.api import DictScalar
-from miniworld.model.domain.interface import Interface as InterfaceModel
+from miniworld.nodes.EmulationNode import EmulationNode as DomainEmulationNode
 from miniworld.model.domain.connection import Connection as DomainConnection
+from miniworld.model.domain.interface import Interface as InterfaceModel
 from miniworld.service.persistence import connections
 from miniworld.service.persistence import interfaces, nodes
 from miniworld.service.persistence.nodes import NodePersistenceService
-from miniworld.nodes.EmulationNode import EmulationNode as DomainEmulationNode
 
 
 class InternalIdentifier(graphene.Interface):
@@ -192,12 +192,12 @@ class NodeExecuteCommand(graphene.Mutation):
 
 def serialize_node(node: DomainEmulationNode) -> EmulationNode:
     return EmulationNode(
-        id=node._id,
-        iid=node._id,
-        virtualization=node.virtualization_layer.__class__.__name__,
-        interfaces=[serialize_interface(interface) for interface in node.network_mixin.interfaces],
-        links=node.connections,
-        kind=node.connection_type.value,
+        id=node._node._id,
+        iid=node._node._id,
+        virtualization='QemuTap',  # TODO: do not hardcode
+        interfaces=[serialize_interface(interface) for interface in node._node.interfaces],
+        links=node._node.connections,
+        kind=node._node.type.value,
     )
 
 

@@ -33,10 +33,10 @@ class EqualInterfaceNumbers(InterfaceFilter):
         self.cnt_interfaces = None
 
     def get_interfaces(self, emulation_node_x, emulation_node_y):
-        self.cnt_interfaces = len(self._interface_service.filter_normal_interfaces(emulation_node_x.network_mixin.interfaces))
+        self.cnt_interfaces = len(self._interface_service.filter_normal_interfaces(emulation_node_x._node.interfaces))
 
-        interfaces_x = self._interface_service.filter_normal_interfaces(emulation_node_x.network_mixin.interfaces)
-        interfaces_y = self._interface_service.filter_normal_interfaces(emulation_node_y.network_mixin.interfaces)
+        interfaces_x = self._interface_service.filter_normal_interfaces(emulation_node_x._node.interfaces)
+        interfaces_y = self._interface_service.filter_normal_interfaces(emulation_node_y._node.interfaces)
 
         for i in range(self.cnt_interfaces):
             yield interfaces_x[i], interfaces_y[i]
@@ -51,6 +51,6 @@ class AllInterfaces(InterfaceFilter):
     def get_interfaces(self, emulation_node_x, emulation_node_y):
 
         # TODO: speed improvement by not calling the filter every time?
-        for interface_x in self._interface_service.filter_normal_interfaces(emulation_node_x.network_mixin.interfaces):
-            for interface_y in self._interface_service.filter_normal_interfaces(emulation_node_y.network_mixin.interfaces):
+        for interface_x in self._interface_service.filter_normal_interfaces(emulation_node_x._node.interfaces):
+            for interface_y in self._interface_service.filter_normal_interfaces(emulation_node_y._node.interfaces):
                 yield interface_x, interface_y

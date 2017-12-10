@@ -23,13 +23,11 @@ class NetworkBackendBootStrapper:
 
     def __init__(self,
                  network_backend_type,
-                 emulation_node_network_backend_type,
                  emulation_node_type,
                  virtualization_layer_type,
                  connection_service,
                  switch_type,
                  network_configurator_type,
-                 virtual_node_network_backend_type=None,
                  central_node_type=None,
                  management_node_type=None,
                  tunnel_type=None,
@@ -40,7 +38,6 @@ class NetworkBackendBootStrapper:
             connection_type = Connection
 
         self.network_backend_type = network_backend_type
-        self.emulation_node_network_backend_type = emulation_node_network_backend_type
 
         # domain models
         self.connection_type = connection_type
@@ -55,4 +52,3 @@ class NetworkBackendBootStrapper:
         self.virtualization_layer_type = virtualization_layer_type
         self.central_node_type = central_node_type
         self.management_node_type = management_node_type
-        self.virtual_node_network_backend_type = virtual_node_network_backend_type

@@ -1,3 +1,5 @@
+from subprocess import CalledProcessError
+
 from miniworld.nodes import EmulationNode
 from miniworld.singletons import singletons
 
@@ -9,8 +11,12 @@ class EmulationNodeBridged(EmulationNode.EmulationNode):
 
         # TODO:
         # set NIC state up
-        for _if in self.network_mixin.interfaces:
-            tap = singletons.network_backend.get_tap_name(self._id, _if)
+        for _if in self._node.interfaces:
+            tap = singletons.network_backend.get_tap_name(self._node._id, _if)
             # TODO: abstract NIC COMMANDS!
             cmd = "ifconfig {} up" .format(tap)
-            singletons.shell_helper.run_shell("host shell", cmd, prefixes=[str(self._id)])
+            # TODO: REMOVE
+            try:
+                singletons.shell_helper.run_shell("host shell", cmd, prefixes=[str(self._node._id)])
+            except CalledProcessError as e:
+                pass

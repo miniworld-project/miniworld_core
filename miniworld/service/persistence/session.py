@@ -5,12 +5,14 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from miniworld.model.db.base import Base
+from miniworld.singletons import singletons
 
 
 class Session:
     def __init__(self):
         self.engine = None
         self.session = None
+        self._logger = singletons.logger_factory.get_logger(self)
 
     def create_session(self):
         self.engine = create_engine('sqlite:///db.sql', echo=False, connect_args={'check_same_thread': False},

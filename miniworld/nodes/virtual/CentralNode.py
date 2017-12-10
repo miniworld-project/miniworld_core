@@ -1,4 +1,5 @@
 from miniworld.model.domain.interface import Interface
+from miniworld.model.domain.node import Node
 from miniworld.network.connection import AbstractConnection
 from miniworld.network.backends.NetworkBackendNotifications import ConnectionInfo
 from miniworld.nodes.virtual import VirtualNode
@@ -9,16 +10,8 @@ class CentralNode(VirtualNode.VirtualNode):
     A VirtualNode whose links are quality adjusted by distance matrix.
     """
 
-    def __init__(self, network_backend_bootstrapper):
-        """
-
-        Parameters
-        ----------
-        network_backend_bootstrapper : NetworkBackendBootStrapper
-        id : int, optional (default is generated)
-        bridge_name : str
-        """
-        super(CentralNode, self).__init__(network_backend_bootstrapper)
+    def __init__(self, node: Node):
+        super(CentralNode, self).__init__(node=node)
         self.connection_type = AbstractConnection.ConnectionType.central
 
     def init_connection_info(self):

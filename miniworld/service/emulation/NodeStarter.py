@@ -1,10 +1,16 @@
 from copy import deepcopy
 from threading import Lock, Event
 
+from sqlalchemy.orm.exc import NoResultFound
+
 from miniworld.concurrency.ExceptionStopThread import ExceptionStopThread
 from miniworld.errors import Unsupported
 from miniworld.model.domain.interface import Interface
+from miniworld.model.domain.node import Node
+from miniworld.network.connection import AbstractConnection
 from miniworld.nodes.virtual.CentralNode import CentralNode
+from miniworld.service.emulation import interface
+from miniworld.service.persistence import nodes
 from miniworld.service.persistence.nodes import NodePersistenceService
 from miniworld.singletons import singletons
 from miniworld.util import ConcurrencyUtil
@@ -49,6 +55,9 @@ class NodeStarter:
         self.lock = Lock()
 
         self.thread_check_nodes_started = None
+
+        self._node_persistence_service = nodes.NodePersistenceService()
+        self._interface_service = interface.InterfaceService()
 
     #################################################
     # Thread methods
@@ -163,17 +172,27 @@ class NodeStarter:
                 self._logger.info("Network Backend has no management node")
                 return None
 
-            management_node = network_backend_bootstrapper.management_node_type(network_backend_bootstrapper)
-            management_node.start(switch=True, bridge_dev_name=singletons.config.get_bridge_tap_name())
-            # persist node
-            node_persistence_service = NodePersistenceService()
-            # TODO: management node should not have 2 interfaces
-            node_persistence_service.add(management_node)
+            # check if management node already exists
+            try:
+                return self._node_persistence_service.get(connection_type=AbstractConnection.ConnectionType.mgmt)._node
+            except NoResultFound:
+                node = Node(
+                    interfaces=self._interface_service.factory([Interface.InterfaceType.management]),
+                    type=AbstractConnection.ConnectionType.mgmt
+                )
 
-            for node in self.nodes:
-                management_node.connect_to_emu_node(singletons.network_backend, node)
+                # persist node
+                self._node_persistence_service.add(node)
 
-            return management_node
+                management_node = network_backend_bootstrapper.management_node_type(node=node)
+                management_node.start(switch=True, bridge_dev_name=singletons.config.get_bridge_tap_name())
+
+                singletons.simulation_manager.nodes_id_mapping[node._id] = management_node
+
+                for node in self.nodes:
+                    management_node.connect_to_emu_node(singletons.network_backend, node)
+
+                return management_node
 
     def _start_node(self, *args):
         """
@@ -184,27 +203,39 @@ class NodeStarter:
         EmulationNode
         """
         args = args[0]
+        node_id = args[0]  # type:int
 
-        node = singletons.network_backend_bootstrapper.emulation_node_type.factory()
-        node.start(args[1], flo_post_boot_script=args[2])
+        self._node_persistence_service = NodePersistenceService()
+
+        add_node = True
+        # if snapshot boot, do not add node again to db
+        # node can not have changed since the scenario is still the same
+        if not singletons.simulation_manager.scenario_changed:
+            if self._node_persistence_service.exists(node_id):
+                add_node = False
+
+        if add_node:
+            interfaces = deepcopy(singletons.scenario_config.get_interfaces(node_id=id))
+            # automatically add a management interface if enabled in config
+            if singletons.config.is_management_switch_enabled():
+                interfaces.append(Interface.InterfaceType.management)
+
+            assert isinstance(interfaces, list)
+            interfaces = self._interface_service.factory(interfaces)
+            node = Node(_id=node_id, interfaces=interfaces, type=AbstractConnection.ConnectionType.user)
+            self._node_persistence_service.add(node)
+        else:
+            node = self._node_persistence_service.get(node_id=node_id)._node
+
+        emulation_node = singletons.network_backend_bootstrapper.emulation_node_type(node)
+        emulation_node.start(args[1], flo_post_boot_script=args[2])
+        singletons.simulation_manager.nodes_id_mapping[node._id] = emulation_node
 
         with self.lock:
             # keep track of started nodes
-            self.nodes_running.append(node)
+            self.nodes_running.append(emulation_node)
 
-            node_persistence_service = NodePersistenceService()
-
-            add_node = True
-            # if snapshot boot, do not add node again to db
-            # node can not have changed since the scenario is still the same
-            if not singletons.simulation_manager.scenario_changed:
-                if node_persistence_service.exists(node._id):
-                    add_node = False
-
-            if add_node:
-                node_persistence_service.add(node)
-
-        return node
+        return emulation_node
 
     def nodes_not_ready(self):
         """
@@ -217,7 +248,7 @@ class NodeStarter:
         """
         all_node_ids = set(self.node_ids)
 
-        nodes_remaining = all_node_ids.difference(set(map(lambda node: node._id, self.nodes_running)))
+        nodes_remaining = all_node_ids.difference(set(map(lambda node: node._node._id, self.nodes_running)))
         # all nodes started :)
         if not nodes_remaining:
             # remember last node id

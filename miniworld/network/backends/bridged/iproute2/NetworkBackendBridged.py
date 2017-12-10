@@ -88,7 +88,7 @@ def NetworkBackendBridgedIproute2():
             self._logger.info("connection_among_servers")
 
             # TODO: destroy tunnels again!
-            tunnel_name = self.get_tunnel_name(emulation_node_x._id, emulation_node_y._id)
+            tunnel_name = self.get_tunnel_name(emulation_node_x._node._id, emulation_node_y._node._id)
             # TODO:
             # new = False
             if tunnel_name not in self.tunnels:

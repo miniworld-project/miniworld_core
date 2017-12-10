@@ -60,12 +60,12 @@ class NetworkConfiguratorSameSubnet(NetworkConfiguratorConnectionLess):
         return self.subnets[key]
 
     def configure_connection(self, emulation_node: EmulationNode):
-        assert emulation_node._id is not None
+        assert emulation_node._node._id is not None
         # dict<int, list<str>>
         commands_per_node = defaultdict(list)
         c = Counter()
 
-        normal_ifaces = self._interface_service.filter_normal_interfaces(emulation_node.network_mixin.interfaces)
+        normal_ifaces = self._interface_service.filter_normal_interfaces(emulation_node._node.interfaces)
 
         for idx, interface in enumerate(normal_ifaces):
             assert interface._id is not None
@@ -85,7 +85,7 @@ class NetworkConfiguratorSameSubnet(NetworkConfiguratorConnectionLess):
                 # TODO: this works only for situations where all nodes have the same number of interfaces!
                 cnt_type_ifaces = c[interface.class_id]
                 assert cnt_type_ifaces >= 1
-                offset = (emulation_node._id + 1)
+                offset = (emulation_node._node._id + 1)
                 ip_addr = self.get_ip(subnet, offset=offset - 1)
             netmask = subnet.netmask
 
@@ -157,4 +157,4 @@ class NetworkConfiguratorSameSubnet(NetworkConfiguratorConnectionLess):
     ################################################
 
     def get_key_ip_dict(self, emulation_node, interface):
-        return emulation_node._id, interface._id
+        return emulation_node._node._id, interface._id

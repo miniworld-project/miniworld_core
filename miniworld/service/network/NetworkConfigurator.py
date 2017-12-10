@@ -110,16 +110,16 @@ class NetworkConfigurator:
         # run over EmulationNode s and set up the network
         with ConcurrencyUtil.network_provision_parallel() as executor:
 
-            for emu_node, commands in sorted(commands_per_emulation_node.items()):
+            for emu_node, commands in sorted(commands_per_emulation_node.items(), key=lambda x: x[0]._node._id):
                 commands = '\n'.join(commands)
 
                 def _exec(emu_node, commands):
                     if commands:
-                        self._logger.debug("network config for node: %s:\n%s", emu_node._id, commands)
+                        self._logger.debug("network config for node: %s:\n%s", emu_node._node._id, commands)
                         emu_node.virtualization_layer.run_commands_eager_check_ret_val(StringIO(commands))
 
                     # notify EventSystem
-                    ev.update([emu_node._id], 1.0, add=True)
+                    ev.update([emu_node._node._id], 1.0, add=True)
 
                 future = executor.submit(_exec, emu_node, commands)
                 results.append(future)

@@ -1,48 +1,33 @@
-from functools import total_ordering
 from io import StringIO
 
-from miniworld.model.StartableObject import ScenarioState
-from miniworld.model.base import Base
-from miniworld.network.connection import AbstractConnection
+from miniworld.model.domain.interface import Interface
+from miniworld.model.domain.node import Node
+from miniworld.nodes import AbstractNode
 from miniworld.service.emulation.interface import InterfaceService
+from miniworld.service.provisioning.CommandRunner import REPLUnexpectedResult
 from miniworld.singletons import singletons
+from miniworld.util import NetUtil
 
 __author__ = 'Nils Schmidt'
 
 
-# TODO: REMOVE
-# CMD_TEMPLATE_DISABLE_IPTABLES = """
-# iptables -F
-# iptables -X
-# iptables -t nat -F
-# iptables -t nat -X
-# iptables -t mangle -F
-# iptables -t mangle -X
-# iptables -P INPUT ACCEPT
-# iptables -P FORWARD ACCEPT
-# iptables -P OUTPUT ACCEPT
-# """
+def get_cmd_rename_mgmt_interface():
+    # TODO: #63: generic solution? works only if image has iproute2 installed :/
+    CMD_RENAME_MANAGEMENT_INTERFACE = """
+# name management interface
+last_eth=$(ls -1 /sys/class/net/|grep {iface_prefix}|tail -n 1)
+ip link set name {mgmt_iface} $last_eth
+ifconfig {mgmt_iface} up
+""".format(mgmt_iface=singletons.config.get_bridge_tap_name(),
+           iface_prefix=singletons.scenario_config.get_network_links_nic_prefix())
+
+    return CMD_RENAME_MANAGEMENT_INTERFACE
 
 
-# TODO: #54,#55: adjust doc
-@total_ordering
-@Base.id_provider
-class EmulationNode(Base, ScenarioState):
+class EmulationNode(AbstractNode):
     """ Models a node in a mesh network.
 
     A node consists of a QEMU instance running e.g. an OpenWRT image.
-
-    Attributes
-    ----------
-    nlog
-        Specific node logger object.
-    id: int
-        ID of the node.
-    virtualization_layer : VirtulizationLayer
-        The node within a specific virtualization layer.
-    network_mixin : EmulationNodeNetworkBackend
-    network_backend_bootstrapper : NetworkBackendBootStrapper
-    network_mixin : NetworkMixin, optional (default is taken :py:class:`.NetworkBackendBootStrapper`
     """
 
     #############################################################
@@ -62,60 +47,25 @@ class EmulationNode(Base, ScenarioState):
     # Magic and private methods
     #############################################################
 
-    def __init__(self, network_backend_bootstrapper, interfaces, network_mixin=None, connections=None, connection_type=None):
-        if connection_type is None:
-            connection_type = AbstractConnection.ConnectionType.user
-
-        Base.__init__(self)
-        ScenarioState.__init__(self)
+    def __init__(self, node: Node):
+        super().__init__(node=node)
 
         self._interface_service = InterfaceService()
-        self.name = None
         self._logger = singletons.logger_factory.get_logger(self)
 
-        self.network_backend_bootstrapper = network_backend_bootstrapper
-
-        if network_mixin is None:
-            network_mixin_type = network_backend_bootstrapper.emulation_node_network_backend_type
-            self.network_mixin = network_mixin_type(network_backend_bootstrapper, self._id, interfaces=interfaces,
-                                                    management_switch=singletons.config.is_management_switch_enabled())
-        else:
-            self.network_mixin = network_mixin
+        self.network_backend_bootstrapper = singletons.network_backend_bootstrapper
 
         # create extra node logger
-        self.nlog = singletons.logger_factory.get_node_logger(self._id)
-
+        self.nlog = singletons.logger_factory.get_node_logger(self._node._id)
         # qemu instance, prevent cyclic import
-        self.virtualization_layer = network_backend_bootstrapper.virtualization_layer_type(self._id, self)
-
-        self.connection_type = connection_type
-        self.connections = connections
-
-    @property
-    def name(self):
-        return str(self._id)
-
-    @name.setter
-    def name(self, name):
-        self._name = name
-
-    def __eq__(self, other):
-        if not isinstance(other, self.__class__):
-            return False
-        return self.name == other.name
-
-    def __lt__(self, other):
-        return self._id < other._id
-
-    def __str__(self):
-        return str(self.name)
+        self.virtualization_layer = self.network_backend_bootstrapper.virtualization_layer_type(self._node._id, self)
 
     def __repr__(self):
-        return str(self)
+        return repr(self._node._id)
         # return '%s(%s, %s)' % (self.__class__.__name__, self._id, self.network_mixin)
 
     def __hash__(self):
-        return hash(self.name)
+        return hash(self._node._id)
 
     # TODO: adjust DOC
     def _start(self, *args, **kwargs):
@@ -137,8 +87,6 @@ class EmulationNode(Base, ScenarioState):
         if flo_post_boot_script is not None:
             del kwargs["flo_post_boot_script"]
 
-        self.network_mixin.start()
-
         es = singletons.event_system
 
         # start and wait for switches
@@ -150,7 +98,7 @@ class EmulationNode(Base, ScenarioState):
         self.nlog.info("node running ...")
 
         # notify EventSystem even if there are no commands
-        with es.event_no_init(es.EVENT_VM_SHELL_PRE_NETWORK_COMMANDS, finish_ids=[self._id]):
+        with es.event_no_init(es.EVENT_VM_SHELL_PRE_NETWORK_COMMANDS, finish_ids=[self._node._id]):
             # do this immediately after the node has been started
             self.run_pre_network_shell_commands(flo_post_boot_script)
 
@@ -194,20 +142,47 @@ class EmulationNode(Base, ScenarioState):
         # TODO: use node_id everywhere possible for singletons.scenario_config.*()
         # # notify EventSystem even if there are no commands
         es = singletons.event_system
-        with es.event_no_init(es.EVENT_VM_SHELL_POST_NETWORK_COMMANDS, finish_ids=[self._id]):
-            commands = singletons.scenario_config.get_all_shell_commands_post_network_start(node_id=self._id)
+        with es.event_no_init(es.EVENT_VM_SHELL_POST_NETWORK_COMMANDS, finish_ids=[self._node._id]):
+            commands = singletons.scenario_config.get_all_shell_commands_post_network_start(node_id=self._node._id)
             if commands:
                 self.virtualization_layer.run_commands_eager(StringIO(commands))
 
             self.nlog.info("post_network_shell_commands done")
 
     #############################################################
-    # Notify NetworkBackend
+    # EmulationNode notifications
     #############################################################
 
-    # TODO: create interface
+    # TODO: DOC
     def after_pre_shell_commands(self):
-        self.network_mixin.after_pre_shell_commands(self)
+        pass
 
     def do_network_config_after_pre_shell_commands(self):
-        self.network_mixin.do_network_config_after_pre_shell_commands(self)
+        # Rename Management Interface and set ip
+        if singletons.config.is_management_switch_enabled():
+            self.virtualization_layer.run_commands_eager(StringIO(get_cmd_rename_mgmt_interface()))
+            self.nic_mgmt_ipv4_config()
+
+        self.nic_ipv4_config()
+
+    #########################################
+    # Network Config
+    #########################################
+
+    def _nic_mgmt_ipv4_config(self):
+        for _if in [interface for interface in self._node.interfaces if interface.name == Interface.InterfaceType.management.value]:
+            ip = self._interface_service.get_ip(node_id=self._node._id, interface=_if)
+            _if.ipv4 = str(ip)
+            netmask = self._interface_service.get_netmask(interface=_if)
+            # TODO: #63: we dont know if renaming worked, therefore try to rename both ethX and mgmt
+            cmd_ip_change = NetUtil.get_ip_addr_change_cmd(singletons.config.get_bridge_tap_name(), ip, netmask)
+            try:
+                self.virtualization_layer.run_commands_eager_check_ret_val(StringIO(cmd_ip_change))
+            except REPLUnexpectedResult:
+                self._logger.error('could not set ip on management interface {}'.format(singletons.config.get_bridge_tap_name()))
+
+    def nic_ipv4_config(self):
+        pass
+
+    def nic_mgmt_ipv4_config(self):
+        self._nic_mgmt_ipv4_config()

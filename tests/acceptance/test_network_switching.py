@@ -79,6 +79,17 @@ def _create_scenarios(connection_mode):
         yield partial(fun, connection_mode, execution_mode), '{}_{}'.format(connection_mode, execution_mode)
 
 
+@pytest.fixture
+def topologies() -> List[Dict[int, Iterable[int]]]:
+    return [
+        {0: {1}, 1: {2}, 2: {3}, 3: {4}},
+        {0: {1, 2, 3, 4}, 1: {2, 3, 4}, 2: {3, 4}, 3: {4}},
+        {0: {1, 4}, 1: {2}, 2: {3}, 3: {4}, 4: {0}},
+        {0: {1, 2, 3, 4}},
+        {0: {1, 2, 3, 4}, 1: {2, 4}, 2: {3}, 3: {4}, 4: {1}},
+    ]
+
+
 @pytest.mark.parametrize('scenario_fun',
                          **dict(zip(['argvalues', 'ids'], zip(*_create_scenarios(Scenario.CONNECTION_MODE_SINGLE)))))
 def test_network_switching_bridged_backends_single(scenario_fun, snapshot_runner, image_path, request,
@@ -114,84 +125,6 @@ def test_network_switching_bridged_backends_single(scenario_fun, snapshot_runner
     for i in range(len(scenario['network']['core']['topologies'])):
         snapshot_runner.step()
         check_topology(topologies[i])
-    brctl_output_after = subprocess.check_call(['brctl', 'show'])
-    ebtables_after = subprocess.check_call(['ebtables', '-L'])
-    # check cleanup done correctly
-    assert brctl_output_before == brctl_output_after, 'network backend cleanup not working'
-    assert ebtables_before == ebtables_after, 'network backend cleanup not working'
-
-
-@pytest.mark.parametrize('scenario_fun',
-                         **dict(zip(['argvalues', 'ids'], zip(*_create_scenarios(Scenario.CONNECTION_MODE_MULTI)))))
-def test_network_switching_bridged_backends_multi(scenario_fun, snapshot_runner, image_path, request,
-                                                  core_topologies_dir):
-    _test_network_switch_bridged_backends(core_topologies_dir, image_path, request, snapshot_runner, scenario_fun)
-
-
-@pytest.fixture
-def topologies() -> List[Dict[int, Iterable[int]]]:
-    return [
-        {0: {1}, 1: {2}, 2: {3}, 3: {4}},
-        {0: {1, 2, 3, 4}, 1: {2, 3, 4}, 2: {3, 4}, 3: {4}},
-        {0: {1, 4}, 1: {2}, 2: {3}, 3: {4}, 4: {0}},
-        {0: {1, 2, 3, 4}},
-        {0: {1, 2, 3, 4}, 1: {2, 4}, 2: {3}, 3: {4}, 4: {1}},
-    ]
-
-
-def _test_network_switch_bridged_backends(core_topologies_dir, image_path, request, runner, scenario_fun):
-    """
-    0>>>  ifconfig eth0 10.0.0.1 netmask 255.255.0.0 up ; echo -n exit code:$?
-
-    1>>>  ifconfig eth0 10.0.0.2 netmask 255.255.0.0 up ; echo -n exit code:$?
-    1>>>  ifconfig eth1 10.1.0.1 netmask 255.255.0.0 up ; echo -n exit code:$?
-
-    2>>>  ifconfig eth0 10.1.0.2 netmask 255.255.0.0 up ; echo -n exit code:$?
-    2>>>  ifconfig eth1 10.2.0.1 netmask 255.255.0.0 up ; echo -n exit code:$?
-
-    3>>>  ifconfig eth0 10.2.0.2 netmask 255.255.0.0 up ; echo -n exit code:$?
-    3>>>  ifconfig eth1 10.3.0.1 netmask 255.255.0.0 up ; echo -n exit code:$?
-
-    4>>>  ifconfig eth0 10.3.0.2 netmask 255.255.0.0 up ; echo -n exit code:$?
-    """
-    checks = [
-        {
-            0: [
-                '10.0.0.2'
-            ],
-            1: [
-                '10.1.0.2'
-            ],
-            2: [
-                '10.2.0.2'
-            ],
-            3: [
-                '10.3.0.2'
-            ]
-        }
-    ]
-
-    def check(x: int, ip: str):
-        cmd = 'exec -v --node-id {x} "ping -c 1 {ip}"'.format(x=x, ip=ip)
-        runner.run_mwcli_command(shlex.split(cmd))
-
-    scenario = scenario_fun(image_path, request, core_topologies_dir)
-    connection_mode = scenario['network']['backend']['connection_mode']
-    if connection_mode not in runner.connection_modes:
-        force_snapshot_boot = False
-        runner.connection_modes.add(connection_mode)
-    else:
-        force_snapshot_boot = True
-
-    brctl_output_before = subprocess.check_call(['brctl', 'show'])
-    ebtables_before = subprocess.check_call(['ebtables', '-L'])
-    runner.start_scenario(scenario, force_snapshot_boot=force_snapshot_boot)
-    for i in range(len(scenario['network']['core']['topologies'])):
-        runner.step()
-        if i == 0:
-            for x, ips in checks[0].items():
-                for ip in ips:
-                    check(x, ip)
     brctl_output_after = subprocess.check_call(['brctl', 'show'])
     ebtables_after = subprocess.check_call(['ebtables', '-L'])
     # check cleanup done correctly

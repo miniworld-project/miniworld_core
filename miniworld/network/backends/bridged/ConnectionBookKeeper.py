@@ -68,8 +68,8 @@ class ConnectionBookKeeper(ResetableInterface):
         dynamic by hotplugging new tap devices into the nodes.
         """
 
-        tap_x = singletons.network_backend.get_tap_name(emulation_node_x._id, interface_x)
-        tap_y = singletons.network_backend.get_tap_name(emulation_node_y._id, interface_y)
+        tap_x = singletons.network_backend.get_tap_name(emulation_node_x._node._id, interface_x)
+        tap_y = singletons.network_backend.get_tap_name(emulation_node_y._node._id, interface_y)
 
         # do not connect multiple times
         # NOTE: needed because otherwise the code would connect all interfaces of a node with all interfaces of any other node
@@ -94,8 +94,8 @@ class ConnectionBookKeeper(ResetableInterface):
         Returns
         -------
         """
-        tap_x = singletons.network_backend.get_tap_name(emulation_node_x._id, interface_x)
-        tap_y = singletons.network_backend.get_tap_name(emulation_node_y._id, interface_y)
+        tap_x = singletons.network_backend.get_tap_name(emulation_node_x._node._id, interface_x)
+        tap_y = singletons.network_backend.get_tap_name(emulation_node_y._node._id, interface_y)
 
         self.interface_states.add_device(tap_x)
         self.interface_states.add_device(tap_y)

@@ -26,8 +26,8 @@ class ConnectionPersistenceService:
             if not conn:
                 db_connection.id = 0
             session.add(db_connection)
-        if is_domain:
-            connection._id = db_connection.id
+            if is_domain:
+                connection._id = db_connection.id
 
     def get(self, **kwargs) -> DomainConnection:
         with singletons.db_session.session_scope() as session:

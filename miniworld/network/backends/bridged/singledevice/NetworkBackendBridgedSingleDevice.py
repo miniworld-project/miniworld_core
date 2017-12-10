@@ -146,8 +146,8 @@ def NetworkBackendBridgedSingleDevice():
 
             is_one_tap_mode = connection_info.is_one_tap_mode
             if not is_one_tap_mode:
-                tap_x = self.get_tap_name(emulation_node_x._id, interface_x)
-                tap_y = self.get_tap_name(emulation_node_y._id, interface_y)
+                tap_x = self.get_tap_name(emulation_node_x._node._id, interface_x)
+                tap_y = self.get_tap_name(emulation_node_y._node._id, interface_y)
 
                 # TODO: #84: check which devices are already added to the bridge ...
                 # add devices to bridge
@@ -165,7 +165,7 @@ def NetworkBackendBridgedSingleDevice():
                 tap_dev_name = None
                 if connection_info.is_remote_conn:
 
-                    tunnel_dev_name = self.get_tunnel_name(emulation_node_x._id, emulation_node_y._id)
+                    tunnel_dev_name = self.get_tunnel_name(emulation_node_x._node._id, emulation_node_y._node._id)
                     # add the tunnel to the bridge
                     bridge.add_if(tunnel_dev_name, if_up=True)
                     remote_node, if_remote_node, local_emu_node, if_local_emu_node = singletons.simulation_manager._get_remote_node(
@@ -174,7 +174,7 @@ def NetworkBackendBridgedSingleDevice():
                     tap_dev_name = self.get_tap_name(local_emu_node._id, if_local_emu_node)
                 else:
                     emu_node, emu_if = connections.filter_real_emulation_nodes()[0]
-                    tap_dev_name = self.get_tap_name(emu_node._id, emu_if)
+                    tap_dev_name = self.get_tap_name(emu_node._node._id, emu_if)
                     bridge = virtual_node.switch
 
                 # add the tap device to the bridge

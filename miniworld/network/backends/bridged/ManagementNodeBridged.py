@@ -1,3 +1,4 @@
+from miniworld.model.domain.node import Node
 from miniworld.singletons import singletons
 from miniworld.model import ResetableInterface
 from miniworld.nodes.virtual import ManagementNode
@@ -10,8 +11,8 @@ class ManagementNodeBridged(ManagementNode.ManagementNode, ResetableInterface.Re
     No link quality adjustment is done. This is intended for management stuff.
     """
 
-    def __init__(self, network_backend_bootstrapper):
-        ManagementNode.ManagementNode.__init__(self, network_backend_bootstrapper)
+    def __init__(self, node: Node):
+        ManagementNode.ManagementNode.__init__(self, node=node)
 
     def _start(self, switch=True, bridge_dev_name=None):
         # TODO: DOC, NetlinkError: (34, 'Numerical result out of range')

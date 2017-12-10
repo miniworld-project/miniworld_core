@@ -15,6 +15,7 @@ from miniworld.nodes.REPLable import REPLable
 from miniworld.nodes.VirtualizationLayer import VirtualizationLayer
 from miniworld.nodes.qemu.QemuMonitorRepl import QemuMonitorRepl
 from miniworld.service.emulation.interface import InterfaceService
+from miniworld.service.persistence.interfaces import InterfacePersistenceService
 from miniworld.service.provisioning import TemplateEngine
 from miniworld.service.provisioning.SocketExpect import SocketExpect
 from miniworld.service.shell.shell import run_shell
@@ -133,6 +134,7 @@ class Qemu(VirtualizationLayer, ShellProcess, REPLable):
         VirtualizationLayer.__init__(self, id, emulation_node)
 
         self._interface_service = InterfaceService()
+        self._interface_persistence_service = InterfacePersistenceService()
         self.emulation_node = emulation_node
 
         # log file for qemu boot
@@ -566,7 +568,7 @@ class Qemu(VirtualizationLayer, ShellProcess, REPLable):
         """
         interface_service = InterfaceService()
         return ['%s%s' % (singletons.scenario_config.get_network_links_nic_prefix(), iface_idx) for iface_idx in
-                range(len(interface_service.filter_normal_interfaces(self.emulation_node.network_mixin.interfaces)))]
+                range(len(interface_service.filter_normal_interfaces(self.emulation_node._node.interfaces)))]
         # res = self.run_commands_eager_check_ret_val(
         #     StringIO("ls /sys/class/net/|grep {iface_prefix}".format(iface_prefix=singletons.scenario_config.get_network_links_nic_prefix())))
         # return res.split("\n")[2:][0].split(" ")

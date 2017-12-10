@@ -16,7 +16,6 @@ __author__ = 'Nils Schmidt'
 def get_superclass_dynamic():
     assert singletons.scenario_config.is_network_backend_bridged_connection_mode_set()
 
-    import miniworld.network.backends.bridged.multidevice.ConnectionMultiBridges
     import miniworld.network.backends.bridged.singledevice.ConnectionEbtables
 
     return miniworld.network.backends.bridged.singledevice.ConnectionEbtables.ConnectionEbtables() if singletons.scenario_config.is_network_backend_bridged_connection_mode_single() else miniworld.network.backends.bridged.multidevice.ConnectionMultiBridges.ConnectionMultiBridges()
@@ -93,8 +92,8 @@ def ConnectionDummy():
                     self._shape_device(tap_dev_name, connection_id, link_quality_dict)
                 else:
                     # get tap device names
-                    tap_x = singletons.network_backend.get_tap_name(connection.emulation_node_x._id, connection.interface_x)
-                    tap_y = singletons.network_backend.get_tap_name(connection.emulation_node_y._id, connection.interface_y)
+                    tap_x = singletons.network_backend.get_tap_name(connection.emulation_node_x._node._id, connection.interface_x)
+                    tap_y = singletons.network_backend.get_tap_name(connection.emulation_node_y._node._id, connection.interface_y)
 
                     # traffic shape downlinks
                     # because each device is connected to a linux bridge,
@@ -230,8 +229,8 @@ def ConnectionDummy():
                 self.tap_link_up_remote(tap_local, tunnel_dev_name, up=up)
             else:
                 # get tap device names
-                tap_x = singletons.network_backend.get_tap_name(connection.emulation_node_x._id, connection.interface_x)
-                tap_y = singletons.network_backend.get_tap_name(connection.emulation_node_y._id, connection.interface_y)
+                tap_x = singletons.network_backend.get_tap_name(connection.emulation_node_x._node._id, connection.interface_x)
+                tap_y = singletons.network_backend.get_tap_name(connection.emulation_node_y._node._id, connection.interface_y)
 
                 self.tap_link_up(connection, tap_x, tap_y, up=up)
                 self.tap_link_up(connection, tap_y, tap_x, up=up)

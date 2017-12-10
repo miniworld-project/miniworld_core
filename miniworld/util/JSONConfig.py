@@ -1,12 +1,11 @@
 """
 Utility functions and class to use json as config file format.
 """
+import collections
 import json
 import re
 from collections import UserDict
 from functools import wraps
-
-import collections
 
 from miniworld.errors import ConfigError, ConfigNotSet, ConfigMalformed, ConfigOptionNotSupported
 from miniworld.util.Nothing import nothing
