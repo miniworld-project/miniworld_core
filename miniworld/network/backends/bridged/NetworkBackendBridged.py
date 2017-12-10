@@ -9,7 +9,6 @@ from ordered_set import OrderedSet
 from miniworld.concurrency.serialization.ShellCommandSerializer import ShellCommandSerializer
 from miniworld.model.ResetableInterface import ResetableInterface
 from miniworld.network.backends import NetworkBackend
-from miniworld.network.backends.bridged.ConnectionBookKeeper import ConnectionBookKeeper
 from miniworld.network.backends.bridged.iproute2 import Constants
 from miniworld.singletons import singletons
 from miniworld.util import PathUtil
@@ -128,9 +127,6 @@ def NetworkBackendBridgedDummy():
             self.event_monitor = EventMonitor()
 
             self.reset_shell_command_executor()
-
-            # reset
-            self.connection_book_keeper = ConnectionBookKeeper()
 
             # TODO: delete tunnels!
 
