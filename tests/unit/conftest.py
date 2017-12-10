@@ -106,8 +106,8 @@ def mock_connections(mock_nodes, mock_persistence, monkeypatch) -> List[Abstract
             'bandwidth': 500,
             'loss': 0.5
         }
-        interface1 = node1.interfaces[0]
-        interface2 = node2.interfaces[0]
+        interface1 = node1._node.interfaces[0]
+        interface2 = node2._node.interfaces[0]
         conn = Connection(
             _id=idx,
             emulation_node_x=node1,
