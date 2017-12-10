@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy.orm.exc import NoResultFound
 
 from miniworld.model.domain.interface import Interface
-from miniworld.nodes.EmulationNode import EmulationNode
+from miniworld.nodes.EmulationService import EmulationService
 from miniworld.service.persistence.connections import ConnectionPersistenceService
 
 
@@ -45,7 +45,7 @@ class TestConnectionPersistenceService:
     def test_all(self, connections, service: ConnectionPersistenceService):
         res = service.all()
         connection = res[0]
-        assert isinstance(connection.emulation_node_x, EmulationNode)
-        assert isinstance(connection.emulation_node_y, EmulationNode)
+        assert isinstance(connection.emulation_node_x, EmulationService)
+        assert isinstance(connection.emulation_node_y, EmulationService)
         assert isinstance(connection.interface_x, Interface)
         assert isinstance(connection.interface_y, Interface)

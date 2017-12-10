@@ -6,7 +6,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from miniworld import singletons
 from miniworld.api import DictScalar
-from miniworld.nodes.EmulationNode import EmulationNode as DomainEmulationNode
+from miniworld.nodes.EmulationService import EmulationService as DomainEmulationNode
 from miniworld.model.domain.connection import Connection as DomainConnection
 from miniworld.model.domain.interface import Interface as InterfaceModel
 from miniworld.service.persistence import connections

@@ -1,10 +1,10 @@
 from subprocess import CalledProcessError
 
-from miniworld.nodes import EmulationNode
+from miniworld.nodes import EmulationService
 from miniworld.singletons import singletons
 
 
-class EmulationNodeBridged(EmulationNode.EmulationNode):
+class EmulationNodeBridged(EmulationService.EmulationService):
 
     def do_network_config_after_pre_shell_commands(self):
         super(EmulationNodeBridged, self).do_network_config_after_pre_shell_commands()

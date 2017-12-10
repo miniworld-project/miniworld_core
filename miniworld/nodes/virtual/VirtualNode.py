@@ -40,7 +40,7 @@ class VirtualNode(AbstractNode):
         for switch in self.switches.values():
             switch.start(*args, **kwargs)
 
-    def _start(self, bridge_dev_name=None, switch=None):
+    def start(self, bridge_dev_name=None, switch=None):
         """
 
         Parameters

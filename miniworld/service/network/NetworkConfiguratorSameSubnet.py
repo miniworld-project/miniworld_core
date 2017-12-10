@@ -1,7 +1,7 @@
 from collections import defaultdict, OrderedDict, Counter
 
 from miniworld.network.connection import AbstractConnection
-from miniworld.nodes.EmulationNode import EmulationNode
+from miniworld.nodes.EmulationService import EmulationService
 from miniworld.nodes.EmulationNodes import EmulationNodes
 from miniworld.service.network.NetworkConfigurator import NetworkConfigurator, \
     NoMoreSubnetsAvailable, SubnetNoMoreIps
@@ -59,7 +59,7 @@ class NetworkConfiguratorSameSubnet(NetworkConfiguratorConnectionLess):
                 raise NoMoreSubnetsAvailable("All /%s subnets from base network: %s used!" % (self.prefixlen, self.base_network_cidr))
         return self.subnets[key]
 
-    def configure_connection(self, emulation_node: EmulationNode):
+    def configure_connection(self, emulation_node: EmulationService):
         assert emulation_node._node._id is not None
         # dict<int, list<str>>
         commands_per_node = defaultdict(list)

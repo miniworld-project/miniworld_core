@@ -24,7 +24,7 @@ ifconfig {mgmt_iface} up
     return CMD_RENAME_MANAGEMENT_INTERFACE
 
 
-class EmulationNode(AbstractNode):
+class EmulationService(AbstractNode):
     """ Models a node in a mesh network.
 
     A node consists of a QEMU instance running e.g. an OpenWRT image.
@@ -43,11 +43,11 @@ class EmulationNode(AbstractNode):
         self.network_backend_bootstrapper = singletons.network_backend_bootstrapper
 
         # create extra node logger
-        self.nlog = singletons.logger_factory.get_node_logger(self._node._id)
+        self.nlog = singletons.logger_factory.get_node_logger(node._id)
         # qemu instance, prevent cyclic import
         self.virtualization_layer = self.network_backend_bootstrapper.virtualization_layer_type(self._node._id, self)
 
-    def _start(self, *args, **kwargs):
+    def start(self, *args, **kwargs):
         """
         Starting a node involves the following steps:
 
@@ -63,6 +63,8 @@ class EmulationNode(AbstractNode):
         """
 
         flo_post_boot_script = kwargs.get("flo_post_boot_script")
+        # node = kwargs['node']  # type: Node
+        # self.nlog = singletons.logger_factory.get_node_logger(node._id)
         if flo_post_boot_script is not None:
             del kwargs["flo_post_boot_script"]
 

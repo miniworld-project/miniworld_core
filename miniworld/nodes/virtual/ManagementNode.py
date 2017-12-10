@@ -17,8 +17,8 @@ class ManagementNode(VirtualNode):
         super(ManagementNode, self).__init__(node=node)
         self.connection_type = AbstractConnection.ConnectionType.mgmt
 
-    def _start(self, switch=True, bridge_dev_name=None):
-        super(ManagementNode, self)._start(switch=switch, bridge_dev_name=bridge_dev_name)
+    def start(self, switch=True, bridge_dev_name=None):
+        super(ManagementNode, self).start(switch=switch, bridge_dev_name=bridge_dev_name)
 
     def init_connection_info(self):
         """
