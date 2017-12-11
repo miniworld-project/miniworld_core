@@ -13,7 +13,7 @@ class ManagementNode(VirtualNode):
     No link quality adjustment is done. This is intended for management stuff.
     """
 
-    def __init__(self, node: Node):
+    def __init__(self, node: Node=None):
         super(ManagementNode, self).__init__(node=node)
         self.connection_type = AbstractConnection.ConnectionType.mgmt
 

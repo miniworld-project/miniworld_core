@@ -48,7 +48,7 @@ class QemuMonitorRepl(REPLable):
         self.qemu = qemu
 
         # create extra node logger
-        self.id = self.qemu.id
+        self.id = self.qemu.node._id
         self.nlog = singletons.logger_factory.get_node_logger(self.id)
 
         ################################

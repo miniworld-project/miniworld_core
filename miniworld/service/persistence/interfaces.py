@@ -1,13 +1,10 @@
 from miniworld.model.db.base import Interface
 from miniworld.model.domain.interface import Interface as DomainInterface
 from miniworld.network.connection import AbstractConnection
-from miniworld.service.persistence.nodes import NodePersistenceService
 from miniworld.singletons import singletons
 
 
 class InterfacePersistenceService:
-    def __init__(self):
-        self._node_persistence_service = NodePersistenceService()
 
     @staticmethod
     def to_domain(interface: Interface) -> DomainInterface:

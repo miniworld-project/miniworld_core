@@ -5,7 +5,7 @@ from miniworld.singletons import singletons
 
 
 class AbstractNode(Base, ScenarioStateReset):
-    def __init__(self, node: Node):
+    def __init__(self, node: Node = None):
         Base.__init__(self)
         ScenarioStateReset.__init__(self)
 

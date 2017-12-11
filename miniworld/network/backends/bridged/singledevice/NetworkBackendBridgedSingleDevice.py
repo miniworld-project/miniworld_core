@@ -120,29 +120,35 @@ def NetworkBackendBridgedSingleDevice():
             # afterwards use ebtables for connection filtering on layer 2
             connection_type = self.network_backend_bootstrapper.connection_type
             connection_service = self.network_backend_bootstrapper.connection_service
+            connections = Connections([(emulation_node_x, interface_x), (emulation_node_y, interface_y)])
 
-            # TODO: DOC
-            br_name = self.get_br_name(interface_x.nr_host_interface)
-            if not self.bridges.get(br_name, None):
-                self._logger.info("creating bridge %s", br_name)
-                bridge = self.bridges[br_name] = self.network_backend_bootstrapper.switch_type(br_name, interface_x)
-                # create extra chain for bridge
-                self.add_shell_ebtables_command(self.EVENT_EBTABLES_CREATE_CHAINS,
-                                                connection_service.get_ebtables_chain_cmd(br_name,
-                                                                                          connection_service.policy_drop))
-                # redirect to new chain
-                self.add_shell_ebtables_command(self.EVENT_EBTABLES_REDIRECT,
-                                                connection_service.get_ebtables_redirect_cmd(br_name))
-
-                bridge.start(switch=False, bridge_dev_name=br_name)
+            if connection_info.connection_type in [AbstractConnection.ConnectionType.central, AbstractConnection.ConnectionType.mgmt]:
+                virtual_node, _if = None, None
+                if connection_info.connection_type == AbstractConnection.ConnectionType.central:
+                    virtual_node, _if = connections.filter_central_nodes()[0]
+                elif connection_info.connection_type == AbstractConnection.ConnectionType.mgmt:
+                    virtual_node, _if = connections.filter_mgmt_nodes()[0]
+                bridge = self.network_backend_bootstrapper.switch_type(virtual_node._id, _if)
+                bridge.start(switch=True, bridge_dev_name=singletons.config.get_bridge_tap_name())
             else:
-                bridge = self.get_bridge(interface_x)
+                br_name = self.get_br_name(interface_x.nr_host_interface)
+                if not self.bridges.get(br_name, None):
+                    self._logger.info("creating bridge %s", br_name)
+                    bridge = self.bridges[br_name] = self.network_backend_bootstrapper.switch_type(br_name, interface_x)
+                    # create extra chain for bridge
+                    self.add_shell_ebtables_command(self.EVENT_EBTABLES_CREATE_CHAINS,
+                                                    connection_service.get_ebtables_chain_cmd(br_name,
+                                                                                              connection_service.policy_drop))
+                    # redirect to new chain
+                    self.add_shell_ebtables_command(self.EVENT_EBTABLES_REDIRECT,
+                                                    connection_service.get_ebtables_redirect_cmd(br_name))
+
+                    bridge.start(switch=False, bridge_dev_name=br_name)
+                else:
+                    bridge = self.get_bridge(interface_x)
 
             connection = connection_type.from_connection_info(emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info)
             connection_service.start(connection=connection)
-
-            # TODO: #84: improve
-            connections = Connections([(emulation_node_x, interface_x), (emulation_node_y, interface_y)])
 
             is_one_tap_mode = connection_info.is_one_tap_mode
             if not is_one_tap_mode:
@@ -156,13 +162,6 @@ def NetworkBackendBridgedSingleDevice():
 
             # TODO: nearly same code as in NetworkBackendBridgedMultiDevice!
             else:
-                virtual_node, _if = None, None
-                if connection_info.connection_type == AbstractConnection.ConnectionType.central:
-                    virtual_node, _if = connections.filter_central_nodes()[0]
-                elif connection_info.connection_type == AbstractConnection.ConnectionType.mgmt:
-                    virtual_node, _if = connections.filter_mgmt_nodes()[0]
-
-                tap_dev_name = None
                 if connection_info.is_remote_conn:
 
                     tunnel_dev_name = self.get_tunnel_name(emulation_node_x._node._id, emulation_node_y._node._id)
@@ -174,8 +173,7 @@ def NetworkBackendBridgedSingleDevice():
                     tap_dev_name = self.get_tap_name(local_emu_node._id, if_local_emu_node)
                 else:
                     emu_node, emu_if = connections.filter_real_emulation_nodes()[0]
-                    tap_dev_name = self.get_tap_name(emu_node._node._id, emu_if)
-                    bridge = virtual_node.switch
+                    tap_dev_name = self.get_tap_name(emu_node._id, emu_if)
 
                 # add the tap device to the bridge
                 bridge.add_if(tap_dev_name, if_up=True)

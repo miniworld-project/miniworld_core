@@ -17,7 +17,6 @@ class NetworkBackendBootStrapper:
         Only use the central mode if the backend provides a class for it.
     management_node_type : type
         Only use the management mode if the backend provides a class for it.
-    virtual_node_network_backend_type : type
     tunnel_type : type
     """
 
@@ -42,11 +41,12 @@ class NetworkBackendBootStrapper:
         # domain models
         self.connection_type = connection_type
         self.switch_type = switch_type
-        self.emulation_node_type = emulation_node_type
+        # self.emulation_node_type = emulation_node_type
         self.tunnel_type = tunnel_type
 
         # domain service (singleton until the scenario changes)
         self.connection_service = connection_service()
+        self.emulation_service = emulation_node_type()
 
         self.network_configurator_type = network_configurator_type
         self.virtualization_layer_type = virtualization_layer_type

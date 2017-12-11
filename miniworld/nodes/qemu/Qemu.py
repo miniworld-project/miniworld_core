@@ -11,6 +11,8 @@ from os.path import splitext
 
 from miniworld.errors import QemuBootWaitTimeout
 from miniworld.model.ShellProcess import ShellProcess
+from miniworld.model.domain.interface import Interface
+from miniworld.model.domain.node import Node
 from miniworld.nodes.REPLable import REPLable
 from miniworld.nodes.VirtualizationLayer import VirtualizationLayer
 from miniworld.nodes.qemu.QemuMonitorRepl import QemuMonitorRepl
@@ -35,6 +37,24 @@ qemu-img create
     -f qcow2
     "{overlay_image_path}"
 """
+
+
+def get_cmd_template_qemu_nic():
+    """
+
+    Returns
+    -------
+
+    See Also
+    --------
+    http://www.linux-kvm.org/page/10G_NIC_performance:_VFIO_vs_virtio
+    """
+    # # TODO: #54,#55: check what vlan means for qemu
+    CMD_TEMPLATE_QEMU_NIC = """
+    -device {nic_model},netdev=net{vlan},mac={mac_addr}
+    -netdev tap,id=net{vlan},ifname={ifname},script=no,downscript=no
+    """
+    return CMD_TEMPLATE_QEMU_NIC
 
 
 # TODO: check for kvm!
@@ -130,15 +150,14 @@ class Qemu(VirtualizationLayer, ShellProcess, REPLable):
     re_zero_ret_code_text = '%s0' % exit_code_identifier
     re_zero_ret_code = re.compile(re_zero_ret_code_text, flags=re.DOTALL)
 
-    def __init__(self, id, emulation_node):
-        VirtualizationLayer.__init__(self, id, emulation_node)
+    def __init__(self, node: Node):
+        VirtualizationLayer.__init__(self, node=node)
 
         self._interface_service = InterfaceService()
         self._interface_persistence_service = InterfacePersistenceService()
-        self.emulation_node = emulation_node
 
         # log file for qemu boot
-        self.log_path_qemu_boot = PathUtil.get_log_file_path("qemu_boot_%s.txt" % self.id)
+        self.log_path_qemu_boot = PathUtil.get_log_file_path("qemu_boot_%s.txt" % self.node._id)
 
         self.monitor_repl = QemuMonitorRepl(self)
 
@@ -151,7 +170,7 @@ class Qemu(VirtualizationLayer, ShellProcess, REPLable):
         REPLable.__init__(self)
 
         # unix domain socket paths
-        self.path_uds_socket = self.get_qemu_sock_path(self.id)
+        self.path_uds_socket = self.get_qemu_sock_path(self.node._id)
         # self.uds_socket = None
 
     def reset(self):
@@ -192,8 +211,49 @@ class Qemu(VirtualizationLayer, ShellProcess, REPLable):
 
         return overlay_image_cmd
 
+    # TODO: #54,#55: DOC
     def _build_qemu_nic_command(self):
-        raise NotImplementedError
+
+        # TODO: ABSTRACT COMMAND GENERATION!
+        cmd_setup_nics = []
+
+        def add_if(_if, _if_name, vlan):
+            cmd_setup_nics.append(self._build_qemu_nic_command_internal(_if, _if_name, vlan))
+
+        cnt_normal_iface = 0
+        self._logger.debug("using ifaces: '%s'", self.node.interfaces)
+
+        # NOTE: sort the interfaces so that the Management interface is the last one
+        for vlan, _if in enumerate(self.node.interfaces):
+
+            _if_name = None
+            if not Interface.InterfaceType(_if.name) in Interface.INTERFACE_TYPE_NORMAL:
+                _if_name = singletons.network_backend.get_tap_name(self.node._id, _if)
+            else:
+                # create for each connection a tap device
+                # NOTE: for each new tap device we need to adjust the `nr_host_interface`
+                # NOTE: otherwise we have duplicate interface names!
+                # iterate over interfaces and connections
+
+                _if_name = singletons.network_backend.get_tap_name(self.node._id, _if)
+                cnt_normal_iface += 1
+
+            self._logger.debug('add_if(%s,%s,%s)', repr(_if), _if_name, vlan)
+            add_if(_if, _if_name, vlan)
+
+        return '\n'.join(cmd_setup_nics)
+
+    def _build_qemu_nic_command_internal(self, _if, _if_name, vlan):
+        # node classes have a common mac address prefix
+        mac = InterfaceService.get_mac(node_id=self.node._id, interface=_if)
+        # self._interface_persistence_service.update_mac(interface=_if, mac=mac)
+        _if.mac = mac
+        return get_cmd_template_qemu_nic().format(
+            ifname=_if_name,
+            mac_addr=mac,
+            vlan=vlan,
+            nic_model=singletons.scenario_config.get_qemu_nic()
+        )
 
     def _build_qemu_command(self, path_qemu_base_image, qemu_user_addition=None):
         """
@@ -208,7 +268,7 @@ class Qemu(VirtualizationLayer, ShellProcess, REPLable):
         """
 
         if qemu_user_addition is None:
-            qemu_user_addition = singletons.scenario_config.get_qemu_user_addition(node_id=self.id) or ""
+            qemu_user_addition = singletons.scenario_config.get_qemu_user_addition(node_id=self.node._id) or ""
 
         log_kvm_usable()
 
@@ -239,7 +299,7 @@ class Qemu(VirtualizationLayer, ShellProcess, REPLable):
         # return '%s_%s' % (singletons.scenario_config.get_scenario_name(), Qemu.sha1(singletons.scenario_config.get_path_image()))
         return singletons.scenario_config.get_scenario_name()
 
-    def _start(self, path_qemu_base_image):
+    def _start(self, path_qemu_base_image: str, node: Node):
         """
         Start the QEMU instance:
 
@@ -281,7 +341,7 @@ class Qemu(VirtualizationLayer, ShellProcess, REPLable):
         snapshot_load_failed = False
 
         if singletons.config.is_qemu_snapshot_boot():
-            self.process = singletons.qemu_process_singletons.get(self.id)
+            self.process = singletons.qemu_process_singletons.get(self.node._id)
             take_process_ownership = False
         else:
             take_process_ownership = True
@@ -324,7 +384,7 @@ class Qemu(VirtualizationLayer, ShellProcess, REPLable):
             # build qemu shell command from template
             qemu_cmd = self._build_qemu_command(path_qemu_base_image)
             # run the qemu command
-            self.process = singletons.shell_helper.run_shell_async(self.id, qemu_cmd, prefixes=[self.shell_prefix],
+            self.process = singletons.shell_helper.run_shell_async(self.node._id, qemu_cmd, prefixes=[self.shell_prefix],
                                                                    # we are responsible ourselves for killing the process
                                                                    take_process_ownership=take_process_ownership)
 
@@ -332,16 +392,16 @@ class Qemu(VirtualizationLayer, ShellProcess, REPLable):
             self.monitor_repl.run_commands_eager(StringIO("\n"))
             # NetUtil.wait_until_uds_reachable(self.path_uds_socket)
 
-            booted_signal = singletons.scenario_config.get_signal_boot_completed(node_id=self.id)
-            shell_prompt = singletons.scenario_config.get_shell_prompt(node_id=self.id)
+            booted_signal = singletons.scenario_config.get_signal_boot_completed(node_id=self.node._id)
+            shell_prompt = singletons.scenario_config.get_shell_prompt(node_id=self.node._id)
 
             # boot signal and shell prompt supplied
             # use boot signal for boot and shell prompt for entering the shell
             if booted_signal is not None and shell_prompt is not None:
                 func = Qemu.wait_for_socket_result
-                booted_signal = singletons.scenario_config.get_signal_boot_completed(node_id=self.id)
+                booted_signal = singletons.scenario_config.get_signal_boot_completed(node_id=self.node._id)
             else:
-                booted_signal = singletons.scenario_config.get_shell_prompt(node_id=self.id)
+                booted_signal = singletons.scenario_config.get_shell_prompt(node_id=self.node._id)
                 func = Qemu.wait_for_boot
 
             if singletons.scenario_config.is_provisioning_boot_mode_selectors():
@@ -357,7 +417,7 @@ class Qemu(VirtualizationLayer, ShellProcess, REPLable):
 
         # notify EventSystem that the VM booted successfully
         with es.event_no_init_finish(es.EVENT_VM_BOOT) as ev:
-            ev.update([self.id], 1.0)
+            ev.update([self.node._id], 1.0)
 
         if not self.booted_from_snapshot:
             # connect to the serial shell
@@ -365,13 +425,13 @@ class Qemu(VirtualizationLayer, ShellProcess, REPLable):
 
         # notify EventSystem that the VMs shell is ready
         with es.event_no_init_finish(es.EVENT_VM_SHELL_READY) as ev:
-            ev.update([self.id], 1.0)
+            ev.update([self.node._id], 1.0)
 
         self.nlog.info("qemu instance running ...")
 
         if singletons.config.is_qemu_snapshot_boot():
             # store process singleton
-            singletons.qemu_process_singletons[self.id] = self.process
+            singletons.qemu_process_singletons[self.node._id] = self.process
 
         self.after_start()
 
@@ -400,7 +460,7 @@ class Qemu(VirtualizationLayer, ShellProcess, REPLable):
 
         # image name without file suffix
         overlay_image_name = splitext(base_image_file_name)[0]
-        overlay_image_name = '%s_overlay_%s.img' % (overlay_image_name, self.id)
+        overlay_image_name = '%s_overlay_%s.img' % (overlay_image_name, self.node._id)
         # get the temp file for the final overlay image
         overlay_image_path = PathUtil.get_temp_file_path(overlay_image_name)
         # create it
@@ -408,7 +468,7 @@ class Qemu(VirtualizationLayer, ShellProcess, REPLable):
                                                                                       overlay_image_path=overlay_image_path)
 
         # TODO: #2 : error handling
-        singletons.shell_helper.run_shell(self.id, cmd_qemu_create_overlay_image,
+        singletons.shell_helper.run_shell(self.node._id, cmd_qemu_create_overlay_image,
                                           [self.shell_prefix, "create_overlay", basename(base_image_path)])
 
         return overlay_image_path
@@ -518,7 +578,7 @@ class Qemu(VirtualizationLayer, ShellProcess, REPLable):
         kwargs.update({
             'brief_logger': self.nlog,
             'verbose_logger': self.nlog if singletons.config.is_log_provisioning() else None,
-            'shell_prompt': singletons.scenario_config.get_shell_prompt(node_id=self.id)
+            'shell_prompt': singletons.scenario_config.get_shell_prompt(node_id=self.node._id)
         })
         return REPLable.run_commands(self, *args, **kwargs)
 
@@ -549,7 +609,7 @@ class Qemu(VirtualizationLayer, ShellProcess, REPLable):
         return vars
 
     def get_repl_variables(self, vars=None):
-        return self.get_repl_variables_static(self.id)
+        return self.get_repl_variables_static(self.node._id)
 
     ###############################################
     ###
@@ -568,7 +628,7 @@ class Qemu(VirtualizationLayer, ShellProcess, REPLable):
         """
         interface_service = InterfaceService()
         return ['%s%s' % (singletons.scenario_config.get_network_links_nic_prefix(), iface_idx) for iface_idx in
-                range(len(interface_service.filter_normal_interfaces(self.emulation_node._node.interfaces)))]
+                range(len(interface_service.filter_normal_interfaces(self.node.interfaces)))]
         # res = self.run_commands_eager_check_ret_val(
         #     StringIO("ls /sys/class/net/|grep {iface_prefix}".format(iface_prefix=singletons.scenario_config.get_network_links_nic_prefix())))
         # return res.split("\n")[2:][0].split(" ")

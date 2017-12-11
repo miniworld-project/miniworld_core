@@ -133,7 +133,9 @@ class NodeStarter:
                 for node in executor.map(self._start_node, args):
                     self.nodes.append(node)
 
-            self._logger.info("all qemu instances started ...")
+            emulation_service = singletons.network_backend_bootstrapper.emulation_service
+            self._logger.info("all nodes started ...")
+            emulation_service.all_nodes_booted()
 
             # NOTE: create management switch after all nodes exist!
             # TODO: return management node and not None if scenario changed
@@ -176,25 +178,22 @@ class NodeStarter:
             try:
                 return self._node_persistence_service.get(connection_type=AbstractConnection.ConnectionType.mgmt)._node
             except NoResultFound:
-                node = Node(
+                management_node = Node(
                     interfaces=self._interface_service.factory([Interface.InterfaceType.management]),
                     type=AbstractConnection.ConnectionType.mgmt
                 )
 
                 # persist node
-                self._node_persistence_service.add(node)
-
-                management_node = network_backend_bootstrapper.management_node_type(node=node)
-                management_node.start(switch=True, bridge_dev_name=singletons.config.get_bridge_tap_name())
-
-                singletons.simulation_manager.nodes_id_mapping[node._id] = management_node
+                self._node_persistence_service.add(management_node)
+                # TODO: rename in network_backend_bootstrapper
+                management_service = singletons.network_backend_bootstrapper.management_node_type(node=management_node)
 
                 for node in self.nodes:
-                    management_node.connect_to_emu_node(singletons.network_backend, node)
+                    management_service.connect_to_emu_node(management_node, node)
 
                 return management_node
 
-    def _start_node(self, *args):
+    def _start_node(self, *args) -> Node:
         """
         Start a node.
 
@@ -225,17 +224,17 @@ class NodeStarter:
             node = Node(_id=node_id, interfaces=interfaces, type=AbstractConnection.ConnectionType.user)
             self._node_persistence_service.add(node)
         else:
-            node = self._node_persistence_service.get(node_id=node_id)._node
+            node = self._node_persistence_service.get(node_id=node_id)
 
-        emulation_node = singletons.network_backend_bootstrapper.emulation_node_type(node)
-        emulation_node.start(args[1], flo_post_boot_script=args[2])
+        emulation_node = singletons.network_backend_bootstrapper.emulation_service
+        emulation_node.start(args[1], node=node, flo_post_boot_script=args[2])
         singletons.simulation_manager.nodes_id_mapping[node._id] = emulation_node
 
         with self.lock:
             # keep track of started nodes
             self.nodes_running.append(emulation_node)
 
-        return emulation_node
+        return node
 
     def nodes_not_ready(self):
         """

@@ -1,5 +1,7 @@
 from miniworld.errors import NetworkBackendUnknown
 from miniworld.network.backends.NetworkBackendBootStrapper import NetworkBackendBootStrapper
+
+
 from miniworld.service.network import NetworkConfiguratorSameSubnet
 from miniworld.singletons import singletons
 
@@ -103,14 +105,14 @@ class NetworkBackendBootstrapperFactory:
         -------
         NetworkBackendBootStrapper
         """
-        from miniworld.network.backends.bridged import EmulationNodeBridged
         from miniworld.network.backends.bridged import ManagementNodeBridged
         from miniworld.network.backends.bridged import CentralBridgeNode
-        from miniworld.network.backends.bridged import QemuTap
+        from miniworld.nodes.EmulationService import EmulationService
+        from miniworld.nodes.qemu import Qemu
 
         return NetworkBackendBootStrapper(network_backend,
-                                          EmulationNodeBridged.EmulationNodeBridged,
-                                          QemuTap.QemuTap,
+                                          EmulationService,
+                                          Qemu.Qemu,
                                           connection,
                                           bridge,
                                           NetworkConfiguratorSameSubnet.NetworkConfiguratorSameSubnet,

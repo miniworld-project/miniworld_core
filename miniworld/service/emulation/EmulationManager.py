@@ -143,7 +143,7 @@ class EmulationManager(ResetableInterface):
         list<int>
         """
         # filter out virtual nodes!
-        return [node._node._id for node in self.get_emulation_nodes()]
+        return [node._id for node in self.get_emulation_nodes()]
 
     ###############################################
     # CentralHub
@@ -402,9 +402,6 @@ class EmulationManager(ResetableInterface):
                 self.movement_director = MovementDirectorFactory().get(cnt_nodes)
                 self._logger.info("%s running ... ", self.movement_director)
 
-            if singletons.config.is_qemu_snapshot_boot():
-                self.create_snapshots_parallel()
-
         if self.auto_stepping:
             self.try_start_run_loop(auto_stepping)
 
@@ -626,16 +623,9 @@ class EmulationManager(ResetableInterface):
             #     emulation_node.run_post_network_shell_commands()
 
             with ConcurrencyUtil.network_provision_parallel() as executor:
-                res = executor.map(lambda node: node.run_post_network_shell_commands(), self.get_emulation_nodes())
+                res = executor.map(lambda node: node.run_post_network_shell_commands(node), self.get_emulation_nodes())
                 # wait for evaluation!
                 list(res)
-
-    def create_snapshots_parallel(self):
-        self._logger.info("creating snapshots ...")
-        with ConcurrencyUtil.node_start_parallel() as executor:
-            res = executor.map(lambda node: node.virtualization_layer.make_snapshot(), self.get_emulation_nodes())
-            # wait for evaluation!
-            list(res)
 
     def get_emulation_node_for_idx(self, idx):
         return self.nodes_id_mapping[idx]
@@ -890,6 +880,7 @@ class DistributedModeSimulationManager(EmulationManager):
 
     @property
     def all_nodes_id_mapping(self):
+        raise RuntimeError()
         if not self._all_nodes_id_mapping:
             emu_node_type = NetworkBackends.get_current_network_backend_bootstrapper().emulation_node_type
             self._all_nodes_id_mapping = {_id: emu_node_type.factory(_id) for _id in

@@ -9,6 +9,7 @@ from miniworld.model.domain.interface import Interface as DomainInterface
 from miniworld.model.domain.node import Node as DomainNode
 from miniworld.network.connection import AbstractConnection
 from miniworld.nodes.EmulationService import EmulationService
+from miniworld.service.persistence.interfaces import InterfacePersistenceService
 from miniworld.singletons import singletons
 
 lock = Lock()
@@ -79,22 +80,15 @@ class NodePersistenceService:
         with singletons.db_session.session_scope() as session:
             return session.query(exists().where(Node.id == node_id)).scalar()
 
-    # def to_domain(self, node: Node) -> DomainNode:
-    #     interfaces = [InterfacePersistenceService.to_domain(interface for interface in node.interfaces)]
-    #     return DomainNode(
-    #         _id=node.id,
-    #         type=node.type,
-    #         connections=node.connections,
-    #         interfaces=interfaces
-    #
-    #    )
+    def to_domain(self, node: Node) -> DomainNode:
+        interfaces = [InterfacePersistenceService.to_domain(interface) for interface in node.interfaces]
+        return DomainNode(
+            _id=node.id,
+            type=node.type,
+            connections=node.connections,
+            interfaces=interfaces
 
-    def to_domain(self, node: Node, include_connections=True) -> EmulationService:
-        from miniworld.service.persistence.connections import ConnectionPersistenceService
-        emulation_node = singletons.simulation_manager.nodes_id_mapping[node.id]
-        if include_connections:
-            emulation_node._node.connections = [ConnectionPersistenceService.to_domain(connection) for connection in node.connections]
-        return emulation_node
+        )
 
     @staticmethod
     def _add_filters(query, node_id: int = None, connection_type: AbstractConnection.ConnectionType = None):

@@ -109,8 +109,8 @@ class Connection(Base):
     @staticmethod
     def from_domain(connection: DomainConnection) -> 'Connection':
         return Connection(
-            node_x_id=connection.emulation_node_x._node._id,
-            node_y_id=connection.emulation_node_y._node._id,
+            node_x_id=connection.emulation_node_x._id,
+            node_y_id=connection.emulation_node_y._id,
             interface_x_id=connection.interface_x._id,
             interface_y_id=connection.interface_y._id,
             type=connection.connection_type,

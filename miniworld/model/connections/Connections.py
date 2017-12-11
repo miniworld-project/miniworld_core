@@ -1,4 +1,5 @@
 from miniworld.model.Objects import Objects
+from miniworld.network.connection import AbstractConnection
 
 
 class Connections(Objects):
@@ -26,8 +27,7 @@ class Connections(Objects):
         -------
         list<(ManagementNode, Management)>
         """
-        from miniworld.nodes.virtual.ManagementNode import ManagementNode
-        return self.filter_type(fun=lambda x: ManagementNode.is_management_node(x[0]))
+        return self.filter_type(fun=lambda x: x[0].type == AbstractConnection.ConnectionType.mgmt)
 
     def filter_real_emulation_nodes(self):
         """
