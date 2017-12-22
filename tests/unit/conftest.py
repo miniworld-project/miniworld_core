@@ -61,7 +61,7 @@ def mock_nodes(request, mock_persistence, monkeypatch) -> Dict[int, Node]:
 
     def get_interface(interface_id):
         for emulation_node in singletons.simulation_manager.nodes_id_mapping.values():
-            for interface in emulation_node._node.interfaces:
+            for interface in emulation_node.interfaces:
                 if interface._id == interface_id:
                     return interface
 
@@ -81,8 +81,7 @@ def mock_nodes(request, mock_persistence, monkeypatch) -> Dict[int, Node]:
     cnt_nodes = getattr(request, 'param', None) or 2
     for i in range(cnt_nodes):
         interface = InterfaceService.factory(['mesh'])[0]
-        emulation_node = MagicMock()
-        emulation_node._node = n = Node(_id=node_id_counter, interfaces=[interface], type=AbstractConnection.ConnectionType.user)
+        emulation_node = n = Node(_id=node_id_counter, interfaces=[interface], type=AbstractConnection.ConnectionType.user)
         node_id_counter += 1
         for interface in n.interfaces:
             configure_net(interface, n)
@@ -106,8 +105,8 @@ def mock_connections(mock_nodes, mock_persistence, monkeypatch) -> List[Abstract
             'bandwidth': 500,
             'loss': 0.5
         }
-        interface1 = node1._node.interfaces[0]
-        interface2 = node2._node.interfaces[0]
+        interface1 = node1.interfaces[0]
+        interface2 = node2.interfaces[0]
         conn = Connection(
             _id=idx,
             emulation_node_x=node1,
@@ -123,16 +122,17 @@ def mock_connections(mock_nodes, mock_persistence, monkeypatch) -> List[Abstract
         )
         connections.append(conn)
         # TODO: is this ensured for functional tests too?
-        if node1._node.connections is None:
-            node1._node.connections = []
-        if node2._node.connections is None:
-            node2._node.connections = []
-        node1._node.connections.append(conn)
+        if node1.connections is None:
+            node1.connections = []
+        if node2.connections is None:
+            node2.connections = []
+        node1.connections.append(conn)
 
     connections = {conn._id: conn for conn in connections}
     if mock_persistence:
         monkeypatch.setattr('miniworld.service.persistence.connections.ConnectionPersistenceService.all', MagicMock(return_value=connections))
         monkeypatch.setattr('miniworld.service.persistence.connections.ConnectionPersistenceService.get', MagicMock(side_effect=lambda connection_id: connections.get(connection_id)))
+        monkeypatch.setattr('miniworld.service.persistence.connections.ConnectionPersistenceService.get_by_node', MagicMock(side_effect=[[x] for x in connections.values()]) + [[]])
 
     return connections
 

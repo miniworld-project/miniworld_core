@@ -1,5 +1,7 @@
+import functools
 import subprocess
 from io import StringIO
+from typing import Union, Dict
 
 from miniworld.model.domain.interface import Interface
 from miniworld.model.domain.node import Node
@@ -127,19 +129,19 @@ class EmulationService(AbstractNode):
 
         nlog.info("pre_network_shell_commands done")
 
-    def run_post_network_shell_commands(self, emulation_node: 'EmulationService'):
+    def run_post_network_shell_commands(self, emulation_node: Node):
         """
         Run user commands. This method is called from the :py:class:`.SimulationManager`
          after the network has been set up.
         """
-        nlog = singletons.logger_factory.get_node_logger(emulation_node._node._id)
+        nlog = singletons.logger_factory.get_node_logger(emulation_node._id)
         # TODO: use node_id everywhere possible for singletons.scenario_config.*()
         # # notify EventSystem even if there are no commands
         es = singletons.event_system
-        with es.event_no_init(es.EVENT_VM_SHELL_POST_NETWORK_COMMANDS, finish_ids=[emulation_node._node._id]):
-            commands = singletons.scenario_config.get_all_shell_commands_post_network_start(node_id=emulation_node._node._id)
+        with es.event_no_init(es.EVENT_VM_SHELL_POST_NETWORK_COMMANDS, finish_ids=[emulation_node._id]):
+            commands = singletons.scenario_config.get_all_shell_commands_post_network_start(node_id=emulation_node._id)
             if commands:
-                virtualization_layer = self.virtualization_layers[emulation_node._node._id]
+                virtualization_layer = self.virtualization_layers[emulation_node._id]
                 virtualization_layer.run_commands_eager(StringIO(commands))
 
             nlog.info("post_network_shell_commands done")
@@ -191,3 +193,32 @@ class EmulationService(AbstractNode):
 
     def nic_mgmt_ipv4_config(self, node: Node):
         self._nic_mgmt_ipv4_config(node=node)
+
+    def exec_node_cmd(self, cmd: str, node_id: int = None, validation: bool = True, timeout: float = None) -> Union[str, Dict[int, str]]:
+        """
+        Execute a command on a node or all nodes.
+        """
+
+        def get_fun(virtualization_layer: VirtualizationLayer):
+            fun = virtualization_layer.run_commands_eager_check_ret_val if validation else virtualization_layer.run_commands_eager
+            return functools.partial(fun, timeout=timeout)
+
+        if node_id is None:
+            nodes = self.virtualization_layers
+            jobs = {}
+            res = {}
+            with ConcurrencyUtil.node_start_parallel() as executor:
+                for node in nodes:
+                    fun = get_fun(node)
+                    jobs[node._id] = executor.submit(fun, StringIO(cmd))
+
+                for node_id, job in jobs.items():
+                    res[node_id] = job.result()
+
+            return res
+
+        else:
+            node = self.virtualization_layers[node_id]
+            fun = get_fun(node)
+
+            return fun(StringIO(cmd))

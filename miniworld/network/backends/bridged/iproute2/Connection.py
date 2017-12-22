@@ -1,6 +1,5 @@
 from miniworld.network.backends.bridged.Connection import Connection
 from miniworld.network.backends.bridged.iproute2 import IPRoute2Commands
-from miniworld.singletons import singletons
 
 
 def ConnectionIproute2():

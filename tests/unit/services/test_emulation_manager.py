@@ -92,7 +92,7 @@ class TestEmulationManager:
     def test_step(self, emulation_manager, scenario_config, distance_matrix, monkeypatch, mock_nodes):
         emulation_manager.nodes_id_mapping = mock_nodes
         mock = MagicMock(side_effect=lambda _: _)
-        monkeypatch.setattr('miniworld.service.persistence.interfaces.NodePersistenceService.add', mock)
+        monkeypatch.setattr('miniworld.service.persistence.nodes.NodePersistenceService.add', mock)
         node_starter = MagicMock()
         monkeypatch.setattr('miniworld.service.emulation.NodeStarter.NodeStarter.start_nodes', node_starter)
         node_starter.return_value = [mock_nodes.values(), 'dummy']

@@ -7,6 +7,7 @@ import sys
 import xmlrpc.client
 
 from miniworld import Constants
+from miniworld.nodes.EmulationService import exec_node_cmd
 from miniworld.service.rpc import RPCUtil
 from miniworld.util import CliUtil
 from miniworld.util.CliUtil import rpc_parser
@@ -200,19 +201,19 @@ def action_exec(self, args, single=True):
     cmd = args.cmd
 
     if not args.distributed:
-        print(json.loads(self.connection.exec_node_cmd(cmd, node_id, args.validate, args.timeout)))
+        print(json.loads(exec_node_cmd(self.connection.nodes_id_mapping, cmd, node_id, args.validate, args.timeout)))
     else:
         if node_id is not None:
             # only switch to the rpc server which holds the node
             self.connection = self.get_connection_server(node_id=node_id, is_distributed=args.distributed)
-            print(json.loads(self.connection.exec_node_cmd(cmd, node_id, args.validate, args.timeout)))
+            print(json.loads(exec_node_cmd(self.connection.nodes_id_mapping, cmd, node_id, args.validate, args.timeout)))
         else:
             for server_id in json.loads(self.connection.get_distributed_address_mapping()):
 
                 # only switch to the rpc server which holds the node
                 print("\nServer %s >>>" % server_id)
                 self.connection = self.get_connection_server(server_id=server_id, is_distributed=args.distributed)
-                result = json.loads(self.connection.exec_node_cmd(cmd, node_id, args.validate, args.timeout))
+                result = json.loads(exec_node_cmd(self.connection.nodes_id_mapping, cmd, node_id, args.validate, args.timeout))
                 for _node_id, output in result.items():
                     print("\nNode %s >>>" % _node_id)
                     print(output)

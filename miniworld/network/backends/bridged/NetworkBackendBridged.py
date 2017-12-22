@@ -276,7 +276,7 @@ def NetworkBackendBridgedDummy():
         #############################################################
 
         def get_interface_index(self, emulation_node, interface):
-            return self.get_id_tap_postfix(emulation_node._node._id, interface) - 1
+            return self.get_id_tap_postfix(emulation_node._id, interface) - 1
 
         #############################################################
         # Actual connection changing/qdisc
@@ -328,11 +328,11 @@ def NetworkBackendBridgedDummy():
             """
 
             max_id = 10 ** 5
-            if emulation_node_x._node._id > max_id or emulation_node_y._node._id > max_id:
+            if emulation_node_x._id > max_id or emulation_node_y._id > max_id:
                 raise ValueError("Only %d nodes supported!" % max_id)
 
             br_name = 'br_{id_fmt}_{id_fmt}'.format(id_fmt=Constants.NODE_ID_FMT) % (
-                emulation_node_x._node._id, emulation_node_y._node._id)
+                emulation_node_x._id, emulation_node_y._id)
 
             bridge = self.network_backend_bootstrapper.switch_type(br_name, interface_x)
             bridge.start(switch=False, bridge_dev_name=br_name)

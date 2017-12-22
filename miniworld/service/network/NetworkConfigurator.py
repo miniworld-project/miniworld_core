@@ -17,7 +17,6 @@ class NetworkConfiguratorError(Base):
 
 
 class NetworkConfigurator:
-
     """
     Base class for network configuraters.
 
@@ -105,23 +104,24 @@ class NetworkConfigurator:
     def get_nic_check_commands(self):
         return self.nic_check_commands
 
+    # TODO: move to EmulationService ?
     def run_emulation_node_commands(self, commands_per_emulation_node, ev, cnt_minions=None):
         results = []
         # run over EmulationNode s and set up the network
         with ConcurrencyUtil.network_provision_parallel() as executor:
 
-            for emu_node, commands in sorted(commands_per_emulation_node.items(), key=lambda x: x[0]._node._id):
+            for emu_node, commands in sorted(commands_per_emulation_node.items(), key=lambda x: x[0]._id):
                 commands = '\n'.join(commands)
 
-                def _exec(emu_node, commands):
+                def _exec(virtualization_layer, commands):
                     if commands:
-                        self._logger.debug("network config for node: %s:\n%s", emu_node._node._id, commands)
-                        emu_node.virtualization_layer.run_commands_eager_check_ret_val(StringIO(commands))
+                        virtualization_layer.run_commands_eager_check_ret_val(StringIO(commands))
 
                     # notify EventSystem
-                    ev.update([emu_node._node._id], 1.0, add=True)
+                    # TODO:
+                    # ev.update([virtualization_layer.node._id], 1.0, add=True)
 
-                future = executor.submit(_exec, emu_node, commands)
+                future = executor.submit(_exec, singletons.network_backend_bootstrapper.emulation_service.virtualization_layers[emu_node._id], commands)
                 results.append(future)
 
             # wait for results

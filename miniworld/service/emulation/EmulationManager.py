@@ -1,4 +1,3 @@
-import functools
 import hashlib
 import json
 import math
@@ -6,7 +5,7 @@ from collections import defaultdict
 from copy import deepcopy
 from io import StringIO
 from pprint import pformat
-from typing import Dict, Union
+from typing import Dict
 
 from ordered_set import OrderedSet
 
@@ -177,7 +176,7 @@ class EmulationManager(ResetableInterface):
                 self._logger.info("idx_central_node: %s", idx_central_node)
                 bridge_node_id = list(self.central_nodes_id_mapping.keys())[idx_central_node]
 
-                if [interface for interface in node._node.interfaces if interface.name == Interface.InterfaceType.hub.value]:
+                if [interface for interface in node.interfaces if interface.name == Interface.InterfaceType.hub.value]:
                     # NOTE: we keep the upper triangular matrix
                     matrix[(node_id, bridge_node_id)] = ImpairmentModel.VAL_DISTANCE_ZERO
                 else:
@@ -408,41 +407,6 @@ class EmulationManager(ResetableInterface):
         self.running = True
         return emulation_nodes
 
-    def exec_node_cmd(self, cmd, node_id=None, validation=True, timeout=None) -> Union[str, Dict[int, str]]:
-        """
-        Execute a command on a node or all nodes.
-
-        Parameters
-        ----------
-        node_id
-        cmd
-        validation
-        timeout
-        """
-        nodes = self.get_emulation_nodes()
-
-        def get_fun(node):
-            fun = node.virtualization_layer.run_commands_eager_check_ret_val if validation else node.virtualization_layer.run_commands_eager
-            return functools.partial(fun, timeout=timeout)
-
-        if node_id is None:
-            jobs = {}
-            res = {}
-            with ConcurrencyUtil.node_start_parallel() as executor:
-                for node in nodes:
-                    fun = get_fun(node)
-                    jobs[node._id] = executor.submit(fun, StringIO(cmd))
-
-                for node_id, job in jobs.items():
-                    res[node_id] = job.result()
-
-            return res
-
-        else:
-            fun = get_fun(self.nodes_id_mapping[node_id])
-
-            return fun(StringIO(cmd))
-
     def try_start_run_loop(self, auto_stepping):
         # we need the run-loop only with a `MovementDirector`
         if self.is_movement_director_enabled():
@@ -623,7 +587,8 @@ class EmulationManager(ResetableInterface):
             #     emulation_node.run_post_network_shell_commands()
 
             with ConcurrencyUtil.network_provision_parallel() as executor:
-                res = executor.map(lambda node: node.run_post_network_shell_commands(node), self.get_emulation_nodes())
+                emulation_service = singletons.network_backend_bootstrapper.emulation_service  # type: EmulationService
+                res = executor.map(lambda node: emulation_service.run_post_network_shell_commands(node), self.get_emulation_nodes())
                 # wait for evaluation!
                 list(res)
 
@@ -737,7 +702,7 @@ class EmulationManager(ResetableInterface):
             if interface_x.name == interface_y.name and not interface_x.name == Interface.InterfaceType.management:
 
                 # does a connection already exists? (active or inactive)
-                if not self._connection_persistence_service.exists(node_x_id=emulation_node_x._node._id, node_y_id=emulation_node_y._node._id,
+                if not self._connection_persistence_service.exists(node_x_id=emulation_node_x._id, node_y_id=emulation_node_y._id,
                                                                    interface_x_id=interface_x._id, interface_y_id=interface_y._id):
                     # no connection exists
 
@@ -814,8 +779,8 @@ class EmulationManager(ResetableInterface):
                 emulation_node_x, emulation_node_y, interface_x, interface_y, connection_info)
 
         for connection in self._connection_persistence_service.all(
-                node_x_id=emulation_node_x._node._id,
-                node_y_id=emulation_node_y._node._id,
+                node_x_id=emulation_node_x._id,
+                node_y_id=emulation_node_y._id,
                 connected=True,
                 connection_type=AbstractConnection.ConnectionType.user,
         ):  # type: List[AbstractConnection]
@@ -832,8 +797,8 @@ class EmulationManager(ResetableInterface):
         if link_quality_model_says_connected:
             # inactive connection moved to active
             for connection in self._connection_persistence_service.all(
-                    node_x_id=emulation_node_x._node._id,
-                    node_y_id=emulation_node_y._node._id,
+                    node_x_id=emulation_node_x._id,
+                    node_y_id=emulation_node_y._id,
                     connected=False,
                     connection_type=AbstractConnection.ConnectionType.user,
             ):  # type: List[AbstractConnection]
@@ -939,8 +904,8 @@ class SimulationManagerDistributedClient(DistributedModeSimulationManager):
             return False
 
         # an node
-        local_1 = self.is_local_node(emulation_node_x._node._id)
-        local_2 = self.is_local_node(emulation_node_y._node._id)
+        local_1 = self.is_local_node(emulation_node_x._id)
+        local_2 = self.is_local_node(emulation_node_y._id)
         if local_1 != local_2:
             return True
         return False
@@ -995,7 +960,7 @@ class SimulationManagerDistributedClient(DistributedModeSimulationManager):
             remote_node, if_remote_node, local_emu_node, if_local_emu_node
         """
         return (emulation_node_x, interface_x, emulation_node_y, interface_y) if not self.is_local_node(
-            emulation_node_x._node._id) else (emulation_node_y, interface_y, emulation_node_x, interface_x)
+            emulation_node_x._id) else (emulation_node_y, interface_y, emulation_node_x, interface_x)
 
 
 class SimulationManagerDistributedCoordinator(DistributedModeSimulationManager):

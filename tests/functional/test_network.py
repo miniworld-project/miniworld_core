@@ -68,6 +68,7 @@ def snapshot_runner(runner):
     runner.stop(hard=False)
 
 
+@pytest.mark.skip(reason='old test')
 def test_info_connections(snapshot_runner):
     # mgmt network
     connections = {'1': ['mgmt'],

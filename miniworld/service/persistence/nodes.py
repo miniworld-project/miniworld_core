@@ -8,7 +8,7 @@ from miniworld.model.db.base import Node, Interface
 from miniworld.model.domain.interface import Interface as DomainInterface
 from miniworld.model.domain.node import Node as DomainNode
 from miniworld.network.connection import AbstractConnection
-from miniworld.nodes.EmulationService import EmulationService
+
 from miniworld.service.persistence.interfaces import InterfacePersistenceService
 from miniworld.singletons import singletons
 
@@ -58,9 +58,10 @@ class NodePersistenceService:
                     node._id = db_node.id
                     assert node._id is not None
 
+            singletons.simulation_manager.nodes_id_mapping[node._id] = node
             return node
 
-    def get(self, **kwargs) -> EmulationService:
+    def get(self, **kwargs) -> DomainNode:
         with singletons.db_session.session_scope() as session:
             query = session.query(Node)
             query = self._add_filters(query, **kwargs)
@@ -68,7 +69,7 @@ class NodePersistenceService:
             node = self.to_domain(node)
             return node
 
-    def all(self, **kwargs) -> List[EmulationService]:
+    def all(self, **kwargs) -> List[DomainNode]:
         with singletons.db_session.session_scope() as session:
             query = session.query(Node)
             query = self._add_filters(query, **kwargs)
@@ -85,7 +86,6 @@ class NodePersistenceService:
         return DomainNode(
             _id=node.id,
             type=node.type,
-            connections=node.connections,
             interfaces=interfaces
 
         )

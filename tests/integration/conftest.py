@@ -21,8 +21,8 @@ def mock_persistence():
 @pytest.fixture  # noqa
 def connections(mock_connections):
     connection = mock_connections[0]  # type: AbstractConnection
-    node_0 = connection.emulation_node_x._node
-    node_1 = connection.emulation_node_y._node
+    node_0 = connection.emulation_node_x
+    node_1 = connection.emulation_node_y
     node_persistence_service = NodePersistenceService()
     node_persistence_service.add(node_0)
     node_persistence_service.add(node_1)

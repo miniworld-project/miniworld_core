@@ -1,4 +1,5 @@
 from miniworld.model.Objects import Objects
+from miniworld.network.connection import AbstractConnection
 from miniworld.singletons import singletons
 
 
@@ -11,9 +12,7 @@ class EmulationNodes(Objects):
         -------
         EmulationNodes
         """
-
-        from miniworld.nodes.virtual.VirtualNode import VirtualNode
-        return self.filter_type(fun=lambda node: not isinstance(node, VirtualNode))
+        return self.filter_type(fun=lambda x: x.type == AbstractConnection.ConnectionType.user)
 
     def filter_central_nodes(self):
         """
@@ -23,8 +22,7 @@ class EmulationNodes(Objects):
         list<CentralNode>
         """
 
-        from miniworld.nodes.virtual.CentralNode import CentralNode
-        return self.filter_type(fun=CentralNode.is_central_node)
+        return self.filter_type(fun=lambda x: x.type == AbstractConnection.ConnectionType.central)
 
     def filter_mgmt_nodes(self):
         """
@@ -33,8 +31,7 @@ class EmulationNodes(Objects):
         -------
         list<ManagementNode>
         """
-        from miniworld.nodes.virtual.CentralNode import CentralNode
-        return self.filter_type(fun=CentralNode.is_management_node)
+        return self.filter_type(fun=lambda x: x.type == AbstractConnection.ConnectionType.mgmt)
 
     def sort_by_locality(self):
         """
@@ -52,7 +49,7 @@ class EmulationNodes(Objects):
         if singletons.simulation_manager.is_connection_among_servers(emulation_node_x, emulation_node_y):
 
             # one of both must be local
-            if singletons.simulation_manager.is_local_node(emulation_node_x._node._id):
+            if singletons.simulation_manager.is_local_node(emulation_node_x._id):
                 return EmulationNodes([emulation_node_x, emulation_node_y])
 
             return EmulationNodes([emulation_node_y, emulation_node_x])

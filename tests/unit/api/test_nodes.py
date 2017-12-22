@@ -170,8 +170,9 @@ class TestNodes:
         ''')
         snapshot.assert_match(res)
 
-    def test_node_execute_command(self, client):
+    def test_node_execute_command(self, client, monkeypatch):
         result = "bin\nboot"
+        monkeypatch.setattr('miniworld.singletons.network_backend_bootstrapper.emulation_service.exec_node_cmd', MagicMock(return_value=result))
         singletons.simulation_manager.exec_node_cmd = MagicMock(return_value=result)
         res = client.execute('''
         mutation ($nodeID: Int, $cmd: String, $validate: Boolean, $timeout: Float) {

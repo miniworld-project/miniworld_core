@@ -17,8 +17,7 @@ class Connections(Objects):
         list<(CentralNode, HubWiFi>
         """
 
-        from miniworld.nodes.virtual.CentralNode import CentralNode
-        return self.filter_type(fun=lambda x: CentralNode.is_central_node(x[0]))
+        return self.filter_type(fun=lambda x: x[0].type == AbstractConnection.ConnectionType.central)
 
     def filter_mgmt_nodes(self):
         """
@@ -37,6 +36,4 @@ class Connections(Objects):
         -------
         list<EmulationNode>
         """
-
-        from miniworld.nodes.virtual.VirtualNode import VirtualNode
-        return self.filter_type(fun=lambda x: not isinstance(x[0], VirtualNode))
+        return self.filter_type(fun=lambda x: x[0].type == AbstractConnection.ConnectionType.user)

@@ -24,16 +24,16 @@ class TestNetworkConfiguratorSameSubnet:
                                   ):
         # TODO: use node domain model
         emulation_node = MagicMock()
-        emulation_node._node._id = 0
+        emulation_node._id = 0
         emulation_node2 = MagicMock()
-        emulation_node2._node._id = 1
+        emulation_node2._id = 1
 
         interfaces = [
             Interface(_id=0, name=Interface.InterfaceType.mesh.value, nr_host_interface=0),
             Interface(_id=1, name=Interface.InterfaceType.mesh.value, nr_host_interface=1),
         ]
-        emulation_node._node.interfaces = interfaces
-        emulation_node2._node.interfaces = interfaces
+        emulation_node.interfaces = interfaces
+        emulation_node2.interfaces = interfaces
 
         # configure node 1
         commands_per_node, _ = service.configure_connection(emulation_node=emulation_node)

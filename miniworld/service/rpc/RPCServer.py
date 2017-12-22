@@ -14,6 +14,8 @@ from threading import Lock
 from xmlrpc.server import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
 
 # set PYTHONPATH
+from miniworld.nodes.EmulationService import exec_node_cmd
+
 sys.path.insert(0, os.getcwd())  # noqa
 from miniworld.model.connections.JSONEncoder import ConnectionEncoder
 
@@ -187,7 +189,7 @@ class MiniWorldRPC:
             node_id = int(node_id)
 
         return json.dumps(
-            singletons.simulation_manager.exec_node_cmd(cmd, node_id=node_id, validation=validation, timeout=timeout))
+            exec_node_cmd(singletons.simulation_manager.nodes_id_mapping, cmd, node_id=node_id, validation=validation, timeout=timeout))
 
     @dec_requires_simulation_running
     def get_distributed_node_mapping(self):

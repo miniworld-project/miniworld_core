@@ -292,7 +292,7 @@ class EventSystem(collections.UserDict, EventSystemStats, ResetableInterface.Res
 
         def check_progress(progress):
             if progress > 1.0:
-                raise ValueError("Progress must be 0 <= progress <= 1.0!")
+                raise ValueError("Progress must be 0 <= progress <= 1.0!, is {}".format(progress))
 
         def update(node_id):
             # store progress for event

@@ -6,8 +6,8 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from miniworld import singletons
 from miniworld.api import DictScalar
-from miniworld.nodes.EmulationService import EmulationService as DomainEmulationNode
 from miniworld.model.domain.connection import Connection as DomainConnection
+from miniworld.model.domain.node import Node as DomainNode
 from miniworld.model.domain.interface import Interface as InterfaceModel
 from miniworld.service.persistence import connections
 from miniworld.service.persistence import interfaces, nodes
@@ -129,7 +129,7 @@ class EmulationNode(graphene.ObjectType):
     def resolve_links(self, info, connected: bool = None) -> List[Connection]:
         # TODO: respect connection ids!
         connection_persistence_service = connections.ConnectionPersistenceService()
-        return [serialize_connection(connection_persistence_service.get(connection_id=connection._id)) for connection in self.links]
+        return [serialize_connection(connection) for connection in connection_persistence_service.get_by_node(DomainNode(_id=self.iid))]
 
     def resolve_distances(self, info, between: BetweenDistances = None) -> List[Distance]:
         # TODO: use persistence service! current implementation returns the next distance matrix!
@@ -187,17 +187,17 @@ class NodeExecuteCommand(graphene.Mutation):
 
     def mutate(self, info, id: int, cmd: str,
                validate: bool, timeout: float):
-        return NodeExecuteCommand(result=singletons.simulation_manager.exec_node_cmd(cmd, node_id=id, validation=validate, timeout=timeout))
+        return NodeExecuteCommand(result=singletons.network_backend_bootstrapper.emulation_service.exec_node_cmd(cmd, node_id=id, validation=validate, timeout=timeout))
 
 
-def serialize_node(node: DomainEmulationNode) -> EmulationNode:
+def serialize_node(node: DomainNode) -> EmulationNode:
     return EmulationNode(
-        id=node._node._id,
-        iid=node._node._id,
+        id=node._id,
+        iid=node._id,
         virtualization='QemuTap',  # TODO: do not hardcode
-        interfaces=[serialize_interface(interface) for interface in node._node.interfaces],
-        links=node._node.connections,
-        kind=node._node.type.value,
+        interfaces=[serialize_interface(interface) for interface in node.interfaces],
+        links=node.connections,
+        kind=node.type.value,
     )
 
 

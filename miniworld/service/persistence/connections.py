@@ -1,3 +1,4 @@
+from operator import or_
 from typing import List, Dict
 
 from miniworld.model.db.base import Connection
@@ -36,6 +37,17 @@ class ConnectionPersistenceService:
             connection = query.one()
 
             return self.to_domain(connection)
+
+    def get_by_node(self, node) -> List[DomainConnection]:
+        with singletons.db_session.session_scope() as session:
+            query = session.query(Connection)
+            query = query.filter(or_(
+                Connection.node_x_id == node._id,
+                Connection.node_y_id == node._id,
+            ))
+            connections = query.all()
+
+            return [self.to_domain(connection) for connection in connections]
 
     def all(self, **kwargs) -> List[DomainConnection]:
         with singletons.db_session.session_scope() as session:
@@ -92,8 +104,8 @@ class ConnectionPersistenceService:
             _id=connection.id,
             interface_x=interface_persistence_service.to_domain(connection.interface_x),
             interface_y=interface_persistence_service.to_domain(connection.interface_y),
-            emulation_node_x=node_persistence_service.to_domain(connection.node_x, include_connections=False),
-            emulation_node_y=node_persistence_service.to_domain(connection.node_y, include_connections=False),
+            emulation_node_x=node_persistence_service.to_domain(connection.node_x),
+            emulation_node_y=node_persistence_service.to_domain(connection.node_y),
             connected=connection.connected,
             connection_type=AbstractConnection.ConnectionType(connection.type),
             distance=connection.distance,

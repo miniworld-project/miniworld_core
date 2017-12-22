@@ -2,6 +2,7 @@ import pytest
 from sqlalchemy.orm.exc import NoResultFound
 
 from miniworld.model.domain.interface import Interface
+from miniworld.model.domain.node import Node
 from miniworld.nodes.EmulationService import EmulationService
 from miniworld.service.persistence.connections import ConnectionPersistenceService
 
@@ -25,6 +26,13 @@ class TestConnectionPersistenceService:
 
     def test_get(self, connections, service: ConnectionPersistenceService):
         assert service.get(connection_id=connections[0]._id)._id == 0
+
+    def test_get_by_node(self, connections, service: ConnectionPersistenceService):
+        connections = service.get_by_node(Node(_id=0))
+        assert len(connections) == 1
+        connection = connections[0]
+        assert connection.emulation_node_x._id == 0
+        assert connection.emulation_node_y._id == 1
 
     def test_exists(self, connections, service: ConnectionPersistenceService):
         assert service.exists(node_x_id=0, node_y_id=1)

@@ -45,7 +45,7 @@ class NodeStarter:
 
         self._logger = singletons.logger_factory.get_logger(self)
         self.node_ids = node_ids
-        self.nodes_running = []
+        self.nodes_running = []  # type: List[Node]
         self.nodes = []
 
         self.network_backend_name = network_backend_name
@@ -228,11 +228,10 @@ class NodeStarter:
 
         emulation_node = singletons.network_backend_bootstrapper.emulation_service
         emulation_node.start(args[1], node=node, flo_post_boot_script=args[2])
-        singletons.simulation_manager.nodes_id_mapping[node._id] = emulation_node
 
         with self.lock:
             # keep track of started nodes
-            self.nodes_running.append(emulation_node)
+            self.nodes_running.append(node)
 
         return node
 
@@ -247,7 +246,7 @@ class NodeStarter:
         """
         all_node_ids = set(self.node_ids)
 
-        nodes_remaining = all_node_ids.difference(set(map(lambda node: node._node._id, self.nodes_running)))
+        nodes_remaining = all_node_ids.difference(set(map(lambda node: node._id, self.nodes_running)))
         # all nodes started :)
         if not nodes_remaining:
             # remember last node id
