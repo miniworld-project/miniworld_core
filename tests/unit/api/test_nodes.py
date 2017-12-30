@@ -35,6 +35,24 @@ class TestNodes:
         ''')
         snapshot.assert_match(res)
 
+    def test_connections(self, client, mock_nodes, mock_connections, snapshot):
+        res = client.execute('''
+        {
+          connections {
+            iid
+            kind
+            impairment
+            connected
+            distance
+            emulationNodeX { iid kind }
+            interfaceX { iid }
+            emulationNodeY{ iid kind }
+            interfaceY { iid }
+          }
+        }
+            ''')
+        snapshot.assert_match(res)
+
     def test_connection_get(self, client, mock_nodes, mock_connections, snapshot):
         res = client.execute('''
         {

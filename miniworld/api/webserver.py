@@ -9,6 +9,7 @@ from graphene import ObjectType, String
 import miniworld
 from miniworld.api.impairmentmodel import ImpairmentQuery
 from miniworld.api.node import NodeQuery, NodeExecuteCommand
+from miniworld.api.connection import ConnectionQuery
 from miniworld.api.scenario import ScenarioStart, ScenarioStep, ScenarioAbort
 
 
@@ -26,7 +27,7 @@ class Mutations(graphene.ObjectType):
     node_execute_command = NodeExecuteCommand.Field()
 
 
-class Query(PingQuery, NodeQuery, ImpairmentQuery):
+class Query(PingQuery, NodeQuery, ConnectionQuery, ImpairmentQuery):
     node = graphene.relay.Node.Field()
 
 

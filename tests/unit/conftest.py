@@ -130,7 +130,7 @@ def mock_connections(mock_nodes, mock_persistence, monkeypatch) -> List[Abstract
 
     connections = {conn._id: conn for conn in connections}
     if mock_persistence:
-        monkeypatch.setattr('miniworld.service.persistence.connections.ConnectionPersistenceService.all', MagicMock(return_value=connections))
+        monkeypatch.setattr('miniworld.service.persistence.connections.ConnectionPersistenceService.all', MagicMock(return_value=connections.values()))
         monkeypatch.setattr('miniworld.service.persistence.connections.ConnectionPersistenceService.get', MagicMock(side_effect=lambda connection_id: connections.get(connection_id)))
         monkeypatch.setattr('miniworld.service.persistence.connections.ConnectionPersistenceService.get_by_node', MagicMock(side_effect=[[x] for x in connections.values()]) + [[]])
 
