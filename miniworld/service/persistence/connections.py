@@ -38,13 +38,14 @@ class ConnectionPersistenceService:
 
             return self.to_domain(connection)
 
-    def get_by_node(self, node) -> List[DomainConnection]:
+    def get_by_node(self, node, **kwargs) -> List[DomainConnection]:
         with singletons.db_session.session_scope() as session:
             query = session.query(Connection)
             query = query.filter(or_(
                 Connection.node_x_id == node._id,
                 Connection.node_y_id == node._id,
             ))
+            query = self._add_filters(query, **kwargs)
             connections = query.all()
 
             return [self.to_domain(connection) for connection in connections]
@@ -117,7 +118,18 @@ class ConnectionPersistenceService:
         )
         return res
 
-    def _add_filters(self, query, connection_id: int = None, connected: bool = None, connection_type: AbstractConnection.ConnectionType = None, step: int = None, interface_x_id: int = None, interface_y_id: int = None, node_x_id: int = None, node_y_id: int = None):
+    def _add_filters(
+            self,
+            query,
+            connection_id: int = None,
+            connected: bool = None,
+            connection_type: AbstractConnection.ConnectionType = None,
+            step: int = None,
+            interface_x_id: int = None,
+            interface_y_id: int = None,
+            node_x_id: int = None,
+            node_y_id: int = None
+    ):
         if connection_id is not None:
             query = query.filter(Connection.id == connection_id)
         if connected is not None:

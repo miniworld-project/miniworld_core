@@ -5,9 +5,7 @@ from collections import defaultdict
 from copy import deepcopy
 from io import StringIO
 from pprint import pformat
-from typing import Dict
-
-from ordered_set import OrderedSet
+from typing import Dict, List
 
 from miniworld.errors import Base, SimulationStateStartFailed
 from miniworld.impairment import ImpairmentModel
@@ -86,6 +84,7 @@ class EmulationManager(ResetableInterface):
         self._logger = singletons.logger_factory.get_logger(self)
         self._logger.info("starting ...")
         self._connection_persistence_service = ConnectionPersistenceService()
+        self._node_persistence_service = NodePersistenceService()
 
         # NOTE: init resets first for reset()
         self.reset()
@@ -126,22 +125,9 @@ class EmulationManager(ResetableInterface):
         return self.movement_director is not None or singletons.config.is_mode_distributed()
 
     def get_emulation_nodes(self):
-        """
-        Get all :py:class:`.EmulationNode` from the current simulation.
+        return EmulationNodes(self._node_persistence_service.all(connection_type=AbstractConnection.ConnectionType.user))
 
-        Returns
-        -------
-        EmulationNodes
-        """
-        return EmulationNodes(OrderedSet(self.nodes_id_mapping.values())).filter_real_emulation_nodes()
-
-    def get_emulation_node_ids(self):
-        """
-        Returns
-        -------
-        list<int>
-        """
-        # filter out virtual nodes!
+    def get_emulation_node_ids(self) -> List[int]:
         return [node._id for node in self.get_emulation_nodes()]
 
     ###############################################
@@ -310,7 +296,7 @@ class EmulationManager(ResetableInterface):
             self._logger.info("responsible for nodes: %s",
                               ','.join(map(str, singletons.scenario_config.get_local_node_ids())))
 
-            return self._start(auto_stepping=auto_stepping)
+            self._start(auto_stepping=auto_stepping)
 
         except Exception as e:
             self._logger.critical("Encountered an error while starting the simulation! You should reset the system (mwcli stop)!")
@@ -330,14 +316,6 @@ class EmulationManager(ResetableInterface):
         5. Add 0 distance to the distance matrix for the :py:class:`.HubWifi` links
         6. Create the :py:class:`.MovementDirector`
         7. Start the :py:class:`.RunLoop` if necessary and wait until the network has been setup
-
-        Parameters
-        ----------
-        node_ids : list<int>, optional (default is all node ids)
-
-        Returns
-        -------
-        list<EmulationNode>
         """
 
         # get scenario settings
@@ -382,9 +360,10 @@ class EmulationManager(ResetableInterface):
 
             # start nodes
             node_starter = NodeStarter.NodeStarter(node_ids, network_backend_name)
-            emulation_nodes, _ = node_starter.start_nodes(path_qemu_image, post_boot_script_string_io,
-                                                          interfaces=interfaces,
-                                                          )
+            emulation_nodes, _ = node_starter.start_nodes(
+                path_qemu_image, post_boot_script_string_io,
+                interfaces=interfaces,
+            )
 
             # NOTE: first the EmulationNodes then the CentralHubs need to be created
             self.central_nodes_id_mapping = self.network_backend.create_n_connect_central_nodes()
@@ -405,7 +384,6 @@ class EmulationManager(ResetableInterface):
             self.try_start_run_loop(auto_stepping)
 
         self.running = True
-        return emulation_nodes
 
     def try_start_run_loop(self, auto_stepping):
         # we need the run-loop only with a `MovementDirector`
@@ -465,22 +443,6 @@ class EmulationManager(ResetableInterface):
         """
         return (emulation_node_x, interface_x, emulation_node_y, interface_y) if CentralNode.is_central_node(
             emulation_node_x) else (emulation_node_y, interface_y, emulation_node_x, emulation_node_x)
-
-    def get_distance_matrix_diff(self, new_distance_matrix):
-        """
-        This method is not idempotent.
-
-        Parameters
-        ----------
-        new_distance_matrix
-
-        Returns
-        -------
-        DistanceMatrix
-        """
-
-        # TODO: #52: maybe numpy is faster for comparing matrices
-        # do not take the distance matrix for the CentralHub into account (doesn't change)
 
     ###############################################
     # Simulation stepping
