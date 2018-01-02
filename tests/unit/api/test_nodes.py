@@ -142,25 +142,17 @@ class TestNodes:
         monkeypatch.setattr('miniworld.service.persistence.connections.ConnectionPersistenceService.get', mock)
         res = client.execute('''
         {
-          emulationNodes {
-            iid
-            virtualization
-            links(connected: true) {
-              edges {
-                node {
-                    id
-                    iid
-                    kind
-                    impairment
-                    connected
-                    distance
-                    emulationNodeX { iid kind }
-                    emulationNodeY { iid kind }
-                    interfaceX { iid }
-                    interfaceY { iid }
-                }
-              }
-            }
+            connections(connected: true) {
+                id
+                iid
+                kind
+                impairment
+                connected
+                distance
+                emulationNodeX { iid kind }
+                emulationNodeY { iid kind }
+                interfaceX { iid }
+                interfaceY { iid }
           }
         }
         ''')

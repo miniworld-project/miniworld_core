@@ -2,7 +2,7 @@ import graphene
 from sqlalchemy.orm.exc import NoResultFound
 
 from miniworld.api import InternalIdentifier, ConnectionTypeInterface, ConnectionInterface
-from miniworld.api.node import EmulationNode, NodeConnection
+from miniworld.api.node import EmulationNode
 from miniworld.api.interface import Interface
 from miniworld.model.domain.connection import Connection as DomainConnection
 from miniworld.service.persistence import connections
@@ -45,17 +45,9 @@ class Connection(graphene.ObjectType):
         )
 
 
-class NodeConnectionQuery(graphene.ObjectType):
-    node_connections = graphene.List(NodeConnection)
-
-    def resolve_node_connections(self, info):
-        connection_persistence_service = connections.ConnectionPersistenceService()
-        return [NodeConnection.serialize_connection(connection) for connection in connection_persistence_service.all()]
-
-
 class ConnectionQuery(graphene.ObjectType):
-    connections = graphene.List(Connection)
+    connections = graphene.List(Connection, connected=graphene.Boolean(default_value=True))
 
-    def resolve_connections(self, info):
+    def resolve_connections(self, info, connected: bool = True):
         connection_persistence_service = connections.ConnectionPersistenceService()
-        return [Connection.serialize_connection(connection) for connection in connection_persistence_service.all()]
+        return [Connection.serialize_connection(connection) for connection in connection_persistence_service.all(connected=connected)]

@@ -5,49 +5,11 @@ import graphene
 from sqlalchemy.orm.exc import NoResultFound
 
 from miniworld import singletons
-from miniworld.api import InternalIdentifier, ConnectionTypeInterface, ConnectionInterface
+from miniworld.api import InternalIdentifier, ConnectionTypeInterface
 from miniworld.api.interface import Interface
-from miniworld.model.domain.connection import Connection as DomainConnection
 from miniworld.model.domain.node import Node as DomainNode
-from miniworld.service.persistence import connections
 from miniworld.service.persistence import interfaces, nodes
 from miniworld.service.persistence.nodes import NodePersistenceService
-
-
-class NodeConnection(graphene.ObjectType):
-    class Meta:
-        interfaces = (InternalIdentifier, ConnectionTypeInterface, ConnectionInterface, graphene.relay.Node)
-
-    emulation_node = graphene.Field(lambda: EmulationNode)
-    interface = graphene.Field(lambda: Interface)
-
-    @classmethod
-    def get_node(cls, info, id):
-        id = int(id)
-        connection_persistence_service = connections.ConnectionPersistenceService()
-
-        try:
-            connection = connection_persistence_service.get(connection_id=id)
-        except NoResultFound:
-            return None
-
-        return cls.serialize_connection(connection)
-
-    @classmethod
-    def serialize_connection(cls, connection: DomainConnection) -> 'NodeConnection':
-        # choose the node and interface which is not the own one
-        emulation_node = connection.emulation_node_x if connection.emulation_node_y._id == cls.emulation_node.iid else connection.emulation_node_y
-        interface = connection.interface_x if emulation_node == connection.emulation_node_x else connection.interface_y
-        return NodeConnection(
-            id=connection._id,
-            iid=connection._id,
-            connected=connection.connected,
-            emulation_node=EmulationNode.serialize(emulation_node),
-            interface=Interface.serialize(interface),
-            kind=connection.connection_type.value,
-            distance=connection.distance,
-            impairment=connection.impairment if connection.impairment is not None else {},  # TODO: REMOVE after objects come from db!
-        )
 
 
 class Distance(graphene.ObjectType):
@@ -62,10 +24,6 @@ class EmulationNode(graphene.ObjectType):
     class InterfaceConnection(graphene.relay.Connection):
         class Meta:
             node = Interface
-
-    class LinkConnection(graphene.relay.Connection):
-        class Meta:
-            node = NodeConnection
 
     class DistanceConnection(graphene.relay.Connection):
         class Meta:
@@ -83,11 +41,6 @@ class EmulationNode(graphene.ObjectType):
         description='The interfaces of the node.'
     )
 
-    links = graphene.relay.ConnectionField(
-        LinkConnection,
-        connected=graphene.Boolean(),
-        kind=graphene.String(),  # TODO: actually enum
-    )
     distances = graphene.relay.ConnectionField(
         DistanceConnection,
         between=BetweenDistances()
@@ -100,7 +53,6 @@ class EmulationNode(graphene.ObjectType):
             iid=node._id,
             virtualization='QemuTap',  # TODO: do not hardcode
             interfaces=[Interface.serialize(interface) for interface in node.interfaces],
-            links=node.connections,
             kind=node.type.value,
         )
 
@@ -108,13 +60,6 @@ class EmulationNode(graphene.ObjectType):
         # TODO: filter by type!
         interface_persistence_service = interfaces.InterfacePersistenceService()
         return [Interface.serialize(interface_persistence_service.get(interface_id=interface.iid)) for interface in self.interfaces]
-
-    def resolve_links(self, info, connected: bool = None, kind: str = None) -> List[NodeConnection]:
-        # TODO: respect connection ids!
-        connection_persistence_service = connections.ConnectionPersistenceService()
-        return [self._serialize_node_connection(connection) for connection in connection_persistence_service.get_by_node(
-            node=DomainNode(_id=self.iid), connection_type=kind, connected=connected,
-        )]
 
     def resolve_distances(self, info, between: BetweenDistances = None) -> List[Distance]:
         # TODO: use persistence service! current implementation returns the next distance matrix!

@@ -208,14 +208,7 @@ class TestAPI:
         for _ in range(2):
             res = client.execute('''
             {
-              emulationNodes {
-                id
-                iid
-                kind
-                virtualization
-                links {
-                  edges {
-                    node {
+                connections {
                     id
                     iid
                     kind
@@ -226,8 +219,6 @@ class TestAPI:
                     emulationNodeY { iid kind }
                     interfaceX { iid }
                     interfaceY { iid }
-                    }
-                  }
                 }
               }
             }
