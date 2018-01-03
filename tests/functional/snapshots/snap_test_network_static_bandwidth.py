@@ -7,208 +7,6 @@ from snapshottest import Snapshot
 
 snapshots = Snapshot()
 
-snapshots['TestAPI.test_links 1'] = {
-    'data': {
-        'emulationNodes': [
-            {
-                'id': 'RW11bGF0aW9uTm9kZTow',
-                'iid': 0,
-                'kind': 'user',
-                'links': {
-                    'edges': [
-                    ]
-                },
-                'virtualization': 'QemuTap'
-            },
-            {
-                'id': 'RW11bGF0aW9uTm9kZTox',
-                'iid': 1,
-                'kind': 'user',
-                'links': {
-                    'edges': [
-                    ]
-                },
-                'virtualization': 'QemuTap'
-            },
-            {
-                'id': 'RW11bGF0aW9uTm9kZToy',
-                'iid': 2,
-                'kind': 'user',
-                'links': {
-                    'edges': [
-                    ]
-                },
-                'virtualization': 'QemuTap'
-            },
-            {
-                'id': 'RW11bGF0aW9uTm9kZToz',
-                'iid': 3,
-                'kind': 'mgmt',
-                'links': {
-                    'edges': [
-                    ]
-                },
-                'virtualization': 'QemuTap'
-            }
-        ]
-    }
-}
-
-snapshots['TestAPI.test_links 2'] = {
-    'data': {
-        'emulationNodes': [
-            {
-                'id': 'RW11bGF0aW9uTm9kZTow',
-                'iid': 0,
-                'kind': 'user',
-                'links': {
-                    'edges': [
-                        {
-                            'node': {
-                                'connected': True,
-                                'distance': 1.0,
-                                'emulationNodeX': {
-                                    'iid': 0,
-                                    'kind': 'user'
-                                },
-                                'emulationNodeY': {
-                                    'iid': 1,
-                                    'kind': 'user'
-                                },
-                                'id': 'Q29ubmVjdGlvbjow',
-                                'iid': 0,
-                                'impairment': {
-                                    'bandwidth': 55296000,
-                                    'loss': 0
-                                },
-                                'interfaceX': {
-                                    'iid': 0
-                                },
-                                'interfaceY': {
-                                    'iid': 2
-                                },
-                                'kind': 'user'
-                            }
-                        }
-                    ]
-                },
-                'virtualization': 'QemuTap'
-            },
-            {
-                'id': 'RW11bGF0aW9uTm9kZTox',
-                'iid': 1,
-                'kind': 'user',
-                'links': {
-                    'edges': [
-                        {
-                            'node': {
-                                'connected': True,
-                                'distance': 1.0,
-                                'emulationNodeX': {
-                                    'iid': 0,
-                                    'kind': 'user'
-                                },
-                                'emulationNodeY': {
-                                    'iid': 1,
-                                    'kind': 'user'
-                                },
-                                'id': 'Q29ubmVjdGlvbjow',
-                                'iid': 0,
-                                'impairment': {
-                                    'bandwidth': 55296000,
-                                    'loss': 0
-                                },
-                                'interfaceX': {
-                                    'iid': 0
-                                },
-                                'interfaceY': {
-                                    'iid': 2
-                                },
-                                'kind': 'user'
-                            }
-                        },
-                        {
-                            'node': {
-                                'connected': True,
-                                'distance': 1.0,
-                                'emulationNodeX': {
-                                    'iid': 1,
-                                    'kind': 'user'
-                                },
-                                'emulationNodeY': {
-                                    'iid': 2,
-                                    'kind': 'user'
-                                },
-                                'id': 'Q29ubmVjdGlvbjox',
-                                'iid': 1,
-                                'impairment': {
-                                    'bandwidth': 55296000,
-                                    'loss': 0
-                                },
-                                'interfaceX': {
-                                    'iid': 2
-                                },
-                                'interfaceY': {
-                                    'iid': 4
-                                },
-                                'kind': 'user'
-                            }
-                        }
-                    ]
-                },
-                'virtualization': 'QemuTap'
-            },
-            {
-                'id': 'RW11bGF0aW9uTm9kZToy',
-                'iid': 2,
-                'kind': 'user',
-                'links': {
-                    'edges': [
-                        {
-                            'node': {
-                                'connected': True,
-                                'distance': 1.0,
-                                'emulationNodeX': {
-                                    'iid': 1,
-                                    'kind': 'user'
-                                },
-                                'emulationNodeY': {
-                                    'iid': 2,
-                                    'kind': 'user'
-                                },
-                                'id': 'Q29ubmVjdGlvbjox',
-                                'iid': 1,
-                                'impairment': {
-                                    'bandwidth': 55296000,
-                                    'loss': 0
-                                },
-                                'interfaceX': {
-                                    'iid': 2
-                                },
-                                'interfaceY': {
-                                    'iid': 4
-                                },
-                                'kind': 'user'
-                            }
-                        }
-                    ]
-                },
-                'virtualization': 'QemuTap'
-            },
-            {
-                'id': 'RW11bGF0aW9uTm9kZToz',
-                'iid': 3,
-                'kind': 'mgmt',
-                'links': {
-                    'edges': [
-                    ]
-                },
-                'virtualization': 'QemuTap'
-            }
-        ]
-    }
-}
-
 snapshots['TestAPI.test_node_get 1'] = {
     'data': {
         'node': {
@@ -429,6 +227,70 @@ snapshots['TestAPI.test_interfaces 1'] = {
                 },
                 'kind': 'mgmt',
                 'virtualization': 'QemuTap'
+            }
+        ]
+    }
+}
+
+snapshots['TestAPI.test_links 1'] = {
+    'data': {
+        'connections': [
+        ]
+    }
+}
+
+snapshots['TestAPI.test_links 2'] = {
+    'data': {
+        'connections': [
+            {
+                'connected': True,
+                'distance': 1.0,
+                'emulationNodeX': {
+                    'iid': 0,
+                    'kind': 'user'
+                },
+                'emulationNodeY': {
+                    'iid': 1,
+                    'kind': 'user'
+                },
+                'id': 'Q29ubmVjdGlvbjow',
+                'iid': 0,
+                'impairment': {
+                    'bandwidth': 55296000,
+                    'loss': 0
+                },
+                'interfaceX': {
+                    'iid': 0
+                },
+                'interfaceY': {
+                    'iid': 2
+                },
+                'kind': 'user'
+            },
+            {
+                'connected': True,
+                'distance': 1.0,
+                'emulationNodeX': {
+                    'iid': 1,
+                    'kind': 'user'
+                },
+                'emulationNodeY': {
+                    'iid': 2,
+                    'kind': 'user'
+                },
+                'id': 'Q29ubmVjdGlvbjox',
+                'iid': 1,
+                'impairment': {
+                    'bandwidth': 55296000,
+                    'loss': 0
+                },
+                'interfaceX': {
+                    'iid': 2
+                },
+                'interfaceY': {
+                    'iid': 4
+                },
+                'kind': 'user'
             }
         ]
     }

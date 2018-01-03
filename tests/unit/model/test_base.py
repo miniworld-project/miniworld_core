@@ -16,4 +16,4 @@ class TestBase:
             pass
 
         sub = Sub(foo='foo', bar='bar')
-        assert repr(sub) == "Sub(foo='foo', bar='bar')"
+        assert repr(sub) in ("Sub(foo='foo', bar='bar')", "Sub(bar='bar', foo='foo')")

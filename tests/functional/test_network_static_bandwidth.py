@@ -220,7 +220,6 @@ class TestAPI:
                     interfaceX { iid }
                     interfaceY { iid }
                 }
-              }
             }
             ''')
             snapshot.assert_match(res)
