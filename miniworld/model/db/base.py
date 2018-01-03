@@ -38,7 +38,6 @@ class Node(Base):
 
     id = Column(Integer, primary_key=True)
     interfaces = relationship('Interface', order_by='Interface.id', back_populates='node')
-    connections = relationship('Connection', primaryjoin='or_(Node.id==Connection.node_x_id, Node.id==Connection.node_y_id)')
     type = Column(Enum(AbstractConnection.ConnectionType), nullable=False, default=AbstractConnection.ConnectionType.user)
 
     @staticmethod
@@ -97,9 +96,7 @@ class Connection(Base):
     interface_y = relationship('Interface', foreign_keys=[interface_y_id])
 
     node_x_id = Column(Integer, ForeignKey('nodes.id'), nullable=False)
-    node_x = relationship('Node', foreign_keys=[node_x_id], back_populates='connections')
     node_y_id = Column(Integer, ForeignKey('nodes.id'), nullable=False)
-    node_y = relationship('Node', foreign_keys=[node_y_id], back_populates='connections')
 
     impairment = Column(MagicJSON, nullable=False, default={})
     connected = Column(Boolean, default=True, nullable=False)

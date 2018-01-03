@@ -62,6 +62,9 @@ def _create_scenarios(connection_mode):
                             "name": execution_mode,
                         }
                     },
+                    "links": {
+                        "bandwidth": 55296000
+                    },
                     "core": {
                         "topologies": [
                             [0, os.path.join(core_topologies_dir, "chain5.xml")],

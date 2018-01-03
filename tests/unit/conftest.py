@@ -121,12 +121,6 @@ def mock_connections(mock_nodes, mock_persistence, monkeypatch) -> List[Abstract
             distance=10,
         )
         connections.append(conn)
-        # TODO: is this ensured for functional tests too?
-        if node1.connections is None:
-            node1.connections = []
-        if node2.connections is None:
-            node2.connections = []
-        node1.connections.append(conn)
 
     connections = {conn._id: conn for conn in connections}
     if mock_persistence:
