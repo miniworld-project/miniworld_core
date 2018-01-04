@@ -3,7 +3,6 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from miniworld.model.domain.interface import Interface
 from miniworld.model.domain.node import Node
-from miniworld.nodes.EmulationService import EmulationService
 from miniworld.service.persistence.connections import ConnectionPersistenceService
 
 
@@ -22,7 +21,7 @@ class TestConnectionPersistenceService:
     def test_delete(self, service, connections):
         service.delete()
         with pytest.raises(NoResultFound):
-            service.get(connection_id=connections[0].id)
+            service.get(connection_id=connections[0]._id)
 
     def test_get(self, connections, service: ConnectionPersistenceService):
         assert service.get(connection_id=connections[0]._id)._id == 0
@@ -53,7 +52,7 @@ class TestConnectionPersistenceService:
     def test_all(self, connections, service: ConnectionPersistenceService):
         res = service.all()
         connection = res[0]
-        assert isinstance(connection.emulation_node_x, EmulationService)
-        assert isinstance(connection.emulation_node_y, EmulationService)
+        assert isinstance(connection.emulation_node_x, Node)
+        assert isinstance(connection.emulation_node_y, Node)
         assert isinstance(connection.interface_x, Interface)
         assert isinstance(connection.interface_y, Interface)

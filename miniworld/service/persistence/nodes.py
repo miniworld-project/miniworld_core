@@ -2,7 +2,6 @@ from multiprocessing import Lock
 from typing import List
 
 from sqlalchemy import exists
-from sqlalchemy.orm import joinedload
 
 from miniworld.model.db.base import Node, Interface
 from miniworld.model.domain.interface import Interface as DomainInterface
@@ -65,7 +64,7 @@ class NodePersistenceService:
         with singletons.db_session.session_scope() as session:
             query = session.query(Node)
             query = self._add_filters(query, **kwargs)
-            node = query.options(joinedload('connections')).one()
+            node = query.one()
             node = self.to_domain(node)
             return node
 

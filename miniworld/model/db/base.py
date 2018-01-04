@@ -96,7 +96,9 @@ class Connection(Base):
     interface_y = relationship('Interface', foreign_keys=[interface_y_id])
 
     node_x_id = Column(Integer, ForeignKey('nodes.id'), nullable=False)
+    node_x = relationship('Node', foreign_keys=[node_x_id])
     node_y_id = Column(Integer, ForeignKey('nodes.id'), nullable=False)
+    node_y = relationship('Node', foreign_keys=[node_y_id])
 
     impairment = Column(MagicJSON, nullable=False, default={})
     connected = Column(Boolean, default=True, nullable=False)

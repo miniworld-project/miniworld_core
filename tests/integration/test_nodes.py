@@ -28,7 +28,7 @@ class TestNodePersistenceService:
         emulation_node = service.get(node_id=0)
 
         # test that domain IDs got updated
-        node_0 = connections[0].emulation_node_x._node
+        node_0 = connections[0].emulation_node_x
         assert node_0._id == 0
         assert node_0.interfaces[0]._id == 0
 
@@ -42,6 +42,5 @@ class TestNodePersistenceService:
     def test_get(self, service, connections):
         emulation_node = service.get(node_id=0)
         assert emulation_node._id == 0
-        assert len(emulation_node.interfaces) == 2
+        assert len(emulation_node.interfaces) == 1
         assert emulation_node.interfaces[0]._id == 0
-        assert emulation_node.interfaces[1]._id == 1

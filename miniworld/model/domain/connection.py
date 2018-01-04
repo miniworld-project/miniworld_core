@@ -15,7 +15,7 @@ class Connection(Base):
                  impairment: Dict = None,
                  connected: bool = None,
                  step_added: int = None,
-                 distance: int = None
+                 distance: float = None
                  ):
         Base.__init__(self)
         self._id = _id
