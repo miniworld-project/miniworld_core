@@ -165,8 +165,7 @@ class EmulationService(AbstractNode):
         # set NIC state up
         for _if in node.interfaces:
             tap = singletons.network_backend.get_tap_name(node._id, _if)
-            # TODO: abstract NIC COMMANDS!
-            cmd = "ifconfig {} up".format(tap)
+            cmd = "ip link set dev {} up".format(tap)
             try:
                 singletons.shell_helper.run_shell("host shell", cmd, prefixes=[str(node._id)])
             except subprocess.CalledProcessError as e:
