@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from tests.conftest import create_runner
+from tests.acceptance.conftest import create_runner
 from tests.functional.conftest import assert_topologies_equal
 
 
@@ -40,11 +40,8 @@ def runner(tmpdir_factory, image_path, request, config_path, core_topologies_dir
                 "name": "bridged",
                 "connection_mode": "single",
                 "execution_mode": {
-                    "name": "brctl",
+                    "name": "iproute2",
                 }
-            },
-            "links": {
-                "model": "miniworld.model.network.linkqualitymodels.LinkQualityModelRange.LinkQualityModelRange"
             },
             "core": {
                 "topologies": [
@@ -71,6 +68,7 @@ def snapshot_runner(runner):
     runner.stop(hard=False)
 
 
+@pytest.mark.skip(reason='old test')
 def test_info_connections(snapshot_runner):
     # mgmt network
     connections = {'1': ['mgmt'],

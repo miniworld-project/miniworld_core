@@ -1,5 +1,5 @@
 from miniworld.errors import Base
-from miniworld.model.singletons.Singletons import singletons
+from miniworld.singletons import singletons
 
 
 class AlreadyStartedError(Base):
@@ -9,10 +9,9 @@ class AlreadyStartedError(Base):
 class AlreadyPerformedShutdownError(Base):
     pass
 
-# TODO: DOC
 
-
-class StartableObject(object):
+class StartableObject:
+    """ Provides a start and shutdown method and ensures both are called exactly once. """
 
     def __init__(self):
         self.started = False
@@ -43,14 +42,25 @@ class StartableObject(object):
     def _shutdown(self, *args, **kwargs):
         raise NotImplementedError
 
-# TODO: #54,#55: DOC
 
-
-class StartableSimulationStateObject(StartableObject):
+# TODO: REMOVE all domain objects are fetched from db
+class ScenarioState(StartableObject):
+    """ Object whose state can be cleared with the `shutdown` method at the end of a scenario. """
 
     def __init__(self):
-        super(StartableSimulationStateObject, self).__init__()
-        singletons.simulation_state_gc.add_tmp_object_with_simulation_scenario_state(self)
+        super().__init__()
+        singletons.simulation_state_gc.add_object(self)
+
+    def reset(self):
+        self.shutdown()
+
+
+class ScenarioStateReset:
+    """ Object whose state can be cleared with the `reset` method at the end of a scenario. """
+
+    def __init__(self):
+        super().__init__()
+        singletons.simulation_state_gc.add_object(self)
 
     def reset(self):
         raise NotImplementedError

@@ -1,11 +1,13 @@
 import errno
-import time
 import socket
-import selectors
+
 from miniworld.errors import Base
-from miniworld.log import get_logger
 
 __author__ = 'Nils Schmidt'
+
+
+class Timeout(Base):
+    pass
 
 
 def get_mac(postfix_as_int, prefix="aa:aa:aa:aa"):
@@ -101,148 +103,6 @@ def wait_until_uds_reachable(uds_path, return_sock=False):
     sock = ConcurrencyUtil.wait_until_fun_returns_true(lambda x: x[0] is True, uds_reachable, uds_path,
                                                        return_sock=return_sock)[1]
     return sock
-
-
-class Timeout(Base):
-    pass
-
-
-# # TODO: DOC
-# TODO: use for multiple sockets in parallel!
-
-
-class SocketExpect(object):
-    # TODO: REMOVE expected_length
-    # TODO: support timeout!
-    def __init__(self, sock, check_fun, read_buf_size=1, timeout=None, send_data=None):
-        """
-        Read from the socket `sock` until the function
-        `check_fun` return True.
-
-        Parameters
-        ----------
-        sock: socket
-        check_fun : str -> str -> bool
-            Currently received data, whole data, expected result?
-        read_buf_size : int, optional (default is 1)
-            Reads bytewise from the socket.
-        send_data: bytes
-        """
-
-        if timeout is not None and timeout < 0:
-            raise ValueError("timeout must be > 0!")
-        self.sock = sock
-        self.check_fun = check_fun
-        self.read_buf_size = read_buf_size
-
-        self.output = ""
-
-        # get the best selector for the system
-        self.selector = selectors.DefaultSelector()
-
-        self.timeout = timeout
-
-        self.send_data = send_data
-        self.logger = get_logger(self.__class__.__name__)
-
-    # TODO: DOC
-    def read(self):
-        """
-
-        Returns
-        -------
-        str
-            The read stream content.
-
-
-        Raises
-        ------
-        Timeout
-            If `timeout` is not None.
-        """
-        try:
-            self.selector.register(self.sock, selectors.EVENT_READ)
-            t_start = time.time()
-            last_check = None
-
-            while True:
-                if last_check is None:
-                    last_check = time.time()
-
-                # data available or timeout occurred ?
-                events = self.selector.select(0.5)
-                if time.time() - t_start > self.timeout:
-                    raise Timeout("Timeout (%s) occurred!" % self.timeout)
-
-                if self.send_data is not None and time.time() - last_check > 1:
-                    last_check = time.time()
-                    self.sock.send(self.send_data)
-                    self.logger.debug('sending {}'.format(self.send_data))
-                for key, mask in events:
-                    if mask == selectors.EVENT_READ:
-                        res = self.process_socket()
-                        if res:
-                            return self.output
-
-        finally:
-            self.selector.unregister(self.sock)
-
-    def process_socket(self):
-
-        try:
-            data = self.sock.recv(self.read_buf_size)
-            self.output += data.decode('utf-8')
-            res = self.check_fun(data, self.output)
-            if res:
-                return res
-        except socket.error as e:
-            # # error: [Errno 104] Connection reset by peer
-            # if e.errno == 104:
-            #     log.critical("Socket '%s' caused troubles! %s, %s.Read yet:%s", self.sock, self.sock.getpeername(), self.sock.getsockname(), self.output)
-            raise
-
-
-def wait_for_socket_result(*args, **kwargs):
-    buffered_socket_reader = SocketExpect(*args, **kwargs)
-    return buffered_socket_reader.read()
-
-
-def wait_for_boot(*args, **kwargs):
-    """
-    Raises
-    ------
-    Timeout
-    """
-    # enter shell after each select timeout
-    kwargs['send_data'] = b'\n'
-    buffered_socket_reader = SocketExpect(*args, **kwargs)
-    return buffered_socket_reader.read()
-
-
-if __name__ == '__main__':
-
-    def foo():
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect(("127.0.0.1", 2000))
-        sock.send("GET /")
-
-        sel = selectors.DefaultSelector()
-        sel.register(sock, selectors.EVENT_READ)
-
-        while True:
-            events = sel.select(None)
-            for key, mask in events:
-                # print key, mask
-                if mask == selectors.EVENT_READ:
-                    sock = key.fileobj
-                    data = sock.recv(1)
-                    print(data)
-                else:
-                    print(mask)
-
-        sel.unregister(sock)
-
-    foo()
 
 
 def read_remaining_data(sock, buf_size=4096):

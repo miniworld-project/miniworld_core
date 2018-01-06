@@ -5,7 +5,6 @@ class Objects(UserList):
     def __hash__(self):
         return hash(tuple(self))
 
-    # TODO: DOC
     def filter_type(self, _type=None, fun=None):
 
         if type is None and fun is None:

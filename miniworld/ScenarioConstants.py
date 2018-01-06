@@ -1,7 +1,7 @@
 import re
 import subprocess
 
-from miniworld.management.ShellHelper import run_sub_process_popen
+from miniworld.service.shell.shell import run_sub_process_popen
 
 
 def get_nic_models():

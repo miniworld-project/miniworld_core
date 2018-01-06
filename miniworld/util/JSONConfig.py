@@ -1,12 +1,11 @@
 """
 Utility functions and class to use json as config file format.
 """
+import collections
 import json
 import re
 from collections import UserDict
 from functools import wraps
-
-import collections
 
 from miniworld.errors import ConfigError, ConfigNotSet, ConfigMalformed, ConfigOptionNotSupported
 from miniworld.util.Nothing import nothing
@@ -153,7 +152,7 @@ class JSONConfig(UserDict):
     `JSONConfig` leverages JSON to form a config system.
     Access to the values in the config are provided by decorating functions.
     The decorators map the key(s) and therefore the structure of the config layout to the functions.
-    The names of the functions are considered to be stable. Therefore allowing abstracted access to the config.
+    The names of the functions are considered to be stable. Therefore allowing abstracted access to the singletons.config.
     Changing the config layout requires only to change the mapping (given by the decorators) to the config layout.
 
     Examples
@@ -253,7 +252,7 @@ def get_dict_nested_value(d, keys):
                 raise ConfigMalformed("The value for '%s' should be a dictionary! Not a value!" % _pretty_format(keys))
 
     if cur_dict is None:
-        raise ConfigNotSet("Cannot read values from the config. It has not been set!")
+        raise ConfigNotSet("Cannot read values from the singletons.config. It has not been set!")
 
     # travel in the dict
     for k in keys:

@@ -1,0 +1,2 @@
+class TestCentralNode:
+    pass

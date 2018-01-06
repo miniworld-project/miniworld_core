@@ -4,14 +4,7 @@ matrix:
     - os: linux
       dist: trusty
       sudo: required
-      python: '3.6'
 install:
-    - sudo apt-get update
-    - sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-ce
-    - docker-compose --version
-    - sudo rm /usr/local/bin/docker-compose
-    - sudo pip install docker-compose
-
     # build miniworld container
     - export REPO=miniworldproject/miniworld_core
     - pushd ~/build/miniworld-project/miniworld_core
@@ -27,10 +20,15 @@ script:
     - MW_CONFIG=tests/config.json BRANCH=$TRAVIS_BRANCH docker-compose up -d  # start docker environment
     - sleep 10
     - MW_CONFIG=tests/config.json BRANCH=$TRAVIS_BRANCH docker-compose logs
-    - docker-compose exec core pytest -x -v -m "not examples" tests  # actual tests
-after_script:
+    - docker-compose exec core ./scripts/test_unit.sh
+    - docker-compose exec core ./scripts/test_integration.sh
+    - docker-compose exec core ./scripts/test_functional.sh
+    - docker-compose exec core ./scripts/test_acceptance.sh -x -m "not examples"
+after_failure:
     - docker-compose logs > docker-compose.txt
+    - tail -n 500 docker-compose.txt
 after_success:
+    - docker-compose logs > docker-compose.txt
     - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
     - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH ; fi`
     # push docker image

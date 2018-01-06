@@ -1,10 +1,13 @@
+import os
+import shlex
+import subprocess
 from functools import partial
 
-import os
 import pytest
-import subprocess
-from miniworld import Scenario
-from tests.conftest import create_runner
+from typing import Dict, List, Iterable
+
+from miniworld.config import Scenario
+from tests.acceptance.conftest import create_runner
 
 
 @pytest.fixture(scope='session')
@@ -60,7 +63,7 @@ def _create_scenarios(connection_mode):
                         }
                     },
                     "links": {
-                        "model": "miniworld.model.network.linkqualitymodels.LinkQualityModelRange.LinkQualityModelRange"
+                        "bandwidth": 55296000
                     },
                     "core": {
                         "topologies": [
@@ -79,34 +82,52 @@ def _create_scenarios(connection_mode):
         yield partial(fun, connection_mode, execution_mode), '{}_{}'.format(connection_mode, execution_mode)
 
 
+@pytest.fixture
+def topologies() -> List[Dict[int, Iterable[int]]]:
+    return [
+        {0: {1}, 1: {2}, 2: {3}, 3: {4}},
+        {0: {1, 2, 3, 4}, 1: {2, 3, 4}, 2: {3, 4}, 3: {4}},
+        {0: {1, 4}, 1: {2}, 2: {3}, 3: {4}, 4: {0}},
+        {0: {1, 2, 3, 4}},
+        {0: {1, 2, 3, 4}, 1: {2, 4}, 2: {3}, 3: {4}, 4: {1}},
+    ]
+
+
 @pytest.mark.parametrize('scenario_fun',
                          **dict(zip(['argvalues', 'ids'], zip(*_create_scenarios(Scenario.CONNECTION_MODE_SINGLE)))))
 def test_network_switching_bridged_backends_single(scenario_fun, snapshot_runner, image_path, request,
-                                                   core_topologies_dir):
-    _test_network_switch_bridged_backends(core_topologies_dir, image_path, request, snapshot_runner, scenario_fun)
+                                                   core_topologies_dir, topologies):
+    def check_topology(topology: Dict[int, Iterable[int]]):
+        for x, peers in topology.items():
+            for y in peers:
+                check_connection(x, y)
 
+            for i in range(scenario['cnt_nodes']):
+                # exclude allowed connections and only ping based on upper-triangular matrix
+                if i in peers or x >= i:
+                    continue
+                # check that we can not ping other nodes
+                with pytest.raises(subprocess.CalledProcessError, message='{}->{} should not be reachable'.format(x, i)):
+                    check_connection(x, i)
 
-@pytest.mark.parametrize('scenario_fun',
-                         **dict(zip(['argvalues', 'ids'], zip(*_create_scenarios(Scenario.CONNECTION_MODE_MULTI)))))
-def test_network_switching_bridged_backends_multi(scenario_fun, snapshot_runner, image_path, request,
-                                                  core_topologies_dir):
-    _test_network_switch_bridged_backends(core_topologies_dir, image_path, request, snapshot_runner, scenario_fun)
+    def check_connection(x: int, y: int):
+        cmd = 'exec -v --node-id {x} "ping -c 1 10.0.0.{y}"'.format(x=x, y=y + 1)
+        snapshot_runner.run_mwcli_command(shlex.split(cmd))
 
-
-def _test_network_switch_bridged_backends(core_topologies_dir, image_path, request, runner, scenario_fun):
     scenario = scenario_fun(image_path, request, core_topologies_dir)
     connection_mode = scenario['network']['backend']['connection_mode']
-    if connection_mode not in runner.connection_modes:
+    if connection_mode not in snapshot_runner.connection_modes:
         force_snapshot_boot = False
-        runner.connection_modes.add(connection_mode)
+        snapshot_runner.connection_modes.add(connection_mode)
     else:
         force_snapshot_boot = True
 
     brctl_output_before = subprocess.check_call(['brctl', 'show'])
     ebtables_before = subprocess.check_call(['ebtables', '-L'])
-    runner.start_scenario(scenario, force_snapshot_boot=force_snapshot_boot)
+    snapshot_runner.start_scenario(scenario, force_snapshot_boot=force_snapshot_boot)
     for i in range(len(scenario['network']['core']['topologies'])):
-        runner.step()
+        snapshot_runner.step()
+        check_topology(topologies[i])
     brctl_output_after = subprocess.check_call(['brctl', 'show'])
     ebtables_after = subprocess.check_call(['ebtables', '-L'])
     # check cleanup done correctly

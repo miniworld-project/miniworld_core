@@ -7,7 +7,7 @@ import sys
 
 import time
 
-from tests.conftest import create_runner, strip_output
+from tests.acceptance.conftest import create_runner, strip_output
 
 
 @pytest.fixture(scope='session')
@@ -35,11 +35,13 @@ def snapshot_runner(runner):
     runner.stop(hard=False)
 
 
+@pytest.mark.skip(reason='old test')
 def test_ping(snapshot_runner):
     res = snapshot_runner.run_mwcli_command(['ping']).decode()
     assert strip_output(res) == 'pong'
 
 
+@pytest.mark.skip(reason='old test')
 def test_info_scenario(snapshot_runner):
     res = snapshot_runner.run_mwcli_command(['info', 'scenario']).decode()
     with open(snapshot_runner.scenario, 'r') as f:

@@ -1,8 +1,8 @@
 import contextlib
-from time import sleep
-
 import multiprocessing
 from concurrent import futures
+from time import sleep
+from miniworld.singletons import singletons
 
 __author__ = 'Nils Schmidt'
 
@@ -37,16 +37,14 @@ def wait_until_fun_returns_true(check_fun, fun, *args, **kwargs):
 
 @contextlib.contextmanager
 def network_provision_parallel():
-    from miniworld.Scenario import scenario_config
-    cnt_minions = scenario_config.get_network_backend_cnt_minions()
+    cnt_minions = singletons.scenario_config.get_network_backend_cnt_minions()
     with tpe(cnt_minions) as executor:
         yield executor
 
 
 @contextlib.contextmanager
 def node_start_parallel():
-    from miniworld.Scenario import scenario_config
-    parallel = scenario_config.is_parallel_node_starting()
+    parallel = singletons.scenario_config.is_parallel_node_starting()
     cnt_minions = cpu_count() if parallel else 1
     with tpe(cnt_minions) as executor:
         yield executor
@@ -55,7 +53,7 @@ def node_start_parallel():
 # @contextlib.contextmanager
 # def network_backend_parallel():
 #     from miniworld.Scenario import scenario_config
-#     cnt_minions = scenario_config.get_network_backend_cnt_minions()
+#     cnt_minions = singletons.scenario_config.get_network_backend_cnt_minions()
 #     with tpe(cnt_minions) as executor:
 #         yield executor
 

@@ -2,28 +2,25 @@
 
 import argparse
 import json
+import logging
 import os
-import selectors
-import shlex
-import socket
 import sys
-import xmlrpc.client
-import subprocess
 
-from miniworld import Constants, Config
-from miniworld.Config import config
-from miniworld.log import log
-from miniworld.model.emulation.Qemu import Qemu
-from miniworld.rpc import RPCUtil
-from miniworld.util import CliUtil, PathUtil
+from graphqlclient import GraphQLClient
+from typing import Dict
+
+from miniworld import Constants
+from miniworld.util import CliUtil
 from miniworld.util.CliUtil import rpc_parser
+
+logging.basicConfig()
+log = logging.getLogger()
+
 
 class Action:
     '''
     Models an action that is associated with a argparse parser.
     The class behaves like a function, but provides custom initialization.
-
-    We use that to provide the rpc connection in any function and to check for errors in the simulation loop.
 
     Attributes
     ----------
@@ -32,54 +29,29 @@ class Action:
         The RPC connection address string.
     '''
 
-    def __init__(self):
-        self.connection = None
+    def __init__(self, fun):
+        self.fun = fun
 
-    @staticmethod
-    def get_connection(addr):
-        return xmlrpc.client.ServerProxy(addr, allow_none=True)
+    def __call__(self, *args, **kwargs):
+        # TODO: adopt get_connection logic from mwcli.rpc
+        self.client = GraphQLClient('http://127.0.0.1:5000/graphql')
+        client_execute = self.client.execute
 
-    def get_connection_server(self, node_id=None, server_id=None, is_distributed:bool=None):
+        def execute_graphql(query, *args, **kwargs) -> Dict:
+            """ Monkey-patch execute method of GraphQLClient. """
+            print('executing graphql: {}, variables: {}'.format(query, kwargs.get('variables')), file=sys.stderr)
+            res_json = client_execute(query, *args, **kwargs)
+            res = json.loads(res_json)
+            if res.get('errors') is not None:
+                print('graphql errors: {}'.format(res['errors']), file=sys.stderr)
+                sys.exit(1)
+            print(res_json, file=sys.stderr)
+            return res
 
-        if is_distributed:
+        self.client.execute = execute_graphql
 
-            # ask local rpc for ip of the server which holds the node
-
-            if server_id is None and node_id is not None:
-                server_id = self.connection.get_server_for_node(node_id)
-            else:
-                server_id = server_id
-
-            print("using server: %s" % server_id, file=sys.stderr)
-            addr = json.loads(self.connection.get_distributed_address_mapping())[str(server_id)]
-            addr = RPCUtil.addr_from_ip(addr, RPCUtil.PORT_CLIENT)
-            log.info("switching to rpc server '%s'", addr)
-            # drop local connection and use remote server
-            connection = self.get_connection(addr)
-
-            # check for errors first
-            connection.simulation_encountered_exception()
-
-            return connection
-
-        # use local connection
-        return self.connection
-
-    def __call__(self, args, **kwargs):
-        self.addr = RPCUtil.addr_from_ip(args.addr, RPCUtil.PORT_COORDINATOR)
-        log.info("connecting to rpc server '%s'", self.addr)
-        self.connection = self.get_connection(self.addr)
-        if not args.no_check:
-            # check for errors first
-            self.connection.simulation_encountered_exception()
-
-        # only switch to the rpc server which holds the node
-        if hasattr(args, "node_id") and args.node_id is not None:
-            self.connection = self.get_connection_server(node_id=args.node_id, is_distributed=args.distributed)
-
-    def __new__(cls, *args, **kwargs):
-        cls._instance = super(Action, cls).__new__(cls)
-        return cls._instance(*args, **kwargs)
+        # supply ActionSubClass to the method
+        return self.fun(self, *args, **kwargs)
 
 
 def new_action_decorator(fun):
@@ -96,14 +68,7 @@ def new_action_decorator(fun):
     ActionSubClass
     '''
 
-    class ActionSubClass(Action):
-        def __call__(self, *args, **kwargs):
-            super(ActionSubClass, self).__call__(*args, **kwargs)
-
-            # supply ActionSubClass to the method
-            return fun(self, *args, **kwargs)
-
-    return ActionSubClass
+    return Action(fun)
 
 
 #################################################
@@ -158,7 +123,12 @@ def action_info_scenario(self, args):
 
 @new_action_decorator
 def action_ping(self, args):
-    print(self.connection.ping())
+    res = self.client.execute('''
+    query {
+        ping
+    } 
+    ''')
+    print(res)
 
 
 #################################################
@@ -174,49 +144,57 @@ def action_logs_boot(self, args):
 def action_start(self, args):
     scenario_config, _, scenario_config_json = CliUtil.parse_scenario_config(args.scenario_config, args.custom_scenario)
 
-    if args.progress:
-        return CliUtil.start_scenario(scenario_config_json, args.auto_stepping, False, args.force_snapshot_boot)
-
-    return self.connection.simulation_start(scenario_config_json, args.auto_stepping, True, args.force_snapshot_boot)
+    query = '''
+mutation MyMutations($scenario_config: String) {
+    scenarioStart(scenarioConfig: $scenario_config) {
+        scenarioConfig
+    }
+}
+ '''
+    self.client.execute(query, variables={'scenario_config': scenario_config_json})
 
 
 @new_action_decorator
 def action_stop(self, args):
-    self.connection.simulation_abort()
+    query = '''
+mutation MyMutations {
+    scenarioAbort {status}
+}
+    '''
+    self.client.execute(query)
 
 
 @new_action_decorator
 def action_step(self, args):
-    return self.connection.simulation_step(args.steps)
+    query = '''
+mutation {
+ scenarioStep(steps:1) {
+    steps
+ }
+}
+'''
+    self.client.execute(query)
 
 
 @new_action_decorator
-def action_exec(self, args, single=True):
-    # TODO: we need to print deserialized json here due to the rpc server hack
-    if not hasattr(args, "node_id"):
-        node_id = None
-    else:
-        node_id = args.node_id
-
-    cmd = args.cmd
-
-    if not args.distributed:
-        print(json.loads(self.connection.exec_node_cmd(cmd, node_id, args.validate, args.timeout)))
-    else:
-        if node_id is not None:
-            # only switch to the rpc server which holds the node
-            self.connection = self.get_connection_server(node_id=node_id, is_distributed=args.distributed)
-            print(json.loads(self.connection.exec_node_cmd(cmd, node_id, args.validate, args.timeout)))
-        else:
-            for server_id in json.loads(self.connection.get_distributed_address_mapping()):
-
-                # only switch to the rpc server which holds the node
-                print("\nServer %s >>>" % server_id)
-                self.connection = self.get_connection_server(server_id=server_id, is_distributed=args.distributed)
-                result = json.loads(self.connection.exec_node_cmd(cmd, node_id, args.validate, args.timeout))
-                for _node_id, output in result.items():
-                    print("\nNode %s >>>" % _node_id)
-                    print(output)
+def action_exec(self, args):
+    query = '''
+mutation ($node_id: Int, $cmd: String, $validate: Boolean, $timeout: Float){
+   nodeExecuteCommand(id: $node_id, cmd: $cmd, validate: $validate, timeout: $timeout) {
+       result
+   }
+}
+'''
+    variables = {
+        'node_id': args.node_id,
+        'cmd': args.cmd,
+    }
+    if args.timeout is not None:
+        variables['timeout'] = args.timeout
+    if args.validate is not None:
+        variables['validate'] = args.validate
+    res = self.client.execute(query, variables)
+    print(res['data']['nodeExecuteCommand']['result'])
 
 
 def action_shell(args):

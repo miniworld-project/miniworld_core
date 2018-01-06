@@ -1,4 +1,3 @@
-
 from codecs import open
 from os import path
 
@@ -26,11 +25,11 @@ setup(
     extras_require={
         'server': ['ordered-set', 'argparse', 'ipaddress', 'colorlog', 'geojson', 'futures',
                    'netifaces', 'networkx', 'blessings', 'py-dictdiffer', 'pyroute2', 'psutil', 'LatLon23',
-                   'requests', 'msgpack-python', 'zmq', 'injector'],
-        'develop': ['pytest', 'sphinx', 'pep8', 'flake8'],
+                   'requests', 'msgpack-python', 'zmq', 'graphene', 'flask', 'flask-graphql', 'graphqlclient', 'sqlalchemy'],
+        'develop': ['pytest', 'sphinx', 'pep8', 'flake8', 'snapshottest'],
     },
     scripts=['mwcli'],
     entry_points={
-        'console_scripts': ['mwserver=miniworld.rpc.RPCServer:main'],
+        'console_scripts': ['mwserver=miniworld.api.webserver:main'],
     }
 )
